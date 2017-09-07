@@ -7,44 +7,70 @@
 
 #include "library.hpp"
 
-
-class pdfDocument: public Napi::ObjectWrap<pdfDocument> {
+class pdfDocument : public Napi::ObjectWrap<pdfDocument> {
 public:
-	explicit pdfDocument( const CallbackInfo &callbackInfo ); //constructor
-	static void Initialize(Env& env, Object& target) {
-		Function constructor = DefineClass(env, "pdfDocument", {
-				InstanceAccessor("page", &GetPage, &SetPage),
-				InstanceMethod("load", &Load)
-		}, nullptr );
-		target.Set("pdfDocument", constructor);
-	}
-	Value Load(const CallbackInfo&);
-	Value GetPageCount(const CallbackInfo&);
-	Value GetPage(const CallbackInfo&);
-	void Write(const CallbackInfo&);
-	void SetPage(const CallbackInfo&, const Value&);
+  explicit pdfDocument(const CallbackInfo &callbackInfo); // constructor
+  ~pdfDocument();
+  string originPdf;
+  static Napi::FunctionReference constructor;
+
+  static void Initialize(Napi::Env &env, Napi::Object &target) {
+    Napi::HandleScope scope(env);
+    Function ctor =
+        DefineClass(env, "pdfDocument",
+                    {InstanceMethod("load", &pdfDocument::Load),
+                     InstanceMethod("getPageCount", &pdfDocument::GetPageCount),
+                     InstanceMethod("getPage", &pdfDocument::GetPage),
+                     InstanceMethod("setPassword", &pdfDocument::SetPassword),
+                     InstanceMethod("getVersion", &pdfDocument::GetVersion),
+                     InstanceMethod("isLinearized", &pdfDocument::IsLinearized),
+                     InstanceMethod("write", &pdfDocument::Write)});
+
+    constructor = Napi::Persistent(ctor);
+    constructor.SuppressDestruct();
+
+    target.Set("pdfDocument", ctor);
+  }
+
+  Napi::Value Load(const CallbackInfo &);
+
+  Napi::Value GetPageCount(const CallbackInfo &);
+
+  Napi::Value GetPage(const CallbackInfo &);
+
+  void SetPassword(const CallbackInfo &);
+
+  Napi::Value GetVersion(const CallbackInfo &);
+
+  Napi::Value IsLinearized(const CallbackInfo &);
+
+  void Write(const CallbackInfo &);
+
+  inline PoDoFo::PdfMemDocument *document() { return _document; }
+
+private:
+  PoDoFo::PdfMemDocument *_document;
 };
 
 /*class PdfMemDocument {
 public:
-	void Init(napi_env env, napi_value exports);
-	static void Destructor( napi_env env, void *obj, void *finalize );
+        void Init(napi_env env, napi_value exports);
+        static void Destructor( napi_env env, void *obj, void *finalize );
 
 private:
-	explicit PdfMemDocument(const string &file);
-	~PdfMemDocument( );
+        explicit PdfMemDocument(const string &file);
+        ~PdfMemDocument( );
 
-	static napi_value New(napi_env, napi_callback_info);
-	static napi_value Load(napi_env, napi_callback_info);
-	static napi_value GetPageCount(napi_env, napi_callback_info);
-	static napi_value GetPage(napi_env, napi_callback_info);
-	static napi_value Write(napi_env, napi_callback_info);
+        static napi_value New(napi_env, napi_callback_info);
+        static napi_value Load(napi_env, napi_callback_info);
+        static napi_value GetPageCount(napi_env, napi_callback_info);
+        static napi_value GetPage(napi_env, napi_callback_info);
+        static napi_value Write(napi_env, napi_callback_info);
 
-	static napi_ref constructor;
-	string original;
-	napi_env env_;
-	napi_ref wrapper_;
+        static napi_ref constructor;
+        string original;
+        napi_env env_;
+        napi_ref wrapper_;
 };*/
 
-
-#endif //NPDF_PDFMEMDOCUMENT_H
+#endif // NPDF_PDFMEMDOCUMENT_H

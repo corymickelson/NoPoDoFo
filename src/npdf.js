@@ -1,2 +1,4 @@
 const mod = require('bindings')('npdf');
-console.log(JSON.stringify(mod.hello()));
+const npdf = new mod;
+npdf.load("/home/skyslope/tes.out.pdf")
+console.log(npdf.getVersion())
