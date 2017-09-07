@@ -1,4 +1,3 @@
-const mod = require('bindings')('npdf');
-const npdf = new mod;
-npdf.load("/home/skyslope/tes.out.pdf")
-console.log(npdf.getVersion())
+const mod = require('../build/Release/npdf.node')
+const npdf = mod.npdf
+console.log(npdf.test())
