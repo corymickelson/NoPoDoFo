@@ -5,8 +5,7 @@
 #ifndef NPDF_NPDF_H
 #define NPDF_NPDF_H
 
-#include <napi.h>
-#include <podofo/podofo.h>
+#include "library.hpp"
 
 using namespace std;
 using namespace PoDoFo;

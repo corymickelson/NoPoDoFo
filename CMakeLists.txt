@@ -3,9 +3,11 @@ project(npdf)
 
 set(CMAKE_CXX_STANDARD 17)
 
-file(GLOB SOURCE_FILES
-        src/*.h
-        src/*.cc)
+set(SOURCE_FILES
+        src/npdf.cc
+        src/npdf.h
+        src/pdfDocument.cc
+        src/pdfDocument.h test/catch.hpp src/library.hpp)
 
 add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES})
 
