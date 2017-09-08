@@ -16,7 +16,7 @@ Napi::Value
 Document::Load(const CallbackInfo& info)
 {
   string filePath = info[0].As<String>().Utf8Value();
-  if (! filesystem::exists( filePath)) {
+  if (!filesystem::exists(filePath)) {
     stringstream ss;
     ss << "File: " << filePath << " not found. Try using absolute path instead "
        << endl;
@@ -37,15 +37,15 @@ Document::GetPageCount(const CallbackInfo& info)
 Napi::Value
 Document::GetPage(const CallbackInfo& info)
 {
-  if (info.Length() != 1 || ! info[0].IsNumber()) {
+  if (info.Length() != 1 || !info[0].IsNumber()) {
     throw Napi::Error::New(info.Env(),
                            "getPage takes an argument of 1, of type number.");
   }
   int n = info[0].As<Number>();
   PoDoFo::PdfPage* page = _document->GetPage(n);
   auto exp = Napi::External<PoDoFo::PdfPage>::New(info.Env(), page);
-  auto instance = Page::constructor({exp});
-	return instance;
+  auto instance = Page::constructor.New({ exp });
+  return instance;
 }
 
 Napi::Value

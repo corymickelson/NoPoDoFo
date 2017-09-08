@@ -23,22 +23,19 @@ public:
     Napi::Function ctor =
       DefineClass(env,
                   "PdfPage",
-                  {}
-//                  { InstanceMethod("getRotation", &Page::GetRotation),
-//                    InstanceMethod("getNumFields", &Page::GetNumFields),
-//                    InstanceMethod("getField", &Page::GetField),
-//                    InstanceMethod("setRotation", &Page::SetRotation) },
-                  );
+                  { InstanceMethod("getRotation", &Page::GetRotation),
+                    InstanceMethod("getNumFields", &Page::GetNumFields),
+                    InstanceMethod("getField", &Page::GetField),
+                    InstanceMethod("setRotation", &Page::SetRotation) });
     constructor = Napi::Persistent(ctor);
     constructor.SuppressDestruct();
     target.Set("Page", constructor);
   }
-//  Napi::Value GetRotation(const CallbackInfo&);
-//  Napi::Value GetNumFields(const CallbackInfo&);
-//  Napi::Value GetField(const CallbackInfo&);
-//  void SetRotation(const CallbackInfo&);
-//  inline PoDoFo::PdfPage* page() { return _page; }
-//	void SetPage(PoDoFo::PdfPage* p) {_page = p;}
+  Napi::Value GetRotation(const CallbackInfo&);
+  Napi::Value GetNumFields(const CallbackInfo&);
+  Napi::Value GetField(const CallbackInfo&);
+  void SetRotation(const CallbackInfo&);
+  inline PoDoFo::PdfPage* page() { return _page; }
 
 private:
   PoDoFo::PdfPage* _page;
