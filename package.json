@@ -13,5 +13,8 @@
     "bindings": "^1.3.0",
     "cmake-js": "^3.5.0",
     "node-addon-api": "^0.6.3"
+  },
+  "dependencies": {
+    "boost-lib": "^0.11.3"
   }
 }

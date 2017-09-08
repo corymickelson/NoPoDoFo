@@ -9,22 +9,39 @@
 #include <podofo/podofo.h>
 
 using namespace Napi;
-using namespace PoDoFo;
 using namespace std;
 
-class pdfPage : public ObjectWrap<pdfPage> {
+class Page : public Napi::ObjectWrap<Page>
+{
 public:
-	explicit pdfPage( const CallbackInfo &callbackInfo );
-
-	~pdfPage( ) { }
-
-	static void Initialize( Env &env, Object &target ) { }
-
-	inline PdfPage *page( ) { return _page; }
+  explicit Page(const CallbackInfo& callbackInfo);
+  ~Page() { delete _page; }
+  static Napi::FunctionReference constructor;
+  static void Initialize(Napi::Env& env, Napi::Object& target)
+  {
+    Napi::HandleScope scope(env);
+    Napi::Function ctor =
+      DefineClass(env,
+                  "PdfPage",
+                  {}
+//                  { InstanceMethod("getRotation", &Page::GetRotation),
+//                    InstanceMethod("getNumFields", &Page::GetNumFields),
+//                    InstanceMethod("getField", &Page::GetField),
+//                    InstanceMethod("setRotation", &Page::SetRotation) },
+                  );
+    constructor = Napi::Persistent(ctor);
+    constructor.SuppressDestruct();
+    target.Set("Page", constructor);
+  }
+//  Napi::Value GetRotation(const CallbackInfo&);
+//  Napi::Value GetNumFields(const CallbackInfo&);
+//  Napi::Value GetField(const CallbackInfo&);
+//  void SetRotation(const CallbackInfo&);
+//  inline PoDoFo::PdfPage* page() { return _page; }
+//	void SetPage(PoDoFo::PdfPage* p) {_page = p;}
 
 private:
-	PdfPage *_page;
+  PoDoFo::PdfPage* _page;
 };
 
-
-#endif //NPDF_PDFPAGE_HPP
+#endif // NPDF_PDFPAGE_HPP
