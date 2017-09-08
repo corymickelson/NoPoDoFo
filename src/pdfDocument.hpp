@@ -36,10 +36,6 @@ public:
     target.Set("pdfDocument", ctor);
   }
 
-  Napi::Value Test(const CallbackInfo &info) {
-    return Napi::Boolean::New(info.Env(), true);
-  }
-
   Napi::Value Load(const CallbackInfo &);
 
   Napi::Value GetPageCount(const CallbackInfo &);
@@ -52,7 +48,7 @@ public:
 
   Napi::Value IsLinearized(const CallbackInfo &);
 
-  void Write(const CallbackInfo &);
+  Napi::Value Write(const CallbackInfo &);
 
   inline PoDoFo::PdfMemDocument *document() { return _document; }
 

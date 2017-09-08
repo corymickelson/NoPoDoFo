@@ -1,4 +1,4 @@
-#include "pdfDocument.h"
+#include "pdfDocument.hpp"
 
 void init(Napi::Env env, Napi::Object exports, Napi::Object module) {
   pdfDocument::Initialize(env, exports);

@@ -7,11 +7,11 @@ set(SOURCE_FILES
 #        src/npdf.cc
 #        src/npdf.h
         src/pdfDocument.cc
-        src/pdfDocument.h
+        src/pdfDocument.hpp
         src/addon.cc
         test/catch.hpp
 #        src/library.hpp
-        )
+        src/pdfPage.cc src/pdfPage.hpp)
 
 add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES})
 
@@ -19,7 +19,8 @@ set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "" SUFFIX ".node")
 
 target_include_directories(${PROJECT_NAME}
         PRIVATE ${CMAKE_JS_INC}
-        PRIVATE $ENV{HOME}/.nvm/versions/node/v$ENV{NODE_VERSION}/include/node
+        #PRIVATE $ENV{HOME}/.nvm/versions/node/v$ENV{NODE_VERSION}/include/node
+        PRIVATE $ENV{HOME}/.nvm/versions/node/v8.4.0/include/node
         PRIVATE ${CMAKE_SOURCE_DIR}/node_modules/node-addon-api)
 
 target_link_libraries(${PROJECT_NAME}
