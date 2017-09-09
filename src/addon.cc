@@ -1,5 +1,4 @@
 #include "pdfDocument.hpp"
-#include "pdfPage.hpp"
 
 void
 init(Napi::Env env, Napi::Object exports, Napi::Object module)

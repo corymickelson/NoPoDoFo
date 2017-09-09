@@ -6,6 +6,7 @@ CMakeScripts
 Testing
 Makefile
 cmake_install.cmake
+CMakeLists.txt.user
 install_manifest.txt
 compile_commands.json
 CTestTestfile.cmake
