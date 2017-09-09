@@ -19,4 +19,16 @@ declare namespace npdf {
     }
 
     class Field {}
+    class Rectangle {
+    	constructor()
+	fromArray(dimensions:Array<number>)
+	getBottom(): number
+	setBottom(value:number)
+	getLeft(): number
+	setLeft(value:number)
+	getWidth(): number
+	setWidth(value:number)
+	getHeight(): number
+	setHeight(value:number)
+    }
 }

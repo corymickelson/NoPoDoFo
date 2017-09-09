@@ -5,6 +5,7 @@
 #ifndef NPDF_PDFPAGE_HPP
 #define NPDF_PDFPAGE_HPP
 
+#include "pdfRect.hpp"
 #include <napi.h>
 #include <podofo/podofo.h>
 
@@ -26,6 +27,7 @@ public:
                   { InstanceMethod("getRotation", &Page::GetRotation),
                     InstanceMethod("getNumFields", &Page::GetNumFields),
                     InstanceMethod("getField", &Page::GetField),
+                    InstanceMethod("getPageSize", &Page::GetPageSize),
                     InstanceMethod("setRotation", &Page::SetRotation) });
     constructor = Napi::Persistent(ctor);
     constructor.SuppressDestruct();
@@ -34,6 +36,7 @@ public:
   Napi::Value GetRotation(const CallbackInfo&);
   Napi::Value GetNumFields(const CallbackInfo&);
   Napi::Value GetField(const CallbackInfo&);
+  Napi::Value GetPageSize(const CallbackInfo&);
   void SetRotation(const CallbackInfo&);
   inline PoDoFo::PdfPage* page() { return _page; }
 

@@ -10,6 +10,7 @@
 #include <podofo/podofo.h>
 
 #include "pdfPage.hpp"
+#include "pdfRect.hpp"
 
 using namespace boost;
 using namespace Napi;
@@ -19,9 +20,13 @@ class Document : public Napi::ObjectWrap<Document>
 {
 public:
   explicit Document(const CallbackInfo& callbackInfo); // constructor
-  ~Document() { delete _document; }
+  ~Document()
+  {
+    free(_buffer);
+    delete _document;
+  }
   string originPdf;
-    static Napi::FunctionReference constructor;
+  static Napi::FunctionReference constructor;
 
   static void Initialize(Napi::Env& env, Napi::Object& target)
   {
@@ -37,8 +42,8 @@ public:
                     InstanceMethod("isLinearized", &Document::IsLinearized),
                     InstanceMethod("write", &Document::Write) });
 
-        constructor = Napi::Persistent(ctor);
-        constructor.SuppressDestruct();
+    constructor = Napi::Persistent(ctor);
+    constructor.SuppressDestruct();
     target.Set("Document", ctor);
   }
 
@@ -49,10 +54,10 @@ public:
   Napi::Value GetVersion(const CallbackInfo&);
   Napi::Value IsLinearized(const CallbackInfo&);
   Napi::Value Write(const CallbackInfo&);
-  inline PoDoFo::PdfMemDocument* document() { return _document; }
 
 private:
   PoDoFo::PdfMemDocument* _document;
+  void* _buffer;
 };
 
 #endif // NPDF_PDFMEMDOCUMENT_H

@@ -24,7 +24,7 @@ Document::Load(const CallbackInfo& info)
   }
   originPdf = filePath;
   _document->Load(filePath.c_str());
-  return Napi::Number::New(info.Env(), _document->GetPageCount());
+  return Value();
 }
 
 Napi::Value
@@ -55,11 +55,10 @@ Document::Write(const CallbackInfo& info)
     string destinationFile = info[0].As<String>().Utf8Value();
     PoDoFo::PdfOutputDevice device(destinationFile.c_str());
     _document->Write(&device);
-    return Value();
+    return Napi::String::New(info.Env(), destinationFile);
   } else if (info.Length() == 0) {
-    size_t fake = 0;
-    return Napi::Uint8Array::New(
-      info.Env(), fake, napi_typedarray_type::napi_uint8_array);
+    throw Napi::Error::New(info.Env(),
+                           "Writing to node buffer not currently supported :(");
   } else {
     throw Napi::Error::New(
       info.Env(),

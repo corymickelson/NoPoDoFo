@@ -6,7 +6,7 @@ set(CMAKE_CXX_FLAGS -fPIC)
 
 file(GLOB SOURCE_FILES
     "src/*.hpp"
-    "src/*.cc")
+    "src/*.cc" )
 
 add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES})
 
@@ -25,4 +25,3 @@ target_link_libraries(${PROJECT_NAME}
         PUBLIC Boost::filesystem
         podofo)
 
-#add_executable(npdf ${SOURCE_FILES})

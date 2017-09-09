@@ -46,3 +46,12 @@ Page::SetRotation(const CallbackInfo& info)
   int rotate = info[0].As<Number>();
   _page->SetRotation(rotate);
 }
+
+Napi::Value
+Page::GetPageSize(const CallbackInfo& info)
+{
+  PoDoFo::PdfRect rect = _page->GetPageSize();
+  auto ptr = Napi::External<PoDoFo::PdfRect>::New(info.Env(), &rect);
+  auto instance = Rectangle::constructor.New({ ptr });
+  return instance;
+}
