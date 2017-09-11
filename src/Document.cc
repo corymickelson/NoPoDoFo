@@ -2,9 +2,10 @@
 // Created by red on 9/6/17.
 //
 
-#include "pdfDocument.hpp"
+#include "Document.h"
+#include "closure.h"
 
-Napi::FunctionReference Document::constructor;
+//Napi::FunctionReference Document::constructor;
 
 Document::Document(const CallbackInfo& callbackInfo)
   : ObjectWrap(callbackInfo)
@@ -23,8 +24,38 @@ Document::Load(const CallbackInfo& info)
     throw Napi::Error::New(info.Env(), ss.str());
   }
   originPdf = filePath;
+
+  // async, if callback function provided
+  /*if(info[1].IsFunction()) {
+    bool status;
+    auto *closure = static_cast<closure_t*>(malloc(sizeof(closure_t*)));
+    status = InitClosure(closure, this);
+    if(!status) {
+      DestroyClosure(closure);
+      free(closure);
+      throw Napi::Error::New(info.Env(), "Failed to create closure. What did you do?");
+    }
+    this->Ref();
+    closure->ptr = new Napi::FunctionReference();
+    closure->ptr->Reset(info[1].As<Napi::Function>(),1);
+    auto *req = new uv_work_t;
+    req->data = closure;
+    uv_queue_work(uv_default_loop(), req, LoadAsync,)
+  }*/
   _document->Load(filePath.c_str());
   return Value();
+}
+
+static void
+LoadAsync(const string &file, PoDoFo::PdfMemDocument *document, closure_t *closure)
+{
+  document->Load(file.c_str());
+}
+
+static void
+LoadAsyncAfter()
+{
+
 }
 
 Napi::Value

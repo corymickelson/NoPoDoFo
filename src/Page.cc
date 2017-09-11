@@ -2,7 +2,8 @@
 // Created by red on 9/7/17.
 //
 
-#include "pdfPage.hpp"
+#include "Page.h"
+#include "Field.h"
 
 Napi::FunctionReference Page::constructor;
 
@@ -34,7 +35,11 @@ Page::GetField(const CallbackInfo& info)
       info.Env(), "SetRotation takes a single argument of type number.");
   }
   int n = info[0].As<Number>();
-  PoDoFo::PdfField field = _page->GetField(n);
+  PdfField field = _page->GetField(n);
+  PdfField *ptr = &field;
+  auto fieldPtr = Napi::External<PoDoFo::PdfField>::New(info.Env(), ptr);
+  auto instance = Field::constructor.New({fieldPtr});
+  return instance;
 }
 void
 Page::SetRotation(const CallbackInfo& info)
