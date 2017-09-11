@@ -1,13 +1,12 @@
 {
   "name": "npdf",
-  "version": "1.0.0",
-  "description": "",
+  "version": "0.0.0",
+  "description": "Node.js native module bindings for PoDoFo",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "postinstall": "cmake-js compile"
   },
-  "author": "",
+  "author": "Cory Mickelson<mickelsoncory@gmail.com>",
   "license": "ISC",
   "devDependencies": {
     "@types/node": "^8.0.27",
