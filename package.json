@@ -1,12 +1,21 @@
 {
   "name": "npdf",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Node.js native module bindings for PoDoFo",
   "main": "index.js",
+  "types": "index.d.ts",
+  "repository": "git+https://github.com/corymickelson/npdf.git",
   "scripts": {
     "postinstall": "cmake-js compile"
   },
-  "author": "Cory Mickelson<mickelsoncory@gmail.com>",
+  "keywords": [
+    "pdf"
+  ],
+  "author": "Cory Mickelson <mickelsoncory@gmail.com> (http://corymickelson.github.io/)",
+  "homepage": "https://github.com/corymickelson/npdf#readme",
+  "bugs": {
+    "url": "https://github.com/corymickelson/npdf/issues"
+  },
   "license": "ISC",
   "devDependencies": {
     "@types/node": "^8.0.27",
@@ -18,3 +27,4 @@
     "boost-lib": "^0.11.3"
   }
 }
+
