@@ -10,7 +10,6 @@
 #include <podofo/podofo.h>
 
 #include "pdfPage.hpp"
-#include "pdfRect.hpp"
 
 using namespace boost;
 using namespace Napi;

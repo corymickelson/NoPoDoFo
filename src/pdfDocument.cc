@@ -43,8 +43,10 @@ Document::GetPage(const CallbackInfo& info)
   }
   int n = info[0].As<Number>();
   PoDoFo::PdfPage* page = _document->GetPage(n);
-  auto exp = Napi::External<PoDoFo::PdfPage>::New(info.Env(), page);
-  auto instance = Page::constructor.New({ exp });
+  auto pagePtr = Napi::External<PoDoFo::PdfPage>::New(info.Env(), page);
+  auto docPtr =
+    Napi::External<PoDoFo::PdfMemDocument>::New(info.Env(), _document);
+  auto instance = Page::constructor.New({ pagePtr, docPtr });
   return instance;
 }
 

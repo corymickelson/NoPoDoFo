@@ -8,7 +8,6 @@ declare namespace npdf {
         isLinearized():boolean
         setPassword(password:string)
         write(file:string)
-        write(): Buffer
     }
     class Page {
         constructor()
@@ -16,12 +15,6 @@ declare namespace npdf {
         getNumFields(): number
         getField(index: number): Field
         setRotation(degree: number)
-    }
-
-    class Field {}
-    class Rectangle {
-    	constructor()
-	fromArray(dimensions:Array<number>)
 	getBottom(): number
 	setBottom(value:number)
 	getLeft(): number
@@ -30,5 +23,8 @@ declare namespace npdf {
 	setWidth(value:number)
 	getHeight(): number
 	setHeight(value:number)
+	addImg(file:string, dx: number, dy: number, scaleX: number, scaleY: number)
     }
+
+    class Field {}
 }
