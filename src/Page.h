@@ -7,6 +7,7 @@
 
 #include <napi.h>
 #include <podofo/podofo.h>
+#include "Document.h"
 
 using namespace Napi;
 using namespace std;
@@ -20,6 +21,7 @@ public:
     delete _page;
     delete _parent;
   }
+  int pageNumber;
   static Napi::FunctionReference constructor;
   static void
   Initialize(Napi::Env &env, Napi::Object &target)
@@ -30,7 +32,9 @@ public:
                   "PdfPage",
                   {InstanceMethod("getRotation", &Page::GetRotation),
                    InstanceMethod("getNumFields", &Page::GetNumFields),
+//                   InstanceMethod("getPageSize", &Page::GetPageSize),
                    InstanceMethod("getField", &Page::GetField),
+                   InstanceMethod("getFields", &Page::GetFields),
                    InstanceMethod("getWidth", &Page::GetWidth),
                    InstanceMethod("getHeight", &Page::GetHeight),
                    InstanceMethod("getBottom", &Page::GetBottom),
@@ -71,13 +75,17 @@ public:
   SetLeft(const CallbackInfo &);
   void
   AddImg(const CallbackInfo &);
-
-  inline PoDoFo::PdfPage *
-  page() { return _page; }
+  Napi::Value
+  GetFields(const CallbackInfo &);
+  void
+  SetFields(const CallbackInfo &);
 
 private:
   PoDoFo::PdfPage *_page;
   PoDoFo::PdfMemDocument *_parent;
+
+  void
+  GetFieldObject(Napi::Object &, PoDoFo::PdfField &);
 };
 
 #endif // NPDF_PDFPAGE_HPP

@@ -77,7 +77,7 @@ Document::GetPage(const CallbackInfo& info)
   auto pagePtr = Napi::External<PoDoFo::PdfPage>::New(info.Env(), page);
   auto docPtr =
     Napi::External<PoDoFo::PdfMemDocument>::New(info.Env(), _document);
-  auto instance = Page::constructor.New({ pagePtr, docPtr });
+  auto instance = Page::constructor.New({pagePtr, docPtr, Napi::Number::New(info.Env(), n)});
   return instance;
 }
 

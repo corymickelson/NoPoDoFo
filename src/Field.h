@@ -6,7 +6,7 @@
 #define NPDF_PDFFIELD_H
 
 #include <napi.h>
-#include <podofo/doc/PdfField.h>
+#include <podofo/podofo.h>
 #include <string>
 #include "ValidateArguments.h"
 
@@ -17,8 +17,8 @@ using namespace PoDoFo;
 class Field : public Napi::ObjectWrap<Field>
 {
 public:
-  Field(const CallbackInfo &callbackInfo);
-  ~Field() { delete _field; };
+  Field(const CallbackInfo &info);
+  ~Field() { delete _field; }
   static FunctionReference constructor;
   static void
   Initialize(Napi::Env &env, Napi::Object &target)
@@ -57,8 +57,7 @@ public:
   IsRequired(const CallbackInfo &);
 
 private:
-  PoDoFo::PdfField *_field;
-
+  PdfField *_field;
 };
 
 #endif //NPDF_PDFFIELD_H
