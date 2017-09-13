@@ -16,6 +16,5 @@ build/
 cmake-build-debug/
 node_modules/
 generators/
-dist/
 *.user
 *.user.*
