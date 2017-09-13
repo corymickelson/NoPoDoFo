@@ -1,4 +1,4 @@
-declare namespace npdf {
+declare namespace NPdf {
     export class Document {
         constructor()
 
