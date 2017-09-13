@@ -1,5 +1,5 @@
 declare namespace npdf {
-    class Document {
+    export class Document {
         constructor()
 
         load(file: string)
@@ -7,6 +7,10 @@ declare namespace npdf {
         getPageCount(): number
 
         getPage(pageN: number): Page
+
+        mergeDocument(doc: string)
+
+        deletePage(pageIndex: number)
 
         getVersion(): number
 
@@ -17,7 +21,7 @@ declare namespace npdf {
         write(file: string)
     }
 
-    class Page {
+    export class Page {
         constructor()
 
         getRotation(): number
@@ -45,6 +49,21 @@ declare namespace npdf {
         setHeight(value: number)
 
         addImg(file: string, dx: number, dy: number, scaleX: number, scaleY: number)
+
+        getFields(): [{
+            name: string, alternateName: string, mappingName: string, required: boolean, readOnly: boolean, value: string | number,
+            maxLen?: number, multiLine?: boolean, caption?: string, type: string, selected?: string
+        }]
+
+        setFieldValue(fieldIndex: number, value: number | string)
+
+        setFieldAlternateName(fieldIndex: number, value: string)
+
+        setFieldMappingName(fieldIndex: number, value: string)
+
+        setFieldRequired(fieldIndex: number, value: boolean)
+
+        getFieldIndex(fieldName: string): number
     }
 
     class Field {

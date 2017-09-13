@@ -36,6 +36,8 @@ public:
                   {InstanceMethod("load", &Document::Load),
                    InstanceMethod("getPageCount", &Document::GetPageCount),
                    InstanceMethod("getPage", &Document::GetPage),
+                   InstanceMethod("mergeDocument", &Document::MergeDocument),
+                   InstanceMethod("deletePage", &Document::DeletePage),
                    InstanceMethod("setPassword", &Document::SetPassword),
                    InstanceMethod("getVersion", &Document::GetVersion),
                    InstanceMethod("isLinearized", &Document::IsLinearized),
@@ -50,6 +52,10 @@ public:
   GetPageCount(const CallbackInfo &);
   Napi::Value
   GetPage(const CallbackInfo &);
+  void
+  MergeDocument(const CallbackInfo &);
+  void
+  DeletePage(const CallbackInfo &);
   void
   SetPassword(const CallbackInfo &);
   Napi::Value

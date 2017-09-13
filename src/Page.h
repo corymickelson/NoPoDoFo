@@ -5,9 +5,9 @@
 #ifndef NPDF_PDFPAGE_HPP
 #define NPDF_PDFPAGE_HPP
 
+#include "Document.h"
 #include <napi.h>
 #include <podofo/podofo.h>
-#include "Document.h"
 
 using namespace Napi;
 using namespace std;
@@ -27,24 +27,29 @@ public:
   Initialize(Napi::Env &env, Napi::Object &target)
   {
     Napi::HandleScope scope(env);
-    Napi::Function ctor =
-      DefineClass(env,
-                  "PdfPage",
-                  {InstanceMethod("getRotation", &Page::GetRotation),
-                   InstanceMethod("getNumFields", &Page::GetNumFields),
-//                   InstanceMethod("getPageSize", &Page::GetPageSize),
-                   InstanceMethod("getField", &Page::GetField),
-                   InstanceMethod("getFields", &Page::GetFields),
-                   InstanceMethod("getWidth", &Page::GetWidth),
-                   InstanceMethod("getHeight", &Page::GetHeight),
-                   InstanceMethod("getBottom", &Page::GetBottom),
-                   InstanceMethod("getLeft", &Page::GetLeft),
-                   InstanceMethod("setWidth", &Page::SetWidth),
-                   InstanceMethod("setHeight", &Page::SetHeight),
-                   InstanceMethod("setLeft", &Page::SetLeft),
-                   InstanceMethod("setBottom", &Page::SetBottom),
-                   InstanceMethod("setRotation", &Page::SetRotation),
-                   InstanceMethod("addImg", &Page::AddImg)});
+    Napi::Function ctor = DefineClass(
+      env,
+      "PdfPage",
+      {InstanceMethod("getRotation", &Page::GetRotation),
+       InstanceMethod("getNumFields", &Page::GetNumFields),
+       InstanceMethod("getWidth", &Page::GetWidth),
+       InstanceMethod("getHeight", &Page::GetHeight),
+       InstanceMethod("getBottom", &Page::GetBottom),
+       InstanceMethod("getLeft", &Page::GetLeft),
+       InstanceMethod("setWidth", &Page::SetWidth),
+       InstanceMethod("setHeight", &Page::SetHeight),
+       InstanceMethod("setLeft", &Page::SetLeft),
+       InstanceMethod("setBottom", &Page::SetBottom),
+       InstanceMethod("setRotation", &Page::SetRotation),
+       InstanceMethod("getField", &Page::GetField),
+       InstanceMethod("getFields", &Page::GetFields),
+       InstanceMethod("setFields", &Page::SetFields),
+       InstanceMethod("setFieldValue", &Page::SetFieldValue),
+       InstanceMethod("setFieldAlternateName", &Page::SetFieldAlternateName),
+       InstanceMethod("setFieldMappingName", &Page::SetFieldMappingName),
+       InstanceMethod("setFieldRequired", &Page::SetFieldRequired),
+       InstanceMethod("getFieldIndex", &Page::GetFieldIndex),
+       InstanceMethod("addImg", &Page::AddImg)});
     constructor = Napi::Persistent(ctor);
     constructor.SuppressDestruct();
     target.Set("Page", constructor);
@@ -79,13 +84,24 @@ public:
   GetFields(const CallbackInfo &);
   void
   SetFields(const CallbackInfo &);
+  void
+  SetFieldValue(const CallbackInfo &);
+  void
+  SetFieldAlternateName(const CallbackInfo &);
+  void
+  SetFieldMappingName(const CallbackInfo &);
+  void
+  SetFieldRequired(const CallbackInfo &);
+  Napi::Value
+  GetFieldIndex(const CallbackInfo &);
 
 private:
   PoDoFo::PdfPage *_page;
   PoDoFo::PdfMemDocument *_parent;
-
   void
   GetFieldObject(Napi::Object &, PoDoFo::PdfField &);
+  int
+  FindFieldIndex(const string &);
 };
 
 #endif // NPDF_PDFPAGE_HPP

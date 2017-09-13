@@ -18,7 +18,7 @@
   },
   "license": "ISC",
   "devDependencies": {
-    "@types/node": "^8.0.27",
+    "@types/node": "^8.0.28",
     "bindings": "^1.3.0",
     "cmake-js": "^3.5.0",
     "node-addon-api": "^0.6.3"
@@ -27,4 +27,3 @@
     "boost-lib": "^0.11.3"
   }
 }
-

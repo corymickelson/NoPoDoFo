@@ -26,6 +26,8 @@ AssertFunctionArgs(const CallbackInfo &info,
   }
   for (int i = 0; i < info.Length(); ++i)
   {
+    if (expectedTypes.size() - 1 == i)
+      break;
     napi_valuetype expected = expectedTypes[i];
     napi_valuetype actual = info[i].Type();
     if (actual != expected)

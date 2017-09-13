@@ -1,7 +1,17 @@
-exports.main = function main() {
+///<reference path="./npdf.d.ts">
+/**
+ * @type {npdf}
+ */
 const npdf = require('bindings')('npdf')
-const doc = new npdf.Document()
-doc.load('/home/red/fw9.pdf')
-let page = doc.getPage(0)
-return {doc, page}
+
+export class Transform {
+    /**
+     *
+     * @param {string} file
+     */
+    constructor(file) {
+        this.document = new npdf.Document()
+        this.document.load(file)
+    }
+
 }

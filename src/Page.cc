@@ -50,13 +50,13 @@ Page::GetField(const CallbackInfo &info)
   switch (field.GetType())
   {
     case ePdfField_TextField:break;
-    case ePdfField_CheckBox: break;
-    case ePdfField_ComboBox: break;
-    case ePdfField_ListBox: break;
-    case ePdfField_PushButton: break;
-    case ePdfField_RadioButton: break;
-    case ePdfField_Signature: break;
-    case ePdfField_Unknown: break;
+    case ePdfField_CheckBox:break;
+    case ePdfField_ComboBox:break;
+    case ePdfField_ListBox:break;
+    case ePdfField_PushButton:break;
+    case ePdfField_RadioButton:break;
+    case ePdfField_Signature:break;
+    case ePdfField_Unknown:break;
   }
   return Value();
 }
@@ -64,15 +64,25 @@ Page::GetField(const CallbackInfo &info)
 Napi::Value
 Page::GetFields(const CallbackInfo &info)
 {
-  auto fields = Napi::Array::New(info.Env());
-  for (uint32_t i = 0; i < _page->GetNumFields(); ++i)
+  try
   {
-    auto obj = Napi::Object::New(info.Env());
-    auto field = _page->GetField(i);
-    Page::GetFieldObject(obj, field);
-    fields.Set(i, obj);
+    auto fields = Napi::Array::New(info.Env());
+    for (size_t i = 0; i < static_cast<size_t>(_page->GetNumFields()); ++i)
+    {
+      auto obj = Napi::Object::New(info.Env());
+      auto field = _page->GetField(static_cast<int>(i));
+      obj.Set("index", Napi::Number::New(info.Env(), i));
+      Page::GetFieldObject(obj, field);
+      fields.Set(static_cast<uint32_t>(i), obj);
+    }
+    return fields;
   }
-  return fields;
+  catch (PdfError &err)
+  {
+    stringstream errMsg;
+    errMsg << "An error occured in PoDoFo: " << err.GetError() << endl;
+    throw Napi::Error::New(info.Env(), errMsg.str());
+  }
 }
 
 void
@@ -97,7 +107,7 @@ Page::GetFieldObject(Napi::Object &obj, PoDoFo::PdfField &field)
       long maxLen = textField.GetMaxLen();
       bool multiLine = textField.IsMultiLine();
       obj.Set("value", fieldValue);
-      obj.Set("maxLength", &maxLen);
+      obj.Set("maxLength", static_cast<double>(maxLen));
       obj.Set("isMultiLine", multiLine);
       obj.Set("type", "TextField");
       break;
@@ -115,7 +125,8 @@ Page::GetFieldObject(Napi::Object &obj, PoDoFo::PdfField &field)
     case ePdfField_ComboBox:
     {
       PdfComboBox comboBox(field);
-      string comboValue = comboBox.GetItem(comboBox.GetSelectedItem()).GetStringUtf8();
+      string comboValue =
+        comboBox.GetItem(comboBox.GetSelectedItem()).GetStringUtf8();
       obj.Set("type", "ComboBox");
       obj.Set("selected", comboValue);
       break;
@@ -123,7 +134,8 @@ Page::GetFieldObject(Napi::Object &obj, PoDoFo::PdfField &field)
     case ePdfField_ListBox:
     {
       PdfListBox listBox(field);
-      string listValue = listBox.GetItem(listBox.GetSelectedItem()).GetStringUtf8();
+      string listValue =
+        listBox.GetItem(listBox.GetSelectedItem()).GetStringUtf8();
       obj.Set("type", "ListBox");
       obj.Set("value", listValue);
       break;
@@ -266,7 +278,147 @@ Page::AddImg(const CallbackInfo &info)
   painter.FinishPage();
 }
 void
-Page::SetFields(const CallbackInfo &)
+Page::SetFields(const CallbackInfo &info)
 {
+  return;
+}
+void
+Page::SetFieldValue(const CallbackInfo &info)
+{
+  try
+  {
+    AssertFunctionArgs(info, 2, {napi_valuetype::napi_number});
+    int fieldIndex = info[0].As<Number>();
+    PdfField field = _page->GetField(fieldIndex);
+    switch (field.GetType())
+    {
+      case ePdfField_TextField:
+      {
+        if (info[1].IsString())
+        {
+          PdfTextField text(field);
+          string value = info[1].As<String>().Utf8Value();
+          PdfString fieldText(value);
+          text.SetText(fieldText);
+        }
+        break;
+      }
+      case ePdfField_CheckBox:
+      {
+        if (info[1].IsBoolean())
+        {
+          PdfCheckBox checkBox(field);
+          bool value = info[1].As<Boolean>();
+          checkBox.SetChecked(value);
+        }
+        break;
+      }
+      case ePdfField_ComboBox:
+      {
+        if (info[1].IsNumber())
+        {
+          PdfComboBox comboBox(field);
+          int value = info[1].As<Number>();
+          comboBox.SetSelectedItem(value);
+        }
+        break;
+      }
+      case ePdfField_ListBox:
+      {
+        if (info[1].IsNumber())
+        {
+          PdfListBox listBox(field);
+          int value = info[1].As<Number>();
+          listBox.SetSelectedItem(value);
+        }
+        break;
+      }
+      case ePdfField_PushButton:
+      case ePdfField_RadioButton:
+      case ePdfField_Signature:
+      case ePdfField_Unknown:break;
+    }
+  }
+  catch (PdfError &pdfError)
+  {
+    stringstream err;
+    err << "Failed to Set value, PoDoFo error: " << pdfError.GetError() << endl;
+    throw Napi::Error::New(info.Env(), err.str());
+  }
+  catch (Error &jsError)
+  {
+    stringstream err;
+    err << "Failed to construct javascript return value: " << jsError.Message()
+        << endl;
+    throw Napi::Error::New(info.Env(), err.str());
+  }
+}
+void
+Page::SetFieldAlternateName(const CallbackInfo &info)
+{
+  AssertFunctionArgs(
+    info, 2, {napi_valuetype::napi_number, napi_valuetype::napi_string});
+  int fieldIndex = info[0].As<Number>();
+  string name = info[1].As<String>().Utf8Value();
+  PdfField field = _page->GetField(fieldIndex);
+  field.SetAlternateName(PdfString(name));
+}
+void
+Page::SetFieldMappingName(const CallbackInfo &info)
+{
+  AssertFunctionArgs(
+    info, 2, {napi_valuetype::napi_number, napi_valuetype::napi_string});
+  int fieldIndex = info[0].As<Number>();
+  string name = info[1].As<String>().Utf8Value();
+  PdfField field = _page->GetField(fieldIndex);
+  field.SetMappingName(PdfString(name));
+}
+void
+Page::SetFieldRequired(const CallbackInfo &info)
+{
+  AssertFunctionArgs(
+    info, 2, {napi_valuetype::napi_number, napi_valuetype::napi_boolean});
+  int fieldIndex = info[0].As<Number>();
+  bool required = info[1].As<Boolean>();
+  PdfField field = _page->GetField(fieldIndex);
+  field.SetRequired(required);
+}
 
+Napi::Value
+Page::GetFieldIndex(const CallbackInfo &info)
+{
+  AssertFunctionArgs(info, 1, {napi_valuetype::napi_string});
+  string key = info[0].As<String>().Utf8Value();
+  int index = -1;
+  for (int i = 0; i < _page->GetNumFields(); ++i)
+  {
+    PdfField field = _page->GetField(i);
+    string name = field.GetFieldName().GetStringUtf8();
+    string alternate = field.GetAlternateName().GetStringUtf8();
+    string mapping = field.GetMappingName().GetStringUtf8();
+    if (key == name || key == alternate || key == mapping)
+    {
+      index = i;
+      break;
+    }
+  }
+  return Napi::Number::New(info.Env(), index);
+}
+int
+Page::FindFieldIndex(const string &key)
+{
+  int index = -1;
+  for (int i = 0; i < _page->GetNumFields(); ++i)
+  {
+    PdfField field = _page->GetField(i);
+    string name = field.GetFieldName().GetStringUtf8();
+    string alternate = field.GetAlternateName().GetStringUtf8();
+    string mapping = field.GetMappingName().GetStringUtf8();
+    if (key == name || key == alternate || key == mapping)
+    {
+      index = i;
+      break;
+    }
+  }
+  return index;
 }

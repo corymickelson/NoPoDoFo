@@ -4,6 +4,7 @@
 
 #include "Document.h"
 #include "closure.h"
+#include "ValidateArguments.h"
 
 //Napi::FunctionReference Document::constructor;
 
@@ -152,4 +153,21 @@ Napi::Value
 Document::IsLinearized(const CallbackInfo& info)
 {
   return Napi::Boolean::New(info.Env(), _document->IsLinearized());
+}
+
+void
+Document::DeletePage(const CallbackInfo &info)
+{
+  AssertFunctionArgs(info, 1, {napi_valuetype::napi_number});
+  int pageIndex = info[0].As<Number>();
+  _document->GetPagesTree()->DeletePage(pageIndex);
+}
+
+void
+Document::MergeDocument(const CallbackInfo &info)
+{
+  AssertFunctionArgs(info, 1, {napi_valuetype::napi_string});
+  string docPath = info[0].As<String>().Utf8Value();
+  PoDoFo::PdfMemDocument merged(docPath.c_str());
+  _document->Append(merged);
 }
