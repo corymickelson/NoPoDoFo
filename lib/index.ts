@@ -1,7 +1,4 @@
-/**
- * @type {NPdf}
- */
-const mod = require('bindings')('npdf')
+const mod = require('../src/npdf')
 
 interface IPage {
     getRotation(): number
@@ -107,7 +104,7 @@ class Document implements IDocument {
         throw new Error("Method not implemented.");
     }
 
-    private _instance: NPdf.Document
+    private _instance:Object
 
     constructor(file: string) {
         this._instance = new mod.Document()

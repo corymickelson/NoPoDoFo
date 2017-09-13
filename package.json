@@ -6,7 +6,8 @@
   "types": "index.d.ts",
   "repository": "git+https://github.com/corymickelson/npdf.git",
   "scripts": {
-    "postinstall": "cmake-js compile"
+    "postinstall": "cmake-js compile",
+    "docs": "typedoc --mode modules --module commonjs --target es6 --out ./docs"
   },
   "keywords": [
     "pdf"
@@ -21,7 +22,8 @@
     "@types/node": "^8.0.28",
     "bindings": "^1.3.0",
     "cmake-js": "^3.5.0",
-    "node-addon-api": "^0.6.3"
+    "node-addon-api": "^0.6.3",
+    "typedoc": "^0.8.0"
   },
   "dependencies": {
     "boost-lib": "^0.11.3"

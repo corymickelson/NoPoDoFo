@@ -1,6 +1,3 @@
-/**
- * @type {NPdf}
- */
 declare const mod: any;
 interface IPage {
     getRotation(): number;

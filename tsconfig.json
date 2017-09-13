@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "declaration": true,
+    "allowJs": true,
     "lib": [
       "esnext"
     ],
@@ -16,7 +17,8 @@
       "node_modules/@types",
       "src"
     ]
-  }
+  },
+  "include": ["lib/index.ts"]
 }
 //{
 //  "compilerOptions": {
