@@ -29,19 +29,31 @@ interface IPage {
 }
 interface IField {
     getType(): string;
+
     getFieldName(): string;
+
     getAlternateName(): string;
+
     getMappingName(): string;
+
     isRequired(): boolean;
+
     setRequired(required: boolean): void;
+
     setAlternateName(name: string): void;
+
     setMappingName(name: string): void;
 }
+
 interface IPainter {
     setPage(page: IPage): void;
+
     finishPage(): void;
+
     drawText(): void;
+
     drawImage(imgFile: string): void;
+
     getPrecision(): number;
 }
 interface IDocument {
