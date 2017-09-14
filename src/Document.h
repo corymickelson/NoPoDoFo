@@ -64,6 +64,8 @@ public:
   IsLinearized(const CallbackInfo &);
   Napi::Value
   Write(const CallbackInfo &);
+  PoDoFo::PdfMemDocument *
+  GetDocument() { return _document; }
 
 private:
   PoDoFo::PdfMemDocument *_document;

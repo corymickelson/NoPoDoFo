@@ -18,8 +18,7 @@ class Field : public Napi::ObjectWrap<Field>
 {
 public:
   Field(const CallbackInfo &info);
-  ~Field() { delete _field; }
-  static FunctionReference constructor;
+  ~Field() {}
   static void
   Initialize(Napi::Env &env, Napi::Object &target)
   {
@@ -34,10 +33,9 @@ public:
                                  InstanceMethod("setMappingName", &Field::SetMappingName),
                                  InstanceMethod("setRequired", &Field::SetRequired),
                                  InstanceMethod("isRequired", &Field::IsRequired)});
-    constructor = Napi::Persistent(ctor);
-    constructor.SuppressDestruct();
-    target.Set("Field", constructor);
+    target.Set("Field", ctor);
   }
+
 
   Napi::Value
   GetType(const CallbackInfo &);
@@ -57,7 +55,10 @@ public:
   IsRequired(const CallbackInfo &);
 
 private:
-  PdfField *_field;
+  int fieldIndex;
+  PdfField
+  GetField() { return _page->GetField(fieldIndex); }
+  PdfPage *_page;
 };
 
 #endif //NPDF_PDFFIELD_H

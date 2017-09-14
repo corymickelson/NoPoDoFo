@@ -36,29 +36,7 @@ Page::GetNumFields(const CallbackInfo &info)
 Napi::Value
 Page::GetField(const CallbackInfo &info)
 {
-  if (info.Length() != 1 || !info[0].IsNumber())
-  {
-    throw Napi::Error::New(
-      info.Env(), "SetRotation takes a single argument of type number.");
-  }
-  int n = info[0].As<Number>();
-  if (n < 0 || n > _page->GetNumFields())
-  {
-    throw Napi::Error::New(info.Env(), "Out of Range");
-  }
-  PdfField field = _page->GetField(n);
-  switch (field.GetType())
-  {
-    case ePdfField_TextField:break;
-    case ePdfField_CheckBox:break;
-    case ePdfField_ComboBox:break;
-    case ePdfField_ListBox:break;
-    case ePdfField_PushButton:break;
-    case ePdfField_RadioButton:break;
-    case ePdfField_Signature:break;
-    case ePdfField_Unknown:break;
-  }
-  return Value();
+
 }
 
 Napi::Value
@@ -258,131 +236,6 @@ Page::SetBottom(const CallbackInfo &info)
   PoDoFo::PdfRect rect = _page->GetPageSize();
   rect.SetBottom(bottom);
 }
-void
-Page::AddImg(const CallbackInfo &info)
-{
-  double x, y, width, height;
-  string imgFile = info[0].As<String>().Utf8Value();
-  x = info[1].As<Number>();
-  y = info[2].As<Number>();
-  width = info[3].As<Number>();
-  height = info[4].As<Number>();
-
-  PoDoFo::PdfPainter painter;
-  PoDoFo::PdfImage image(_parent);
-  image.LoadFromFile(imgFile.c_str());
-  painter.SetPage(_page);
-  //  painter.DrawImage(x, y, &image, width, height);
-  painter.DrawImage(
-    0.0, _page->GetPageSize().GetHeight() - image.GetHeight(), &image);
-  painter.FinishPage();
-}
-void
-Page::SetFields(const CallbackInfo &info)
-{
-  return;
-}
-void
-Page::SetFieldValue(const CallbackInfo &info)
-{
-  try
-  {
-    AssertFunctionArgs(info, 2, {napi_valuetype::napi_number});
-    int fieldIndex = info[0].As<Number>();
-    PdfField field = _page->GetField(fieldIndex);
-    switch (field.GetType())
-    {
-      case ePdfField_TextField:
-      {
-        if (info[1].IsString())
-        {
-          PdfTextField text(field);
-          string value = info[1].As<String>().Utf8Value();
-          PdfString fieldText(value);
-          text.SetText(fieldText);
-        }
-        break;
-      }
-      case ePdfField_CheckBox:
-      {
-        if (info[1].IsBoolean())
-        {
-          PdfCheckBox checkBox(field);
-          bool value = info[1].As<Boolean>();
-          checkBox.SetChecked(value);
-        }
-        break;
-      }
-      case ePdfField_ComboBox:
-      {
-        if (info[1].IsNumber())
-        {
-          PdfComboBox comboBox(field);
-          int value = info[1].As<Number>();
-          comboBox.SetSelectedItem(value);
-        }
-        break;
-      }
-      case ePdfField_ListBox:
-      {
-        if (info[1].IsNumber())
-        {
-          PdfListBox listBox(field);
-          int value = info[1].As<Number>();
-          listBox.SetSelectedItem(value);
-        }
-        break;
-      }
-      case ePdfField_PushButton:
-      case ePdfField_RadioButton:
-      case ePdfField_Signature:
-      case ePdfField_Unknown:break;
-    }
-  }
-  catch (PdfError &pdfError)
-  {
-    stringstream err;
-    err << "Failed to Set value, PoDoFo error: " << pdfError.GetError() << endl;
-    throw Napi::Error::New(info.Env(), err.str());
-  }
-  catch (Error &jsError)
-  {
-    stringstream err;
-    err << "Failed to construct javascript return value: " << jsError.Message()
-        << endl;
-    throw Napi::Error::New(info.Env(), err.str());
-  }
-}
-void
-Page::SetFieldAlternateName(const CallbackInfo &info)
-{
-  AssertFunctionArgs(
-    info, 2, {napi_valuetype::napi_number, napi_valuetype::napi_string});
-  int fieldIndex = info[0].As<Number>();
-  string name = info[1].As<String>().Utf8Value();
-  PdfField field = _page->GetField(fieldIndex);
-  field.SetAlternateName(PdfString(name));
-}
-void
-Page::SetFieldMappingName(const CallbackInfo &info)
-{
-  AssertFunctionArgs(
-    info, 2, {napi_valuetype::napi_number, napi_valuetype::napi_string});
-  int fieldIndex = info[0].As<Number>();
-  string name = info[1].As<String>().Utf8Value();
-  PdfField field = _page->GetField(fieldIndex);
-  field.SetMappingName(PdfString(name));
-}
-void
-Page::SetFieldRequired(const CallbackInfo &info)
-{
-  AssertFunctionArgs(
-    info, 2, {napi_valuetype::napi_number, napi_valuetype::napi_boolean});
-  int fieldIndex = info[0].As<Number>();
-  bool required = info[1].As<Boolean>();
-  PdfField field = _page->GetField(fieldIndex);
-  field.SetRequired(required);
-}
 
 Napi::Value
 Page::GetFieldIndex(const CallbackInfo &info)
@@ -404,21 +257,76 @@ Page::GetFieldIndex(const CallbackInfo &info)
   }
   return Napi::Number::New(info.Env(), index);
 }
-int
-Page::FindFieldIndex(const string &key)
-{
-  int index = -1;
-  for (int i = 0; i < _page->GetNumFields(); ++i)
-  {
-    PdfField field = _page->GetField(i);
-    string name = field.GetFieldName().GetStringUtf8();
-    string alternate = field.GetAlternateName().GetStringUtf8();
-    string mapping = field.GetMappingName().GetStringUtf8();
-    if (key == name || key == alternate || key == mapping)
-    {
-      index = i;
-      break;
-    }
-  }
-  return index;
-}
+
+//void
+//Page::SetFieldValue(const CallbackInfo &info)
+//{
+//  try
+//  {
+//    AssertFunctionArgs(info, 2, {napi_valuetype::napi_number});
+//    int fieldIndex = info[0].As<Number>();
+//    PdfField field = _page->GetField(fieldIndex);
+//    switch (field.GetType())
+//    {
+//      case ePdfField_TextField:
+//      {
+//        if (info[1].IsString())
+//        {
+//          PdfTextField text(field);
+//          string value = info[1].As<String>().Utf8Value();
+//          PdfString fieldText(value);
+//          text.SetText(fieldText);
+//        }
+//        break;
+//      }
+//      case ePdfField_CheckBox:
+//      {
+//        if (info[1].IsBoolean())
+//        {
+//          PdfCheckBox checkBox(field);
+//          bool value = info[1].As<Boolean>();
+//          checkBox.SetChecked(value);
+//        }
+//        break;
+//      }
+//      case ePdfField_ComboBox:
+//      {
+//        if (info[1].IsNumber())
+//        {
+//          PdfComboBox comboBox(field);
+//          int value = info[1].As<Number>();
+//          comboBox.SetSelectedItem(value);
+//        }
+//        break;
+//      }
+//      case ePdfField_ListBox:
+//      {
+//        if (info[1].IsNumber())
+//        {
+//          PdfListBox listBox(field);
+//          int value = info[1].As<Number>();
+//          listBox.SetSelectedItem(value);
+//        }
+//        break;
+//      }
+//      case ePdfField_PushButton:
+//      case ePdfField_RadioButton:
+//      case ePdfField_Signature:
+//      case ePdfField_Unknown:break;
+//    }
+//  }
+//  catch (PdfError &pdfError)
+//  {
+//    stringstream err;
+//    err << "Failed to Set value, PoDoFo error: " << pdfError.GetError() << endl;
+//    throw Napi::Error::New(info.Env(), err.str());
+//  }
+//  catch (Error &jsError)
+//  {
+//    stringstream err;
+//    err << "Failed to construct javascript return value: " << jsError.Message()
+//        << endl;
+//    throw Napi::Error::New(info.Env(), err.str());
+//  }
+//}
+

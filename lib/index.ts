@@ -25,26 +25,42 @@ interface IPage {
 
     setHeight(value: number): void
 
-    addImg(file: string, dx: number, dy: number, scaleX: number, scaleY: number): void
-
     getFields(): [{
         name: string, alternateName: string, mappingName: string, required: boolean, readOnly: boolean, value: string | number,
         maxLen?: number, multiLine?: boolean, caption?: string, type: string, selected?: string
     }]
 
-    setFieldValue(fieldIndex: number, value: number | string): void
-
-    setFieldAlternateName(fieldIndex: number, value: string): void
-
-    setFieldMappingName(fieldIndex: number, value: string): void
-
-    setFieldRequired(fieldIndex: number, value: boolean): void
-
     getFieldIndex(fieldName: string): number
 }
 
 interface IField {
+    getType(): string
 
+    getFieldName(): string
+
+    getAlternateName(): string
+
+    getMappingName(): string
+
+    isRequired(): boolean
+
+    setRequired(required: boolean): void
+
+    setAlternateName(name: string): void
+
+    setMappingName(name: string): void
+}
+
+interface IPainter {
+    setPage(page: IPage): void
+
+    finishPage(): void
+
+    drawText(): void
+
+    drawImage(imgFile: string): void
+
+    getPrecision(): number
 }
 
 interface IDocument {
@@ -161,27 +177,7 @@ class Page implements IPage {
         throw new Error("Method not implemented.");
     }
 
-    addImg(file: string, dx: number, dy: number, scaleX: number, scaleY: number): void {
-        throw new Error("Method not implemented.");
-    }
-
     getFields(): [{ name: string; alternateName: string; mappingName: string; required: boolean; readOnly: boolean; value: (string | number); maxLen?: number; multiLine?: boolean; caption?: string; type: string; selected?: string }] {
-        throw new Error("Method not implemented.");
-    }
-
-    setFieldValue(fieldIndex: number, value: number | string): void {
-        throw new Error("Method not implemented.");
-    }
-
-    setFieldAlternateName(fieldIndex: number, value: string): void {
-        throw new Error("Method not implemented.");
-    }
-
-    setFieldMappingName(fieldIndex: number, value: string): void {
-        throw new Error("Method not implemented.");
-    }
-
-    setFieldRequired(fieldIndex: number, value: boolean): void {
         throw new Error("Method not implemented.");
     }
 

@@ -5,6 +5,7 @@
 #include "Annotation.h"
 #include "Signature.h"
 #include "Rect.h"
+#include "Painter.h"
 
 void
 init(Napi::Env env, Napi::Object exports, Napi::Object module)
@@ -17,6 +18,7 @@ init(Napi::Env env, Napi::Object exports, Napi::Object module)
   Signature::Initialize(env, exports);
   Annotation::Initialize(env, exports);
   Rect::Initialize(env, exports);
+  Painter::Initialize(env, exports);
 }
 
 NODE_API_MODULE(npdf, init);

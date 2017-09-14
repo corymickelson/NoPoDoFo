@@ -43,13 +43,7 @@ public:
        InstanceMethod("setRotation", &Page::SetRotation),
        InstanceMethod("getField", &Page::GetField),
        InstanceMethod("getFields", &Page::GetFields),
-       InstanceMethod("setFields", &Page::SetFields),
-       InstanceMethod("setFieldValue", &Page::SetFieldValue),
-       InstanceMethod("setFieldAlternateName", &Page::SetFieldAlternateName),
-       InstanceMethod("setFieldMappingName", &Page::SetFieldMappingName),
-       InstanceMethod("setFieldRequired", &Page::SetFieldRequired),
-       InstanceMethod("getFieldIndex", &Page::GetFieldIndex),
-       InstanceMethod("addImg", &Page::AddImg)});
+       InstanceMethod("getFieldIndex", &Page::GetFieldIndex)});
     constructor = Napi::Persistent(ctor);
     constructor.SuppressDestruct();
     target.Set("Page", constructor);
@@ -78,30 +72,19 @@ public:
   GetLeft(const CallbackInfo &);
   void
   SetLeft(const CallbackInfo &);
-  void
-  AddImg(const CallbackInfo &);
   Napi::Value
   GetFields(const CallbackInfo &);
-  void
-  SetFields(const CallbackInfo &);
-  void
-  SetFieldValue(const CallbackInfo &);
-  void
-  SetFieldAlternateName(const CallbackInfo &);
-  void
-  SetFieldMappingName(const CallbackInfo &);
-  void
-  SetFieldRequired(const CallbackInfo &);
   Napi::Value
   GetFieldIndex(const CallbackInfo &);
-
+  PoDoFo::PdfPage *
+  GetPage() { return _page; }
+  PoDoFo::PdfMemDocument *
+  GetDocument() { return _parent; }
 private:
   PoDoFo::PdfPage *_page;
   PoDoFo::PdfMemDocument *_parent;
   void
   GetFieldObject(Napi::Object &, PoDoFo::PdfField &);
-  int
-  FindFieldIndex(const string &);
 };
 
 #endif // NPDF_PDFPAGE_HPP

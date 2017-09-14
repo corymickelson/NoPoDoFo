@@ -6,7 +6,8 @@
   "types": "index.d.ts",
   "repository": "git+https://github.com/corymickelson/npdf.git",
   "scripts": {
-    "postinstall": "cmake-js compile --std c++17 --prefer-clang",
+    "compile": "cmake-js compile --std c++17 --prefer-clang",
+    "postinstall": "npm run compile",
     "docs": "typedoc --mode modules --module commonjs --target es6 --out ./docs"
   },
   "keywords": [

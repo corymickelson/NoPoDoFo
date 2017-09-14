@@ -69,22 +69,7 @@ class Page {
     setHeight(value) {
         throw new Error("Method not implemented.");
     }
-    addImg(file, dx, dy, scaleX, scaleY) {
-        throw new Error("Method not implemented.");
-    }
     getFields() {
-        throw new Error("Method not implemented.");
-    }
-    setFieldValue(fieldIndex, value) {
-        throw new Error("Method not implemented.");
-    }
-    setFieldAlternateName(fieldIndex, value) {
-        throw new Error("Method not implemented.");
-    }
-    setFieldMappingName(fieldIndex, value) {
-        throw new Error("Method not implemented.");
-    }
-    setFieldRequired(fieldIndex, value) {
         throw new Error("Method not implemented.");
     }
     getFieldIndex(fieldName) {
