@@ -20,10 +20,10 @@ public:
   TextField(const CallbackInfo&);
   ~TextField()
   {
-    delete _base;
+    //    delete _base;
     delete _field;
   }
-  static Napi::FunctionReference constructor;
+  //  static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target)
   {
     HandleScope scope(env);
@@ -32,15 +32,17 @@ public:
                   "TextField",
                   { InstanceMethod("setText", &TextField::SetText),
                     InstanceMethod("getText", &TextField::GetText) });
-    constructor = Napi::Persistent(ctor);
-    constructor.SuppressDestruct();
-    target.Set("TextField", constructor);
+    //    constructor = Napi::Persistent(ctor);
+    //    constructor.SuppressDestruct();
+    target.Set("TextField", ctor);
   }
   void SetText(const CallbackInfo&);
   Napi::Value GetText(const CallbackInfo&);
 
 private:
-  PoDoFo::PdfField* _base;
-  PoDoFo::PdfTextField* _field;
+  Field* _field;
+  PdfTextField GetField() { return PdfTextField(_field->GetField()); }
+  //  PoDoFo::PdfField* _base;
+  //  PoDoFo::PdfTextField* _field;
 };
 #endif // NPDF_TEXTFIELD_H

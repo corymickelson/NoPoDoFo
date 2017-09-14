@@ -120,12 +120,12 @@ Field::GetFieldIndex(const CallbackInfo& info)
   return Napi::Number::New(info.Env(), fieldIndex);
 }
 
-Napi::Value
-Field::TextField(const CallbackInfo& info)
-{
-  PoDoFo::PdfField field = GetField();
-  PoDoFo::PdfTextField text(field);
-  auto ptr = Napi::External<PoDoFo::PdfTextField>::New(info.Env(), &text);
-  auto instance = TextField::constructor.New({ ptr });
-  return instance;
-}
+// Napi::Value
+// Field::TextField(const CallbackInfo& info)
+//{
+//  PoDoFo::PdfField field = GetField();
+//  PoDoFo::PdfTextField text(field);
+//  auto ptr = Napi::External<PoDoFo::PdfTextField>::New(info.Env(), &text);
+//  auto instance = TextField::constructor.New({ ptr });
+//  return instance;
+//}
