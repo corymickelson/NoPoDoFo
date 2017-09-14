@@ -14,7 +14,7 @@ Field::Field(const CallbackInfo& info)
   fieldIndex = info[1].As<Number>();
   Page* page = Page::Unwrap(pageObj);
   _page = page->GetPage();
-  PdfField pdfField = _page->GetField(fieldIndex);
+  //  PdfField pdfField = _page->GetField(fieldIndex);
 }
 
 Napi::Value
@@ -118,4 +118,14 @@ Napi::Value
 Field::GetFieldIndex(const CallbackInfo& info)
 {
   return Napi::Number::New(info.Env(), fieldIndex);
+}
+
+Napi::Value
+Field::TextField(const CallbackInfo& info)
+{
+  PoDoFo::PdfField field = GetField();
+  PoDoFo::PdfTextField text(field);
+  auto ptr = Napi::External<PoDoFo::PdfTextField>::New(info.Env(), &text);
+  auto instance = TextField::constructor.New({ ptr });
+  return instance;
 }

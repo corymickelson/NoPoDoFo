@@ -5,6 +5,7 @@
 #ifndef NPDF_PDFFIELD_H
 #define NPDF_PDFFIELD_H
 
+#include "TextField.h"
 #include "ValidateArguments.h"
 #include <napi.h>
 #include <podofo/podofo.h>
@@ -34,6 +35,7 @@ public:
         InstanceMethod("setRequired", &Field::SetRequired),
         InstanceMethod("setFieldIndex", &Field::SetFieldIndex),
         InstanceMethod("getFieldIndex", &Field::GetFieldIndex),
+        InstanceMethod("textField", &Field::TextField),
         InstanceMethod("isRequired", &Field::IsRequired) });
     target.Set("Field", ctor);
   }
@@ -48,10 +50,11 @@ public:
   Napi::Value IsRequired(const CallbackInfo&);
   void SetFieldIndex(const CallbackInfo&);
   Napi::Value GetFieldIndex(const CallbackInfo&);
+  Napi::Value TextField(const CallbackInfo&);
+  PdfField GetField() { return _page->GetField(fieldIndex); }
 
 private:
   int fieldIndex;
-  PdfField GetField() { return _page->GetField(fieldIndex); }
   PdfPage* _page;
 };
 
