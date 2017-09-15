@@ -5,6 +5,7 @@
 #ifndef NPDF_RECT_H
 #define NPDF_RECT_H
 
+#include "Page.h"
 #include <napi.h>
 #include <podofo/podofo.h>
 
@@ -14,21 +15,37 @@ using namespace PoDoFo;
 class Rect : public ObjectWrap<Rect>
 {
 public:
-  Rect(const CallbackInfo &callbackInfo);
+  Rect(const CallbackInfo& callbackInfo);
   ~Rect();
-  static FunctionReference constructor;
-  static void
-  Initialize(Napi::Env &env, Napi::Object &target)
+  static void Initialize(Napi::Env& env, Napi::Object& target)
   {
     HandleScope scope(env);
     Function ctor = DefineClass(env,
                                 "Rect",
-                                {});
-    constructor = Napi::Persistent(ctor);
-    constructor.SuppressDestruct();
-    target.Set("Rect", constructor);
-  }
+                                {
+                                  InstanceMethod("getWidth", &Rect::GetWidth),
+                                  InstanceMethod("getHeight", &Rect::GetHeight),
+                                  InstanceMethod("getBottom", &Rect::GetBottom),
+                                  InstanceMethod("getLeft", &Rect::GetLeft),
+                                  InstanceMethod("setWidth", &Rect::SetWidth),
+                                  InstanceMethod("setHeight", &Rect::SetHeight),
+                                  InstanceMethod("setLeft", &Rect::SetLeft),
+                                  InstanceMethod("setBottom", &Rect::SetBottom),
 
+                                });
+    target.Set("Rect", ctor);
+  }
+  Napi::Value GetWidth(const CallbackInfo&);
+  void SetWidth(const CallbackInfo&);
+  Napi::Value GetHeight(const CallbackInfo&);
+  void SetHeight(const CallbackInfo&);
+  Napi::Value GetBottom(const CallbackInfo&);
+  void SetBottom(const CallbackInfo&);
+  Napi::Value GetLeft(const CallbackInfo&);
+  void SetLeft(const CallbackInfo&);
+
+private:
+  PoDoFo::PdfRect rect = *new PoDoFo::PdfRect();
 };
 
-#endif //NPDF_RECT_H
+#endif // NPDF_RECT_H

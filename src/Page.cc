@@ -7,11 +7,11 @@
 
 Napi::FunctionReference Page::constructor;
 
-Page::Page(const CallbackInfo &info)
+Page::Page(const CallbackInfo& info)
   : ObjectWrap(info)
 {
-  PoDoFo::PdfPage *page = info[0].As<Napi::External<PoDoFo::PdfPage>>().Data();
-  PoDoFo::PdfMemDocument *parent =
+  PoDoFo::PdfPage* page = info[0].As<Napi::External<PoDoFo::PdfPage>>().Data();
+  PoDoFo::PdfMemDocument* parent =
     info[1].As<Napi::External<PoDoFo::PdfMemDocument>>().Data();
   _parent = parent;
   _page = page;
@@ -19,34 +19,22 @@ Page::Page(const CallbackInfo &info)
 }
 
 Napi::Value
-Page::GetRotation(const CallbackInfo &info)
+Page::GetRotation(const CallbackInfo& info)
 {
   return Napi::Number::New(info.Env(), _page->GetRotation());
 }
 Napi::Value
-Page::GetNumFields(const CallbackInfo &info)
+Page::GetNumFields(const CallbackInfo& info)
 {
   return Napi::Number::New(info.Env(), _page->GetNumFields());
 }
-/**
- * @todo this method is not creating a valid instance of PdfField? Need to fix.
- * @param info
- * @return
- */
-Napi::Value
-Page::GetField(const CallbackInfo &info)
-{
-
-}
 
 Napi::Value
-Page::GetFields(const CallbackInfo &info)
+Page::GetFields(const CallbackInfo& info)
 {
-  try
-  {
+  try {
     auto fields = Napi::Array::New(info.Env());
-    for (size_t i = 0; i < static_cast<size_t>(_page->GetNumFields()); ++i)
-    {
+    for (size_t i = 0; i < static_cast<size_t>(_page->GetNumFields()); ++i) {
       auto obj = Napi::Object::New(info.Env());
       auto field = _page->GetField(static_cast<int>(i));
       obj.Set("index", Napi::Number::New(info.Env(), i));
@@ -54,9 +42,7 @@ Page::GetFields(const CallbackInfo &info)
       fields.Set(static_cast<uint32_t>(i), obj);
     }
     return fields;
-  }
-  catch (PdfError &err)
-  {
+  } catch (PdfError& err) {
     stringstream errMsg;
     errMsg << "An error occured in PoDoFo: " << err.GetError() << endl;
     throw Napi::Error::New(info.Env(), errMsg.str());
@@ -64,7 +50,7 @@ Page::GetFields(const CallbackInfo &info)
 }
 
 void
-Page::GetFieldObject(Napi::Object &obj, PoDoFo::PdfField &field)
+Page::GetFieldObject(Napi::Object& obj, PoDoFo::PdfField& field)
 {
   string name = field.GetFieldName().GetStringUtf8();
   string alternateName = field.GetAlternateName().GetStringUtf8();
@@ -76,10 +62,8 @@ Page::GetFieldObject(Napi::Object &obj, PoDoFo::PdfField &field)
   obj.Set("mappingName", mappingName);
   obj.Set("required", required);
   obj.Set("readOnly", isWritable);
-  switch (field.GetType())
-  {
-    case ePdfField_TextField:
-    {
+  switch (field.GetType()) {
+    case ePdfField_TextField: {
       PdfTextField textField(field);
       string fieldValue = textField.GetText().GetStringUtf8();
       long maxLen = textField.GetMaxLen();
@@ -90,8 +74,7 @@ Page::GetFieldObject(Napi::Object &obj, PoDoFo::PdfField &field)
       obj.Set("type", "TextField");
       break;
     }
-    case ePdfField_CheckBox:
-    {
+    case ePdfField_CheckBox: {
       PdfCheckBox checkBox(field);
       bool checkBoxValue = checkBox.IsChecked();
       string checkBoxCaption = checkBox.GetCaption().GetStringUtf8();
@@ -100,8 +83,7 @@ Page::GetFieldObject(Napi::Object &obj, PoDoFo::PdfField &field)
       obj.Set("type", "CheckBox");
       break;
     }
-    case ePdfField_ComboBox:
-    {
+    case ePdfField_ComboBox: {
       PdfComboBox comboBox(field);
       string comboValue =
         comboBox.GetItem(comboBox.GetSelectedItem()).GetStringUtf8();
@@ -109,8 +91,7 @@ Page::GetFieldObject(Napi::Object &obj, PoDoFo::PdfField &field)
       obj.Set("selected", comboValue);
       break;
     }
-    case ePdfField_ListBox:
-    {
+    case ePdfField_ListBox: {
       PdfListBox listBox(field);
       string listValue =
         listBox.GetItem(listBox.GetSelectedItem()).GetStringUtf8();
@@ -118,26 +99,22 @@ Page::GetFieldObject(Napi::Object &obj, PoDoFo::PdfField &field)
       obj.Set("value", listValue);
       break;
     }
-    case ePdfField_PushButton:
-    {
+    case ePdfField_PushButton: {
       PdfPushButton pushButton(field);
       string pushCaption = pushButton.GetCaption().GetStringUtf8();
       obj.Set("type", "PushButton");
       obj.Set("caption", pushCaption);
       break;
     }
-    case ePdfField_RadioButton:
-    {
+    case ePdfField_RadioButton: {
       obj.Set("type", "RadioButton");
       break;
     }
-    case ePdfField_Signature:
-    {
+    case ePdfField_Signature: {
       obj.Set("type", "Signature");
       break;
     }
-    case ePdfField_Unknown:
-    {
+    case ePdfField_Unknown: {
       obj.Set("type", "Unknown");
       break;
     }
@@ -145,10 +122,9 @@ Page::GetFieldObject(Napi::Object &obj, PoDoFo::PdfField &field)
 }
 
 void
-Page::SetRotation(const CallbackInfo &info)
+Page::SetRotation(const CallbackInfo& info)
 {
-  if (info.Length() != 1 || !info[0].IsNumber())
-  {
+  if (info.Length() != 1 || !info[0].IsNumber()) {
     throw Napi::Error::New(
       info.Env(), "SetRotation takes a single argument of type number.");
   }
@@ -156,101 +132,17 @@ Page::SetRotation(const CallbackInfo &info)
   _page->SetRotation(rotate);
 }
 Napi::Value
-Page::GetWidth(const CallbackInfo &info)
+Page::GetFieldIndex(const CallbackInfo& info)
 {
-  return Napi::Number::New(info.Env(), _page->GetPageSize().GetWidth());
-}
-Napi::Value
-Page::GetHeight(const CallbackInfo &info)
-{
-
-  return Napi::Number::New(info.Env(), _page->GetPageSize().GetHeight());
-}
-Napi::Value
-Page::GetLeft(const CallbackInfo &info)
-{
-  return Napi::Number::New(info.Env(), _page->GetPageSize().GetLeft());
-}
-Napi::Value
-Page::GetBottom(const CallbackInfo &info)
-{
-  return Napi::Number::New(info.Env(), _page->GetPageSize().GetBottom());
-}
-void
-Page::SetWidth(const CallbackInfo &info)
-{
-  if (info.Length() > 0)
-  {
-    if (!info[0].IsNumber())
-    {
-      throw Napi::Error::New(
-        info.Env(), "SetWidth requies a single argument of type number");
-    }
-  }
-  double width = info[0].As<Number>();
-  PoDoFo::PdfRect rect = _page->GetPageSize();
-  rect.SetWidth(width);
-}
-void
-Page::SetHeight(const CallbackInfo &info)
-{
-  if (info.Length() > 0)
-  {
-    if (!info[0].IsNumber())
-    {
-      throw Napi::Error::New(
-        info.Env(), "SetWidth requies a single argument of type number");
-    }
-  }
-  double height = info[0].As<Number>();
-  PoDoFo::PdfRect rect = _page->GetPageSize();
-  rect.SetHeight(height);
-}
-void
-Page::SetLeft(const CallbackInfo &info)
-{
-  if (info.Length() > 0)
-  {
-    if (!info[0].IsNumber())
-    {
-      throw Napi::Error::New(
-        info.Env(), "SetWidth requies a single argument of type number");
-    }
-  }
-  double left = info[0].As<Number>();
-  PoDoFo::PdfRect rect = _page->GetPageSize();
-  rect.SetLeft(left);
-}
-void
-Page::SetBottom(const CallbackInfo &info)
-{
-  if (info.Length() > 0)
-  {
-    if (!info[0].IsNumber())
-    {
-      throw Napi::Error::New(
-        info.Env(), "SetWidth requies a single argument of type number");
-    }
-  }
-  double bottom = info[0].As<Number>();
-  PoDoFo::PdfRect rect = _page->GetPageSize();
-  rect.SetBottom(bottom);
-}
-
-Napi::Value
-Page::GetFieldIndex(const CallbackInfo &info)
-{
-  AssertFunctionArgs(info, 1, {napi_valuetype::napi_string});
+  AssertFunctionArgs(info, 1, { napi_valuetype::napi_string });
   string key = info[0].As<String>().Utf8Value();
   int index = -1;
-  for (int i = 0; i < _page->GetNumFields(); ++i)
-  {
+  for (int i = 0; i < _page->GetNumFields(); ++i) {
     PdfField field = _page->GetField(i);
     string name = field.GetFieldName().GetStringUtf8();
     string alternate = field.GetAlternateName().GetStringUtf8();
     string mapping = field.GetMappingName().GetStringUtf8();
-    if (key == name || key == alternate || key == mapping)
-    {
+    if (key == name || key == alternate || key == mapping) {
       index = i;
       break;
     }
@@ -258,8 +150,8 @@ Page::GetFieldIndex(const CallbackInfo &info)
   return Napi::Number::New(info.Env(), index);
 }
 
-//void
-//Page::SetFieldValue(const CallbackInfo &info)
+// void
+// Page::SetFieldValue(const CallbackInfo &info)
 //{
 //  try
 //  {
@@ -318,15 +210,16 @@ Page::GetFieldIndex(const CallbackInfo &info)
 //  catch (PdfError &pdfError)
 //  {
 //    stringstream err;
-//    err << "Failed to Set value, PoDoFo error: " << pdfError.GetError() << endl;
+//    err << "Failed to Set value, PoDoFo error: " << pdfError.GetError() <<
+//    endl;
 //    throw Napi::Error::New(info.Env(), err.str());
 //  }
 //  catch (Error &jsError)
 //  {
 //    stringstream err;
-//    err << "Failed to construct javascript return value: " << jsError.Message()
+//    err << "Failed to construct javascript return value: " <<
+//    jsError.Message()
 //        << endl;
 //    throw Napi::Error::New(info.Env(), err.str());
 //  }
 //}
-

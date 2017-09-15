@@ -18,7 +18,7 @@ using namespace std;
 class Document : public Napi::ObjectWrap<Document>
 {
 public:
-  explicit Document(const CallbackInfo &callbackInfo); // constructor
+  explicit Document(const CallbackInfo& callbackInfo); // constructor
   ~Document()
   {
     free(_buffer);
@@ -26,56 +26,43 @@ public:
   }
   string originPdf;
 
-  static void
-  Initialize(Napi::Env &env, Napi::Object &target)
+  static void Initialize(Napi::Env& env, Napi::Object& target)
   {
     Napi::HandleScope scope(env);
     Function ctor =
       DefineClass(env,
                   "Document",
-                  {InstanceMethod("load", &Document::Load),
-                   InstanceMethod("getPageCount", &Document::GetPageCount),
-                   InstanceMethod("getPage", &Document::GetPage),
-                   InstanceMethod("mergeDocument", &Document::MergeDocument),
-                   InstanceMethod("deletePage", &Document::DeletePage),
-                   InstanceMethod("setPassword", &Document::SetPassword),
-                   InstanceMethod("getVersion", &Document::GetVersion),
-                   InstanceMethod("isLinearized", &Document::IsLinearized),
-                   InstanceMethod("getWriteMode", &Document::GetWriteMode),
-                   InstanceMethod("setEncrypt", &Document::SetEncrypted),
-                   InstanceMethod("write", &Document::Write)});
+                  { InstanceMethod("load", &Document::Load),
+                    InstanceMethod("getPageCount", &Document::GetPageCount),
+                    InstanceMethod("getPage", &Document::GetPage),
+                    InstanceMethod("mergeDocument", &Document::MergeDocument),
+                    InstanceMethod("deletePage", &Document::DeletePage),
+                    InstanceMethod("setPassword", &Document::SetPassword),
+                    InstanceMethod("getVersion", &Document::GetVersion),
+                    InstanceMethod("isLinearized", &Document::IsLinearized),
+                    InstanceMethod("getWriteMode", &Document::GetWriteMode),
+                    InstanceMethod("setEncrypt", &Document::SetEncrypted),
+                    InstanceMethod("write", &Document::Write) });
 
     target.Set("Document", ctor);
   }
 
-  Napi::Value
-  Load(const CallbackInfo &);
-  Napi::Value
-  GetPageCount(const CallbackInfo &);
-  Napi::Value
-  GetPage(const CallbackInfo &);
-  void
-  MergeDocument(const CallbackInfo &);
-  void
-  DeletePage(const CallbackInfo &);
-  void
-  SetPassword(const CallbackInfo &);
-  Napi::Value
-  GetVersion(const CallbackInfo &);
-  Napi::Value
-  IsLinearized(const CallbackInfo &);
-  Napi::Value
-  Write(const CallbackInfo &);
-  PoDoFo::PdfMemDocument *
-  GetDocument() { return _document; }
-  Napi::Value
-  GetWriteMode(const CallbackInfo&);
-  void
-  SetEncrypted(const CallbackInfo&);
+  Napi::Value Load(const CallbackInfo&);
+  Napi::Value GetPageCount(const CallbackInfo&);
+  Napi::Value GetPage(const CallbackInfo&);
+  void MergeDocument(const CallbackInfo&);
+  void DeletePage(const CallbackInfo&);
+  void SetPassword(const CallbackInfo&);
+  Napi::Value GetVersion(const CallbackInfo&);
+  Napi::Value IsLinearized(const CallbackInfo&);
+  Napi::Value Write(const CallbackInfo&);
+  PoDoFo::PdfMemDocument* GetDocument() { return _document; }
+  Napi::Value GetWriteMode(const CallbackInfo&);
+  void SetEncrypted(const CallbackInfo&);
 
 private:
-  PoDoFo::PdfMemDocument *_document;
-  void *_buffer;
+  PoDoFo::PdfMemDocument* _document;
+  void* _buffer;
 };
 
 #endif // NPDF_PDFMEMDOCUMENT_H

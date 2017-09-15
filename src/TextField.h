@@ -6,6 +6,7 @@
 #define NPDF_TEXTFIELD_H
 
 #include "Field.h"
+#include "ValidateArguments.h"
 #include <napi.h>
 #include <podofo/podofo.h>
 #include <string>
@@ -18,12 +19,7 @@ class TextField : public Napi::ObjectWrap<TextField>
 {
 public:
   TextField(const CallbackInfo&);
-  ~TextField()
-  {
-    //    delete _base;
-    delete _field;
-  }
-  //  static Napi::FunctionReference constructor;
+  ~TextField() { delete _field; }
   static void Initialize(Napi::Env& env, Napi::Object& target)
   {
     HandleScope scope(env);
@@ -32,8 +28,6 @@ public:
                   "TextField",
                   { InstanceMethod("setText", &TextField::SetText),
                     InstanceMethod("getText", &TextField::GetText) });
-    //    constructor = Napi::Persistent(ctor);
-    //    constructor.SuppressDestruct();
     target.Set("TextField", ctor);
   }
   void SetText(const CallbackInfo&);
@@ -42,7 +36,5 @@ public:
 private:
   Field* _field;
   PdfTextField GetField() { return PdfTextField(_field->GetField()); }
-  //  PoDoFo::PdfField* _base;
-  //  PoDoFo::PdfTextField* _field;
 };
 #endif // NPDF_TEXTFIELD_H
