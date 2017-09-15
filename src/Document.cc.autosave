@@ -238,6 +238,9 @@ Document::SetEncrypted(const CallbackInfo& info)
   }
   if (encryption.Has("algorithm")) {
     // rc4v1 =1 rc4v2 = 2 aesv2 = 4 aesv3 = 8
+    if(encryption.Get("algorithm").IsString()) {
+      string algo = encryption.Get("algorithm").As<String>().Utf8Value();
+    }
   }
   if (encryption.Has("keyLength")) {
     // 40 56 80 96 128 256

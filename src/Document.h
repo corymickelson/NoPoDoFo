@@ -41,6 +41,8 @@ public:
                    InstanceMethod("setPassword", &Document::SetPassword),
                    InstanceMethod("getVersion", &Document::GetVersion),
                    InstanceMethod("isLinearized", &Document::IsLinearized),
+                   InstanceMethod("getWriteMode", &Document::GetWriteMode),
+                   InstanceMethod("setEncrypt", &Document::SetEncrypted),
                    InstanceMethod("write", &Document::Write)});
 
     target.Set("Document", ctor);
@@ -66,6 +68,10 @@ public:
   Write(const CallbackInfo &);
   PoDoFo::PdfMemDocument *
   GetDocument() { return _document; }
+  Napi::Value
+  GetWriteMode(const CallbackInfo&);
+  void
+  SetEncrypted(const CallbackInfo&);
 
 private:
   PoDoFo::PdfMemDocument *_document;

@@ -29,32 +29,22 @@ interface IPage {
 }
 interface IField {
     getType(): string;
-
     getFieldName(): string;
-
     getAlternateName(): string;
-
     getMappingName(): string;
-
     isRequired(): boolean;
-
     setRequired(required: boolean): void;
-
     setAlternateName(name: string): void;
-
     setMappingName(name: string): void;
 }
-
 interface IPainter {
     setPage(page: IPage): void;
-
     finishPage(): void;
-
     drawText(): void;
-
     drawImage(imgFile: string): void;
-
     getPrecision(): number;
+}
+interface ITextField {
 }
 interface IDocument {
     load(file: string): void;
@@ -66,6 +56,14 @@ interface IDocument {
     isLinearized(): boolean;
     setPassword(password: string): void;
     write(file: string): void;
+}
+interface IRect {
+}
+interface IImage {
+}
+interface IAnnotation {
+}
+interface ISignature {
 }
 declare class Document implements IDocument {
     load(file: string): void;
@@ -107,4 +105,10 @@ declare class Page implements IPage {
         selected?: string;
     }];
     getFieldIndex(fieldName: string): number;
+}
+declare class Field implements IField {
+}
+declare class TextField implements ITextField {
+}
+declare class Painter implements IPainter {
 }

@@ -1,6 +1,6 @@
 const mod = require('../src/npdf')
 
-interface IPage {
+public interface IPage {
     getRotation(): number
 
     getNumFields(): number
@@ -33,7 +33,7 @@ interface IPage {
     getFieldIndex(fieldName: string): number
 }
 
-interface IField {
+public interface IField {
     getType(): string
 
     getFieldName(): string
@@ -51,7 +51,7 @@ interface IField {
     setMappingName(name: string): void
 }
 
-interface IPainter {
+public interface IPainter {
     setPage(page: IPage): void
 
     finishPage(): void
@@ -63,7 +63,11 @@ interface IPainter {
     getPrecision(): number
 }
 
-interface IDocument {
+public interface ITextField {
+
+}
+
+public interface IDocument {
     load(file: string): void
 
     getPageCount(): number
@@ -83,7 +87,23 @@ interface IDocument {
     write(file: string): void
 }
 
-class Document implements IDocument {
+public interface IRect {
+
+}
+
+public interface IImage {
+
+}
+
+public interface IAnnotation {
+
+}
+
+public interface ISignature {
+
+}
+
+export class Document implements IDocument {
     load(file: string): void {
         throw new Error("Method not implemented.");
     }
@@ -127,7 +147,7 @@ class Document implements IDocument {
     }
 }
 
-class Page implements IPage {
+export class Page implements IPage {
     getRotation(): number {
 
         throw new Error("Method not implemented.");
@@ -187,3 +207,16 @@ class Page implements IPage {
 
 }
 
+export class Field implements IField {}
+
+export class TextField implements ITextField {}
+
+export class Painter implements IPainter {}
+
+export class Rect implements IRect {}
+
+export class Image implements IImage {}
+
+export class Signature implements ISignature {}
+
+export class Annotation implements IAnnotation {}

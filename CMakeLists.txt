@@ -7,7 +7,7 @@ set(CMAKE_CXX_FLAGS -fPIC)
 
 file(GLOB SOURCE_FILES
     "src/*.hpp"
-        "src/*.h"
+    "src/*.h"
     "src/*.cc" )
 
 add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES})

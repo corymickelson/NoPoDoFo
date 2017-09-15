@@ -1,4 +1,5 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 const mod = require('../src/npdf');
 class Document {
     load(file) {
@@ -32,6 +33,7 @@ class Document {
         this._instance = new mod.Document();
     }
 }
+exports.Document = Document;
 class Page {
     getRotation() {
         throw new Error("Method not implemented.");
@@ -76,3 +78,25 @@ class Page {
         throw new Error("Method not implemented.");
     }
 }
+exports.Page = Page;
+class Field {
+}
+exports.Field = Field;
+class TextField {
+}
+exports.TextField = TextField;
+class Painter {
+}
+exports.Painter = Painter;
+class Rect {
+}
+exports.Rect = Rect;
+class Image {
+}
+exports.Image = Image;
+class Signature {
+}
+exports.Signature = Signature;
+class Annotation {
+}
+exports.Annotation = Annotation;
