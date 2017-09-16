@@ -3,9 +3,104 @@
 //
 
 #include "Image.h"
-Napi::FunctionReference Image::constructor;
 
-Image::Image(const CallbackInfo &callbackInfo) : ObjectWrap(callbackInfo)
+Image::Image(const CallbackInfo& info)
+  : ObjectWrap(info)
 {
 
+#ifdef PODOFO_HAVE_JPEG_LIB
+  try {
+    if (info.Length() < 1) {
+      throw Napi::Error::New(info.Env(), "Image requires the document.");
+    }
+    Object docObj = info[0].As<Object>();
+    _doc = Document::Unwrap(docObj);
+    PdfMemDocument* doc = _doc->GetDocument();
+    img = new PdfImage(doc);
+    if (info.Length() == 2 && info[1].IsString()) {
+      string imgFile = info[1].As<String>().Utf8Value();
+      if (filesystem::exists(imgFile) == false) {
+        stringstream msg;
+        msg << "File: " << imgFile << " not found." << endl;
+        throw Napi::Error::New(info.Env(), msg.str());
+      }
+      img->LoadFromFile(imgFile.c_str());
+      loaded = true;
+    }
+  } catch (PdfError& err) {
+    stringstream msg;
+    msg << "PoDoFo error: " << err.GetError() << endl;
+    throw Napi::Error::New(info.Env(), msg.str());
+  }
+#else
+  throw Napi::Error::New(info.Env(),
+                         "NPdf PoDoFo requires libjpeg for images.");
+#endif
+}
+
+void
+Image::SetFile(const CallbackInfo& info)
+{
+
+#ifdef PODOFO_HAVE_JPEG_LIB
+  try {
+    if (info[0].IsString()) {
+      string file = info[0].As<String>().Utf8Value();
+      if (filesystem::exists(file) == false) {
+        stringstream msg;
+        msg << "File: " << file << " not found." << endl;
+        throw Napi::Error::New(info.Env(), msg.str());
+      }
+      img->LoadFromFile(file.c_str());
+      loaded = true;
+    } else {
+      throw Napi::Error::New(
+        info.Env(), "LoadFromFile takes a single argument of type string.");
+    }
+  } catch (PdfError& err) {
+    stringstream msg;
+    msg << "PoDoFo fail code: " << err.GetError() << endl;
+    throw Napi::Error::New(info.Env(), msg.str());
+  }
+#else
+  throw Napi::Error::New(info.Env(),
+                         "NPdf PoDoFo requires libjpeg for images.");
+#endif
+}
+
+void
+Image::SetData(const CallbackInfo& info)
+{
+}
+
+Napi::Value
+Image::GetHeight(const CallbackInfo& info)
+{
+  try {
+    if (!loaded) {
+      throw Napi::Error::New(info.Env(),
+                             "Can not call getWidth before setting file/data.");
+    }
+    return Napi::Number::New(info.Env(), img->GetHeight());
+  } catch (PdfError& err) {
+    stringstream msg;
+    msg << "PoDoFo failure: " << err.GetError() << endl;
+    throw Napi::Error::New(info.Env(), msg.str());
+  }
+}
+
+Napi::Value
+Image::GetWidth(const CallbackInfo& info)
+{
+  try {
+    if (!loaded) {
+      throw Napi::Error::New(info.Env(),
+                             "Can not call getWidth before setting file/data.");
+    }
+    return Napi::Number::New(info.Env(), img->GetWidth());
+  } catch (PdfError& err) {
+    stringstream msg;
+    msg << "PoDoFo failure: " << err.GetError() << endl;
+    throw Napi::Error::New(info.Env(), msg.str());
+  }
 }

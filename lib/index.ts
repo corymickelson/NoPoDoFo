@@ -1,29 +1,11 @@
 const mod = require('../src/npdf')
 
-public interface IPage {
+export interface IPage {
     getRotation(): number
 
     getNumFields(): number
 
-    getField(index: number): IField
-
     setRotation(degree: number): void
-
-    getBottom(): number
-
-    setBottom(value: number): void
-
-    getLeft(): number
-
-    setLeft(value: number): void
-
-    getWidth(): number
-
-    setWidth(value: number): void
-
-    getHeight(): number
-
-    setHeight(value: number): void
 
     getFields(): [{
         name: string, alternateName: string, mappingName: string, required: boolean, readOnly: boolean, value: string | number,
@@ -33,7 +15,7 @@ public interface IPage {
     getFieldIndex(fieldName: string): number
 }
 
-public interface IField {
+export interface IField {
     getType(): string
 
     getFieldName(): string
@@ -51,28 +33,30 @@ public interface IField {
     setMappingName(name: string): void
 }
 
-public interface IPainter {
+export interface IPainter {
     setPage(page: IPage): void
 
     finishPage(): void
 
     drawText(): void
 
-    drawImage(imgFile: string): void
+    drawImage(imgFile: string, x:number, y:number, width:number, height:number): void
 
     getPrecision(): number
 }
 
-public interface ITextField {
-
+export interface ITextField {
+    getText(): string
+    setText(value: string): void
 }
 
-public interface IDocument {
+export interface IDocument {
+
     load(file: string): void
 
     getPageCount(): number
 
-    getPage(pageN: number): Page
+    getPage(pageN: number): IPage
 
     mergeDocument(doc: string): void
 
@@ -87,133 +71,200 @@ public interface IDocument {
     write(file: string): void
 }
 
-public interface IRect {
+export interface IRect {
+    getBottom(): number
+
+    setBottom(value: number): void
+
+    getLeft(): number
+
+    setLeft(value: number): void
+
+    getWidth(): number
+
+    setWidth(value: number): void
+
+    getHeight(): number
+
+    setHeight(value: number): void
+}
+
+export interface IImage {
 
 }
 
-public interface IImage {
+export interface IAnnotation {
 
 }
 
-public interface IAnnotation {
-
-}
-
-public interface ISignature {
+export interface ISignature {
 
 }
 
 export class Document implements IDocument {
-    load(file: string): void {
-        throw new Error("Method not implemented.");
-    }
 
-    getPageCount(): number {
-        throw new Error("Method not implemented.");
-    }
-
-    getPage(pageN: number): Page {
-        throw new Error("Method not implemented.");
-    }
-
-    mergeDocument(doc: string): void {
-        throw new Error("Method not implemented.");
-    }
-
-    deletePage(pageIndex: number): void {
-        throw new Error("Method not implemented.");
-    }
-
-    getVersion(): number {
-        throw new Error("Method not implemented.");
-    }
-
-    isLinearized(): boolean {
-        throw new Error("Method not implemented.");
-    }
-
-    setPassword(password: string): void {
-        throw new Error("Method not implemented.");
-    }
-
-    write(file: string): void {
-        throw new Error("Method not implemented.");
-    }
-
-    private _instance:Object
+    private _instance:any
 
     constructor(file: string) {
         this._instance = new mod.Document()
     }
+
+    load(file: string): void {
+        this._instance.load(file)
+    }
+
+    getPageCount(): number {
+        return this._instance.getPageCount()
+    }
+
+    getPage(pageN: number): IPage {
+        const page:IPage = this._instance.getPage(pageN)
+        return page;
+    }
+
+    mergeDocument(doc: string): void {
+        this._instance.mergeDocument(doc)
+    }
+
+    deletePage(pageIndex: number): void {
+        this._instance.deletePage(pageIndex)
+    }
+
+    getVersion(): number {
+        return this._instance.getVersion()
+    }
+
+    isLinearized(): boolean {
+        return this._instance.isLinearized()
+    }
+
+    setPassword(password: string): void {
+        this._instance.setPassword(password)
+    }
+
+    write(file: string): void {
+        this._instance.write(file)
+    }
+
 }
 
-export class Page implements IPage {
-    getRotation(): number {
 
+export class Field implements IField {
+    private _instance:any
+    constructor(page:IPage, fieldIndex:number) {
+        this._instance = new mod.Field(page, fieldIndex)
+    }
+
+    getType(): string {
+        return this._instance.getType()
+    }
+
+    getFieldName(): string {
+        return this._instance.getFieldName()
+    }
+
+    getAlternateName(): string {
+        return this._instance.getAlternateName()
+    }
+
+    getMappingName(): string {
+        return this._instance.getMappingName()
+    }
+
+    isRequired(): boolean {
+        return this._instance.isRequired()
+    }
+
+    setRequired(required: boolean): void {
+        this._instance.setRequired(required)
+    }
+
+    setAlternateName(name: string): void {
+        this._instance.setAlternateName(name)
+    }
+
+    setMappingName(name: string): void {
+        this._instance.setMappingName(name)
+    }
+}
+
+export class TextField implements ITextField {
+    private _instance:any
+    constructor(field:IField) {
+        this._instance = new mod.TextField(field)
+    }
+    getText(): string {
+        return this._instance.getText()
+    }
+
+    setText(value: string): void {
+        return this._instance.setText(value)
+    }
+}
+
+export class Painter implements IPainter {
+    private _instance: any
+    constructor() {
+        this._instance = new mod.Painter()
+    }
+    setPage(page: IPage): void {
+        this._instance.setPage(page)
+    }
+
+    finishPage(): void {
+        this._instance.finishPage()
+    }
+
+    drawText(): void {
         throw new Error("Method not implemented.");
     }
 
-    getNumFields(): number {
-        throw new Error("Method not implemented.");
+    drawImage(imgFile: string, x:number, y:number, width:number, height:number): void {
+        this._instance.drawImage(imgFile, x,y,width,height)
     }
 
-    getField(index: number): IField {
-        throw new Error("Method not implemented.");
+    getPrecision(): number {
+        return this._instance.getPrecision()
     }
+}
 
-    setRotation(degree: number): void {
-        throw new Error("Method not implemented.");
+export class Rect implements IRect {
+    private _instance:any
+    constructor(page:IPage) {
+        this._instance = new mod.Rect(page)
     }
-
     getBottom(): number {
-        throw new Error("Method not implemented.");
+        return this._instance.getBottom()
     }
 
     setBottom(value: number): void {
-        throw new Error("Method not implemented.");
+        this._instance.setBottom(value)
     }
 
     getLeft(): number {
-        throw new Error("Method not implemented.");
+        return this._instance.getLeft()
     }
 
     setLeft(value: number): void {
-        throw new Error("Method not implemented.");
+        this._instance.setLeft(value)
     }
 
     getWidth(): number {
-        throw new Error("Method not implemented.");
+        return this._instance.getWidth()
     }
 
     setWidth(value: number): void {
-        throw new Error("Method not implemented.");
+        this._instance.setWidth(value)
     }
 
     getHeight(): number {
-        throw new Error("Method not implemented.");
+        return this._instance.getHeight()
     }
 
     setHeight(value: number): void {
-        throw new Error("Method not implemented.");
+        this._instance.setHeight(value)
     }
-
-    getFields(): [{ name: string; alternateName: string; mappingName: string; required: boolean; readOnly: boolean; value: (string | number); maxLen?: number; multiLine?: boolean; caption?: string; type: string; selected?: string }] {
-        throw new Error("Method not implemented.");
-    }
-
-    getFieldIndex(fieldName: string): number {
-        throw new Error("Method not implemented.");
-    }
-
 }
-
-export class Field implements IField {}
-
-export class TextField implements ITextField {}
-
-export class Painter implements IPainter {}
-
-export class Rect implements IRect {}
 
 export class Image implements IImage {}
 
