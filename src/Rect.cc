@@ -7,12 +7,65 @@
 Rect::Rect(const CallbackInfo& info)
   : ObjectWrap(info)
 {
-  if (info.Length() != 1) {
-    throw Error::New(info.Env(), "Rect requires Page as constructor parameter");
+  if (info.Length() == 0) {
+    rect = *new PoDoFo::PdfRect();
   }
-  Object pageObj = info[0].As<Object>();
-  Page* page = Page::Unwrap(pageObj);
-  rect = page->GetPage()->GetPageSize();
+  if (info.Length() == 1) {
+    if (info[0].IsObject() == false) {
+      throw Error::New(info.Env(),
+                       "Rect requires Page as constructor parameter");
+    }
+    Object pageObj = info[0].As<Object>();
+    Page* page = Page::Unwrap(pageObj);
+    rect = page->GetPage()->GetPageSize();
+  }
+  if (info.Length() == 4) {
+    double left, bottom, width, height;
+    for (uint8_t i = 0; i < info.Length(); i++) {
+      if (info[i].IsNumber() == false) {
+        throw Napi::Error::New(info.Env(),
+                               "Rect requires (number, number, number, number) "
+                               "as constructor parameters.");
+      }
+    }
+    left = info[0].As<Number>();
+    bottom = info[1].As<Number>();
+    width = info[2].As<Number>();
+    height = info[3].As<Number>();
+    rect = *new PoDoFo::PdfRect(left, bottom, width, height);
+  }
+}
+void
+Rect::FromArray(const CallbackInfo& info)
+{
+  try {
+    AssertFunctionArgs(info, 1, { napi_valuetype::napi_object });
+    PdfArray array;
+    Array coordinates = info[0].As<Array>();
+    if (coordinates.Length() != 4) {
+      for (uint32_t i = 0; i < coordinates.Length(); ++i) {
+        double point = coordinates.Get(i).As<Number>();
+        array.push_back(point);
+      }
+    }
+    rect.FromArray(array);
+  } catch (PdfError& err) {
+    stringstream msg;
+    msg << "PoDoFo Error: " << err.GetError() << endl;
+    throw Napi::Error::New(info.Env(), msg.str());
+  }
+}
+void
+Rect::Intersect(const CallbackInfo& info)
+{
+  if (info.Length() != 1) {
+    throw Napi::Error::New(info.Env(),
+                           "Intersect requires a single argument of type Rect");
+  }
+  Object rectObj = info[0].As<Object>();
+  Rect* rectIntersect = Rect::Unwrap(rectObj);
+  PdfRect rect = rectIntersect->GetRect();
+  Rect::GetRect().Intersect(rect);
 }
 Napi::Value
 Rect::GetWidth(const CallbackInfo& info)

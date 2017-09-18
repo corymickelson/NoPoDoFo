@@ -38,6 +38,7 @@ public:
                   { InstanceMethod("getWidth", &Image::GetWidth),
                     InstanceMethod("getHeight", &Image::GetHeight),
                     InstanceMethod("setFile", &Image::SetFile),
+                    InstanceAccessor("isLoaded", &Image::IsLoaded, nullptr),
                     InstanceMethod("setData", &Image::SetData) });
     target.Set("Image", ctor);
   }
@@ -46,6 +47,7 @@ public:
   Napi::Value GetHeight(const CallbackInfo&);
   void SetFile(const CallbackInfo&);
   void SetData(const CallbackInfo&);
+  Napi::Value IsLoaded(const CallbackInfo&);
   PdfImage GetImage() { return *img; }
 
 private:

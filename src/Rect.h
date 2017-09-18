@@ -6,6 +6,7 @@
 #define NPDF_RECT_H
 
 #include "Page.h"
+#include "ValidateArguments.h"
 #include <napi.h>
 #include <podofo/podofo.h>
 
@@ -23,6 +24,8 @@ public:
     Function ctor = DefineClass(env,
                                 "Rect",
                                 {
+                                  InstanceMethod("fromArray", &Rect::FromArray),
+                                  InstanceMethod("intersect", &Rect::Intersect),
                                   InstanceMethod("getWidth", &Rect::GetWidth),
                                   InstanceMethod("getHeight", &Rect::GetHeight),
                                   InstanceMethod("getBottom", &Rect::GetBottom),
@@ -35,6 +38,9 @@ public:
                                 });
     target.Set("Rect", ctor);
   }
+
+  void FromArray(const CallbackInfo&);
+  void Intersect(const CallbackInfo&);
   Napi::Value GetWidth(const CallbackInfo&);
   void SetWidth(const CallbackInfo&);
   Napi::Value GetHeight(const CallbackInfo&);
@@ -43,6 +49,7 @@ public:
   void SetBottom(const CallbackInfo&);
   Napi::Value GetLeft(const CallbackInfo&);
   void SetLeft(const CallbackInfo&);
+  PoDoFo::PdfRect GetRect() { return rect; }
 
 private:
   PoDoFo::PdfRect rect = *new PoDoFo::PdfRect();

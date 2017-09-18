@@ -5,7 +5,8 @@
 #ifndef NPDF_PDFPAGE_HPP
 #define NPDF_PDFPAGE_HPP
 
-//#include "Document.h"
+#define CONVERSION_CONSTANT 0.002834645669291339
+
 #include <napi.h>
 #include <podofo/podofo.h>
 

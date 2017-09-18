@@ -6,8 +6,7 @@
 #include "Document.h"
 Painter::Painter(const Napi::CallbackInfo& info)
   : ObjectWrap(info)
-{
-}
+{}
 void
 Painter::SetPage(const Napi::CallbackInfo& info)
 {
@@ -27,32 +26,32 @@ Painter::FinishPage(const CallbackInfo& info)
 }
 void
 Painter::DrawText(const CallbackInfo& info)
-{
-}
+{}
 void
 Painter::DrawImage(const CallbackInfo& info)
 {
-  //  try {
-  //    Object imgObj = info[0].As<Object>();
-  //    Image* img_ = Image::Unwrap(imgObj);
-  //    PdfImage img = img_->GetImage();
-  //    //    PdfImage* img = img_->GetImage();
-  //    _painter->DrawImage(0.0, pageSize.GetHeight() - img.GetHeight(), &img);
+  try {
+    Object imgObj = info[0].As<Object>();
+    Image* img_ = Image::Unwrap(imgObj);
+    PdfImage img = img_->GetImage();
+    //    PdfImage* img = img_->GetImage();
+    _painter->DrawImage(0.0, pageSize.GetHeight() - img.GetHeight(), &img);
 
-  //  } catch (PdfError& err) {
-  //    stringstream msg;
-  //    msg << "PoDoFo failure, error code: " << err.GetError() << endl;
-  //    throw Napi::Error::New(info.Env(), msg.str());
-  //  }
-  double x, y, width, height;
-  string imgFile = info[0].As<String>().Utf8Value();
-  x = info[1].As<Number>();
-  y = info[2].As<Number>();
-  width = info[3].As<Number>();
-  height = info[4].As<Number>();
-  PoDoFo::PdfImage image(_document);
-  image.LoadFromFile(imgFile.c_str());
-  _painter->DrawImage(0.0, pageSize.GetHeight() - image.GetHeight(), &image);
+  } catch (PdfError& err) {
+    stringstream msg;
+    msg << "PoDoFo failure, error code: " << err.GetError() << endl;
+    throw Napi::Error::New(info.Env(), msg.str());
+  }
+  //  double x, y, width, height;
+  //  string imgFile = info[0].As<String>().Utf8Value();
+  //  x = info[1].As<Number>();
+  //  y = info[2].As<Number>();
+  //  width = info[3].As<Number>();
+  //  height = info[4].As<Number>();
+  //  PoDoFo::PdfImage image(_document);
+  //  image.LoadFromFile(imgFile.c_str());
+  //  _painter->DrawImage(0.0, pageSize.GetHeight() - image.GetHeight(),
+  //  &image);
 }
 
 Napi::Value

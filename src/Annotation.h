@@ -5,29 +5,77 @@
 #ifndef NPDF_ANNOTATION_H
 #define NPDF_ANNOTATION_H
 
+#include "Page.h"
+#include "Rect.h"
 #include <napi.h>
 #include <podofo/podofo.h>
+#include <vector>
 
-using namespace Napi;
+using namespace std;
 using namespace PoDoFo;
 
 class Annotation : public ObjectWrap<Annotation>
 {
 public:
-  Annotation(const CallbackInfo &callbackInfo);
+  Annotation(const CallbackInfo& callbackInfo);
   ~Annotation();
-  static FunctionReference constructor;
-  static void
-  Initialize(Napi::Env &env, Napi::Object &target)
+  static void Initialize(Napi::Env& env, Napi::Object& target)
   {
     HandleScope scope(env);
-    Function ctor = DefineClass(env,
-                                "Annotation",
-                                {});
-    constructor = Napi::Persistent(ctor);
-    constructor.SuppressDestruct();
-    target.Set("Annotation", constructor);
-  }
+    Function ctor = DefineClass(
+      env,
+      "Annotation",
+      { InstanceAccessor("flags", &Annotation::GetFlags, &Annotation::SetFlags),
+        InstanceMethod("hasAppearanceStream", &Annotation::HasAppearanceStream),
+        InstanceMethod("setBorderStyle", &Annotation::SetBorderStyle),
+        InstanceAccessor("title", &Annotation::GetTitle, &Annotation::SetTitle),
+        InstanceAccessor(
+          "content", &Annotation::GetContent, &Annotation::SetContent),
+        InstanceAccessor("destination",
+                         &Annotation::GetDestination,
+                         &Annotation::SetDestination),
+        InstanceMethod("hasDestination", &Annotation::HasDestination),
+        InstanceMethod("hasAction", &Annotation::HasAction),
+        InstanceAccessor(
+          "action", &Annotation::GetAction, &Annotation::SetAction),
+        InstanceAccessor("open", &Annotation::GetOpen, &Annotation::SetOpen),
+        InstanceMethod("getType", &Annotation::GetType),
+        InstanceAccessor("color", &Annotation::GetColor, &Annotation::SetColor),
+        InstanceAccessor(
+          "quadPoints", &Annotation::GetQuadPoints, &Annotation::SetQuadPoints),
+        InstanceMethod("setFileAttachment", &Annotation::SetFileAttachment),
+        InstanceMethod("hasFileAttachment", &Annotation::HasFileAttachment) });
 
+    target.Set("Annotation", ctor);
+  }
+  Napi::Value HasAppearanceStream(const CallbackInfo&);
+  void SetFlags(const CallbackInfo&, const Napi::Value&);
+  Napi::Value GetFlags(const CallbackInfo&);
+  void SetBorderStyle(const CallbackInfo&);
+  void SetTitle(const CallbackInfo&, const Napi::Value&);
+  Napi::Value GetTitle(const CallbackInfo&);
+  void SetContent(const CallbackInfo&, const Napi::Value&);
+  Napi::Value GetContent(const CallbackInfo&);
+  void SetDestination(const CallbackInfo&, const Napi::Value&);
+  Napi::Value GetDestination(const CallbackInfo&);
+  Napi::Value HasDestination(const CallbackInfo&);
+  void SetAction(const CallbackInfo&, const Napi::Value&);
+  Napi::Value GetAction(const CallbackInfo&);
+  Napi::Value HasAction(const CallbackInfo&);
+  void SetOpen(const CallbackInfo&, const Napi::Value&);
+  Napi::Value GetOpen(const CallbackInfo&);
+  void SetColor(const CallbackInfo&, const Napi::Value&);
+  Napi::Value GetColor(const CallbackInfo&);
+  Napi::Value GetType(const CallbackInfo&);
+  void SetQuadPoints(const CallbackInfo&, const Napi::Value&);
+  Napi::Value GetQuadPoints(const CallbackInfo&);
+  void SetFileAttachment(const CallbackInfo&);
+  Napi::Value HasFileAttachment(const CallbackInfo&);
+
+  PdfAnnotation* GetAnnotation() { return annot; }
+
+private:
+  PdfAnnotation* annot;
+  PdfMemDocument* doc;
 };
-#endif //NPDF_ANNOTATION_H
+#endif // NPDF_ANNOTATION_H
