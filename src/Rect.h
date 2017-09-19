@@ -24,7 +24,6 @@ public:
     Function ctor = DefineClass(env,
                                 "Rect",
                                 {
-                                  InstanceMethod("fromArray", &Rect::FromArray),
                                   InstanceMethod("intersect", &Rect::Intersect),
                                   InstanceMethod("getWidth", &Rect::GetWidth),
                                   InstanceMethod("getHeight", &Rect::GetHeight),
@@ -39,7 +38,6 @@ public:
     target.Set("Rect", ctor);
   }
 
-  void FromArray(const CallbackInfo&);
   void Intersect(const CallbackInfo&);
   Napi::Value GetWidth(const CallbackInfo&);
   void SetWidth(const CallbackInfo&);

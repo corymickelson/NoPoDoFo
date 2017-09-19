@@ -1,11 +1,12 @@
+#include "Annotation.h"
+#include "CheckBox.h"
 #include "Document.h"
 #include "Field.h"
-#include "TextField.h"
 #include "Image.h"
-#include "Annotation.h"
-#include "Signature.h"
-#include "Rect.h"
 #include "Painter.h"
+#include "Rect.h"
+#include "Signature.h"
+#include "TextField.h"
 
 void
 init(Napi::Env env, Napi::Object exports, Napi::Object module)
@@ -19,6 +20,7 @@ init(Napi::Env env, Napi::Object exports, Napi::Object module)
   Annotation::Initialize(env, exports);
   Rect::Initialize(env, exports);
   Painter::Initialize(env, exports);
+  CheckBox::Initialize(env, exports);
 }
 
 NODE_API_MODULE(npdf, init);

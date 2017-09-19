@@ -5,6 +5,7 @@
 #ifndef NPDF_CHECKBOX_H
 #define NPDF_CHECKBOX_H
 
+#include "Field.h"
 #include <napi.h>
 #include <podofo/podofo.h>
 
@@ -19,11 +20,18 @@ public:
   static void Initialize(Napi::Env& env, Napi::Object& target)
   {
     HandleScope scope(env);
-    Function ctor = DefineClass(env, "Annotation", {});
+    Function ctor =
+      DefineClass(env,
+                  "CheckBox",
+                  { InstanceAccessor(
+                    "checked", &CheckBox::IsChecked, &CheckBox::SetChecked) });
 
-    target.Set("Annotation", ctor);
+    target.Set("CheckBox", ctor);
   }
+  Napi::Value IsChecked(const CallbackInfo&);
+  void SetChecked(const CallbackInfo&, const Napi::Value&);
 
 private:
+  PdfCheckBox* box;
 };
 #endif // NPDF_CHECKBOX_H

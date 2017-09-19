@@ -35,26 +35,7 @@ Rect::Rect(const CallbackInfo& info)
     rect = *new PoDoFo::PdfRect(left, bottom, width, height);
   }
 }
-void
-Rect::FromArray(const CallbackInfo& info)
-{
-  try {
-    AssertFunctionArgs(info, 1, { napi_valuetype::napi_object });
-    PdfArray array;
-    Array coordinates = info[0].As<Array>();
-    if (coordinates.Length() != 4) {
-      for (uint32_t i = 0; i < coordinates.Length(); ++i) {
-        double point = coordinates.Get(i).As<Number>();
-        array.push_back(point);
-      }
-    }
-    rect.FromArray(array);
-  } catch (PdfError& err) {
-    stringstream msg;
-    msg << "PoDoFo Error: " << err.GetError() << endl;
-    throw Napi::Error::New(info.Env(), msg.str());
-  }
-}
+
 void
 Rect::Intersect(const CallbackInfo& info)
 {

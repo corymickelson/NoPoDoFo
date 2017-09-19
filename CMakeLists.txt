@@ -6,7 +6,6 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_FLAGS -fPIC)
 
 file(GLOB SOURCE_FILES
-    "src/*.hpp"
     "src/*.h"
     "src/*.cc" )
 
