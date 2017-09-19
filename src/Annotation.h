@@ -18,7 +18,11 @@ class Annotation : public ObjectWrap<Annotation>
 {
 public:
   Annotation(const CallbackInfo& callbackInfo);
-  ~Annotation();
+  ~Annotation()
+  {
+    delete annot;
+    delete doc;
+  }
   static void Initialize(Napi::Env& env, Napi::Object& target)
   {
     HandleScope scope(env);

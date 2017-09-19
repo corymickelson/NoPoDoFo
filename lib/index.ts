@@ -110,7 +110,13 @@ export interface IImage {
     isLoaded(): boolean
 }
 export interface IAnnotation {
-
+    hasAppearanceStream(): boolean
+    setBorderStyle(horizontalRadius:number, verticalRadius:number, width:number): void
+    hasDestination():boolean
+    hasAction():boolean
+    getType():boolean
+    setFileAttachment():void
+    hasFileAttachment():boolean
 }
 export interface ISignature {
 

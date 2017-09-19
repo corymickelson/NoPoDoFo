@@ -16,7 +16,7 @@ class CheckBox : public ObjectWrap<CheckBox>
 {
 public:
   CheckBox(const CallbackInfo& callbackInfo);
-  ~CheckBox();
+  ~CheckBox() { delete box; }
   static void Initialize(Napi::Env& env, Napi::Object& target)
   {
     HandleScope scope(env);

@@ -19,7 +19,7 @@ class Field : public Napi::ObjectWrap<Field>
 {
 public:
   Field(const CallbackInfo& info);
-  ~Field() {}
+  ~Field() { delete _page; }
   static void Initialize(Napi::Env& env, Napi::Object& target)
   {
     HandleScope scope(env);
