@@ -12,6 +12,7 @@ compile_commands.json
 CTestTestfile.cmake
 
 .idea/
+.vscode/
 build/
 cmake-build-debug/
 node_modules/
