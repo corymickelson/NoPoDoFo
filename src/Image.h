@@ -27,7 +27,7 @@ public:
   ~Image()
   {
     delete _doc;
-    free(img);
+    delete img;
   }
   static void Initialize(Napi::Env& env, Napi::Object& target)
   {

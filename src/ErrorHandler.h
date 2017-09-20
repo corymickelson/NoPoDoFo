@@ -14,10 +14,11 @@ class ErrorHandler
 {
 public:
   ErrorHandler();
+  ErrorHandler(PoDoFo::PdfError&);
   ~ErrorHandler();
   static string WriteMsg(PoDoFo::PdfError&);
 
 private:
-  static stringstream ParseMsgFromPdfError(PoDoFo::PdfError&);
+  static string ParseMsgFromPdfError(PoDoFo::PdfError&);
 };
 #endif // NPDF_ERRORHANDLER_H
