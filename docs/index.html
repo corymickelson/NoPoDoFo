@@ -89,10 +89,51 @@
 				<code>npm i -S n_pdf</code></p>
 				<h3 id="usage">Usage</h3>
 				<p>Getting started</p>
-				<pre><code class="lang-javascript"><span class="hljs-keyword">import</span> {Document, Page} <span class="hljs-keyword">from</span> <span class="hljs-string">'npdf'</span>
+				<pre><code class="lang-javascript"><span class="hljs-keyword">import</span> {...} <span class="hljs-keyword">from</span> <span class="hljs-string">'npdf'</span>
 </code></pre>
-				<p>NPdf includes a definition file for developer happiness. Import <code>src/npdf.d.ts</code> into your editor of choice.</p>
+				<p>NPdf includes a definition file for developer happiness. If your editor does not detect the type file import <code>dist/index.d.ts</code> into your editor of choice.</p>
 				<p>For Webstorm go to settings &gt; language &amp; frameworks &gt; javascript &gt; libraries and add and select the definitions file.</p>
+				<h3 id="document">Document</h3>
+				<p>NPdf wraps <a href="http://podofo.sourceforge.net/doc/html/classPoDoFo_1_1PdfMemDocument.html#ae72a4141ed85e8abda6a368b220854fa">PoDoFo::PdfMemDocument</a> class as Document.
+				Document is the core class for reading and modifying existing pdf documents. </p>
+				<p>Loading a document</p>
+				<pre><code class="lang-javascript"><span class="hljs-keyword">import</span> {Document} <span class="hljs-keyword">from</span> <span class="hljs-string">'npdf'</span>
+<span class="hljs-keyword">const</span> pdf:Document
+<span class="hljs-keyword">try</span> {
+    pdf = <span class="hljs-keyword">new</span> Document(<span class="hljs-string">'/path/to/pdf'</span>) <span class="hljs-comment">// if invalid password is thrown set password</span>
+} <span class="hljs-keyword">catch</span>(e) {
+    <span class="hljs-keyword">if</span>(e.message === <span class="hljs-string">'Password required to modify this document'</span>) {
+        pdf.password = <span class="hljs-string">'secret'</span>
+    }
+}
+</code></pre>
+				<p>At this point the document has been loaded into memory and we can now make modifications to the document and write back to disk.</p>
+				<h3 id="page">Page</h3>
+				<p>To start let&#39;s get a page, and rotate it 90 degrees and then save back to disk. </p>
+				<p>Note: The page definition is defined as an interface, not a concrete class.</p>
+				<pre><code class="lang-javascript"><span class="hljs-keyword">import</span> {Document, IPage} <span class="hljs-keyword">from</span> <span class="hljs-string">'npdf'</span>
+<span class="hljs-keyword">const</span> pdf = <span class="hljs-keyword">new</span> Document(<span class="hljs-string">'/path/to/pdf'</span>)
+<span class="hljs-comment">/** Pages are zero indexed */</span>
+<span class="hljs-keyword">const</span> pageCount = doc.getPageCount()
+<span class="hljs-keyword">for</span>(<span class="hljs-keyword">let</span> i = <span class="hljs-number">0</span>; i &lt; pageCount; i++) {
+    <span class="hljs-keyword">let</span> page:IPage = doc.getPage(i)
+    page.setRotation(<span class="hljs-number">90</span>) <span class="hljs-comment">// value must be increment of 90 (valid:0,90,180, 270)</span>
+}
+doc.write(<span class="hljs-string">'/destination'</span>)
+</code></pre>
+				<p>And that&#39;s all, we&#39;ve loaded a pdf, iterated through it&#39;s pages setting the rotate value to 90 and then written the modified file back to disk.</p>
+				<p>Check a page for fields</p>
+				<pre><code class="lang-javascript"><span class="hljs-keyword">import</span> {Document, IPage} <span class="hljs-keyword">from</span> <span class="hljs-string">'npdf'</span>
+<span class="hljs-keyword">const</span> pdf = <span class="hljs-keyword">new</span> Document(<span class="hljs-string">'/path/to/pdf'</span>)
+<span class="hljs-keyword">const</span> pageCount = doc.getPageCount()
+<span class="hljs-keyword">for</span>(<span class="hljs-keyword">let</span> i = <span class="hljs-number">0</span>; i &lt; pageCount; i++) {
+    <span class="hljs-keyword">let</span> page:IPage = doc.getPage(i)
+    <span class="hljs-keyword">let</span> fieldCount = page.getNumFields()
+    <span class="hljs-keyword">if</span>(fieldCount &gt; <span class="hljs-number">0</span>) {
+        <span class="hljs-keyword">let</span> fieldsSummary:<span class="hljs-built_in">Array</span>&lt;IFieldInfo&gt; = page.getFields()
+    }
+}
+</code></pre>
 			</div>
 		</div>
 		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
@@ -101,8 +142,35 @@
 					<li class="globals  ">
 						<a href="globals.html"><em>Globals</em></a>
 					</li>
+					<li class="label tsd-is-external">
+						<span>Internals</span>
+					</li>
 					<li class=" tsd-kind-external-module">
 						<a href="modules/_index_.html">"index"</a>
+					</li>
+					<li class="label tsd-is-external">
+						<span>Externals</span>
+					</li>
+					<li class=" tsd-kind-external-module tsd-is-external">
+						<a href="modules/_annotation_.html">"annotation"</a>
+					</li>
+					<li class=" tsd-kind-external-module tsd-is-external">
+						<a href="modules/_document_.html">"document"</a>
+					</li>
+					<li class=" tsd-kind-external-module tsd-is-external">
+						<a href="modules/_field_.html">"field"</a>
+					</li>
+					<li class=" tsd-kind-external-module tsd-is-external">
+						<a href="modules/_image_.html">"image"</a>
+					</li>
+					<li class=" tsd-kind-external-module tsd-is-external">
+						<a href="modules/_painter_.html">"painter"</a>
+					</li>
+					<li class=" tsd-kind-external-module tsd-is-external">
+						<a href="modules/_rect_.html">"rect"</a>
+					</li>
+					<li class=" tsd-kind-external-module tsd-is-external">
+						<a href="modules/_signature_.html">"signature"</a>
 					</li>
 				</ul>
 			</nav>

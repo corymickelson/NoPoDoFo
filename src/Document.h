@@ -9,6 +9,7 @@
 #include <napi.h>
 #include <podofo/podofo.h>
 
+#include "ErrorHandler.h"
 #include "Page.h"
 
 using namespace boost;
@@ -29,20 +30,23 @@ public:
   static void Initialize(Napi::Env& env, Napi::Object& target)
   {
     Napi::HandleScope scope(env);
-    Function ctor =
-      DefineClass(env,
-                  "Document",
-                  { InstanceMethod("load", &Document::Load),
-                    InstanceMethod("getPageCount", &Document::GetPageCount),
-                    InstanceMethod("getPage", &Document::GetPage),
-                    InstanceMethod("mergeDocument", &Document::MergeDocument),
-                    InstanceMethod("deletePage", &Document::DeletePage),
-                    InstanceMethod("setPassword", &Document::SetPassword),
-                    InstanceMethod("getVersion", &Document::GetVersion),
-                    InstanceMethod("isLinearized", &Document::IsLinearized),
-                    InstanceMethod("getWriteMode", &Document::GetWriteMode),
-                    InstanceMethod("setEncrypt", &Document::SetEncrypted),
-                    InstanceMethod("write", &Document::Write) });
+    Function ctor = DefineClass(
+      env,
+      "Document",
+      { InstanceMethod("load", &Document::Load),
+        //        InstanceAccessor("acroForm", &Document::GetAcroForm, nullptr),
+        InstanceMethod("getPageCount", &Document::GetPageCount),
+        InstanceMethod("getPage", &Document::GetPage),
+        InstanceMethod("mergeDocument", &Document::MergeDocument),
+        InstanceMethod("deletePage", &Document::DeletePage),
+        InstanceAccessor("password", nullptr, &Document::SetPassword),
+        //                    InstanceMethod("setPassword",
+        //                    &Document::SetPassword),
+        InstanceMethod("getVersion", &Document::GetVersion),
+        InstanceMethod("isLinearized", &Document::IsLinearized),
+        InstanceMethod("getWriteMode", &Document::GetWriteMode),
+        InstanceMethod("setEncrypt", &Document::SetEncrypted),
+        InstanceMethod("write", &Document::Write) });
 
     target.Set("Document", ctor);
   }
@@ -52,7 +56,7 @@ public:
   Napi::Value GetPage(const CallbackInfo&);
   void MergeDocument(const CallbackInfo&);
   void DeletePage(const CallbackInfo&);
-  void SetPassword(const CallbackInfo&);
+  void SetPassword(const CallbackInfo&, const Napi::Value&);
   Napi::Value GetVersion(const CallbackInfo&);
   Napi::Value IsLinearized(const CallbackInfo&);
   Napi::Value Write(const CallbackInfo&);

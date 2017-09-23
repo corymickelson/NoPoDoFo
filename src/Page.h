@@ -29,7 +29,7 @@ public:
     Napi::HandleScope scope(env);
     Napi::Function ctor =
       DefineClass(env,
-                  "PdfPage",
+                  "Page",
                   { InstanceMethod("getRotation", &Page::GetRotation),
                     InstanceMethod("getNumFields", &Page::GetNumFields),
                     InstanceMethod("setRotation", &Page::SetRotation),
