@@ -29,6 +29,9 @@ To install Npdf run
 
 ### Usage
 
+TypeDocs available [here](https://corymickelson.github.io/npdf/index.html)
+
+
 Getting started
 ``` javascript
 import {...} from 'npdf'
