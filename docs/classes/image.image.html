@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>Painter | n_pdf</title>
+	<title>Image | n_pdf</title>
 	<meta name="description" content="">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -56,13 +56,13 @@
 					<a href="../globals.html">Globals</a>
 				</li>
 				<li>
-					<a href="../modules/_painter_.html">&quot;painter&quot;</a>
+					<a href="../modules/image.html">&quot;image&quot;</a>
 				</li>
 				<li>
-					<a href="_painter_.painter.html">Painter</a>
+					<a href="image.image.html">Image</a>
 				</li>
 			</ul>
-			<h1>Class Painter</h1>
+			<h1>Class Image</h1>
 		</div>
 	</div>
 </header>
@@ -73,14 +73,14 @@
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
 					<li>
-						<span class="target">Painter</span>
+						<span class="target">Image</span>
 					</li>
 				</ul>
 			</section>
 			<section class="tsd-panel">
 				<h3>Implements</h3>
 				<ul class="tsd-hierarchy">
-					<li><a href="../interfaces/_painter_.ipainter.html" class="tsd-signature-type">IPainter</a></li>
+					<li><a href="../interfaces/image.iimage.html" class="tsd-signature-type">IImage</a></li>
 				</ul>
 			</section>
 			<section class="tsd-panel-group tsd-index-group">
@@ -90,23 +90,24 @@
 						<section class="tsd-index-section tsd-is-external">
 							<h3>Constructors</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-constructor tsd-parent-kind-class tsd-is-external"><a href="_painter_.painter.html#constructor" class="tsd-kind-icon">constructor</a></li>
+								<li class="tsd-kind-constructor tsd-parent-kind-class tsd-is-external"><a href="image.image.html#constructor" class="tsd-kind-icon">constructor</a></li>
 							</ul>
 						</section>
 						<section class="tsd-index-section tsd-is-private tsd-is-private-protected tsd-is-external">
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private tsd-is-external"><a href="_painter_.painter.html#_instance" class="tsd-kind-icon">_instance</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private tsd-is-external"><a href="image.image.html#_doc" class="tsd-kind-icon">_doc</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private tsd-is-external"><a href="image.image.html#_instance" class="tsd-kind-icon">_instance</a></li>
 							</ul>
 						</section>
 						<section class="tsd-index-section tsd-is-external">
 							<h3>Methods</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-external"><a href="_painter_.painter.html#drawimage" class="tsd-kind-icon">draw<wbr>Image</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-external"><a href="_painter_.painter.html#drawtext" class="tsd-kind-icon">draw<wbr>Text</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-external"><a href="_painter_.painter.html#finishpage" class="tsd-kind-icon">finish<wbr>Page</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-external"><a href="_painter_.painter.html#getprecision" class="tsd-kind-icon">get<wbr>Precision</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-external"><a href="_painter_.painter.html#setpage" class="tsd-kind-icon">set<wbr>Page</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-external"><a href="image.image.html#getheight" class="tsd-kind-icon">get<wbr>Height</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-external"><a href="image.image.html#getwidth" class="tsd-kind-icon">get<wbr>Width</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-external"><a href="image.image.html#isloaded" class="tsd-kind-icon">is<wbr>Loaded</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-external"><a href="image.image.html#setdata" class="tsd-kind-icon">set<wbr>Data</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-external"><a href="image.image.html#setfile" class="tsd-kind-icon">set<wbr>File</a></li>
 							</ul>
 						</section>
 					</div>
@@ -118,22 +119,25 @@
 					<a name="constructor" class="tsd-anchor"></a>
 					<h3>constructor</h3>
 					<ul class="tsd-signatures tsd-kind-constructor tsd-parent-kind-class tsd-is-external">
-						<li class="tsd-signature tsd-kind-icon">new <wbr>Painter<span class="tsd-signature-symbol">(</span>page<span class="tsd-signature-symbol">?: </span><a href="../interfaces/_document_.ipage.html" class="tsd-signature-type">IPage</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_painter_.painter.html" class="tsd-signature-type">Painter</a></li>
+						<li class="tsd-signature tsd-kind-icon">new <wbr>Image<span class="tsd-signature-symbol">(</span>_doc<span class="tsd-signature-symbol">: </span><a href="../interfaces/document.idocument.html" class="tsd-signature-type">IDocument</a>, data<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Buffer</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="image.image.html" class="tsd-signature-type">Image</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in painter.ts:17</li>
+									<li>Defined in image.ts:13</li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5><span class="tsd-flag ts-flagOptional">Optional</span> page: <a href="../interfaces/_document_.ipage.html" class="tsd-signature-type">IPage</a></h5>
+									<h5>_doc: <a href="../interfaces/document.idocument.html" class="tsd-signature-type">IDocument</a></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> data: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Buffer</span></h5>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <a href="_painter_.painter.html" class="tsd-signature-type">Painter</a></h4>
+							<h4 class="tsd-returns-title">Returns <a href="image.image.html" class="tsd-signature-type">Image</a></h4>
 						</li>
 					</ul>
 				</section>
@@ -141,12 +145,22 @@
 			<section class="tsd-panel-group tsd-member-group tsd-is-private tsd-is-private-protected tsd-is-external">
 				<h2>Properties</h2>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private tsd-is-external">
+					<a name="_doc" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagPrivate">Private</span> _doc</h3>
+					<div class="tsd-signature tsd-kind-icon">_doc<span class="tsd-signature-symbol">:</span> <a href="../interfaces/document.idocument.html" class="tsd-signature-type">IDocument</a></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in image.ts:14</li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private tsd-is-external">
 					<a name="_instance" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagPrivate">Private</span> _instance</h3>
 					<div class="tsd-signature tsd-kind-icon">_instance<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">any</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in painter.ts:17</li>
+							<li>Defined in image.ts:13</li>
 						</ul>
 					</aside>
 				</section>
@@ -154,89 +168,17 @@
 			<section class="tsd-panel-group tsd-member-group tsd-is-external">
 				<h2>Methods</h2>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-external">
-					<a name="drawimage" class="tsd-anchor"></a>
-					<h3>draw<wbr>Image</h3>
+					<a name="getheight" class="tsd-anchor"></a>
+					<h3>get<wbr>Height</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-external">
-						<li class="tsd-signature tsd-kind-icon">draw<wbr>Image<span class="tsd-signature-symbol">(</span>imgFile<span class="tsd-signature-symbol">: </span><a href="../interfaces/_image_.iimage.html" class="tsd-signature-type">IImage</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span>, x<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, y<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, width<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, height<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+						<li class="tsd-signature tsd-kind-icon">get<wbr>Height<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
-								<p>Implementation of <a href="../interfaces/_painter_.ipainter.html">IPainter</a>.<a href="../interfaces/_painter_.ipainter.html#drawimage">drawImage</a></p>
+								<p>Implementation of <a href="../interfaces/image.iimage.html">IImage</a>.<a href="../interfaces/image.iimage.html#getheight">getHeight</a></p>
 								<ul>
-									<li>Defined in painter.ts:35</li>
-								</ul>
-							</aside>
-							<h4 class="tsd-parameters-title">Parameters</h4>
-							<ul class="tsd-parameters">
-								<li>
-									<h5>imgFile: <a href="../interfaces/_image_.iimage.html" class="tsd-signature-type">IImage</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span></h5>
-								</li>
-								<li>
-									<h5>x: <span class="tsd-signature-type">number</span></h5>
-								</li>
-								<li>
-									<h5>y: <span class="tsd-signature-type">number</span></h5>
-								</li>
-								<li>
-									<h5>width: <span class="tsd-signature-type">number</span></h5>
-								</li>
-								<li>
-									<h5>height: <span class="tsd-signature-type">number</span></h5>
-								</li>
-							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
-						</li>
-					</ul>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-external">
-					<a name="drawtext" class="tsd-anchor"></a>
-					<h3>draw<wbr>Text</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-external">
-						<li class="tsd-signature tsd-kind-icon">draw<wbr>Text<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
-					</ul>
-					<ul class="tsd-descriptions">
-						<li class="tsd-description">
-							<aside class="tsd-sources">
-								<p>Implementation of <a href="../interfaces/_painter_.ipainter.html">IPainter</a>.<a href="../interfaces/_painter_.ipainter.html#drawtext">drawText</a></p>
-								<ul>
-									<li>Defined in painter.ts:31</li>
-								</ul>
-							</aside>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
-						</li>
-					</ul>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-external">
-					<a name="finishpage" class="tsd-anchor"></a>
-					<h3>finish<wbr>Page</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-external">
-						<li class="tsd-signature tsd-kind-icon">finish<wbr>Page<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
-					</ul>
-					<ul class="tsd-descriptions">
-						<li class="tsd-description">
-							<aside class="tsd-sources">
-								<p>Implementation of <a href="../interfaces/_painter_.ipainter.html">IPainter</a>.<a href="../interfaces/_painter_.ipainter.html#finishpage">finishPage</a></p>
-								<ul>
-									<li>Defined in painter.ts:27</li>
-								</ul>
-							</aside>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
-						</li>
-					</ul>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-external">
-					<a name="getprecision" class="tsd-anchor"></a>
-					<h3>get<wbr>Precision</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-external">
-						<li class="tsd-signature tsd-kind-icon">get<wbr>Precision<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></li>
-					</ul>
-					<ul class="tsd-descriptions">
-						<li class="tsd-description">
-							<aside class="tsd-sources">
-								<p>Implementation of <a href="../interfaces/_painter_.ipainter.html">IPainter</a>.<a href="../interfaces/_painter_.ipainter.html#getprecision">getPrecision</a></p>
-								<ul>
-									<li>Defined in painter.ts:39</li>
+									<li>Defined in image.ts:25</li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
@@ -244,23 +186,97 @@
 					</ul>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-external">
-					<a name="setpage" class="tsd-anchor"></a>
-					<h3>set<wbr>Page</h3>
+					<a name="getwidth" class="tsd-anchor"></a>
+					<h3>get<wbr>Width</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-external">
-						<li class="tsd-signature tsd-kind-icon">set<wbr>Page<span class="tsd-signature-symbol">(</span>page<span class="tsd-signature-symbol">: </span><a href="../interfaces/_document_.ipage.html" class="tsd-signature-type">IPage</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+						<li class="tsd-signature tsd-kind-icon">get<wbr>Width<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
-								<p>Implementation of <a href="../interfaces/_painter_.ipainter.html">IPainter</a>.<a href="../interfaces/_painter_.ipainter.html#setpage">setPage</a></p>
+								<p>Implementation of <a href="../interfaces/image.iimage.html">IImage</a>.<a href="../interfaces/image.iimage.html#getwidth">getWidth</a></p>
 								<ul>
-									<li>Defined in painter.ts:23</li>
+									<li>Defined in image.ts:22</li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-external">
+					<a name="isloaded" class="tsd-anchor"></a>
+					<h3>is<wbr>Loaded</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-external">
+						<li class="tsd-signature tsd-kind-icon">is<wbr>Loaded<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Implementation of <a href="../interfaces/image.iimage.html">IImage</a>.<a href="../interfaces/image.iimage.html#isloaded">isLoaded</a></p>
+								<ul>
+									<li>Defined in image.ts:44</li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-external">
+					<a name="setdata" class="tsd-anchor"></a>
+					<h3>set<wbr>Data</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-external">
+						<li class="tsd-signature tsd-kind-icon">set<wbr>Data<span class="tsd-signature-symbol">(</span>data<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Buffer</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in image.ts:38</li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<dl class="tsd-comment-tags">
+									<dt>description</dt>
+									<dd><p>Embeds data as an image on the document. To use this image pass to Painter.drawImage.
+										New instances will reuse embedded img object if passed the same image reference.</p>
+									</dd>
+									<dt>throws</dt>
+									<dd><p>{TypeError} - throw type error on invalid arguments.</p>
+									</dd>
+								</dl>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>data: <span class="tsd-signature-type">Buffer</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>img data</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+							<p>void</p>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-external">
+					<a name="setfile" class="tsd-anchor"></a>
+					<h3>set<wbr>File</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-external">
+						<li class="tsd-signature tsd-kind-icon">set<wbr>File<span class="tsd-signature-symbol">(</span>file<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Implementation of <a href="../interfaces/image.iimage.html">IImage</a>.<a href="../interfaces/image.iimage.html#setfile">setFile</a></p>
+								<ul>
+									<li>Defined in image.ts:28</li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>page: <a href="../interfaces/_document_.ipage.html" class="tsd-signature-type">IPage</a></h5>
+									<h5>file: <span class="tsd-signature-type">string</span></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -279,31 +295,31 @@
 						<span>Internals</span>
 					</li>
 					<li class=" tsd-kind-external-module">
-						<a href="../modules/_index_.html">"index"</a>
+						<a href="../modules/index.html">"index"</a>
 					</li>
 					<li class="label tsd-is-external">
 						<span>Externals</span>
 					</li>
 					<li class=" tsd-kind-external-module tsd-is-external">
-						<a href="../modules/_annotation_.html">"annotation"</a>
+						<a href="../modules/annotation.html">"annotation"</a>
 					</li>
 					<li class=" tsd-kind-external-module tsd-is-external">
-						<a href="../modules/_document_.html">"document"</a>
+						<a href="../modules/document.html">"document"</a>
 					</li>
 					<li class=" tsd-kind-external-module tsd-is-external">
-						<a href="../modules/_field_.html">"field"</a>
-					</li>
-					<li class=" tsd-kind-external-module tsd-is-external">
-						<a href="../modules/_image_.html">"image"</a>
+						<a href="../modules/field.html">"field"</a>
 					</li>
 					<li class="current tsd-kind-external-module tsd-is-external">
-						<a href="../modules/_painter_.html">"painter"</a>
+						<a href="../modules/image.html">"image"</a>
 					</li>
 					<li class=" tsd-kind-external-module tsd-is-external">
-						<a href="../modules/_rect_.html">"rect"</a>
+						<a href="../modules/painter.html">"painter"</a>
 					</li>
 					<li class=" tsd-kind-external-module tsd-is-external">
-						<a href="../modules/_signature_.html">"signature"</a>
+						<a href="../modules/rect.html">"rect"</a>
+					</li>
+					<li class=" tsd-kind-external-module tsd-is-external">
+						<a href="../modules/signature.html">"signature"</a>
 					</li>
 				</ul>
 			</nav>
@@ -312,38 +328,41 @@
 				</ul>
 				<ul class="current">
 					<li class="current tsd-kind-class tsd-parent-kind-external-module tsd-is-external">
-						<a href="_painter_.painter.html" class="tsd-kind-icon">Painter</a>
+						<a href="image.image.html" class="tsd-kind-icon">Image</a>
 						<ul>
 							<li class=" tsd-kind-constructor tsd-parent-kind-class tsd-is-external">
-								<a href="_painter_.painter.html#constructor" class="tsd-kind-icon">constructor</a>
+								<a href="image.image.html#constructor" class="tsd-kind-icon">constructor</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private tsd-is-external">
-								<a href="_painter_.painter.html#_instance" class="tsd-kind-icon">_instance</a>
+								<a href="image.image.html#_doc" class="tsd-kind-icon">_doc</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private tsd-is-external">
+								<a href="image.image.html#_instance" class="tsd-kind-icon">_instance</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-external">
-								<a href="_painter_.painter.html#drawimage" class="tsd-kind-icon">draw<wbr>Image</a>
+								<a href="image.image.html#getheight" class="tsd-kind-icon">get<wbr>Height</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-external">
-								<a href="_painter_.painter.html#drawtext" class="tsd-kind-icon">draw<wbr>Text</a>
+								<a href="image.image.html#getwidth" class="tsd-kind-icon">get<wbr>Width</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-external">
-								<a href="_painter_.painter.html#finishpage" class="tsd-kind-icon">finish<wbr>Page</a>
+								<a href="image.image.html#isloaded" class="tsd-kind-icon">is<wbr>Loaded</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-external">
-								<a href="_painter_.painter.html#getprecision" class="tsd-kind-icon">get<wbr>Precision</a>
+								<a href="image.image.html#setdata" class="tsd-kind-icon">set<wbr>Data</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-external">
-								<a href="_painter_.painter.html#setpage" class="tsd-kind-icon">set<wbr>Page</a>
+								<a href="image.image.html#setfile" class="tsd-kind-icon">set<wbr>File</a>
 							</li>
 						</ul>
 					</li>
 				</ul>
 				<ul class="after-current">
 					<li class=" tsd-kind-interface tsd-parent-kind-external-module tsd-is-external">
-						<a href="../interfaces/_painter_.ipainter.html" class="tsd-kind-icon">IPainter</a>
+						<a href="../interfaces/image.iimage.html" class="tsd-kind-icon">IImage</a>
 					</li>
 					<li class=" tsd-kind-variable tsd-parent-kind-external-module tsd-is-external tsd-is-not-exported">
-						<a href="../modules/_painter_.html#mod" class="tsd-kind-icon">mod</a>
+						<a href="../modules/image.html#mod" class="tsd-kind-icon">mod</a>
 					</li>
 				</ul>
 			</nav>
