@@ -18,12 +18,17 @@ set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "" SUFFIX ".node")
 # Add Boost and CMakeJS Deps
 add_subdirectory(boost-cmake)
 
+# Find podofo
+find_path(PODOFO_INCLUDE_DIR podofo/podofo.h PATHS /usr/include /usr/local/include)
+find_library(PODOFO_LIBRARY NAMES podofo PATHS /usr/lib64 /usr/lib /usr/local/lib)
+
 target_include_directories(${PROJECT_NAME}
         PRIVATE ${CMAKE_JS_INC}
+        PRIVATE ${PODOFO_INCLUDE_DIR}
         PRIVATE ${CMAKE_SOURCE_DIR}/node_modules/node-addon-api/src
         PRIVATE ${CMAKE_SOURCE_DIR}/node_modules/node-addon-api)
 
 target_link_libraries(${PROJECT_NAME}
         ${CMAKE_JS_LIB}
         PUBLIC Boost::filesystem
-        podofo)
+        PUBLIC ${PODOFO_LIBRARY})
