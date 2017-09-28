@@ -3,8 +3,6 @@
 //
 
 #include "Document.h"
-#include "ValidateArguments.h"
-#include "closure.h"
 
 Document::Document(const CallbackInfo& info)
   : ObjectWrap(info)
@@ -16,6 +14,10 @@ Napi::Value
 Document::Load(const CallbackInfo& info)
 {
   string filePath = info[0].As<String>().Utf8Value();
+  bool forUpdate = false;
+  if (info.Length() == 2) {
+    forUpdate = info[1].As<Boolean>();
+  }
   if (!filesystem::exists(filePath)) {
     stringstream ss;
     ss << "File: " << filePath << " not found. Try using absolute path instead "
@@ -24,7 +26,7 @@ Document::Load(const CallbackInfo& info)
   }
   originPdf = filePath;
   try {
-    _document->Load(filePath.c_str());
+    _document->Load(filePath.c_str(), forUpdate);
   } catch (PoDoFo::PdfError& e) {
     if (e.GetError() == PoDoFo::ePdfError_InvalidPassword) {
       throw Napi::Error::New(info.Env(),

@@ -321,7 +321,7 @@ Annotation::GetType(const CallbackInfo& info)
 }
 
 void
-Annotation::SetQuadPoints(const CallbackInfo& ino, const Napi::Value& value)
+Annotation::SetQuadPoints(const CallbackInfo& info, const Napi::Value& value)
 {}
 
 Napi::Value

@@ -11,7 +11,7 @@ ErrorHandler::ErrorHandler(PoDoFo::PdfError& err) {}
 string
 ErrorHandler::WriteMsg(PoDoFo::PdfError& err)
 {
-  string msg;
+  string msg = ParseMsgFromPdfError(err);
   return msg;
 }
 

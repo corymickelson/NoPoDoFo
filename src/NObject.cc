@@ -1,29 +1,78 @@
 #include "NObject.h"
 
+FunctionReference NObject::constructor;
+
 NObject::NObject(const Napi::CallbackInfo& info)
   : ObjectWrap<NObject>(info)
 {
-  if (info.Length() == 1) {
-    if (info[0].IsString()) {
-      string str = info[0].As<String>().Utf8Value();
-      char nameDelimiter = str[0];
-      if (nameDelimiter == '/') {
-        PdfName name(str);
-        _obj = new PdfObject(name);
-      } else {
-        PdfString pdString(str);
-        _obj = new PdfObject(pdString);
-      }
-    }
-    if (info[0].IsNumber()) {
-      double intValue = info[0].As<Number>();
-      _obj = new PdfObject(intValue);
-    }
-    if (info[0].IsObject()) {
-      Napi::Object obj = info[0].As<Object>();
-    } else {
-      _obj = *info[0].As<Napi::External<PdfObject*>>().Data();
-    }
-  } else
-    _obj = new PdfObject();
+  obj = *info[0].As<Napi::External<PdfObject>>().Data();
+}
+
+Napi::Value
+NObject::GetStream(const CallbackInfo& info)
+{
+  auto stream = obj.GetStream();
+  return Value();
+}
+
+Napi::Value
+NObject::GetDictionary(const CallbackInfo& info)
+{
+  PdfDictionary dict = obj.GetDictionary();
+  auto dictInstancePtr = Napi::External<PdfDictionary>::New(info.Env(), &dict);
+  auto instance = Dictionary::constructor.New({ dictInstancePtr });
+  return instance;
+}
+
+void
+NObject::SetDictionary(const CallbackInfo& info)
+{}
+
+Napi::Value
+NObject::GetObjectLength(const CallbackInfo& info)
+{
+  return Napi::Number::New(info.Env(),
+                           obj.GetObjectLength(ePdfWriteMode_Default));
+}
+
+Napi::Value
+NObject::GetDataType(const CallbackInfo& info)
+{
+  string js;
+  if (obj.IsArray()) {
+    js = "Array";
+  }
+  if (obj.IsBool()) {
+    js = "Boolean";
+  }
+  if (obj.IsDictionary()) {
+    js = "Dictionary";
+  }
+  if (obj.IsEmpty()) {
+    js = "Empty";
+  }
+  if (obj.IsHexString()) {
+    js = "HexString";
+  }
+  if (obj.IsNull()) {
+    js = "Null";
+  }
+  if (obj.IsNumber()) {
+    js = "Number";
+  }
+  if (obj.IsRawData()) {
+    js = "RawData";
+  }
+  if (obj.IsReal()) {
+    js = "Real";
+  }
+  if (obj.IsReference()) {
+    js = "Reference";
+  }
+  if (obj.IsString()) {
+    js = "String";
+  } else {
+    throw Napi::Error::New(info.Env(), "Unknown DataType");
+  }
+  return Napi::String::New(info.Env(), js);
 }

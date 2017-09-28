@@ -9,8 +9,12 @@
 #include <napi.h>
 #include <podofo/podofo.h>
 
+//#include "Dictionary.h"
 #include "ErrorHandler.h"
+#include "NObject.h"
 #include "Page.h"
+#include "ValidateArguments.h"
+//#include "closure.h"
 
 using namespace boost;
 using namespace Napi;
