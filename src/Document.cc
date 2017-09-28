@@ -54,8 +54,8 @@ Document::GetPage(const CallbackInfo& info)
     throw Napi::Error::New(info.Env(),
                            "getPage takes an argument of 1, of type number.");
   }
-  long n = info[0].As<Number>();
-  long pl = _document->GetPageCount();
+  int n = info[0].As<Number>();
+  int pl = _document->GetPageCount();
   if (n > pl) {
     throw Napi::RangeError::New(info.Env(), "Index out of page count range");
   }
