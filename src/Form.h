@@ -2,7 +2,6 @@
 // Created by red on 9/11/17.
 //
 
-//#include "Dictionary.h"
 #include "Document.h"
 #include <napi.h>
 #include <podofo/podofo.h>

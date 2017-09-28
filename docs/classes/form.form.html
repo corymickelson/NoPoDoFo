@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>Image | n_pdf</title>
+	<title>Form | n_pdf</title>
 	<meta name="description" content="">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -56,13 +56,13 @@
 					<a href="../globals.html">Globals</a>
 				</li>
 				<li>
-					<a href="../modules/image.html">&quot;image&quot;</a>
+					<a href="../modules/form.html">&quot;form&quot;</a>
 				</li>
 				<li>
-					<a href="image.image.html">Image</a>
+					<a href="form.form.html">Form</a>
 				</li>
 			</ul>
-			<h1>Class Image</h1>
+			<h1>Class Form</h1>
 		</div>
 	</div>
 </header>
@@ -73,14 +73,8 @@
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
 					<li>
-						<span class="target">Image</span>
+						<span class="target">Form</span>
 					</li>
-				</ul>
-			</section>
-			<section class="tsd-panel">
-				<h3>Implements</h3>
-				<ul class="tsd-hierarchy">
-					<li><a href="../interfaces/image.iimage.html" class="tsd-signature-type">IImage</a></li>
 				</ul>
 			</section>
 			<section class="tsd-panel-group tsd-index-group">
@@ -90,24 +84,27 @@
 						<section class="tsd-index-section ">
 							<h3>Constructors</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-constructor tsd-parent-kind-class"><a href="image.image.html#constructor" class="tsd-kind-icon">constructor</a></li>
+								<li class="tsd-kind-constructor tsd-parent-kind-class"><a href="form.form.html#constructor" class="tsd-kind-icon">constructor</a></li>
 							</ul>
 						</section>
 						<section class="tsd-index-section tsd-is-private tsd-is-private-protected">
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="image.image.html#_doc" class="tsd-kind-icon">_doc</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="image.image.html#_instance" class="tsd-kind-icon">_instance</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="form.form.html#_instance" class="tsd-kind-icon">_instance</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="form.form.html#_needappearances" class="tsd-kind-icon">_need<wbr>Appearances</a></li>
+							</ul>
+						</section>
+						<section class="tsd-index-section ">
+							<h3>Accessors</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-accessor tsd-parent-kind-class"><a href="form.form.html#needappearances" class="tsd-kind-icon">need<wbr>Appearances</a></li>
 							</ul>
 						</section>
 						<section class="tsd-index-section ">
 							<h3>Methods</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-method tsd-parent-kind-class"><a href="image.image.html#getheight" class="tsd-kind-icon">get<wbr>Height</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class"><a href="image.image.html#getwidth" class="tsd-kind-icon">get<wbr>Width</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class"><a href="image.image.html#isloaded" class="tsd-kind-icon">is<wbr>Loaded</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class"><a href="image.image.html#setdata" class="tsd-kind-icon">set<wbr>Data</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class"><a href="image.image.html#setfile" class="tsd-kind-icon">set<wbr>File</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="form.form.html#getdictionary" class="tsd-kind-icon">get<wbr>Dictionary</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="form.form.html#getobject" class="tsd-kind-icon">get<wbr>Object</a></li>
 							</ul>
 						</section>
 					</div>
@@ -119,25 +116,22 @@
 					<a name="constructor" class="tsd-anchor"></a>
 					<h3>constructor</h3>
 					<ul class="tsd-signatures tsd-kind-constructor tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">new <wbr>Image<span class="tsd-signature-symbol">(</span>_doc<span class="tsd-signature-symbol">: </span><a href="../interfaces/document.idocument.html" class="tsd-signature-type">IDocument</a>, data<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Buffer</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="image.image.html" class="tsd-signature-type">Image</a></li>
+						<li class="tsd-signature tsd-kind-icon">new <wbr>Form<span class="tsd-signature-symbol">(</span>document<span class="tsd-signature-symbol">: </span><a href="../interfaces/document.idocument.html" class="tsd-signature-type">IDocument</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="form.form.html" class="tsd-signature-type">Form</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/corymickelson/npdf/blob/8468338/lib/image.ts#L13">image.ts:13</a></li>
+									<li>Defined in form.ts:11</li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>_doc: <a href="../interfaces/document.idocument.html" class="tsd-signature-type">IDocument</a></h5>
-								</li>
-								<li>
-									<h5><span class="tsd-flag ts-flagOptional">Optional</span> data: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Buffer</span></h5>
+									<h5>document: <a href="../interfaces/document.idocument.html" class="tsd-signature-type">IDocument</a></h5>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <a href="image.image.html" class="tsd-signature-type">Image</a></h4>
+							<h4 class="tsd-returns-title">Returns <a href="form.form.html" class="tsd-signature-type">Form</a></h4>
 						</li>
 					</ul>
 				</section>
@@ -145,141 +139,94 @@
 			<section class="tsd-panel-group tsd-member-group tsd-is-private tsd-is-private-protected">
 				<h2>Properties</h2>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private">
-					<a name="_doc" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagPrivate">Private</span> _doc</h3>
-					<div class="tsd-signature tsd-kind-icon">_doc<span class="tsd-signature-symbol">:</span> <a href="../interfaces/document.idocument.html" class="tsd-signature-type">IDocument</a></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in <a href="https://github.com/corymickelson/npdf/blob/8468338/lib/image.ts#L14">image.ts:14</a></li>
-						</ul>
-					</aside>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private">
 					<a name="_instance" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagPrivate">Private</span> _instance</h3>
 					<div class="tsd-signature tsd-kind-icon">_instance<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">any</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/corymickelson/npdf/blob/8468338/lib/image.ts#L13">image.ts:13</a></li>
+							<li>Defined in form.ts:7</li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private">
+					<a name="_needappearances" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagPrivate">Private</span> _need<wbr>Appearances</h3>
+					<div class="tsd-signature tsd-kind-icon">_need<wbr>Appearances<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in form.ts:8</li>
 						</ul>
 					</aside>
 				</section>
 			</section>
 			<section class="tsd-panel-group tsd-member-group ">
-				<h2>Methods</h2>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
-					<a name="getheight" class="tsd-anchor"></a>
-					<h3>get<wbr>Height</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">get<wbr>Height<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></li>
+				<h2>Accessors</h2>
+				<section class="tsd-panel tsd-member tsd-kind-accessor tsd-parent-kind-class">
+					<a name="needappearances" class="tsd-anchor"></a>
+					<h3>need<wbr>Appearances</h3>
+					<ul class="tsd-signatures tsd-kind-accessor tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">get</span> needAppearances<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></li>
+						<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">set</span> needAppearances<span class="tsd-signature-symbol">(</span>value<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
-								<p>Implementation of <a href="../interfaces/image.iimage.html">IImage</a>.<a href="../interfaces/image.iimage.html#getheight">getHeight</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/corymickelson/npdf/blob/8468338/lib/image.ts#L25">image.ts:25</a></li>
-								</ul>
-							</aside>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
-						</li>
-					</ul>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
-					<a name="getwidth" class="tsd-anchor"></a>
-					<h3>get<wbr>Width</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">get<wbr>Width<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></li>
-					</ul>
-					<ul class="tsd-descriptions">
-						<li class="tsd-description">
-							<aside class="tsd-sources">
-								<p>Implementation of <a href="../interfaces/image.iimage.html">IImage</a>.<a href="../interfaces/image.iimage.html#getwidth">getWidth</a></p>
-								<ul>
-									<li>Defined in <a href="https://github.com/corymickelson/npdf/blob/8468338/lib/image.ts#L22">image.ts:22</a></li>
-								</ul>
-							</aside>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
-						</li>
-					</ul>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
-					<a name="isloaded" class="tsd-anchor"></a>
-					<h3>is<wbr>Loaded</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">is<wbr>Loaded<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></li>
-					</ul>
-					<ul class="tsd-descriptions">
-						<li class="tsd-description">
-							<aside class="tsd-sources">
-								<p>Implementation of <a href="../interfaces/image.iimage.html">IImage</a>.<a href="../interfaces/image.iimage.html#isloaded">isLoaded</a></p>
-								<ul>
-									<li>Defined in <a href="https://github.com/corymickelson/npdf/blob/8468338/lib/image.ts#L44">image.ts:44</a></li>
+									<li>Defined in form.ts:10</li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
 						</li>
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in form.ts:11</li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>value: <span class="tsd-signature-type">boolean</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
 					</ul>
 				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group ">
+				<h2>Methods</h2>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
-					<a name="setdata" class="tsd-anchor"></a>
-					<h3>set<wbr>Data</h3>
+					<a name="getdictionary" class="tsd-anchor"></a>
+					<h3>get<wbr>Dictionary</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">set<wbr>Data<span class="tsd-signature-symbol">(</span>data<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Buffer</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+						<li class="tsd-signature tsd-kind-icon">get<wbr>Dictionary<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../interfaces/dictionary.idictionary.html" class="tsd-signature-type">IDictionary</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/corymickelson/npdf/blob/8468338/lib/image.ts#L38">image.ts:38</a></li>
+									<li>Defined in form.ts:20</li>
 								</ul>
 							</aside>
-							<div class="tsd-comment tsd-typography">
-								<dl class="tsd-comment-tags">
-									<dt>description</dt>
-									<dd><p>Embeds data as an image on the document. To use this image pass to Painter.drawImage.
-										New instances will reuse embedded img object if passed the same image reference.</p>
-									</dd>
-									<dt>throws</dt>
-									<dd><p>{TypeError} - throw type error on invalid arguments.</p>
-									</dd>
-								</dl>
-							</div>
-							<h4 class="tsd-parameters-title">Parameters</h4>
-							<ul class="tsd-parameters">
-								<li>
-									<h5>data: <span class="tsd-signature-type">Buffer</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span></h5>
-									<div class="tsd-comment tsd-typography">
-										<p>img data</p>
-									</div>
-								</li>
-							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
-							<p>void</p>
+							<h4 class="tsd-returns-title">Returns <a href="../interfaces/dictionary.idictionary.html" class="tsd-signature-type">IDictionary</a></h4>
 						</li>
 					</ul>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
-					<a name="setfile" class="tsd-anchor"></a>
-					<h3>set<wbr>File</h3>
+					<a name="getobject" class="tsd-anchor"></a>
+					<h3>get<wbr>Object</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">set<wbr>File<span class="tsd-signature-symbol">(</span>file<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+						<li class="tsd-signature tsd-kind-icon">get<wbr>Object<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../interfaces/object.iobject.html" class="tsd-signature-type">IObject</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
-								<p>Implementation of <a href="../interfaces/image.iimage.html">IImage</a>.<a href="../interfaces/image.iimage.html#setfile">setFile</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/corymickelson/npdf/blob/8468338/lib/image.ts#L28">image.ts:28</a></li>
+									<li>Defined in form.ts:17</li>
 								</ul>
 							</aside>
-							<h4 class="tsd-parameters-title">Parameters</h4>
-							<ul class="tsd-parameters">
-								<li>
-									<h5>file: <span class="tsd-signature-type">string</span></h5>
-								</li>
-							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+							<h4 class="tsd-returns-title">Returns <a href="../interfaces/object.iobject.html" class="tsd-signature-type">IObject</a></h4>
 						</li>
 					</ul>
 				</section>
@@ -306,10 +253,10 @@
 					<li class=" tsd-kind-external-module">
 						<a href="../modules/field.html">"field"</a>
 					</li>
-					<li class=" tsd-kind-external-module">
+					<li class="current tsd-kind-external-module">
 						<a href="../modules/form.html">"form"</a>
 					</li>
-					<li class="current tsd-kind-external-module">
+					<li class=" tsd-kind-external-module">
 						<a href="../modules/image.html">"image"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
@@ -334,41 +281,32 @@
 				</ul>
 				<ul class="current">
 					<li class="current tsd-kind-class tsd-parent-kind-external-module">
-						<a href="image.image.html" class="tsd-kind-icon">Image</a>
+						<a href="form.form.html" class="tsd-kind-icon">Form</a>
 						<ul>
 							<li class=" tsd-kind-constructor tsd-parent-kind-class">
-								<a href="image.image.html#constructor" class="tsd-kind-icon">constructor</a>
+								<a href="form.form.html#constructor" class="tsd-kind-icon">constructor</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private">
-								<a href="image.image.html#_doc" class="tsd-kind-icon">_doc</a>
+								<a href="form.form.html#_instance" class="tsd-kind-icon">_instance</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private">
-								<a href="image.image.html#_instance" class="tsd-kind-icon">_instance</a>
+								<a href="form.form.html#_needappearances" class="tsd-kind-icon">_need<wbr>Appearances</a>
+							</li>
+							<li class=" tsd-kind-accessor tsd-parent-kind-class">
+								<a href="form.form.html#needappearances" class="tsd-kind-icon">need<wbr>Appearances</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
-								<a href="image.image.html#getheight" class="tsd-kind-icon">get<wbr>Height</a>
+								<a href="form.form.html#getdictionary" class="tsd-kind-icon">get<wbr>Dictionary</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
-								<a href="image.image.html#getwidth" class="tsd-kind-icon">get<wbr>Width</a>
-							</li>
-							<li class=" tsd-kind-method tsd-parent-kind-class">
-								<a href="image.image.html#isloaded" class="tsd-kind-icon">is<wbr>Loaded</a>
-							</li>
-							<li class=" tsd-kind-method tsd-parent-kind-class">
-								<a href="image.image.html#setdata" class="tsd-kind-icon">set<wbr>Data</a>
-							</li>
-							<li class=" tsd-kind-method tsd-parent-kind-class">
-								<a href="image.image.html#setfile" class="tsd-kind-icon">set<wbr>File</a>
+								<a href="form.form.html#getobject" class="tsd-kind-icon">get<wbr>Object</a>
 							</li>
 						</ul>
 					</li>
 				</ul>
 				<ul class="after-current">
-					<li class=" tsd-kind-interface tsd-parent-kind-external-module">
-						<a href="../interfaces/image.iimage.html" class="tsd-kind-icon">IImage</a>
-					</li>
 					<li class=" tsd-kind-variable tsd-parent-kind-external-module tsd-is-not-exported">
-						<a href="../modules/image.html#mod" class="tsd-kind-icon">mod</a>
+						<a href="../modules/form.html#mod" class="tsd-kind-icon">mod</a>
 					</li>
 				</ul>
 			</nav>

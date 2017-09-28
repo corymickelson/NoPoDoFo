@@ -7,6 +7,7 @@
     ],
     "module": "commonjs",
     "outDir": "./dist",
+    "sourceMap": true,
     "rootDir": "./lib",
     "strict": true,
     "target": "es6",
@@ -14,9 +15,8 @@
       "node"
     ],
     "typeRoots": [
-      "node_modules/@types",
-      "src"
+      "node_modules/@types"
     ]
   },
-  "include": ["lib/index.ts"]
+  "include": ["lib/*.ts"]
 }

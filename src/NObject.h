@@ -25,7 +25,7 @@ public:
       { InstanceAccessor("stream", &NObject::GetStream, nullptr),
         InstanceMethod("getDictionary", &NObject::GetDictionary),
         InstanceMethod("setDictionary", &NObject::SetDictionary),
-        InstanceAccessor("getDataType", &NObject::GetDataType, nullptr),
+        InstanceAccessor("type", &NObject::GetDataType, nullptr),
         InstanceAccessor("length", &NObject::GetObjectLength, nullptr) });
     constructor = Napi::Persistent(ctor);
     constructor.SuppressDestruct();

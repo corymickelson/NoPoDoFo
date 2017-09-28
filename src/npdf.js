@@ -1,3 +1,4 @@
 
-exports.npdf = require('bindings')('npdf')
+const npdf = require('bindings')('npdf')
+module.exports = npdf
 

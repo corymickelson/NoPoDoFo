@@ -3,17 +3,17 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>n_pdf</title>
+	<title>IDictionary | n_pdf</title>
 	<meta name="description" content="">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<link rel="stylesheet" href="assets/css/main.css">
+	<link rel="stylesheet" href="../assets/css/main.css">
 </head>
 <body>
 <header>
 	<div class="tsd-page-toolbar">
 		<div class="container">
 			<div class="table-wrap">
-				<div class="table-cell" id="tsd-search" data-index="assets/js/search.js" data-base=".">
+				<div class="table-cell" id="tsd-search" data-index="../assets/js/search.js" data-base="..">
 					<div class="field">
 						<label for="tsd-search-field" class="tsd-widget search no-caption">Search</label>
 						<input id="tsd-search-field" type="text" />
@@ -22,7 +22,7 @@
 						<li class="state loading">Preparing search index...</li>
 						<li class="state failure">The search index is not available</li>
 					</ul>
-					<a href="index.html" class="title">n_pdf</a>
+					<a href="../index.html" class="title">n_pdf</a>
 				</div>
 				<div class="table-cell" id="tsd-widgets">
 					<div id="tsd-filter">
@@ -53,136 +53,84 @@
 		<div class="container">
 			<ul class="tsd-breadcrumb">
 				<li>
-					<a href="globals.html">Globals</a>
+					<a href="../globals.html">Globals</a>
+				</li>
+				<li>
+					<a href="../modules/dictionary.html">&quot;dictionary&quot;</a>
+				</li>
+				<li>
+					<a href="dictionary.idictionary.html">IDictionary</a>
 				</li>
 			</ul>
-			<h1> n_pdf</h1>
+			<h1>Interface IDictionary</h1>
 		</div>
 	</div>
 </header>
 <div class="container container-main">
 	<div class="row">
 		<div class="col-8 col-content">
-			<div class="tsd-panel tsd-typography">
-				<h1 id="n_pdf">N_Pdf</h1>
-				<p>NPdf, a native node module for reading, parsing, modifying, and creating pdf documents with <a href="http://podofo.sourceforge.net/index.html">PoDoFo</a>.</p>
-				<p><span style="background-color:#FFFF00">Still in early development.</span></p>
-				<h1 id="new-features-">New Features!</h1>
-				<ul>
-					<li>Add an image</li>
-					<li>Rotate pages</li>
-					<li>Get / Set Form Fields</li>
-					<li>Delete Page</li>
-					<li>Merge Documents</li>
-					<li>Get Pdf Document info ( isLinearized, page count, has password, ... more to come)</li>
+			<section class="tsd-panel tsd-hierarchy">
+				<h3>Hierarchy</h3>
+				<ul class="tsd-hierarchy">
+					<li>
+						<span class="target">IDictionary</span>
+					</li>
 				</ul>
-				<h3 id="installation">Installation</h3>
-				<p>NPdf requires:</p>
-				<ul>
-					<li><a href="http://podofo.sourceforge.net/index.html">PoDoFo</a></li>
-					<li><a href="https://www.npmjs.com/package/cmake-js">cmake-js</a></li>
-					<li><a href="https://nodejs.org/">Node.js</a> v8+ (NPdf is built with <a href="https://nodejs.org/dist/latest-v8.x/docs/api/n-api.html">N-Api</a>)</li>
-					<li><a href="http://www.boost.org/">Boost</a> FileSystem module only</li>
-				</ul>
-				<p>For usage in AWS Lambda, PoDoFo prebuilt binaries are available <a href="https://github.com/corymickelson/CommonPdf_PoDoFo">here</a></p>
-				<p>To install Npdf run
-				<code>npm i -S n_pdf</code></p>
-				<h3 id="usage">Usage</h3>
-				<p>TypeDocs available <a href="https://corymickelson.github.io/npdf/index.html">here</a></p>
-				<p>Getting started</p>
-				<pre><code class="lang-javascript"><span class="hljs-keyword">import</span> {...} <span class="hljs-keyword">from</span> <span class="hljs-string">'npdf'</span>
-</code></pre>
-				<p>NPdf includes a definition file for developer happiness. If your editor does not detect the type file import <code>dist/index.d.ts</code> into your editor of choice.</p>
-				<p>For Webstorm go to settings &gt; language &amp; frameworks &gt; javascript &gt; libraries and add and select the definitions file.</p>
-				<h3 id="document">Document</h3>
-				<p>NPdf wraps <a href="http://podofo.sourceforge.net/doc/html/classPoDoFo_1_1PdfMemDocument.html#ae72a4141ed85e8abda6a368b220854fa">PoDoFo::PdfMemDocument</a> class as Document.
-				Document is the core class for reading and modifying existing pdf documents. </p>
-				<p>Loading a document</p>
-				<pre><code class="lang-javascript"><span class="hljs-keyword">import</span> {Document} <span class="hljs-keyword">from</span> <span class="hljs-string">'npdf'</span>
-<span class="hljs-keyword">const</span> pdf:Document
-<span class="hljs-keyword">try</span> {
-    pdf = <span class="hljs-keyword">new</span> Document(<span class="hljs-string">'/path/to/pdf'</span>) <span class="hljs-comment">// if invalid password is thrown set password</span>
-} <span class="hljs-keyword">catch</span>(e) {
-    <span class="hljs-keyword">if</span>(e.message === <span class="hljs-string">'Password required to modify this document'</span>) {
-        pdf.password = <span class="hljs-string">'secret'</span>
-    }
-}
-</code></pre>
-				<p>At this point the document has been loaded into memory and we can now make modifications to the document and write back to disk.</p>
-				<h3 id="page">Page</h3>
-				<p>To start let&#39;s get a page, and rotate it 90 degrees and then save back to disk. </p>
-				<p>Note: The page definition is defined as an interface, not a concrete class.</p>
-				<pre><code class="lang-javascript"><span class="hljs-keyword">import</span> {Document, IPage} <span class="hljs-keyword">from</span> <span class="hljs-string">'npdf'</span>
-<span class="hljs-keyword">const</span> pdf = <span class="hljs-keyword">new</span> Document(<span class="hljs-string">'/path/to/pdf'</span>)
-<span class="hljs-comment">/** Pages are zero indexed */</span>
-<span class="hljs-keyword">const</span> pageCount = doc.getPageCount()
-<span class="hljs-keyword">for</span>(<span class="hljs-keyword">let</span> i = <span class="hljs-number">0</span>; i &lt; pageCount; i++) {
-    <span class="hljs-keyword">let</span> page:IPage = doc.getPage(i)
-    page.setRotation(<span class="hljs-number">90</span>) <span class="hljs-comment">// value must be increment of 90 (valid:0,90,180, 270)</span>
-}
-doc.write(<span class="hljs-string">'/destination'</span>)
-</code></pre>
-				<p>And that&#39;s all, we&#39;ve loaded a pdf, iterated through it&#39;s pages setting the rotate value to 90 and then written the modified file back to disk.</p>
-				<p>Check a page for fields</p>
-				<pre><code class="lang-javascript"><span class="hljs-keyword">import</span> {Document, IPage} <span class="hljs-keyword">from</span> <span class="hljs-string">'npdf'</span>
-<span class="hljs-keyword">const</span> pdf = <span class="hljs-keyword">new</span> Document(<span class="hljs-string">'/path/to/pdf'</span>)
-<span class="hljs-keyword">const</span> pageCount = doc.getPageCount()
-<span class="hljs-keyword">for</span>(<span class="hljs-keyword">let</span> i = <span class="hljs-number">0</span>; i &lt; pageCount; i++) {
-    <span class="hljs-keyword">let</span> page:IPage = doc.getPage(i)
-    <span class="hljs-keyword">let</span> fieldCount = page.getNumFields()
-    <span class="hljs-keyword">if</span>(fieldCount &gt; <span class="hljs-number">0</span>) {
-        <span class="hljs-keyword">let</span> fieldsSummary:<span class="hljs-built_in">Array</span>&lt;IFieldInfo&gt; = page.getFields()
-    }
-}
-</code></pre>
-			</div>
+			</section>
 		</div>
 		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
 			<nav class="tsd-navigation primary">
 				<ul>
 					<li class="globals  ">
-						<a href="globals.html"><em>Globals</em></a>
+						<a href="../globals.html"><em>Globals</em></a>
 					</li>
 					<li class=" tsd-kind-external-module">
-						<a href="modules/annotation.html">"annotation"</a>
+						<a href="../modules/annotation.html">"annotation"</a>
+					</li>
+					<li class="current tsd-kind-external-module">
+						<a href="../modules/dictionary.html">"dictionary"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
-						<a href="modules/dictionary.html">"dictionary"</a>
+						<a href="../modules/document.html">"document"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
-						<a href="modules/document.html">"document"</a>
+						<a href="../modules/documentspec.html">"document.spec"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
-						<a href="modules/documentspec.html">"document.spec"</a>
+						<a href="../modules/field.html">"field"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
-						<a href="modules/field.html">"field"</a>
+						<a href="../modules/form.html">"form"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
-						<a href="modules/form.html">"form"</a>
+						<a href="../modules/image.html">"image"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
-						<a href="modules/image.html">"image"</a>
+						<a href="../modules/index.html">"index"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
-						<a href="modules/index.html">"index"</a>
+						<a href="../modules/object.html">"object"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
-						<a href="modules/object.html">"object"</a>
+						<a href="../modules/painter.html">"painter"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
-						<a href="modules/painter.html">"painter"</a>
+						<a href="../modules/rect.html">"rect"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
-						<a href="modules/rect.html">"rect"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="modules/signature.html">"signature"</a>
+						<a href="../modules/signature.html">"signature"</a>
 					</li>
 				</ul>
 			</nav>
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
+				</ul>
+				<ul class="current">
+					<li class="current tsd-kind-interface tsd-parent-kind-external-module">
+						<a href="dictionary.idictionary.html" class="tsd-kind-icon">IDictionary</a>
+					</li>
+				</ul>
+				<ul class="after-current">
 				</ul>
 			</nav>
 		</div>
@@ -251,7 +199,7 @@ doc.write(<span class="hljs-string">'/destination'</span>)
 	<p>Generated using <a href="http://typedoc.org/" target="_blank">TypeDoc</a></p>
 </div>
 <div class="overlay"></div>
-<script src="assets/js/main.js"></script>
-<script>if (location.protocol == 'file:') document.write('<script src="assets/js/search.js"><' + '/script>');</script>
+<script src="../assets/js/main.js"></script>
+<script>if (location.protocol == 'file:') document.write('<script src="../assets/js/search.js"><' + '/script>');</script>
 </body>
 </html>

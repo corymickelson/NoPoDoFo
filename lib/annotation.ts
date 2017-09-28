@@ -1,14 +1,45 @@
-import {IPage} from './document'
-import {IRect} from './rect'
+import { IPage } from './document'
+import { IRect } from './rect'
+
+const mod = require('bindings')('npdf')
 
 export interface IAnnotation {
     hasAppearanceStream(): boolean
-    setBorderStyle(horizontalRadius:number, verticalRadius:number, width:number): void
-    hasDestination():boolean
-    hasAction():boolean
-    getType():boolean
-    setFileAttachment():void
-    hasFileAttachment():boolean
+    setBorderStyle(horizontalRadius: number, verticalRadius: number, width: number): void
+    hasDestination(): boolean
+    hasAction(): boolean
+    getType(): NPdfAnnotationType
+    setFileAttachment(): void
+    hasFileAttachment(): boolean
+}
+export enum NPdfAnnotationType {
+    Text = 'Text',
+    Link = 'Link',
+    FreeText = 'FreeText',
+    Line = 'Line',
+    Square = 'Square',
+    Circle = 'Circle',
+    Polygon = 'Polygon',
+    PolyLine = 'PolyLine',
+    Highlight = 'Highlight',
+    Underline = 'Underline',
+    Squiggly = 'Squiggly',
+    StrikeOut = 'StrikeOut',
+    Stamp = 'Stamp',
+    Caret = 'Caret',
+    Ink = 'Ink',
+    Popup = 'Popup',
+    FileAttachement = 'FileAttachment',
+    Sound = 'Sound',
+    Movie = 'Movie',
+    Widget = 'Widget',
+    Screen = 'Screen',
+    PrinterMark = 'PrinterMark',
+    TrapNet = 'TrapNet',
+    Watermark = 'Watermark',
+    _3D = '3D',
+    RichMedia = 'RichMedia',
+    WebMedia = 'WebMedia'
 }
 export enum NPdfAnnotation {
     Text = 0,                   // - supported
@@ -41,23 +72,23 @@ export enum NPdfAnnotation {
 }
 
 export enum NpdfAnnotationFlag {
-    Invisible    = 0x0001,
-    Hidden       = 0x0002,
-    Print        = 0x0004,
-    NoZoom       = 0x0008,
-    NoRotate     = 0x0010,
-    NoView       = 0x0020,
-    ReadOnly     = 0x0040,
-    Locked       = 0x0080,
+    Invisible = 0x0001,
+    Hidden = 0x0002,
+    Print = 0x0004,
+    NoZoom = 0x0008,
+    NoRotate = 0x0010,
+    NoView = 0x0020,
+    ReadOnly = 0x0040,
+    Locked = 0x0080,
     ToggleNoView = 0x0100,
     LockedContents = 0x0200
 }
 
- export enum NpdfAction {
+export enum NpdfAction {
     GoTo = 0,
     GoToR,
     GoToE,
-    Launch,    
+    Launch,
     Thread,
     URI,
     Sound,
@@ -73,28 +104,75 @@ export enum NpdfAnnotationFlag {
     Trans,
     GoTo3DView,
     RichMediaExecute,
- }
+}
+export type NPdfRgb = [number, number, number]
 export class Annotation implements IAnnotation {
+    private _instance: any;
+    private _title: string
+    private _flag: NpdfAnnotationFlag
+    private _color: NPdfRgb
+    private _quadPoints: Array<number>
+
+    get quadPoints() {
+        throw Error("unimplemented")
+    }
+    set quadPoints(value:Array<number>) {
+        throw Error("unimplemented")
+    }
+    get title() {
+        return this._title
+    }
+    set title(value:string) {
+        this._title = value
+    }
+    get flag(): NpdfAnnotationFlag {
+        return this._flag
+    }
+    set flag(value: NpdfAnnotationFlag) {
+        this._flag = value
+    }
+    get color() {
+        return this._color
+    }
+    set color(value: NPdfRgb) {
+        let rgbErr = Error("RGB value must be an integer >= 0 || <= 256")
+        if (value.length !== 3) {
+            throw rgbErr
+        }
+        value.forEach(e => {
+            if (Number.isInteger(e) === false) {
+                throw rgbErr
+            }
+            if (Number.isNaN(e)) {
+                throw rgbErr
+            }
+        });
+        this._color = value
+    }
+
+    constructor(page: IPage, type: NPdfAnnotation, rect: IRect) {
+        this._instance = new mod.Annotation(page, type, rect)
+    }
+
     hasAppearanceStream(): boolean {
-        throw new Error("Method not implemented.");
+        return this._instance.hasAppearanceStream()
     }
     setBorderStyle(horizontalRadius: number, verticalRadius: number, width: number): void {
-        throw new Error("Method not implemented.");
+        return this._instance.setBorderStyle(horizontalRadius, verticalRadius, width)
     }
     hasDestination(): boolean {
-        throw new Error("Method not implemented.");
+        return this._instance.hasDestination()
     }
     hasAction(): boolean {
-        throw new Error("Method not implemented.");
+        return this._instance.hasAction()
     }
-    getType(): boolean {
-        throw new Error("Method not implemented.");
+    getType(): NPdfAnnotationType {
+        return this._instance.getType()
     }
     setFileAttachment(): void {
         throw new Error("Method not implemented.");
     }
     hasFileAttachment(): boolean {
-        throw new Error("Method not implemented.");
+        return this._instance.hasFileAttachment()
     }
-    constructor(page: IPage, type: NPdfAnnotation, rect: IRect) { }
 }

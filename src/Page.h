@@ -27,21 +27,20 @@ public:
   static void Initialize(Napi::Env& env, Napi::Object& target)
   {
     Napi::HandleScope scope(env);
-    Napi::Function ctor =
-      DefineClass(env,
-                  "Page",
-                  { InstanceMethod("getRotation", &Page::GetRotation),
-                    InstanceMethod("getNumFields", &Page::GetNumFields),
-                    InstanceMethod("setRotation", &Page::SetRotation),
-                    InstanceMethod("getFields", &Page::GetFields),
-                    InstanceMethod("getFieldIndex", &Page::GetFieldIndex) });
+    Napi::Function ctor = DefineClass(
+      env,
+      "Page",
+      { InstanceAccessor("rotation", &Page::GetRotation, &Page::SetRotation),
+        InstanceMethod("getNumFields", &Page::GetNumFields),
+        InstanceMethod("getFields", &Page::GetFields),
+        InstanceMethod("getFieldIndex", &Page::GetFieldIndex) });
     constructor = Napi::Persistent(ctor);
     constructor.SuppressDestruct();
     target.Set("Page", constructor);
   }
   Napi::Value GetRotation(const CallbackInfo&);
   Napi::Value GetNumFields(const CallbackInfo&);
-  void SetRotation(const CallbackInfo&);
+  void SetRotation(const CallbackInfo&, const Napi::Value&);
 
   Napi::Value GetFields(const CallbackInfo&);
   Napi::Value GetFieldIndex(const CallbackInfo&);

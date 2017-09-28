@@ -4,7 +4,7 @@ const mod = require('../src/npdf')
 
 export interface IDocument {
 
-    load(file: string): void
+    load(file: string, update?:boolean): void
 
     getPageCount(): number
 
@@ -21,14 +21,9 @@ export interface IDocument {
     write(file: string): void
 }
 export interface IPage {
-    getRotation(): number
+    rotation:number
 
     getNumFields(): number
-
-    /**
-     * @description Set page rotate dict entry. Value must be an increment of 90, where 0 is vertical.
-     */
-    setRotation(degree: number): void
 
     /**
      * @description Get information on all fields on the page
@@ -78,10 +73,10 @@ export class Document implements IDocument {
      * @param {string} [file] - pdf file path (optional)
      * @returns void
      */
-    constructor(file: string) {
+    constructor(file: string, update:boolean = false) {
         this._instance = new mod.Document()
         if(file) {
-            this._instance.load(file)
+            this._instance.load(file, update)
             this._pageCount = this._instance.getPageCount()            
             this._loaded = true
         }
@@ -104,7 +99,7 @@ export class Document implements IDocument {
     }
 
     getPage(pageN: number): IPage {
-        if(this.pageCount > pageN || this.pageCount < 0) {
+        if(pageN > this.pageCount || pageN < 0) {
             throw new RangeError("pageN out of range")
         }
         if(!this._loaded) {

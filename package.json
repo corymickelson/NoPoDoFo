@@ -2,13 +2,17 @@
   "name": "n_pdf",
   "version": "0.0.2",
   "description": "Node.js native module bindings for PoDoFo",
-  "main": "index.js",
+  "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "repository": "git+https://github.com/corymickelson/npdf.git",
   "scripts": {
     "compile": "cmake-js compile --std c++17 --prefer-clang",
-    "postinstall": "npm run compile",
-    "docs": "typedoc --mode modules --module commonjs --target es6 --out ./docs"
+    "postinstall": "npm run compile && npm run lib-build",
+    "lib-build": "tsc --p tsconfig.json",
+    "docs": "typedoc --mode modules --module commonjs --target es6 --out ./docs",
+    "test": "node --napi-modules ./dist/**.spec.js | tap-spec",
+    "precommit": "npm run compile && npm run lib-build && npm test",
+    "preinstall": "node ./checkDeps.js"
   },
   "keywords": [
     "pdf"
@@ -21,10 +25,16 @@
   "license": "ISC",
   "devDependencies": {
     "@types/node": "^8.0.28",
+    "@types/tape": "^4.2.30",
+    "husky": "^0.14.3",
+    "tap-spec": "^4.1.1",
+    "tape": "^4.8.0",
+    "typedoc": "^0.8.0",
+    "typescript": "~2.5.3"
+  },
+  "dependencies": {
     "bindings": "^1.3.0",
     "cmake-js": "^3.5.0",
-    "node-addon-api": "^0.6.3",
-    "typedoc": "^0.8.0"
-  },
-  "dependencies": {}
+    "node-addon-api": "0.6.3"
+  }
 }
