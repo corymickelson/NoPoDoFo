@@ -6,26 +6,31 @@ NPdf, a native node module for reading, parsing, modifying, and creating pdf doc
 <span style="background-color:#FFFF00">Still in early development.</span>
 
 # New Features!
-
- - Add an image
- - Rotate pages
  - Get / Set Form Fields
- - Delete Page
- - Merge Documents
- - Get Pdf Document info ( isLinearized, page count, has password, ... more to come)
 
 ### Installation
+
+Currently tested on Mac and Linux
+
+NPdf has been developed against the PoDoFo trunk or github master( v0.9.6 ). It is recommended that when using NPdf you compile PoDoFo from source. Thankfully this is incredibly simple on OSX and Linux, instructions are provided on the PoDoFo source README.html.  
+
+NPdf requires PoDoFo built with dependencies: zlib, openssl, libpng, libtiff, libjpeg, fontconfig, and freetype2
 
 NPdf requires:
  - [PoDoFo](http://podofo.sourceforge.net/index.html)
  - [cmake-js](https://www.npmjs.com/package/cmake-js)
- - [Node.js](https://nodejs.org/) v8+ (NPdf is built with [N-Api](https://nodejs.org/dist/latest-v8.x/docs/api/n-api.html))
+ - [Node.js](https://nodejs.org/) v8.6+ (NPdf is built with [N-Api](https://nodejs.org/dist/latest-v8.x/docs/api/n-api.html))
  - [Boost](http://www.boost.org/) FileSystem module only
 
 For usage in AWS Lambda, PoDoFo prebuilt binaries are available [here](https://github.com/corymickelson/CommonPdf_PoDoFo)
 
 To install Npdf run 
 `npm i -S n_pdf`
+
+### ToDo
+
+ - Add build dependencies to project repo
+ - Add older Node.js version (v4.x, v6.x) support
 
 ### Usage
 
@@ -94,5 +99,4 @@ for(let i = 0; i < pageCount; i++) {
 }
 ```
 
-
-
+PoDoFo Install Instructions:

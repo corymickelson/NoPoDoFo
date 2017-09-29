@@ -10,8 +10,8 @@
 #include "Rect.h"
 #include "TextField.h"
 
-void
-init(Napi::Env env, Napi::Object exports, Napi::Object module)
+Napi::Object
+init(Napi::Env env, Napi::Object exports)
 {
   Document::Initialize(env, exports);
   Page::Initialize(env, exports);
@@ -27,6 +27,7 @@ init(Napi::Env env, Napi::Object exports, Napi::Object module)
   Dictionary::Initialize(env, exports);
   FileSpec::Initialize(env, exports);
   NObject::Initialize(env, exports);
+  return exports;
 }
 
 NODE_API_MODULE(npdf, init);
