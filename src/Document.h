@@ -9,43 +9,34 @@
 #include <napi.h>
 #include <podofo/podofo.h>
 
-//#include "Dictionary.h"
-#include "ErrorHandler.h"
-#include "NObject.h"
-#include "Page.h"
-#include "ValidateArguments.h"
-//#include "closure.h"
-
 using namespace boost;
 using namespace Napi;
 using namespace std;
+using namespace PoDoFo;
 
-class Document : public Napi::ObjectWrap<Document>
+class Document : public ObjectWrap<Document>
 {
 public:
   explicit Document(const CallbackInfo& callbackInfo); // constructor
   ~Document()
   {
     free(_buffer);
-    delete _document;
+    delete document;
   }
   string originPdf;
 
   static void Initialize(Napi::Env& env, Napi::Object& target)
   {
-    Napi::HandleScope scope(env);
+    HandleScope scope(env);
     Function ctor = DefineClass(
       env,
       "Document",
       { InstanceMethod("load", &Document::Load),
-        //        InstanceAccessor("acroForm", &Document::GetAcroForm, nullptr),
         InstanceMethod("getPageCount", &Document::GetPageCount),
         InstanceMethod("getPage", &Document::GetPage),
         InstanceMethod("mergeDocument", &Document::MergeDocument),
         InstanceMethod("deletePage", &Document::DeletePage),
         InstanceAccessor("password", nullptr, &Document::SetPassword),
-        //                    InstanceMethod("setPassword",
-        //                    &Document::SetPassword),
         InstanceMethod("getVersion", &Document::GetVersion),
         InstanceMethod("isLinearized", &Document::IsLinearized),
         InstanceMethod("getWriteMode", &Document::GetWriteMode),
@@ -64,12 +55,12 @@ public:
   Napi::Value GetVersion(const CallbackInfo&);
   Napi::Value IsLinearized(const CallbackInfo&);
   Napi::Value Write(const CallbackInfo&);
-  PoDoFo::PdfMemDocument* GetDocument() { return _document; }
+  PoDoFo::PdfMemDocument* GetDocument() { return document; }
   Napi::Value GetWriteMode(const CallbackInfo&);
   void SetEncrypted(const CallbackInfo&);
 
 private:
-  PoDoFo::PdfMemDocument* _document;
+  PdfMemDocument* document;
   void* _buffer;
 };
 

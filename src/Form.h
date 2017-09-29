@@ -2,7 +2,6 @@
 // Created by red on 9/11/17.
 //
 
-#include "Document.h"
 #include <napi.h>
 #include <podofo/podofo.h>
 
@@ -20,8 +19,7 @@ public:
     Function ctor =
       DefineClass(env,
                   "Form",
-                  { InstanceMethod("getDictionary", &Form::GetDictionary),
-                    InstanceMethod("getObject", &Form::GetObject),
+                  { InstanceMethod("getObject", &Form::GetObject),
                     InstanceAccessor("needAppearances",
                                      &Form::GetNeedAppearances,
                                      &Form::SetNeedAppearances) });
@@ -29,7 +27,6 @@ public:
   }
   void SetNeedAppearances(const CallbackInfo&, const Napi::Value&);
   Napi::Value GetNeedAppearances(const CallbackInfo&);
-  Napi::Value GetDictionary(const CallbackInfo&);
   Napi::Value GetObject(const CallbackInfo&);
   PdfAcroForm* GetForm() { return doc->GetAcroForm(); }
 

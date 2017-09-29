@@ -4,6 +4,8 @@
 
 #include "Painter.h"
 #include "Document.h"
+#include "Page.h"
+
 Painter::Painter(const Napi::CallbackInfo& info)
   : ObjectWrap(info)
 {}

@@ -11,6 +11,7 @@
     "lib-build": "tsc --p tsconfig.json",
     "docs": "typedoc --mode modules --module commonjs --target es6 --out ./docs",
     "test": "node --napi-modules ./dist/**.spec.js | tap-spec",
+    "build:test": "npm run compile && npm run lib-build && npm run test",
     "precommit": "npm run compile && npm run lib-build && npm test",
     "preinstall": "node ./checkDeps.js"
   },

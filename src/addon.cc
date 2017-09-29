@@ -1,6 +1,6 @@
 #include "Annotation.h"
 #include "CheckBox.h"
-//#include "Dictionary.h"
+#include "Dictionary.h"
 #include "Document.h"
 #include "Field.h"
 #include "FileSpec.h"

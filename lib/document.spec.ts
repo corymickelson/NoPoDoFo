@@ -4,6 +4,7 @@ import * as test from 'tape'
 import { Document, IPage } from './document'
 
 const filePath = join(__dirname, '../test.pdf')
+const outFile = './test.out.pdf'
 test('Can load a pdf', t => {
     let doc: Document
     try {
@@ -23,8 +24,7 @@ test('document get page count', t => {
 })
 test('document delete page', t => {
     const doc = new Document(filePath),
-        pc = doc.getPageCount(),
-        outFile = './test.out.pdf'
+        pc = doc.getPageCount()
 
     doc.deletePage(pc - 1)
     doc.write(outFile)
@@ -32,14 +32,10 @@ test('document delete page', t => {
     const docLessOne = new Document(outFile),
         docLessOnePageCount = docLessOne.getPageCount()
     t.assert(pc === docLessOnePageCount + 1)
-    unlink(outFile, e => {
-        if (e) throw e
-        t.end()
-    })
+    cleanUp(t.end)
 })
 test('document merger', t => {
     const doc = new Document(filePath),
-        outFile = './test.out.pdf',
         originalPC = doc.getPageCount()
 
     doc.mergeDocument(filePath)
@@ -49,10 +45,7 @@ test('document merger', t => {
         doc2PC = doc2.getPageCount()
 
     t.assert(originalPC * 2 === doc2PC, "merged document")
-    unlink(outFile, e => {
-        if (e) throw e
-        t.end()
-    })
+    cleanUp(t.end)
 })
 test('get page', t => {
     const doc = new Document(filePath),
@@ -62,7 +55,6 @@ test('get page', t => {
 })
 test('set page rotation', t => {
     const doc = new Document(filePath),
-        outFile = './test.out.pdf',
         page = doc.getPage(0),
         originalRotation = page.rotation,
         newRotation = originalRotation + 90
@@ -72,8 +64,11 @@ test('set page rotation', t => {
     const testDoc = new Document(outFile),
         testPage = testDoc.getPage(0)
     t.assert(testPage.rotation === newRotation)
+    cleanUp(t.end)
+})
+function cleanUp(cb:Function) {
     unlink(outFile, e => {
         if (e) throw e
-        t.end()
+       cb() 
     })
-})
+}

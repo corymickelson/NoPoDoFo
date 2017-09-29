@@ -3,11 +3,14 @@
 //
 
 #include "Document.h"
+#include "ErrorHandler.h"
+#include "Page.h"
+#include "ValidateArguments.h"
 
 Document::Document(const CallbackInfo& info)
   : ObjectWrap(info)
 {
-  _document = new PoDoFo::PdfMemDocument();
+  document = new PdfMemDocument();
 }
 
 Napi::Value
@@ -26,9 +29,9 @@ Document::Load(const CallbackInfo& info)
   }
   originPdf = filePath;
   try {
-    _document->Load(filePath.c_str(), forUpdate);
-  } catch (PoDoFo::PdfError& e) {
-    if (e.GetError() == PoDoFo::ePdfError_InvalidPassword) {
+    document->Load(filePath.c_str(), forUpdate);
+  } catch (PdfError& e) {
+    if (e.GetError() == ePdfError_InvalidPassword) {
       throw Napi::Error::New(info.Env(),
                              "Password required to modify this document");
     } else {
@@ -43,29 +46,33 @@ Document::Load(const CallbackInfo& info)
 Napi::Value
 Document::GetPageCount(const CallbackInfo& info)
 {
-  int pages = _document->GetPageCount();
+  int pages = document->GetPageCount();
   return Napi::Number::New(info.Env(), pages);
 }
 
 Napi::Value
 Document::GetPage(const CallbackInfo& info)
 {
-  if (info.Length() != 1 || !info[0].IsNumber()) {
-    throw Napi::Error::New(info.Env(),
-                           "getPage takes an argument of 1, of type number.");
+  try {
+    if (info.Length() != 1 || !info[0].IsNumber()) {
+      throw Napi::Error::New(info.Env(),
+                             "getPage takes an argument of 1, of type number.");
+    }
+    int n = info[0].As<Number>();
+    int pl = document->GetPageCount();
+    if (n > pl) {
+      throw Napi::RangeError::New(info.Env(), "Index out of page count range");
+    }
+    PdfPage* page = document->GetPage(n);
+    auto pagePtr = Napi::External<PdfPage>::New(info.Env(), page);
+    auto docPtr = Napi::External<PdfMemDocument>::New(info.Env(), document);
+    auto instance = Page::constructor.New(
+      { pagePtr, docPtr, Napi::Number::New(info.Env(), n) });
+    return instance;
+
+  } catch (PdfError& err) {
+    ErrorHandler(err, info);
   }
-  int n = info[0].As<Number>();
-  int pl = _document->GetPageCount();
-  if (n > pl) {
-    throw Napi::RangeError::New(info.Env(), "Index out of page count range");
-  }
-  PoDoFo::PdfPage* page = _document->GetPage(n);
-  auto pagePtr = Napi::External<PoDoFo::PdfPage>::New(info.Env(), page);
-  auto docPtr =
-    Napi::External<PoDoFo::PdfMemDocument>::New(info.Env(), _document);
-  auto instance = Page::constructor.New(
-    { pagePtr, docPtr, Napi::Number::New(info.Env(), n) });
-  return instance;
 }
 
 Napi::Value
@@ -73,8 +80,8 @@ Document::Write(const CallbackInfo& info)
 {
   if (info.Length() == 1 && info[0].IsString()) {
     string destinationFile = info[0].As<String>().Utf8Value();
-    PoDoFo::PdfOutputDevice device(destinationFile.c_str());
-    _document->Write(&device);
+    PdfOutputDevice device(destinationFile.c_str());
+    document->Write(&device);
     return Napi::String::New(info.Env(), destinationFile);
   } else if (info.Length() == 0) {
     throw Napi::Error::New(info.Env(),
@@ -91,42 +98,41 @@ Document::Write(const CallbackInfo& info)
 void
 Document::SetPassword(const CallbackInfo& info, const Napi::Value& value)
 {
-  if (value.IsEmpty()) {
-    throw Napi::Error::New(info.Env(), "Can not set empty password");
+  if (value.IsEmpty() || !value.IsString()) {
+    throw Napi::Error::New(info.Env(), "password must be of type string");
   }
   string password = value.As<String>().Utf8Value();
-  //  string password = info[0].As<String>().Utf8Value();
-  _document->SetPassword(password);
+  document->SetPassword(password);
 }
 
 Napi::Value
 Document::GetVersion(const CallbackInfo& info)
 {
-  PoDoFo::EPdfVersion versionE = _document->GetPdfVersion();
+  EPdfVersion versionE = document->GetPdfVersion();
   double v = 0.0;
   switch (versionE) {
-    case PoDoFo::ePdfVersion_1_1:
+    case ePdfVersion_1_1:
       v = 1.1;
       break;
-    case PoDoFo::ePdfVersion_1_3:
+    case ePdfVersion_1_3:
       v = 1.3;
       break;
-    case PoDoFo::ePdfVersion_1_0:
+    case ePdfVersion_1_0:
       v = 1.0;
       break;
-    case PoDoFo::ePdfVersion_1_2:
+    case ePdfVersion_1_2:
       v = 1.2;
       break;
-    case PoDoFo::ePdfVersion_1_4:
+    case ePdfVersion_1_4:
       v = 1.4;
       break;
-    case PoDoFo::ePdfVersion_1_5:
+    case ePdfVersion_1_5:
       v = 1.5;
       break;
-    case PoDoFo::ePdfVersion_1_6:
+    case ePdfVersion_1_6:
       v = 1.6;
       break;
-    case PoDoFo::ePdfVersion_1_7:
+    case ePdfVersion_1_7:
       v = 1.7;
       break;
   }
@@ -140,7 +146,7 @@ Document::GetVersion(const CallbackInfo& info)
 Napi::Value
 Document::IsLinearized(const CallbackInfo& info)
 {
-  return Napi::Boolean::New(info.Env(), _document->IsLinearized());
+  return Napi::Boolean::New(info.Env(), document->IsLinearized());
 }
 
 void
@@ -148,7 +154,14 @@ Document::DeletePage(const CallbackInfo& info)
 {
   AssertFunctionArgs(info, 1, { napi_valuetype::napi_number });
   int pageIndex = info[0].As<Number>();
-  _document->GetPagesTree()->DeletePage(pageIndex);
+  if (pageIndex < 0 || pageIndex > document->GetPageCount()) {
+    throw Napi::Error::New(info.Env(), "Page index out of range");
+  }
+  try {
+    document->GetPagesTree()->DeletePage(pageIndex);
+  } catch (PdfError& err) {
+    ErrorHandler(err, info);
+  }
 }
 
 void
@@ -156,25 +169,40 @@ Document::MergeDocument(const CallbackInfo& info)
 {
   AssertFunctionArgs(info, 1, { napi_valuetype::napi_string });
   string docPath = info[0].As<String>().Utf8Value();
+  PdfMemDocument mergedDoc;
   if (filesystem::exists(docPath) == false) {
     stringstream msg;
     msg << "File: " << docPath << " not found" << endl;
     throw Napi::Error::New(info.Env(), msg.str());
   }
-  PoDoFo::PdfMemDocument merged(docPath.c_str());
-  _document->Append(merged);
+
+  try {
+    mergedDoc.Load(docPath.c_str());
+  } catch (PdfError& err) {
+    if (err.GetError() == ePdfError_InvalidPassword && info.Length() != 2) {
+      throw Napi::Error::New(info.Env(),
+                             "Password required to modify this document. Call "
+                             "MergeDocument(filePath, password)");
+    } else if (err.GetError() == ePdfError_InvalidPassword &&
+               info.Length() == 2 && info[1].IsString()) {
+      string password = info[1].As<String>().Utf8Value();
+      mergedDoc.SetPassword(password);
+    }
+  }
+
+  document->Append(mergedDoc);
 }
 
 Napi::Value
 Document::GetWriteMode(const CallbackInfo& info)
 {
   string writeMode;
-  switch (_document->GetWriteMode()) {
-    case PoDoFo::ePdfWriteMode_Clean: {
+  switch (document->GetWriteMode()) {
+    case ePdfWriteMode_Clean: {
       writeMode = "Clean";
       break;
     }
-    case PoDoFo::ePdfWriteMode_Compact: {
+    case ePdfWriteMode_Compact: {
       writeMode = "Compact";
       break;
     }
@@ -291,16 +319,16 @@ Document::SetEncrypted(const CallbackInfo& info)
         }
       }
     }
-    _document->SetEncrypted(
+    document->SetEncrypted(
       userPwd,
       ownerPwd,
       permParameter,
-      static_cast<PoDoFo::PdfEncrypt::EPdfEncryptAlgorithm>(algoParameter),
-      static_cast<PoDoFo::PdfEncrypt::EPdfKeyLength>(key));
-  } catch (PoDoFo::PdfError& err) {
+      static_cast<PdfEncrypt::EPdfEncryptAlgorithm>(algoParameter),
+      static_cast<PdfEncrypt::EPdfKeyLength>(key));
+  } catch (PdfError& err) {
     stringstream msg;
-    msg << "PoDoFo::PdfMemDocument::SetEncrypt failed with error: "
-        << err.GetError() << endl;
+    msg << "PdfMemDocument::SetEncrypt failed with error: " << err.GetError()
+        << endl;
     throw Napi::Error::New(info.Env(), msg.str());
   }
 }

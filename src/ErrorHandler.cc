@@ -6,7 +6,13 @@
 
 ErrorHandler::ErrorHandler() {}
 
-ErrorHandler::ErrorHandler(PoDoFo::PdfError& err) {}
+ErrorHandler::ErrorHandler(PoDoFo::PdfError& err, const CallbackInfo& info)
+{
+  string msg = WriteMsg(err);
+  stringstream eMsg;
+  eMsg << "PoDoFo error: " << msg << endl;
+  throw Napi::Error::New(info.Env(), eMsg.str());
+}
 
 string
 ErrorHandler::WriteMsg(PoDoFo::PdfError& err)
@@ -21,6 +27,9 @@ ErrorHandler::ParseMsgFromPdfError(PoDoFo::PdfError& err)
   string text;
   PoDoFo::EPdfError e = static_cast<PoDoFo::EPdfError>(err.GetError());
   switch (e) {
+    case PoDoFo::ePdfError_BrokenFile:
+      text = "BrokenFile";
+      break;
     case PoDoFo::ePdfError_ErrOk:
       text = "Ok";
       break;

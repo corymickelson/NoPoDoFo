@@ -8,6 +8,11 @@ NPdf, a native node module for reading, parsing, modifying, and creating pdf doc
 # New Features!
  - Get / Set Form Fields
 
+## In Progress:
+ - Add Images
+ - Save to Buffer
+ - Add Digital Signature
+
 ### Installation
 
 Currently tested on Mac and Linux

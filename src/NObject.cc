@@ -15,15 +15,6 @@ NObject::GetStream(const CallbackInfo& info)
   return Value();
 }
 
-Napi::Value
-NObject::GetDictionary(const CallbackInfo& info)
-{
-  PdfDictionary dict = obj.GetDictionary();
-  auto dictInstancePtr = Napi::External<PdfDictionary>::New(info.Env(), &dict);
-  auto instance = Dictionary::constructor.New({ dictInstancePtr });
-  return instance;
-}
-
 void
 NObject::SetDictionary(const CallbackInfo& info)
 {}

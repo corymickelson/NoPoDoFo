@@ -1,4 +1,6 @@
 #include "Form.h"
+#include "Document.h"
+#include "NObject.h"
 
 Form::Form(const Napi::CallbackInfo& info)
   : ObjectWrap<Form>(info)
@@ -30,16 +32,6 @@ Napi::Value
 Form::GetNeedAppearances(const CallbackInfo& info)
 {
   return Napi::Boolean::New(info.Env(), GetForm()->GetNeedAppearances());
-}
-
-Value
-Form::GetDictionary(const CallbackInfo& info)
-{
-  auto formDictionary = doc->GetAcroForm()->GetObject()->GetDictionary();
-  auto dictInstancePtr =
-    Napi::External<PdfDictionary>::New(info.Env(), &formDictionary);
-  auto instance = Dictionary::constructor.New({ dictInstancePtr });
-  return instance;
 }
 
 Napi::Value

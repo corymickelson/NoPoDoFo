@@ -2,7 +2,7 @@
 // Created by red on 9/23/17
 //
 
-#include "Dictionary.h"
+//#include "Dictionary.h"
 #include "ErrorHandler.h"
 #include <napi.h>
 #include <podofo/podofo.h>
@@ -23,7 +23,6 @@ public:
       env,
       "Object",
       { InstanceAccessor("stream", &NObject::GetStream, nullptr),
-        InstanceMethod("getDictionary", &NObject::GetDictionary),
         InstanceMethod("setDictionary", &NObject::SetDictionary),
         InstanceAccessor("type", &NObject::GetDataType, nullptr),
         InstanceAccessor("length", &NObject::GetObjectLength, nullptr) });
@@ -32,7 +31,6 @@ public:
     target.Set("Object", constructor);
   }
   Napi::Value GetStream(const CallbackInfo&);
-  Napi::Value GetDictionary(const CallbackInfo&);
   void SetDictionary(const CallbackInfo&);
   Napi::Value GetObjectLength(const CallbackInfo&);
   Napi::Value GetDataType(const CallbackInfo&);

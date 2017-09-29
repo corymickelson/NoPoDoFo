@@ -4,17 +4,26 @@
 
 #include "Dictionary.h"
 
-FunctionReference Dictionary::constructor;
+// FunctionReference Dictionary::constructor;
 
 Dictionary::Dictionary(const CallbackInfo& info)
   : ObjectWrap<Dictionary>(info)
 {
-  dict = *info[0].As<Napi::External<PoDoFo::PdfDictionary>>().Data();
+  auto objWrap = info[0].As<Object>();
+  auto objPtr = NObject::Unwrap(objWrap);
+  dict = objPtr->GetObject().GetDictionary();
+  //  dict = *info[0].As<Napi::External<PoDoFo::PdfDictionary>>().Data();
 }
 
 void
 Dictionary::AddKey(const CallbackInfo& info)
-{}
+{
+  AssertFunctionArgs(
+    info, 2, { napi_valuetype::napi_string, napi_valuetype::napi_object });
+  PdfName key(info[0].As<String>().Utf8Value());
+  Napi::Object objWrap = info[0].As<Object>();
+  //  NObject obj = NObject::
+}
 
 Napi::Value
 Dictionary::GetKey(const CallbackInfo& info)
@@ -62,3 +71,26 @@ Dictionary::GetImmutable(const CallbackInfo& info)
 {
   return Napi::Boolean::New(info.Env(), dict.GetImmutable());
 }
+
+void
+Dictionary::SetDirty(const CallbackInfo& info, const Napi::Value& value)
+{
+  AssertFunctionArgs(info, 1, { napi_valuetype::napi_boolean });
+  dict.SetDirty(value.As<Boolean>());
+}
+
+Napi::Value
+Dictionary::GetDirty(const CallbackInfo& info)
+{
+  return Napi::Boolean::New(info.Env(), dict.IsDirty());
+}
+
+Napi::Value
+Dictionary::GetKeyAs(const CallbackInfo& info)
+{
+  return Value();
+}
+
+void
+Dictionary::Write(const CallbackInfo& info)
+{}

@@ -3,6 +3,8 @@
 //
 
 #include "ErrorHandler.h"
+#include "NObject.h"
+#include "ValidateArguments.h"
 #include <napi.h>
 #include <podofo/podofo.h>
 #include <string>
@@ -15,8 +17,7 @@ class Dictionary : public ObjectWrap<Dictionary>
 {
 public:
   explicit Dictionary(const CallbackInfo&);
-  ~Dictionary() {}
-  static FunctionReference constructor;
+  ~Dictionary() { delete _obj; }
   static void Initialize(Napi::Env& env, Napi::Object& target)
   {
     HandleScope scope(env);
@@ -28,14 +29,13 @@ public:
         InstanceMethod("hasKey", &Dictionary::HasKey),
         InstanceMethod("addKey", &Dictionary::AddKey),
         InstanceMethod("removeKey", &Dictionary::RemoveKey),
+        InstanceMethod("getKeyAs", &Dictionary::GetKeyAs),
+        InstanceAccessor("dirty", &Dictionary::GetDirty, &Dictionary::SetDirty),
         InstanceAccessor(
           "immutable", &Dictionary::GetImmutable, &Dictionary::SetImmutable),
-        InstanceMethod("clear", &Dictionary::Clear) });
-
-    constructor = Napi::Persistent(ctor);
-    constructor.SuppressDestruct();
-    target.Set("Dictionary", constructor);
-    //    target.Set("Dictionary", ctor);
+        InstanceMethod("clear", &Dictionary::Clear),
+        InstanceMethod("write", &Dictionary::Write) });
+    target.Set("Dictionary", ctor);
   }
 
   void AddKey(const CallbackInfo&);
@@ -46,10 +46,12 @@ public:
   Napi::Value Clear(const CallbackInfo&);
   void SetImmutable(const CallbackInfo&, const Napi::Value&);
   Napi::Value GetImmutable(const CallbackInfo&);
+  void SetDirty(const CallbackInfo&, const Napi::Value&);
+  Napi::Value GetDirty(const CallbackInfo&);
+  Napi::Value GetKeyAs(const CallbackInfo&);
+  void Write(const CallbackInfo&);
 
 private:
-  //    PdfDictionary* _dict;
   const PdfObject* _obj;
   PdfDictionary dict = PdfDictionary();
-  //  PdfDictionary _dict = *new PdfDictionary();
 };

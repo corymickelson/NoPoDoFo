@@ -128,6 +128,10 @@ Page::SetRotation(const CallbackInfo& info, const Napi::Value& value)
     throw Napi::Error::New(info.Env(), "Rotation must be number");
   }
   int rotate = value.As<Number>();
+  if (rotate < 0 || rotate > 270) {
+    throw Napi::Error::New(info.Env(),
+                           "Rotate values must be a value of: 0, 90, 180, 270");
+  }
   _page->SetRotation(rotate);
 }
 
