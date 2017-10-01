@@ -1,4 +1,4 @@
-import {IPage} from './document'
+import {IPage} from './page'
 import {IImage} from './image'
 const mod = require('bindings')('npdf')
 

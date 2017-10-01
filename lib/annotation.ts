@@ -1,9 +1,12 @@
-import { IPage } from './document'
+import { IPage } from './page'
 import { IRect } from './rect'
 
 const mod = require('bindings')('npdf')
 
 export interface IAnnotation {
+    title: string
+    flag: number
+    color: NPdfRgb
     hasAppearanceStream(): boolean
     setBorderStyle(horizontalRadius: number, verticalRadius: number, width: number): void
     hasDestination(): boolean
@@ -107,12 +110,6 @@ export enum NpdfAction {
 }
 export type NPdfRgb = [number, number, number]
 export class Annotation implements IAnnotation {
-    private _instance: any;
-    private _title: string
-    private _flag: NpdfAnnotationFlag
-    private _color: NPdfRgb
-    private _quadPoints: Array<number>
-
     get quadPoints() {
         throw Error("unimplemented")
     }
@@ -120,19 +117,19 @@ export class Annotation implements IAnnotation {
         throw Error("unimplemented")
     }
     get title() {
-        return this._title
+        return this._instance.title
     }
     set title(value:string) {
-        this._title = value
+        this._instance.title = value
     }
     get flag(): NpdfAnnotationFlag {
-        return this._flag
+        return this._instance.flag
     }
     set flag(value: NpdfAnnotationFlag) {
-        this._flag = value
+        this._instance.flag = value
     }
     get color() {
-        return this._color
+        return this._instance.color
     }
     set color(value: NPdfRgb) {
         let rgbErr = Error("RGB value must be an integer >= 0 || <= 256")
@@ -147,12 +144,10 @@ export class Annotation implements IAnnotation {
                 throw rgbErr
             }
         });
-        this._color = value
+        this._instance.color = value
     }
 
-    constructor(page: IPage, type: NPdfAnnotation, rect: IRect) {
-        this._instance = new mod.Annotation(page, type, rect)
-    }
+    constructor(private _instance:any) {}
 
     hasAppearanceStream(): boolean {
         return this._instance.hasAppearanceStream()

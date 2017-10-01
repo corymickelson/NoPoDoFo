@@ -4,28 +4,18 @@
 
 #include "Annotation.h"
 
+FunctionReference Annotation::constructor;
+
 Annotation::Annotation(const CallbackInfo& info)
   : ObjectWrap(info)
 {
-  if (info.Length() < 3) {
-    throw Napi::Error::New(info.Env(),
-                           "Annotation constructor requires three arguments of "
-                           "type: Page, NPdfAnnotation, Rect");
-  }
-  auto pageObj = info[0].As<Object>();
-  int npdfAnnotation = info[1].As<Number>();
-  auto rectObj = info[2].As<Object>();
-  auto page = Page::Unwrap(pageObj);
-  auto rect = Rect::Unwrap(rectObj);
-  doc = page->GetDocument();
-  annot = page->GetPage()->CreateAnnotation(
-    static_cast<PoDoFo::EPdfAnnotation>(npdfAnnotation), rect->GetRect());
+  annot = info[0].As<External<PdfAnnotation>>().Data();
 }
 
 void
 Annotation::SetFlags(const CallbackInfo& info, const Napi::Value& value)
 {
-  if (value.IsNumber() == false) {
+  if (!value.IsNumber()) {
     throw Napi::TypeError::New(
       info.Env(), "SetFlag must be an instance of NpdfAnnotationType");
   }

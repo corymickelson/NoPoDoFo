@@ -43,10 +43,11 @@ Rect::Intersect(const CallbackInfo& info)
     throw Napi::Error::New(info.Env(),
                            "Intersect requires a single argument of type Rect");
   }
-  Object rectObj = info[0].As<Object>();
+  auto rectObj = info[0].As<Object>();
   Rect* rectIntersect = Rect::Unwrap(rectObj);
-  PdfRect rect = rectIntersect->GetRect();
-  Rect::GetRect().Intersect(rect);
+  PdfRect _rect = rectIntersect->GetRect();
+//  Rect::GetRect().Intersect(_rect);
+  rect.Intersect(_rect);
 }
 Napi::Value
 Rect::GetWidth(const CallbackInfo& info)
@@ -70,50 +71,42 @@ Rect::GetBottom(const CallbackInfo& info)
   return Napi::Number::New(info.Env(), rect.GetBottom());
 }
 void
-Rect::SetWidth(const CallbackInfo& info)
+Rect::SetWidth(const CallbackInfo& info, const Napi::Value &value)
 {
-  if (info.Length() > 0) {
-    if (!info[0].IsNumber()) {
+    if (!value.IsNumber()) {
       throw Napi::Error::New(
         info.Env(), "SetWidth requies a single argument of type number");
     }
-  }
-  double width = info[0].As<Number>();
+  double width = value.As<Number>();
   rect.SetWidth(width);
 }
 void
-Rect::SetHeight(const CallbackInfo& info)
+Rect::SetHeight(const CallbackInfo& info, const Napi::Value &value)
 {
-  if (info.Length() > 0) {
-    if (!info[0].IsNumber()) {
+    if (!value.IsNumber()) {
       throw Napi::Error::New(
         info.Env(), "SetWidth requies a single argument of type number");
     }
-  }
-  double height = info[0].As<Number>();
+  double height = value.As<Number>();
   rect.SetHeight(height);
 }
 void
-Rect::SetLeft(const CallbackInfo& info)
+Rect::SetLeft(const CallbackInfo& info, const Napi::Value &value)
 {
-  if (info.Length() > 0) {
-    if (!info[0].IsNumber()) {
+    if (!value.IsNumber()) {
       throw Napi::Error::New(
         info.Env(), "SetWidth requies a single argument of type number");
     }
-  }
-  double left = info[0].As<Number>();
+  double left = value.As<Number>();
   rect.SetLeft(left);
 }
 void
-Rect::SetBottom(const CallbackInfo& info)
+Rect::SetBottom(const CallbackInfo& info, const Napi::Value &value)
 {
-  if (info.Length() > 0) {
-    if (!info[0].IsNumber()) {
+    if (!value.IsNumber()) {
       throw Napi::Error::New(
         info.Env(), "SetWidth requies a single argument of type number");
-    }
   }
-  double bottom = info[0].As<Number>();
+  double bottom = value.As<Number>();
   rect.SetBottom(bottom);
 }

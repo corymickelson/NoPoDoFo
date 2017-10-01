@@ -23,6 +23,7 @@ public:
     delete annot;
     delete doc;
   }
+  static FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target)
   {
     HandleScope scope(env);
@@ -50,7 +51,10 @@ public:
         InstanceMethod("setFileAttachment", &Annotation::SetFileAttachment),
         InstanceMethod("hasFileAttachment", &Annotation::HasFileAttachment) });
 
-    target.Set("Annotation", ctor);
+    constructor = Persistent(ctor);
+    constructor.SuppressDestruct();
+    target.Set("Annotation", constructor);
+//    target.Set("Annotation", ctor);
   }
   Napi::Value HasAppearanceStream(const CallbackInfo&);
   void SetFlags(const CallbackInfo&, const Napi::Value&);

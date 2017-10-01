@@ -21,19 +21,33 @@ public:
     HandleScope scope(env);
     Function ctor = DefineClass(
       env,
-      "Object",
+      "PDObject",
       { InstanceAccessor("stream", &NObject::GetStream, nullptr),
-        InstanceMethod("setDictionary", &NObject::SetDictionary),
         InstanceAccessor("type", &NObject::GetDataType, nullptr),
-        InstanceAccessor("length", &NObject::GetObjectLength, nullptr) });
+        InstanceAccessor("length", &NObject::GetObjectLength, nullptr),
+        InstanceAccessor("owner", &NObject::GetOwner, &NObject::SetOwner),
+        InstanceAccessor("reference", &NObject::Reference, nullptr),
+        InstanceMethod("hasStream", &NObject::HasStream),
+        InstanceMethod("getOffset", &NObject::GetByteOffset),
+        InstanceMethod("write", &NObject::WriteObject),
+        InstanceMethod("flateCompressStream", &NObject::FlateCompressStream),
+        InstanceMethod("delayedStreamLoad", &NObject::DelayedStreamLoad) });
     constructor = Napi::Persistent(ctor);
     constructor.SuppressDestruct();
-    target.Set("Object", constructor);
+    target.Set("PDObject", constructor);
   }
   Napi::Value GetStream(const CallbackInfo&);
-  void SetDictionary(const CallbackInfo&);
+  Napi::Value HasStream(const CallbackInfo&);
   Napi::Value GetObjectLength(const CallbackInfo&);
   Napi::Value GetDataType(const CallbackInfo&);
+  Napi::Value GetByteOffset(const CallbackInfo&);
+  Napi::Value GetOwner(const CallbackInfo&);
+  void SetOwner(const CallbackInfo&, const Napi::Value&);
+  void WriteObject(const CallbackInfo&);
+  Napi::Value Reference(const CallbackInfo&);
+  void FlateCompressStream(const CallbackInfo&);
+  void DelayedStreamLoad(const CallbackInfo&);
+
   const PdfObject GetObject() { return obj; }
 
 private:

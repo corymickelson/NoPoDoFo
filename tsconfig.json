@@ -10,6 +10,7 @@
     "sourceMap": true,
     "rootDir": "./lib",
     "strict": true,
+    "removeComments": false,
     "target": "es6",
     "types": [
       "node"

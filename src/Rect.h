@@ -16,38 +16,45 @@ using namespace PoDoFo;
 class Rect : public ObjectWrap<Rect>
 {
 public:
-  Rect(const CallbackInfo& callbackInfo);
+  Rect(const CallbackInfo &callbackInfo);
   ~Rect();
-  static void Initialize(Napi::Env& env, Napi::Object& target)
+  static void
+  Initialize(Napi::Env &env, Napi::Object &target)
   {
     HandleScope scope(env);
     Function ctor = DefineClass(env,
                                 "Rect",
                                 {
-                                  InstanceMethod("intersect", &Rect::Intersect),
-                                  InstanceMethod("getWidth", &Rect::GetWidth),
-                                  InstanceMethod("getHeight", &Rect::GetHeight),
-                                  InstanceMethod("getBottom", &Rect::GetBottom),
-                                  InstanceMethod("getLeft", &Rect::GetLeft),
-                                  InstanceMethod("setWidth", &Rect::SetWidth),
-                                  InstanceMethod("setHeight", &Rect::SetHeight),
-                                  InstanceMethod("setLeft", &Rect::SetLeft),
-                                  InstanceMethod("setBottom", &Rect::SetBottom),
+                                  InstanceAccessor("left", &Rect::GetLeft, &Rect::SetLeft),
+                                  InstanceAccessor("bottom", &Rect::GetBottom, &Rect::SetBottom),
+                                  InstanceAccessor("width", &Rect::GetWidth, &Rect::SetWidth),
+                                  InstanceAccessor("height", &Rect::GetHeight, &Rect::SetHeight),
+                                  InstanceMethod("intersect", &Rect::Intersect)
 
                                 });
     target.Set("Rect", ctor);
   }
 
-  void Intersect(const CallbackInfo&);
-  Napi::Value GetWidth(const CallbackInfo&);
-  void SetWidth(const CallbackInfo&);
-  Napi::Value GetHeight(const CallbackInfo&);
-  void SetHeight(const CallbackInfo&);
-  Napi::Value GetBottom(const CallbackInfo&);
-  void SetBottom(const CallbackInfo&);
-  Napi::Value GetLeft(const CallbackInfo&);
-  void SetLeft(const CallbackInfo&);
-  PoDoFo::PdfRect GetRect() { return rect; }
+  void
+  Intersect(const CallbackInfo &);
+  Napi::Value
+  GetWidth(const CallbackInfo &);
+  void
+  SetWidth(const CallbackInfo &, const Napi::Value &);
+  Napi::Value
+  GetHeight(const CallbackInfo &);
+  void
+  SetHeight(const CallbackInfo &, const Napi::Value &);
+  Napi::Value
+  GetBottom(const CallbackInfo &);
+  void
+  SetBottom(const CallbackInfo &, const Napi::Value &);
+  Napi::Value
+  GetLeft(const CallbackInfo &);
+  void
+  SetLeft(const CallbackInfo &, const Napi::Value &);
+  PoDoFo::PdfRect
+  GetRect() { return rect; }
 
 private:
   PoDoFo::PdfRect rect = *new PoDoFo::PdfRect();

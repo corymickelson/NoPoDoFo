@@ -1,58 +1,64 @@
 const mod = require('../src/npdf')
-import {Document, IDocument, IPage} from './document'
+import { IPage, Page } from './page'
+import { Document, IDocument } from './document'
 
 export interface IRect {
-    getBottom(): number
+    left:number
+    bottom:number
+    width:number
+    height:number
 
-    setBottom(value: number): void
-
-    getLeft(): number
-
-    setLeft(value: number): void
-
-    getWidth(): number
-
-    setWidth(value: number): void
-
-    getHeight(): number
-
-    setHeight(value: number): void
 }
 export class Rect implements IRect {
     private _instance: any
-    constructor(page?: IPage) {
-        if(page) this._instance = new mod.Rect(page)
+
+    constructor(position?: IPage | Array<number>) {
+        if (Array.isArray(position)) {
+
+        }
+        if (position !== null) {
+
+            this._instance = new mod.Rect(
+                (position as number[])[0],
+                (position as number[])[1],
+                (position as number[])[2],
+                (position as number[])[3])
+        }
         else this._instance = new mod.Rect()
     }
-    getBottom(): number {
-        return this._instance.getBottom()
+    get bottom(): number {
+        return this._instance.bottom
     }
 
-    setBottom(value: number): void {
-        this._instance.setBottom(value)
+    set bottom(value: number) {
+        this._instance.bottom = value
     }
 
-    getLeft(): number {
-        return this._instance.getLeft()
+    get left(): number {
+        return this._instance.left
     }
 
-    setLeft(value: number): void {
-        this._instance.setLeft(value)
+    set left(value: number) {
+        this._instance.left = value
     }
 
-    getWidth(): number {
-        return this._instance.getWidth()
+    get width(): number {
+        return this._instance.width
     }
 
-    setWidth(value: number): void {
-        this._instance.setWidth(value)
+    set width(value: number) {
+        this._instance.width = value
     }
 
-    getHeight(): number {
-        return this._instance.getHeight()
+    get height(): number {
+        return this._instance.height
     }
 
-    setHeight(value: number): void {
-        this._instance.setHeight(value)
+    set height(value: number) {
+        this._instance.height = value
+    }
+
+    intersect(rect: IRect): void {
+        this._instance.intersect(rect)
     }
 }

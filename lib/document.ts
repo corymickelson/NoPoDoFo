@@ -1,4 +1,7 @@
 import { IFieldInfo } from './field'
+import { IRect, Rect } from './rect';
+import { IPDObject, PDObject as NObject } from './object';
+import { IPage, Page } from './page';
 
 const mod = require('bindings')('npdf')
 
@@ -20,21 +23,17 @@ export interface IDocument {
 
     write(file: string): void
 }
-export interface IPage {
-    rotation: number
 
-    getNumFields(): number
-
-    /**
-     * @description Get information on all fields on the page
-     */
-    getFields(): Array<IFieldInfo>
-
-    /**
-     * @description Get field index of fieldname.
-     */
-    getFieldIndex(fieldName: string): number
+export type ProtectionOption = 'Copy' | 'Print' | 'Edit' | 'EditNotes' | 'FillAndSign' | 'Accessible' | 'DocAssembly' | 'HighPrint'
+export type DocumentEncryptOption = {
+    userPassword: string
+    ownerPassword: string
+    protection: Array<ProtectionOption>
+    algorithm: 'rc4v1' | 'rc4v2' | 'aesv2' | 'aesv3'
+    keyLength: number
 }
+
+
 
 /**
  * @class Document
@@ -86,8 +85,8 @@ export class Document implements IDocument {
      * @description load pdf file
      * @param {string} file - pdf file path
      */
-    load(file: string): void {
-        this._instance.load(file)
+    load(file: string, update: boolean = false): void {
+        this._instance.load(file, update)
         this._loaded = true
     }
 
@@ -106,7 +105,8 @@ export class Document implements IDocument {
             throw new Error('load a pdf file before calling this method')
         }
         const page: IPage = this._instance.getPage(pageN)
-        return page;
+        const instance = new Page(page);
+        return instance;
     }
 
     /**
@@ -142,6 +142,10 @@ export class Document implements IDocument {
             throw new Error('load a pdf file before calling this method')
         }
         return this._instance.isLinearized()
+    }
+
+    setEncrypt(option: DocumentEncryptOption): void {
+        this._instance.setEncrypt(option)
     }
 
     write(file: string): void {

@@ -9,7 +9,9 @@ set(CMAKE_CXX_FLAGS -fPIC)
 
 file(GLOB SOURCE_FILES
     "src/*.h"
-    "src/*.cc" )
+    "src/*.cc"
+    "src/crypt/*.h",
+    "src/crypt/*.cc" )
 
 # Configure for .node 
 add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES})

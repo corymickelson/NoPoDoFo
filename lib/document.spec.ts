@@ -1,7 +1,8 @@
 import { unlink } from 'fs'
 import { join } from 'path'
 import * as test from 'tape'
-import { Document, IPage } from './document'
+import { Document } from './document'
+import { IPage, Page } from './page'
 
 const filePath = join(__dirname, '../test.pdf')
 const outFile = './test.out.pdf'
@@ -53,22 +54,14 @@ test('get page', t => {
     t.ok(page)
     t.end()
 })
-test('set page rotation', t => {
-    const doc = new Document(filePath),
-        page = doc.getPage(0),
-        originalRotation = page.rotation,
-        newRotation = originalRotation + 90
-    page.rotation = newRotation
-    doc.write(outFile)
 
-    const testDoc = new Document(outFile),
-        testPage = testDoc.getPage(0)
-    t.assert(testPage.rotation === newRotation)
-    cleanUp(t.end)
+test('Document set encrypt', t => {
+    t.end()
 })
-function cleanUp(cb:Function) {
+
+function cleanUp(cb: Function) {
     unlink(outFile, e => {
         if (e) throw e
-       cb() 
+        cb()
     })
 }

@@ -1,5 +1,5 @@
 const mod = require('bindings')('npdf')
-import {IPage} from './document'
+import {IPage} from './page'
 
 export interface ITextField {
     getText(): string

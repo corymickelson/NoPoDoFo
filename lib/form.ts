@@ -1,6 +1,6 @@
 const mod = require('bindings')('npdf')
 import {IDocument} from './document'
-import {IObject} from './object'
+import {IPDObject} from './object'
 
 export class Form {
     private _instance:any
@@ -13,7 +13,7 @@ export class Form {
         this._instance = new mod.Form(document)
     }
 
-    getObject():IObject {
+    getObject():IPDObject {
         return this._instance.getObject()
     }
 }
