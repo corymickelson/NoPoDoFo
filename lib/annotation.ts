@@ -32,7 +32,7 @@ export enum NPdfAnnotationType {
     Caret = 'Caret',
     Ink = 'Ink',
     Popup = 'Popup',
-    FileAttachement = 'FileAttachment',
+    FileAttachment = 'FileAttachment',
     Sound = 'Sound',
     Movie = 'Movie',
     Widget = 'Widget',

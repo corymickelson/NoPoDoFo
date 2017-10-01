@@ -4,6 +4,7 @@
 
 #include "Document.h"
 #include "ErrorHandler.h"
+#include "Obj.h"
 #include "Page.h"
 #include "ValidateArguments.h"
 
@@ -66,10 +67,8 @@ Document::GetPage(const CallbackInfo& info)
     PdfPage* page = document->GetPage(n);
     auto pagePtr = Napi::External<PdfPage>::New(info.Env(), page);
     auto docPtr = Napi::External<PdfMemDocument>::New(info.Env(), document);
-    auto instance = Page::constructor.New(
-      { pagePtr, docPtr, Napi::Number::New(info.Env(), n) });
+    auto instance = Page::constructor.New({ pagePtr, docPtr });
     return instance;
-
   } catch (PdfError& err) {
     ErrorHandler(err, info);
   }
@@ -331,4 +330,18 @@ Document::SetEncrypted(const CallbackInfo& info)
         << endl;
     throw Napi::Error::New(info.Env(), msg.str());
   }
+}
+
+Napi::Value
+Document::GetObjects(const CallbackInfo& info)
+{
+  auto js = Napi::Array::New(info.Env());
+  auto objs = document->GetObjects();
+  for (size_t i = 0; i < objs.GetSize(); i++) {
+    auto obj = objs[i];
+    auto nObj = Napi::External<PdfObject>::New(info.Env(), obj);
+    auto objInstance = Obj::constructor.New({ nObj });
+    js.Set(Napi::Number::New(info.Env(), static_cast<int>(i)), objInstance);
+  }
+  return js;
 }

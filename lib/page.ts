@@ -1,7 +1,7 @@
 import { IFieldInfo } from './field'
 import { IRect, Rect } from './rect';
-import { IPDObject, PDObject as NObject } from './object';
-import {IAnnotation, Annotation, NPdfAnnotationType} from './annotation';
+import { IObj, Obj } from './object';
+import {IAnnotation, Annotation, NPdfAnnotationType, NPdfAnnotation} from './annotation';
 
 export interface IPage {
     rotation: number
@@ -9,16 +9,18 @@ export interface IPage {
     number: number
     width: number
     height: number
+    _instance:any
 
     getNumFields(): number
     getFields(): Array<IFieldInfo>
     getFieldIndex(fieldName: string): number
-    getContents(append: boolean): IPDObject
-    getResources(): IPDObject
+    getContents(append: boolean): IObj
+    getResources(): IObj
     getMediaBox(): IRect
     getBleedBox(): IRect
     getArtBox(): IRect
     getNumAnnots(): number
+    createAnnotation(type:NPdfAnnotation, rect: IRect): IAnnotation
     getAnnotation(index: number): IAnnotation
     getAnnotations(): Array<IAnnotation>
     deleteAnnotation(index: number): void
@@ -68,15 +70,15 @@ export class Page implements IPage {
         this._instance.rotation = degree
     }
 
-    constructor(private _instance: any) {}
+    constructor(public _instance: any) {}
 
-    getContents(append: boolean): IPDObject {
+    getContents(append: boolean): IObj {
         const objInstance = this._instance.getContents(append)
-        return new NObject(objInstance)
+        return new Obj(objInstance)
     }
-    getResources(): IPDObject {
+    getResources(): IObj {
         const objInstance = this._instance.getResources()
-        return new NObject(objInstance)
+        return new Obj(objInstance)
     }
     getMediaBox(): IRect {
         const mediaBoxPositions = this._instance.getMediaBox()
@@ -100,8 +102,8 @@ export class Page implements IPage {
     getFieldIndex(fieldName: string): number {
         return this._instance.getFieldIndex(fieldName)
     }
-    createAnnotation(type: NPdfAnnotationType, rect: IRect): IAnnotation {
-        const instance = this._instance.createAnnotation(type, rect)
+    createAnnotation(type: NPdfAnnotation, rect: IRect): IAnnotation {
+        const instance = this._instance.createAnnotation((type as number), rect._instance)
         return new Annotation(instance)
     }
     getAnnotation(index: number): IAnnotation {

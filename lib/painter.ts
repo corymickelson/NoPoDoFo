@@ -3,25 +3,26 @@ import {IImage} from './image'
 const mod = require('bindings')('npdf')
 
 export interface IPainter {
-    setPage(page: IPage): void
+    _instance:any
+    page:IPage
 
     finishPage(): void
 
     drawText(): void
 
-    drawImage(imgFile: string | IImage, x: number, y: number, width: number, height: number): void
+    drawImage(img: IImage, x: number, y: number, scale?: {width: number, height: number}): void
 
     getPrecision(): number
 }
 export class Painter implements IPainter {
-    private _instance: any
+    _instance: any
+    get page() { return this._instance.page }
+    set page(value:IPage) {this._instance.page = value._instance }
+
     constructor(page?:IPage) {
         this._instance = new mod.Painter()
         if(page)
             this._instance.setPage(page)
-    }
-    setPage(page: IPage): void {
-        this._instance.setPage(page)
     }
 
     finishPage(): void {
@@ -32,8 +33,15 @@ export class Painter implements IPainter {
         throw new Error("Method not implemented.");
     }
 
-    drawImage(imgFile: IImage | string, x: number, y: number, width: number, height: number): void {
-        this._instance.drawImage(imgFile, x, y, width, height)
+    /**
+     *
+     * @param {IImage} img - an instance of Image
+     * @param {number} x - x coordinate (bottom left position of image)
+     * @param {number} y - y coordinate (bottom position of image)
+     * @param {{width:number, heigth:number}} scale - optional scaling
+     */
+    drawImage(img: IImage, x: number, y: number, scale?: {width: number, height: number}): void {
+        scale ? this._instance.drawImage(img, x, y, scale.width, scale.height) : this._instance.drawImage(img, x, y)
     }
 
     getPrecision(): number {

@@ -18,23 +18,22 @@ using namespace std;
 class TextField : public Napi::ObjectWrap<TextField>
 {
 public:
-  TextField(const CallbackInfo&);
-  ~TextField() { delete _field; }
+  explicit TextField(const CallbackInfo&);
+  ~TextField() { delete field; }
   static void Initialize(Napi::Env& env, Napi::Object& target)
   {
     HandleScope scope(env);
     Function ctor =
       DefineClass(env,
                   "TextField",
-                  { InstanceMethod("setText", &TextField::SetText),
-                    InstanceMethod("getText", &TextField::GetText) });
+                  { InstanceAccessor("text", &TextField::GetText, &TextField::SetText) });
     target.Set("TextField", ctor);
   }
-  void SetText(const CallbackInfo&);
+  void SetText(const CallbackInfo&, const Napi::Value &);
   Napi::Value GetText(const CallbackInfo&);
 
 private:
-  Field* _field;
-  PdfTextField GetField() { return PdfTextField(_field->GetField()); }
+  Field* field;
+  PdfTextField GetField() { return PdfTextField(field->GetField()); }
 };
 #endif // NPDF_TEXTFIELD_H

@@ -1,13 +1,12 @@
 import { IDictionary } from "./dictionary";
-import { IReference } from "./reference";
+import { IRef } from "./reference";
 import { IVecObjects } from "./vecObjects";
 
-export interface IPDObject {
+export interface IObj {
     stream: any
     length: number
-    type: string
     owner: IVecObjects
-    reference: IReference
+    reference: IRef
 
     hasStream(): boolean
     getOffset(key: string): number
@@ -24,14 +23,42 @@ export interface IPDObject {
  * 
  * @todo New instance object not yet supported. Objects can only be instantiated from an existing object
  */
-export class PDObject implements IPDObject {
-    stream: any;
-    length: number;
-    type: string;
-    owner: IVecObjects;
-    reference: IReference;
+export class Obj implements IObj {
+    _instance: any
+    get reference() {
+        return this._instance.reference
+    }
 
-    constructor(private _instance: any) { }
+    set reference(value:any) {
+        throw Error("Reference may not be set manually")
+    }
+
+    get owner() {
+        return this._instance.owner
+    }
+
+    set owner(value:IVecObjects) {
+        this._instance.owner = value
+    }
+
+    get length() {
+        return this._instance.length
+    }
+
+    set length(value:any) {
+        throw Error("Object Length may not be set manually")
+    }
+
+    get stream() {
+        return this._instance.stream
+    }
+
+    set stream(value:any) {
+        throw Error("Object stream may not be set manually")
+    }
+    constructor(instance: any) {
+        this._instance = instance
+    }
 
     hasStream(): boolean {
         return this._instance.hasStream()

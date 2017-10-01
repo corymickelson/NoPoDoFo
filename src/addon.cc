@@ -6,8 +6,10 @@
 #include "FileSpec.h"
 #include "Form.h"
 #include "Image.h"
+#include "Obj.h"
 #include "Painter.h"
 #include "Rect.h"
+#include "Ref.h"
 #include "TextField.h"
 
 Napi::Object
@@ -26,7 +28,8 @@ init(Napi::Env env, Napi::Object exports)
   Form::Initialize(env, exports);
   Dictionary::Initialize(env, exports);
   FileSpec::Initialize(env, exports);
-  NObject::Initialize(env, exports);
+  Obj::Initialize(env, exports);
+  Ref::Initialize(env, exports);
   return exports;
 }
 

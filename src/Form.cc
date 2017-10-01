@@ -1,6 +1,6 @@
 #include "Form.h"
 #include "Document.h"
-#include "NObject.h"
+#include "Obj.h"
 
 Form::Form(const Napi::CallbackInfo& info)
   : ObjectWrap<Form>(info)
@@ -39,6 +39,6 @@ Form::GetObject(const CallbackInfo& info)
 {
   auto obj = doc->GetAcroForm()->GetObject();
   auto nObj = Napi::External<PdfObject>::New(info.Env(), obj);
-  auto objInstance = NObject::constructor.New({ nObj });
+  auto objInstance = Obj::constructor.New({ nObj });
   return objInstance;
 }

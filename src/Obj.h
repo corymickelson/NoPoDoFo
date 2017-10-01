@@ -3,38 +3,37 @@
 //
 
 //#include "Dictionary.h"
-#include "ErrorHandler.h"
 #include <napi.h>
 #include <podofo/podofo.h>
 
 using namespace Napi;
 using namespace PoDoFo;
 
-class NObject : public ObjectWrap<NObject>
+class Obj : public ObjectWrap<Obj>
 {
 public:
-  explicit NObject(const CallbackInfo&);
-  ~NObject() {}
+  explicit Obj(const CallbackInfo&);
+  ~Obj() {}
   static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target)
   {
     HandleScope scope(env);
     Function ctor = DefineClass(
       env,
-      "PDObject",
-      { InstanceAccessor("stream", &NObject::GetStream, nullptr),
-        InstanceAccessor("type", &NObject::GetDataType, nullptr),
-        InstanceAccessor("length", &NObject::GetObjectLength, nullptr),
-        InstanceAccessor("owner", &NObject::GetOwner, &NObject::SetOwner),
-        InstanceAccessor("reference", &NObject::Reference, nullptr),
-        InstanceMethod("hasStream", &NObject::HasStream),
-        InstanceMethod("getOffset", &NObject::GetByteOffset),
-        InstanceMethod("write", &NObject::WriteObject),
-        InstanceMethod("flateCompressStream", &NObject::FlateCompressStream),
-        InstanceMethod("delayedStreamLoad", &NObject::DelayedStreamLoad) });
+      "Obj",
+      { InstanceAccessor("stream", &Obj::GetStream, nullptr),
+        InstanceAccessor("type", &Obj::GetDataType, nullptr),
+        InstanceAccessor("length", &Obj::GetObjectLength, nullptr),
+        InstanceAccessor("owner", &Obj::GetOwner, &Obj::SetOwner),
+        InstanceAccessor("reference", &Obj::Reference, nullptr),
+        InstanceMethod("hasStream", &Obj::HasStream),
+        InstanceMethod("getOffset", &Obj::GetByteOffset),
+        InstanceMethod("write", &Obj::WriteObject),
+        InstanceMethod("flateCompressStream", &Obj::FlateCompressStream),
+        InstanceMethod("delayedStreamLoad", &Obj::DelayedStreamLoad) });
     constructor = Napi::Persistent(ctor);
     constructor.SuppressDestruct();
-    target.Set("PDObject", constructor);
+    target.Set("Obj", constructor);
   }
   Napi::Value GetStream(const CallbackInfo&);
   Napi::Value HasStream(const CallbackInfo&);

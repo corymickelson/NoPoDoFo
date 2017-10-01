@@ -5,7 +5,7 @@
 #include "Page.h"
 #include "ErrorHandler.h"
 #include "Field.h"
-#include "NObject.h"
+#include "Obj.h"
 #include "Rect.h"
 #include "Annotation.h"
 
@@ -20,7 +20,6 @@ Page::Page(const CallbackInfo& info)
     info[1].As<Napi::External<PoDoFo::PdfMemDocument>>().Data();
   parent = parentPtr;
   page = pagePtr;
-  pageNumber = info[2].As<Number>();
 }
 
 Napi::Value
@@ -247,7 +246,7 @@ Page::GetContents(const CallbackInfo& info)
   PdfObject* contentsObj =
     forAppending ? page->GetContentsForAppending() : page->GetContents();
   auto objPtr = Napi::External<PdfObject>::New(info.Env(), contentsObj);
-  auto instance = NObject::constructor.New({ objPtr });
+  auto instance = Obj::constructor.New({ objPtr });
   return instance;
 }
 
@@ -256,7 +255,7 @@ Page::GetResources(const CallbackInfo& info)
 {
   PdfObject* resources = page->GetResources();
   auto objPtr = Napi::External<PdfObject>::New(info.Env(), resources);
-  auto instance = NObject::constructor.New({ objPtr });
+  auto instance = Obj::constructor.New({ objPtr });
   return instance;
 }
 

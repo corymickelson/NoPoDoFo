@@ -41,7 +41,8 @@ public:
         InstanceMethod("isLinearized", &Document::IsLinearized),
         InstanceMethod("getWriteMode", &Document::GetWriteMode),
         InstanceMethod("setEncrypt", &Document::SetEncrypted),
-        InstanceMethod("write", &Document::Write) });
+        InstanceMethod("write", &Document::Write),
+        InstanceMethod("getObjects", &Document::GetObjects) });
 
     target.Set("Document", ctor);
   }
@@ -55,9 +56,11 @@ public:
   Napi::Value GetVersion(const CallbackInfo&);
   Napi::Value IsLinearized(const CallbackInfo&);
   Napi::Value Write(const CallbackInfo&);
-  PoDoFo::PdfMemDocument* GetDocument() { return document; }
   Napi::Value GetWriteMode(const CallbackInfo&);
   void SetEncrypted(const CallbackInfo&);
+  Napi::Value GetObjects(const CallbackInfo&);
+
+  PoDoFo::PdfMemDocument* GetDocument() { return document; }
 
 private:
   PdfMemDocument* document;

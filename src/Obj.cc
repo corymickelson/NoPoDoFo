@@ -1,76 +1,68 @@
-#include "NObject.h"
+#include "Obj.h"
+#include "ErrorHandler.h"
+#include "Ref.h"
 #include "ValidateArguments.h"
 
-FunctionReference NObject::constructor;
+FunctionReference Obj::constructor;
 
-NObject::NObject(const Napi::CallbackInfo& info)
-  : ObjectWrap<NObject>(info)
+Obj::Obj(const Napi::CallbackInfo& info)
+  : ObjectWrap<Obj>(info)
 {
   obj = *info[0].As<Napi::External<PdfObject>>().Data();
 }
 
 Napi::Value
-NObject::GetStream(const CallbackInfo& info)
+Obj::GetStream(const CallbackInfo& info)
 {
   auto stream = obj.GetStream();
   return Value();
 }
 
 Value
-NObject::HasStream(const CallbackInfo&)
+Obj::HasStream(const CallbackInfo&)
 {}
 
 Napi::Value
-NObject::GetObjectLength(const CallbackInfo& info)
+Obj::GetObjectLength(const CallbackInfo& info)
 {
   return Napi::Number::New(info.Env(),
                            obj.GetObjectLength(ePdfWriteMode_Default));
 }
 
 Napi::Value
-NObject::GetDataType(const CallbackInfo& info)
+Obj::GetDataType(const CallbackInfo& info)
 {
   string js;
   if (obj.IsArray()) {
     js = "Array";
-  }
-  if (obj.IsBool()) {
+  } else if (obj.IsBool()) {
     js = "Boolean";
-  }
-  if (obj.IsDictionary()) {
+  } else if (obj.IsDictionary()) {
     js = "Dictionary";
-  }
-  if (obj.IsEmpty()) {
+  } else if (obj.IsEmpty()) {
     js = "Empty";
-  }
-  if (obj.IsHexString()) {
+  } else if (obj.IsHexString()) {
     js = "HexString";
-  }
-  if (obj.IsNull()) {
+  } else if (obj.IsNull()) {
     js = "Null";
-  }
-  if (obj.IsNumber()) {
+  } else if (obj.IsNumber()) {
     js = "Number";
-  }
-  if (obj.IsRawData()) {
+  } else if (obj.IsRawData()) {
     js = "RawData";
-  }
-  if (obj.IsReal()) {
+  } else if (obj.IsReal()) {
     js = "Real";
-  }
-  if (obj.IsReference()) {
+  } else if (obj.IsReference()) {
     js = "Reference";
-  }
-  if (obj.IsString()) {
+  } else if (obj.IsString()) {
     js = "String";
   } else {
-    throw Napi::Error::New(info.Env(), "Unknown DataType");
+    js = "Unknown";
   }
   return Napi::String::New(info.Env(), js);
 }
 
 Napi::Value
-NObject::GetByteOffset(const CallbackInfo& info)
+Obj::GetByteOffset(const CallbackInfo& info)
 {
   AssertFunctionArgs(info, 1, { napi_valuetype::napi_string });
   string key = info[0].As<String>().Utf8Value();
@@ -79,17 +71,17 @@ NObject::GetByteOffset(const CallbackInfo& info)
 }
 
 Napi::Value
-NObject::GetOwner(const CallbackInfo& info)
+Obj::GetOwner(const CallbackInfo& info)
 {
   return Value();
 }
 
 void
-NObject::SetOwner(const CallbackInfo& info, const Napi::Value& value)
+Obj::SetOwner(const CallbackInfo& info, const Napi::Value& value)
 {}
 
 void
-NObject::WriteObject(const CallbackInfo& info)
+Obj::WriteObject(const CallbackInfo& info)
 {
   AssertFunctionArgs(info, 1, { napi_valuetype::napi_string });
   string output = info[0].As<String>().Utf8Value();
@@ -103,13 +95,13 @@ NObject::WriteObject(const CallbackInfo& info)
 }
 
 Napi::Value
-NObject::Reference(const CallbackInfo& info)
+Obj::Reference(const CallbackInfo& info)
 {
   return Value();
 }
 
 void
-NObject::FlateCompressStream(const CallbackInfo& info)
+Obj::FlateCompressStream(const CallbackInfo& info)
 {
   try {
     obj.FlateCompressStream();
@@ -119,7 +111,7 @@ NObject::FlateCompressStream(const CallbackInfo& info)
 }
 
 void
-NObject::DelayedStreamLoad(const CallbackInfo& info)
+Obj::DelayedStreamLoad(const CallbackInfo& info)
 {
   try {
     obj.DelayedStreamLoad();

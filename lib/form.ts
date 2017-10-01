@@ -1,19 +1,18 @@
 const mod = require('bindings')('npdf')
 import {IDocument} from './document'
-import {IPDObject} from './object'
+import {IObj} from './object'
 
 export class Form {
-    private _instance:any
-    private _needAppearances:boolean
+    _instance:any
 
-    get needAppearances() {return this._needAppearances}
-    set needAppearances(value:boolean) {this._needAppearances = value}
+    get needAppearances() {return this._instance.needAppearances}
+    set needAppearances(value:boolean) {this._instance.needAppearances = value}
 
     constructor(document:IDocument) {
-        this._instance = new mod.Form(document)
+        this._instance = new mod.Form(document._instance)
     }
 
-    getObject():IPDObject {
+    getObject():IObj {
         return this._instance.getObject()
     }
 }

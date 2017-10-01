@@ -9,8 +9,8 @@ TextField::TextField(const CallbackInfo& info)
 {
   try {
 
-    Object fieldObj = info[0].As<Object>();
-    _field = Field::Unwrap(fieldObj);
+    auto fieldObj = info[0].As<Object>();
+    field = Field::Unwrap(fieldObj);
   } catch (PdfError& err) {
     stringstream msg;
     msg << "Failed to instantiate TextField. PoDoFo Error: " << err.GetError()
@@ -20,12 +20,14 @@ TextField::TextField(const CallbackInfo& info)
 }
 
 void
-TextField::SetText(const CallbackInfo& info)
+TextField::SetText(const CallbackInfo& info, const Napi::Value &value)
 {
-  AssertFunctionArgs(info, 1, { napi_valuetype::napi_string });
-  string input = info[0].As<String>().Utf8Value();
-  PoDoFo::PdfString value(input);
-  TextField::GetField().SetText(value);
+  if(!value.IsString()) {
+    throw Napi::Error::New(info.Env(), "TextField value must be of type string");
+  }
+  string input = value.As<String>().Utf8Value();
+  PoDoFo::PdfString text(input);
+  TextField::GetField().SetText(text);
 }
 
 Napi::Value

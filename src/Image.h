@@ -5,20 +5,15 @@
 #ifndef NPDF_IMAGE_H
 #define NPDF_IMAGE_H
 
-#include "Document.h"
 #include <boost/filesystem.hpp>
 #include <napi.h>
 #include <podofo/podofo.h>
+#include "Document.h"
 
 using namespace Napi;
 using namespace boost;
 using namespace PoDoFo;
 
-struct NPdfImage
-{
-  string originFile;
-  PdfImage source;
-};
 
 class Image : public ObjectWrap<Image>
 {
@@ -37,17 +32,19 @@ public:
                   "Image",
                   { InstanceMethod("getWidth", &Image::GetWidth),
                     InstanceMethod("getHeight", &Image::GetHeight),
-                    InstanceMethod("setFile", &Image::SetFile),
+                    InstanceMethod("loadFromFile", &Image::LoadFromFile),
                     InstanceAccessor("isLoaded", &Image::IsLoaded, nullptr),
-                    InstanceMethod("setData", &Image::SetData) });
+                    InstanceMethod("setInterpolate", &Image::SetInterpolate),
+                    InstanceMethod("setData", &Image::LoadFromBuffer) });
     target.Set("Image", ctor);
   }
 
   Napi::Value GetWidth(const CallbackInfo&);
   Napi::Value GetHeight(const CallbackInfo&);
-  void SetFile(const CallbackInfo&);
-  void SetData(const CallbackInfo&);
+  void LoadFromFile(const CallbackInfo &);
+  void LoadFromBuffer(const CallbackInfo &);
   Napi::Value IsLoaded(const CallbackInfo&);
+  void SetInterpolate(const CallbackInfo &);
   PdfImage GetImage() { return *img; }
 
 private:

@@ -2,7 +2,10 @@
 // Created by red on 9/23/17.
 //
 
+#include <napi.h>
 #include "Dictionary.h"
+#include "ValidateArguments.h"
+#include "Obj.h"
 
 // FunctionReference Dictionary::constructor;
 
@@ -10,7 +13,7 @@ Dictionary::Dictionary(const CallbackInfo& info)
   : ObjectWrap<Dictionary>(info)
 {
   auto objWrap = info[0].As<Object>();
-  auto objPtr = NObject::Unwrap(objWrap);
+  auto objPtr = Obj::Unwrap(objWrap);
   dict = objPtr->GetObject().GetDictionary();
   //  dict = *info[0].As<Napi::External<PoDoFo::PdfDictionary>>().Data();
 }
@@ -21,8 +24,8 @@ Dictionary::AddKey(const CallbackInfo& info)
   AssertFunctionArgs(
     info, 2, { napi_valuetype::napi_string, napi_valuetype::napi_object });
   PdfName key(info[0].As<String>().Utf8Value());
-  Napi::Object objWrap = info[0].As<Object>();
-  //  NObject obj = NObject::
+  auto objWrap = info[0].As<Object>();
+  //  Obj obj = Obj::
 }
 
 Napi::Value

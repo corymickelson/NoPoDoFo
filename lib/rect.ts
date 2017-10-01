@@ -7,24 +7,25 @@ export interface IRect {
     bottom:number
     width:number
     height:number
-
+    _instance:any
 }
 export class Rect implements IRect {
-    private _instance: any
+    _instance: any
 
     constructor(position?: IPage | Array<number>) {
         if (Array.isArray(position)) {
-
-        }
-        if (position !== null) {
-
             this._instance = new mod.Rect(
                 (position as number[])[0],
                 (position as number[])[1],
                 (position as number[])[2],
                 (position as number[])[3])
         }
-        else this._instance = new mod.Rect()
+        else if(position instanceof Page) {
+            this._instance = new mod.Rect(position)
+        }
+        else {
+            this._instance = new mod.Rect()
+        }
     }
     get bottom(): number {
         return this._instance.bottom

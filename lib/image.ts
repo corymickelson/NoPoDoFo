@@ -3,20 +3,28 @@ const mod = require('../src/npdf')
 import {IDocument} from './document'
 
 export interface IImage {
+    _instance: any
     getWidth(): number
     getHeight(): number
-    setFile(file: string): void
-    setData(data: Buffer): void
+    loadFromFile(file: string): void
+    loadFromBuffer(data: Buffer): void
     isLoaded(): boolean
+    setInterpolate(value:boolean):void
 }
 export class Image implements IImage {
-    private _instance: any
+    _instance:any
+
+    /**
+     *
+     * @param {IDocument} _doc - document to embed image in
+     * @param {string | Buffer} data - image file path, or image buffer (buffer not yet implemented)
+     */
     constructor(private _doc: IDocument, data?: string | Buffer) {
         if (data) {
-            this._instance = new mod.Image(_doc, data)
+            this._instance = new mod.Image(_doc._instance, data)
         }
         else {
-            this._instance = new mod.Image(_doc)
+            this._instance = new mod.Image(_doc._instance)
         }
     }
     getWidth(): number {
@@ -25,7 +33,7 @@ export class Image implements IImage {
     getHeight(): number {
         return this._instance.getHeight()
     }
-    setFile(file: string): void {
+    loadFromFile(file: string): void {
         this._instance.setFile(file)
     }
     /**
@@ -35,7 +43,7 @@ export class Image implements IImage {
      * @param data img data
      * @returns void
      */
-    setData(data: Buffer | string): void {
+    loadFromBuffer(data: Buffer | string): void {
         if(Buffer.isBuffer(data)) this._instance.setData(data.toString('utf8'))
         else if(typeof data === 'string' || (data as any) instanceof String)
             this._instance.setData(data)
@@ -45,4 +53,7 @@ export class Image implements IImage {
         return this._instance.isLoaded()
     }
 
+    setInterpolate(value:boolean) {
+        this._instance.setInterpolate(value)
+    }
 }

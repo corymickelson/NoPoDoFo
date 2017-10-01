@@ -3,6 +3,7 @@
 //
 
 #include "Image.h"
+#include "ValidateArguments.h"
 
 Image::Image(const CallbackInfo& info)
   : ObjectWrap(info)
@@ -13,13 +14,13 @@ Image::Image(const CallbackInfo& info)
     if (info.Length() < 1) {
       throw Napi::Error::New(info.Env(), "Image requires the document.");
     }
-    Object docObj = info[0].As<Object>();
+    auto docObj = info[0].As<Object>();
     _doc = Document::Unwrap(docObj);
     PdfMemDocument* doc = _doc->GetDocument();
     img = new PdfImage(doc);
     if (info.Length() == 2 && info[1].IsString()) {
       string imgFile = info[1].As<String>().Utf8Value();
-      if (filesystem::exists(imgFile) == false) {
+      if (!filesystem::exists(imgFile)) {
         stringstream msg;
         msg << "File: " << imgFile << " not found." << endl;
         throw Napi::Error::New(info.Env(), msg.str());
@@ -39,14 +40,14 @@ Image::Image(const CallbackInfo& info)
 }
 
 void
-Image::SetFile(const CallbackInfo& info)
+Image::LoadFromFile(const CallbackInfo &info)
 {
 
 #ifdef PODOFO_HAVE_JPEG_LIB
   try {
     if (info[0].IsString()) {
       string file = info[0].As<String>().Utf8Value();
-      if (filesystem::exists(file) == false) {
+      if (!filesystem::exists(file)) {
         stringstream msg;
         msg << "File: " << file << " not found." << endl;
         throw Napi::Error::New(info.Env(), msg.str());
@@ -69,16 +70,16 @@ Image::SetFile(const CallbackInfo& info)
 }
 
 void
-Image::SetData(const CallbackInfo& info)
+Image::LoadFromBuffer(const CallbackInfo &info)
 #ifdef PODOFO_HAVE_JPEG_LIB
 {
   try {
-    if (info.Length() < 1 || info[0].IsBuffer() == false) {
+    if (info.Length() < 1 || !info[0].IsBuffer()) {
       throw Napi::Error::New(
-        info.Env(), "SetData requires a single argument of type Buffer");
+        info.Env(), "LoadFromBuffer requires a single argument of type Buffer");
     }
     string jsValue = info[0].As<String>().Utf8Value();
-    unsigned char* value = new unsigned char[jsValue.length()];
+    auto * value = new unsigned char[jsValue.length()];
     strcpy(reinterpret_cast<char*>(value), jsValue.c_str());
     img->LoadFromData(value, static_cast<long>(jsValue.length()));
   } catch (PdfError& err) {
@@ -132,4 +133,11 @@ Napi::Value
 Image::IsLoaded(const CallbackInfo& info)
 {
   return Napi::Boolean::New(info.Env(), loaded);
+}
+
+void
+Image::SetInterpolate(const CallbackInfo &info)
+{
+  AssertFunctionArgs(info,1,{napi_valuetype::napi_boolean});
+  img->SetInterpolate(info[0].As<Boolean>());
 }

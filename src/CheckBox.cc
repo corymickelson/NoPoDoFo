@@ -11,7 +11,7 @@ CheckBox::CheckBox(const CallbackInfo& info)
     throw Napi::Error::New(info.Env(),
                            "Requires a single argument of type Field");
   }
-  Object fieldObj = info[0].As<Object>();
+  auto fieldObj = info[0].As<Object>();
   Field* field = Field::Unwrap(fieldObj);
   box = new PdfCheckBox(field->GetField());
 }
@@ -25,7 +25,7 @@ CheckBox::IsChecked(const CallbackInfo& info)
 void
 CheckBox::SetChecked(const CallbackInfo& info, const Napi::Value& value)
 {
-  if (value.IsBoolean() == false) {
+  if (!value.IsBoolean()) {
     throw Napi::TypeError::New(info.Env(),
                                "CheckBox.checked requires boolean value");
   }

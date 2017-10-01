@@ -1,17 +1,17 @@
-import { IFieldInfo } from './field'
-import { IRect, Rect } from './rect';
-import { IPDObject, PDObject as NObject } from './object';
+import {IObj, Obj} from './object';
 import { IPage, Page } from './page';
 
 const mod = require('bindings')('npdf')
 
 export interface IDocument {
-
+    _instance:any
     load(file: string, update?: boolean): void
 
     getPageCount(): number
 
     getPage(pageN: number): IPage
+
+    getObjects(): Array<IObj>
 
     mergeDocument(doc: string): void
 
@@ -50,7 +50,7 @@ export type DocumentEncryptOption = {
  */
 export class Document implements IDocument {
 
-    private _instance: any
+    _instance: any
     private _loaded: boolean = false;
     private _pageCount: number
     private _password: string
@@ -70,6 +70,7 @@ export class Document implements IDocument {
     /**
      * @constructor
      * @param {string} [file] - pdf file path (optional)
+     * @param update
      * @returns void
      */
     constructor(file: string, update: boolean = false) {
@@ -84,6 +85,7 @@ export class Document implements IDocument {
     /**
      * @description load pdf file
      * @param {string} file - pdf file path
+     * @param update
      */
     load(file: string, update: boolean = false): void {
         this._instance.load(file, update)
@@ -105,13 +107,20 @@ export class Document implements IDocument {
             throw new Error('load a pdf file before calling this method')
         }
         const page: IPage = this._instance.getPage(pageN)
-        const instance = new Page(page);
-        return instance;
+        return new Page(page);
+    }
+
+    getObjects(): Array<IObj> {
+        const objects:Array<any> = this._instance.getObjects()
+        return objects.map(value => {
+            return new Obj(value)
+        })
     }
 
     /**
      * @description Append doc to the end of the loaded doc
      * @param {string} doc - pdf file path
+     * @param password
      */
     mergeDocument(doc: string, password?: string): void {
         if (!this._loaded) {

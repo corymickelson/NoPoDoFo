@@ -2,10 +2,15 @@ const mod = require('bindings')('npdf')
 import {IPage} from './page'
 
 export interface ITextField {
-    getText(): string
-    setText(value: string): void
+    _instance:any
+    text:string
+}
+export interface ICheckBox {
+    _instance:any
+    checked:boolean
 }
 export interface IField {
+    _instance:any
     getType(): string
 
     getFieldName(): string
@@ -38,9 +43,9 @@ export interface IFieldInfo {
 
 export type FieldType = 'TextField' | 'CheckBox' | 'ListBox' | 'RadioButton' | 'ComboBox' | 'PushButton' | 'Signature'
 export class Field implements IField {
-    private _instance: any
+    _instance: any
     constructor(page: IPage, fieldIndex: number) {
-        this._instance = new mod.Field(page, fieldIndex)
+        this._instance = new mod.Field(page._instance, fieldIndex)
     }
 
     getType(): FieldType {
@@ -77,14 +82,28 @@ export class Field implements IField {
 }
 
 export class TextField implements ITextField {
-    private _instance: any
+    _instance: any
     constructor(field: IField) {
-        this._instance = new mod.TextField(field)
+        this._instance = new mod.TextField(field._instance)
     }
-    getText(): string {
-        return this._instance.getText()
+    get text(): string {
+        return this._instance.text
     }
-    setText(value: string): void {
-        return this._instance.setText(value)
+    set text(value: string) {
+        this._instance.text = value
     }
 }
+
+export class CheckBox implements ICheckBox {
+    _instance:any
+    get checked() {
+        return this._instance.checked
+    }
+    set checked(value:boolean) {
+        this._instance.checked = value
+    }
+    constructor(field: IField) {
+        this._instance = new mod.CheckBox(field._instance)
+    }
+}
+

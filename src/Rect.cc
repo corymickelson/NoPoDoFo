@@ -11,11 +11,11 @@ Rect::Rect(const CallbackInfo& info)
     rect = *new PoDoFo::PdfRect();
   }
   if (info.Length() == 1) {
-    if (info[0].IsObject() == false) {
+    if (!info[0].IsObject()) {
       throw Error::New(info.Env(),
                        "Rect requires Page as constructor parameter");
     }
-    Object pageObj = info[0].As<Object>();
+    auto pageObj = info[0].As<Object>();
     Page* page = Page::Unwrap(pageObj);
     rect = page->GetPage()->GetPageSize();
   }

@@ -2,63 +2,113 @@
 // Created by red on 9/13/17.
 //
 
+#include "Image.h"
+#include "ValidateArguments.h"
 #include "Painter.h"
 #include "Document.h"
 #include "Page.h"
+#include "ErrorHandler.h"
 
-Painter::Painter(const Napi::CallbackInfo& info)
-  : ObjectWrap(info)
-{}
+Painter::Painter(const Napi::CallbackInfo &info)
+  : ObjectWrap(info) {}
 void
-Painter::SetPage(const Napi::CallbackInfo& info)
+Painter::SetPage(const Napi::CallbackInfo &info, const Napi::Value &value)
 {
-  AssertFunctionArgs(info, 1, { napi_valuetype::napi_object });
-  auto pageObj = info[0].As<Object>();
-  Page* pagePtr = Page::Unwrap(pageObj);
-  PoDoFo::PdfPage* page = pagePtr->GetPage();
-  _document = pagePtr->GetDocument();
-  _painter = new PoDoFo::PdfPainter();
-  _painter->SetPage(page);
+  if (!value.IsObject())
+  {
+    throw Napi::Error::New(info.Env(), "Page must be an instance of Page.");
+  }
+  auto pageObj = value.As<Object>();
+  Page *pagePtr = Page::Unwrap(pageObj);
+  if (!pageObj.InstanceOf(reinterpret_cast<const Function &>(Page::constructor)))
+  {
+    throw Napi::Error::New(info.Env(), "Page must be an instance of Page.");
+  }
+  PoDoFo::PdfPage *page = pagePtr->GetPage();
+  document = pagePtr->GetDocument();
+  painter = new PoDoFo::PdfPainter();
+  painter->SetPage(page);
   pageSize = page->GetPageSize();
 }
-void
-Painter::FinishPage(const CallbackInfo& info)
+Napi::Value
+Painter::GetPage(const CallbackInfo &info)
 {
-  _painter->FinishPage();
+  auto *page = dynamic_cast<PdfPage *>(painter->GetPage());
+  auto pagePtr = Napi::External<PdfPage>::New(info.Env(), page);
+  auto docPtr = Napi::External<PdfMemDocument>::New(info.Env(), document);
+  auto instance = Page::constructor.New({pagePtr, docPtr});
+  return instance;
 }
 void
-Painter::DrawText(const CallbackInfo& info)
-{}
-void
-Painter::DrawImage(const CallbackInfo& info)
+Painter::FinishPage(const CallbackInfo &info)
 {
-  try {
-    Object imgObj = info[0].As<Object>();
-    Image* img_ = Image::Unwrap(imgObj);
-    PdfImage img = img_->GetImage();
-    //    PdfImage* img = img_->GetImage();
-    _painter->DrawImage(0.0, pageSize.GetHeight() - img.GetHeight(), &img);
-
-  } catch (PdfError& err) {
-    stringstream msg;
-    msg << "PoDoFo failure, error code: " << err.GetError() << endl;
-    throw Napi::Error::New(info.Env(), msg.str());
+  painter->FinishPage();
+}
+void
+Painter::DrawText(const CallbackInfo &info) {}
+void
+Painter::DrawImage(const CallbackInfo &info)
+{
+  if (info.Length() < 3)
+  {
+    throw Napi::Error::New(info.Env(), "DrawImage requires a minimum of three parameters: Image, x, y");
   }
-  //  double x, y, width, height;
-  //  string imgFile = info[0].As<String>().Utf8Value();
-  //  x = info[1].As<Number>();
-  //  y = info[2].As<Number>();
-  //  width = info[3].As<Number>();
-  //  height = info[4].As<Number>();
-  //  PoDoFo::PdfImage image(_document);
-  //  image.LoadFromFile(imgFile.c_str());
-  //  _painter->DrawImage(0.0, pageSize.GetHeight() - image.GetHeight(),
+  // Image
+  auto imgObj = info[0].As<Object>();
+  Image *imgInstance = Image::Unwrap(imgObj);
+  PdfImage img = imgInstance->GetImage();
+
+  // Coordinates
+  double x, y;
+  if (!info[1].IsNumber() || !info[2].IsNumber())
+  {
+    throw Napi::Error::New(info.Env(), "coorindates must be of type number");
+  }
+  x = info[1].As<Number>().DoubleValue();
+  y = info[2].As<Number>().DoubleValue();
+
+  // Scaling
+  double width = 0, height = 0;
+  if (info.Length() == 5)
+  {
+    if (!info[3].IsNumber() || !info[4].IsNumber())
+    {
+      throw Napi::Error::New(info.Env(), "scaling width & height must be of type number");
+    }
+    width = info[3].As<Number>().DoubleValue();
+    height = info[4].As<Number>().DoubleValue();
+  }
+  try
+  {
+    if (width != 0 && height != 0)
+      painter->DrawImage(x, y, &img, width, height);
+    else
+      painter->DrawImage(x, y, &img);
+
+  }
+  catch (PdfError &err)
+  {
+    ErrorHandler(err, info);
+  }
+
+  //  painter->DrawImage(0.0, pageSize.GetHeight() - image.GetHeight(),
   //  &image);
 }
 
 Napi::Value
-Painter::GetPrecision(const CallbackInfo& info)
+Painter::GetPrecision(const CallbackInfo &info)
 {
   return Napi::Number::New(info.Env(),
-                           static_cast<double>(_painter->GetPrecision()));
+                           static_cast<double>(painter->GetPrecision()));
 }
+void
+Painter::SetPrecision(const CallbackInfo &info, const Napi::Value &value)
+{
+  if (!value.IsNumber())
+  {
+    throw Napi::Error::New(info.Env(), "Precision must be of type number");
+  }
+  unsigned short p = static_cast<unsigned short>(value.As<Number>().Uint32Value());
+  painter->SetPrecision(p);
+}
+

@@ -12,7 +12,7 @@ import * as sign from './signature'
 export const Document = doc,
     Page = page,
     Dictionary = dict,
-    NObject = obj,
+    Obj = obj,
     Annotation = annot,
     Field = fields,
     Image = image,

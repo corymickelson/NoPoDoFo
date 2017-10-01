@@ -5,8 +5,9 @@
 #ifndef NPDF_PAINTER_H
 #define NPDF_PAINTER_H
 
-#include "Image.h"
-#include "ValidateArguments.h"
+#define CONVERSION_CONSTANT 0.002834645669291339
+
+
 #include <napi.h>
 #include <podofo/podofo.h>
 
@@ -16,8 +17,8 @@ public:
   Painter(const Napi::CallbackInfo& callbackInfo);
   ~Painter()
   {
-    delete _painter;
-    delete _document;
+    delete painter;
+    delete document;
   }
   PoDoFo::PdfRect pageSize;
   static void Initialize(Napi::Env& env, Napi::Object& target)
@@ -26,24 +27,27 @@ public:
     Napi::Function ctor =
       DefineClass(env,
                   "Painter",
-                  { InstanceMethod("setPage", &Painter::SetPage),
+                  { InstanceAccessor("page", &Painter::GetPage, &Painter::SetPage),
+                    InstanceAccessor("precision", &Painter::GetPrecision, &Painter::SetPrecision),
                     InstanceMethod("finishPage", &Painter::FinishPage),
                     InstanceMethod("drawText", &Painter::DrawText),
-                    InstanceMethod("drawImage", &Painter::DrawImage),
-                    InstanceMethod("getPrecision", &Painter::GetPrecision) });
+                    InstanceMethod("drawImage", &Painter::DrawImage) });
     target.Set("Painter", ctor);
   }
-  void SetPage(const CallbackInfo&);
+  void SetPage(const CallbackInfo&, const Napi::Value &);
+  Napi::Value GetPage(const CallbackInfo &);
   void FinishPage(const CallbackInfo&);
   void DrawText(const CallbackInfo&);
   void DrawImage(const CallbackInfo&);
   Napi::Value GetPrecision(const CallbackInfo&);
-  PoDoFo::PdfMemDocument* GetDocument() { return _document; }
-  PoDoFo::PdfPainter* GetPainter() { return _painter; }
+  void SetPrecision(const CallbackInfo &, const Napi::Value &);
+
+  PoDoFo::PdfMemDocument* GetDocument() { return document; }
+  PoDoFo::PdfPainter* GetPainter() { return painter; }
 
 private:
-  PoDoFo::PdfPainter* _painter;
-  PoDoFo::PdfMemDocument* _document;
+  PoDoFo::PdfPainter* painter;
+  PoDoFo::PdfMemDocument* document;
 };
 
 #endif // NPDF_PAINTER_H

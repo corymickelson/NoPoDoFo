@@ -23,7 +23,6 @@ public:
     delete page;
     delete parent;
   }
-  int pageNumber;
   static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target)
   {
