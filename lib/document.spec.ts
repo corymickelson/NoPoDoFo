@@ -2,7 +2,6 @@ import { unlink } from 'fs'
 import { join } from 'path'
 import * as test from 'tape'
 import { Document } from './document'
-import { IPage, Page } from './page'
 
 const filePath = join(__dirname, '../test.pdf')
 const outFile = './test.out.pdf'
