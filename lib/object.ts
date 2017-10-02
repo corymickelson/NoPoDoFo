@@ -1,4 +1,3 @@
-import { IDictionary } from "./dictionary";
 import { IRef } from "./reference";
 import { IVecObjects } from "./vecObjects";
 
@@ -7,6 +6,7 @@ export interface IObj {
     length: number
     owner: IVecObjects
     reference: IRef
+    _instance: any
 
     hasStream(): boolean
     getOffset(key: string): number
