@@ -1,7 +1,7 @@
 import { IFieldInfo, IField, Field } from './field'
 import { IRect, Rect } from './rect';
 import { IObj, Obj } from './object';
-import {IAnnotation, Annotation, NPdfAnnotationType, NPdfAnnotation} from './annotation';
+import { IAnnotation, Annotation, NPdfAnnotationType, NPdfAnnotation } from './annotation';
 
 export interface IPage {
     rotation: number
@@ -9,12 +9,12 @@ export interface IPage {
     number: number
     width: number
     height: number
-    _instance:any
+    _instance: any
 
     getNumFields(): number
     getFieldsInfo(): Array<IFieldInfo>
-    getField(index:number): IField
-    getFields():Array<IField>
+    getField(index: number): IField
+    getFields(): Array<IField>
     getFieldIndex(fieldName: string): number
     getContents(append: boolean): IObj
     getResources(): IObj
@@ -22,7 +22,7 @@ export interface IPage {
     getBleedBox(): IRect
     getArtBox(): IRect
     getNumAnnots(): number
-    createAnnotation(type:NPdfAnnotation, rect: IRect): IAnnotation
+    createAnnotation(type: NPdfAnnotation, rect: IRect): IAnnotation
     getAnnotation(index: number): IAnnotation
     getAnnotations(): Array<IAnnotation>
     deleteAnnotation(index: number): void
@@ -61,18 +61,18 @@ export class Page implements IPage {
         this._instance.height = value
     }
 
-    get rotation():number {
+    get rotation(): number {
         return this._instance.rotation
     }
 
-    set rotation(degree:number) {
-        if(degree < 0 || degree > 270) {
+    set rotation(degree: number) {
+        if (degree < 0 || degree > 270) {
             throw Error('rotation must be one of: 0, 90, 180, 270')
         }
         this._instance.rotation = degree
     }
 
-    constructor(public _instance: any) {}
+    constructor(public _instance: any) { }
 
     getContents(append: boolean): IObj {
         const objInstance = this._instance.getContents(append)
@@ -104,14 +104,14 @@ export class Page implements IPage {
     getFieldIndex(fieldName: string): number {
         return this._instance.getFieldIndex(fieldName)
     }
-    getField(index:number): IField {
+    getField(index: number): IField {
         return new Field(this, index)
     }
     getFields(): Array<IField> {
         const fields = []
         let count = this.getNumFields(),
             i = 0;
-        for(; i < count; i++) {
+        for (; i < count; i++) {
             let field = new Field(this, i)
             fields[i] = field
         }
@@ -122,8 +122,8 @@ export class Page implements IPage {
         return new Annotation(instance)
     }
     getAnnotation(index: number): IAnnotation {
-       const instance = this._instance.getAnnotation(index)
-       return new Annotation(instance)
+        const instance = this._instance.getAnnotation(index)
+        return new Annotation(instance)
     }
     getNumAnnots(): number {
         return this._instance.getNumAnnots()

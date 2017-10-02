@@ -10,7 +10,7 @@ const filePath = join(__dirname, '../test.pdf'),
 test('create field instance from existing pdf field', t => {
     const doc = new Document(filePath),
         page = doc.getPage(0),
-        field = new Field(page, 0)
+        field = page.getField(0)
     t.assert(field !== null)
     t.assert(field instanceof Field)
     console.log(field.getType())
@@ -20,7 +20,7 @@ test('create field instance from existing pdf field', t => {
 test('Can instantiate a TextField given a field of type TextField', t => {
     const doc = new Document(filePath),
         page = doc.getPage(0),
-        field = new Field(page, 0),
+        field = page.getField(0),
         text = new TextField(field)
     t.ok(text)
     t.assert(text.text === '')
