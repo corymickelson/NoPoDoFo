@@ -1,4 +1,4 @@
-import { IFieldInfo } from './field'
+import { IFieldInfo, IField, Field } from './field'
 import { IRect, Rect } from './rect';
 import { IObj, Obj } from './object';
 import {IAnnotation, Annotation, NPdfAnnotationType, NPdfAnnotation} from './annotation';
@@ -12,7 +12,9 @@ export interface IPage {
     _instance:any
 
     getNumFields(): number
-    getFields(): Array<IFieldInfo>
+    getFieldsInfo(): Array<IFieldInfo>
+    getField(index:number): IField
+    getFields():Array<IField>
     getFieldIndex(fieldName: string): number
     getContents(append: boolean): IObj
     getResources(): IObj
@@ -96,11 +98,24 @@ export class Page implements IPage {
     getNumFields(): number {
         return this._instance.getNumFields()
     }
-    getFields(): IFieldInfo[] {
-        return this._instance.getFields()
+    getFieldsInfo(): IFieldInfo[] {
+        return this._instance.getFieldsInfo()
     }
     getFieldIndex(fieldName: string): number {
         return this._instance.getFieldIndex(fieldName)
+    }
+    getField(index:number): IField {
+        return new Field(this, index)
+    }
+    getFields(): Array<IField> {
+        const fields = []
+        let count = this.getNumFields(),
+            i = 0;
+        for(; i < count; i++) {
+            let field = new Field(this, i)
+            fields[i] = field
+        }
+        return fields
     }
     createAnnotation(type: NPdfAnnotation, rect: IRect): IAnnotation {
         const instance = this._instance.createAnnotation((type as number), rect._instance)

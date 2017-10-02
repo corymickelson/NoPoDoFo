@@ -5,6 +5,7 @@ import {Document} from './document'
 import {Rect} from "./rect";
 import {NPdfAnnotation} from "./annotation";
 import {Obj} from "./object";
+import { Field } from './field';
 
 const filePath = join(__dirname, '../test.pdf'),
     outFile = './test.out.pdf'
@@ -48,15 +49,33 @@ test('get number of fields', t => {
     t.end()
 })
 
-test('get fields', t => {
+test('get fields info', t => {
     const doc = new Document(filePath),
         page = doc.getPage(0),
-        fields = page.getFields()
+        fields = page.getFieldsInfo()
 
     t.assert(fields.length === 22)
     t.end()
 })
 
+test('get field', t => {
+    const doc = new Document(filePath),
+        page = doc.getPage(0),
+        field = page.getField(0)
+
+    t.assert(field instanceof Field, 'is an instance of Field')
+    t.end()
+})
+
+test('get fields', t => {
+    const doc = new Document(filePath),
+        page = doc.getPage(0),
+        fields = page.getFields()
+    t.assert(Array.isArray(fields), 'returns an array')
+    t.assert(fields.length === page.getNumFields(), 'is not an empty array')
+    t.assert(fields[0] instanceof Field, 'contains instance(s) of Field')
+    t.end()
+})
 test('page number of annotations', t => {
     const doc = new Document(filePath),
         page = doc.getPage(0)

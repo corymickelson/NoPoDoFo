@@ -37,7 +37,7 @@ public:
         InstanceAccessor("height", &Page::GetPageHeight, &Page::SetPageHeight),
 
         InstanceMethod("getNumFields", &Page::GetNumFields),
-        InstanceMethod("getFields", &Page::GetFields),
+        InstanceMethod("getFieldsInfo", &Page::GetFields),
         InstanceMethod("getFieldIndex", &Page::GetFieldIndex),
         InstanceMethod("getContents", &Page::GetContents),
         InstanceMethod("getResources", &Page::GetResources),
