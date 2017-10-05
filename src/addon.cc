@@ -6,6 +6,7 @@
 #include "doc/Annotation.h"
 #include "doc/CheckBox.h"
 #include "doc/Document.h"
+#include "doc/Encrypt.h"
 #include "doc/Field.h"
 #include "doc/FileSpec.h"
 #include "doc/Form.h"
@@ -34,6 +35,7 @@ init(Napi::Env env, Napi::Object exports)
   Ref::Initialize(env, exports);
   Arr::Initialize(env, exports);
   Stream::Initialize(env, exports);
+  Encrypt::Initialize(env, exports);
   return exports;
 }
 

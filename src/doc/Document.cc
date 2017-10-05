@@ -6,6 +6,7 @@
 #include "../ErrorHandler.h"
 #include "../ValidateArguments.h"
 #include "../base/Obj.h"
+#include "Encrypt.h"
 #include "Page.h"
 
 using namespace boost;
@@ -17,21 +18,24 @@ void
 Document::Initialize(Napi::Env& env, Napi::Object& target)
 {
   HandleScope scope(env);
-  Function ctor =
-    DefineClass(env,
-                "Document",
-                { InstanceMethod("load", &Document::Load),
-                  InstanceMethod("getPageCount", &Document::GetPageCount),
-                  InstanceMethod("getPage", &Document::GetPage),
-                  InstanceMethod("mergeDocument", &Document::MergeDocument),
-                  InstanceMethod("deletePage", &Document::DeletePage),
-                  InstanceAccessor("password", nullptr, &Document::SetPassword),
-                  InstanceMethod("getVersion", &Document::GetVersion),
-                  InstanceMethod("isLinearized", &Document::IsLinearized),
-                  InstanceMethod("getWriteMode", &Document::GetWriteMode),
-                  InstanceMethod("setEncrypt", &Document::SetEncrypted),
-                  InstanceMethod("write", &Document::Write),
-                  InstanceMethod("getObjects", &Document::GetObjects) });
+  Function ctor = DefineClass(
+    env,
+    "Document",
+    { InstanceAccessor("password", nullptr, &Document::SetPassword),
+      InstanceAccessor("encrypt", &Document::GetEncrypt, &Document::SetEncrypt),
+
+      InstanceMethod("load", &Document::Load),
+      InstanceMethod("getPageCount", &Document::GetPageCount),
+      InstanceMethod("getPage", &Document::GetPage),
+      InstanceMethod("mergeDocument", &Document::MergeDocument),
+      InstanceMethod("deletePage", &Document::DeletePage),
+      InstanceMethod("getVersion", &Document::GetVersion),
+      InstanceMethod("isLinearized", &Document::IsLinearized),
+      InstanceMethod("getWriteMode", &Document::GetWriteMode),
+      InstanceMethod("createEncrypt", &Document::CreateEncrypt),
+      InstanceMethod("write", &Document::Write),
+      InstanceMethod("getObjects", &Document::GetObjects),
+      InstanceMethod("getTrailer", &Document::GetTrailer) });
 
   target.Set("Document", ctor);
 }
@@ -240,23 +244,104 @@ Document::GetWriteMode(const CallbackInfo& info)
 }
 
 void
-Document::SetEncrypted(const CallbackInfo& info)
+Document::SetEncrypt(const CallbackInfo& info, const Napi::Value& value)
 {
   try {
     AssertFunctionArgs(info, 1, { napi_valuetype::napi_object });
-    if (!info[0].IsObject()) {
+    if (!value.IsObject()) {
       throw Napi::Error::New(info.Env(),
                              "Set encrypt requires a single argument of"
                              " type Object<{userPassword:string,"
                              " ownerPassword:string, protection:Array<string>,"
                              " algorithm: string, keyLength: int");
     }
-    auto encryption = info[0].As<Object>();
+    auto encryption = value.As<Object>();
     string ownerPwd;
     string userPwd;
     int permParameter = 0;
     int algoParameter = 0;
     int key = 0;
+    ParseJsEncryptObj(
+      info, encryption, ownerPwd, userPwd, permParameter, algoParameter, key);
+    document->SetEncrypted(
+      userPwd,
+      ownerPwd,
+      permParameter,
+      static_cast<PdfEncrypt::EPdfEncryptAlgorithm>(algoParameter),
+      static_cast<PdfEncrypt::EPdfKeyLength>(key));
+  } catch (PdfError& err) {
+    stringstream msg;
+    msg << "PdfMemDocument::SetEncrypt failed with error: " << err.GetError()
+        << endl;
+    throw Napi::Error::New(info.Env(), msg.str());
+  }
+}
+
+Napi::Value
+Document::GetEncrypt(const CallbackInfo& info)
+{
+  return Value();
+  const PdfEncrypt* enc = document->GetEncrypt();
+  auto ptr = const_cast<PdfEncrypt*>(enc);
+  auto encryptPtr = Napi::External<PdfEncrypt>::New(info.Env(), ptr);
+  auto instance = Encrypt::constructor.New({ encryptPtr });
+  return instance;
+}
+
+Napi::Value
+Document::CreateEncrypt(const CallbackInfo& info)
+{
+  //  return Value();
+  AssertFunctionArgs(info, 1, { napi_valuetype::napi_object });
+  auto initObj = info[0].As<Object>();
+  string uPwd, oPwd;
+  int perm, algo, key;
+  ParseJsEncryptObj(info, initObj, oPwd, uPwd, perm, algo, key);
+  static PdfEncrypt* enc = PdfEncrypt::CreatePdfEncrypt(
+    uPwd,
+    oPwd,
+    perm,
+    static_cast<PdfEncrypt::EPdfEncryptAlgorithm>(algo),
+    static_cast<PdfEncrypt::EPdfKeyLength>(key));
+  auto ptr = Napi::External<PdfEncrypt>::New(info.Env(), enc);
+  auto instance = Encrypt::constructor.New({ ptr });
+  return instance;
+}
+
+Napi::Value
+Document::GetObjects(const CallbackInfo& info)
+{
+  auto js = Napi::Array::New(info.Env());
+  auto objs = document->GetObjects();
+  for (size_t i = 0; i < objs.GetSize(); i++) {
+    auto obj = objs[i];
+    auto nObj = Napi::External<PdfObject>::New(info.Env(), obj);
+    auto objInstance = Obj::constructor.New({ nObj });
+    js.Set(Napi::Number::New(info.Env(), static_cast<int>(i)), objInstance);
+  }
+  return js;
+}
+
+Napi::Value
+Document::GetTrailer(const CallbackInfo& info)
+{
+  const PdfObject* trailerPdObject = document->GetTrailer();
+  PdfObject* ptr = const_cast<PdfObject*>(trailerPdObject);
+  auto initPtr = Napi::External<PdfObject>::New(info.Env(), ptr);
+  auto instance = Obj::constructor.New({ initPtr });
+  return instance;
+}
+
+void
+Document::ParseJsEncryptObj(const CallbackInfo& info,
+                            Object& encryption,
+                            string& ownerPwd,
+                            string& userPwd,
+                            int& permParameter,
+                            int& algoParameter,
+                            int& key)
+{
+  try {
     if (encryption.Has("ownerPassword")) {
       ownerPwd = encryption.Get("ownerPassword").As<String>().Utf8Value();
     }
@@ -348,30 +433,9 @@ Document::SetEncrypted(const CallbackInfo& info)
         }
       }
     }
-    document->SetEncrypted(
-      userPwd,
-      ownerPwd,
-      permParameter,
-      static_cast<PdfEncrypt::EPdfEncryptAlgorithm>(algoParameter),
-      static_cast<PdfEncrypt::EPdfKeyLength>(key));
   } catch (PdfError& err) {
     stringstream msg;
-    msg << "PdfMemDocument::SetEncrypt failed with error: " << err.GetError()
-        << endl;
+    msg << "Parse Encrypt Object failed with error: " << err.GetError() << endl;
     throw Napi::Error::New(info.Env(), msg.str());
   }
-}
-
-Napi::Value
-Document::GetObjects(const CallbackInfo& info)
-{
-  auto js = Napi::Array::New(info.Env());
-  auto objs = document->GetObjects();
-  for (size_t i = 0; i < objs.GetSize(); i++) {
-    auto obj = objs[i];
-    auto nObj = Napi::External<PdfObject>::New(info.Env(), obj);
-    auto objInstance = Obj::constructor.New({ nObj });
-    js.Set(Napi::Number::New(info.Env(), static_cast<int>(i)), objInstance);
-  }
-  return js;
 }

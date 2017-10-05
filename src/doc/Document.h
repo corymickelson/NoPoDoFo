@@ -29,13 +29,24 @@ public:
   Napi::Value IsLinearized(const Napi::CallbackInfo&);
   Napi::Value Write(const Napi::CallbackInfo&);
   Napi::Value GetWriteMode(const Napi::CallbackInfo&);
-  void SetEncrypted(const Napi::CallbackInfo&);
+  void SetEncrypt(const Napi::CallbackInfo&, const Napi::Value&);
+  Napi::Value GetEncrypt(const Napi::CallbackInfo&);
+  Napi::Value CreateEncrypt(const Napi::CallbackInfo&);
   Napi::Value GetObjects(const Napi::CallbackInfo&);
+  Napi::Value Authenticate(const Napi::CallbackInfo&);
+  Napi::Value GetTrailer(const Napi::CallbackInfo&);
 
   PoDoFo::PdfMemDocument* GetDocument() { return document; }
 
 private:
   PoDoFo::PdfMemDocument* document;
+  void ParseJsEncryptObj(const Napi::CallbackInfo& info,
+                         Napi::Object& obj,
+                         string& owner,
+                         string& user,
+                         int& pro,
+                         int& algo,
+                         int& key);
 };
 
 #endif // NPDF_PDFMEMDOCUMENT_H

@@ -1,10 +1,13 @@
-import {IObj, Obj} from './object';
+import { IObj, Obj } from './object';
 import { IPage, Page } from './page';
+import { IEncrypt, Encrypt, EncryptInitOption } from './encrypt';
 
 const mod = require('bindings')('npdf')
 
 export interface IDocument {
-    _instance:any
+    _instance: any
+    encrypt: IEncrypt
+
     load(file: string, update?: boolean): void
 
     getPageCount(): number
@@ -22,16 +25,13 @@ export interface IDocument {
     isLinearized(): boolean
 
     write(file: string): void
+
+    createEncrypt(option: EncryptInitOption): IEncrypt
+
+    getTrailer():IObj
 }
 
-export type ProtectionOption = 'Copy' | 'Print' | 'Edit' | 'EditNotes' | 'FillAndSign' | 'Accessible' | 'DocAssembly' | 'HighPrint'
-export type DocumentEncryptOption = {
-    userPassword?: string
-    ownerPassword?: string
-    protection?: Array<ProtectionOption>
-    algorithm?: 'rc4v1' | 'rc4v2' | 'aesv2' | 'aesv3'
-    keyLength?: number
-}
+
 
 
 
@@ -67,6 +67,17 @@ export class Document implements IDocument {
         throw Error("Can not get password from loaded document")
     }
 
+    set encrypt(instance: IEncrypt) {
+        if (instance.option) this._instance.encrypt = instance.option
+        else {
+            throw Error("Set document encrypt with an instance of Encrypt with the optional EncryptInitOption defined at construction")
+        }
+    }
+
+    get encrypt() {
+        const instance = this._instance.encrypt
+        return new Encrypt(instance)
+    }
     /**
      * @constructor
      * @param {string} [file] - pdf file path (optional)
@@ -111,7 +122,7 @@ export class Document implements IDocument {
     }
 
     getObjects(): Array<IObj> {
-        const objects:Array<any> = this._instance.getObjects()
+        const objects: Array<any> = this._instance.getObjects()
         return objects.map(value => {
             return new Obj(value)
         })
@@ -153,9 +164,6 @@ export class Document implements IDocument {
         return this._instance.isLinearized()
     }
 
-    setEncrypt(option: DocumentEncryptOption): void {
-        this._instance.setEncrypt(option)
-    }
 
     write(file: string): void {
         if (!this._loaded) {
@@ -164,4 +172,13 @@ export class Document implements IDocument {
         this._instance.write(file)
     }
 
+    createEncrypt(option: EncryptInitOption): IEncrypt {
+        const encryptInstance = this._instance.createEncrypt(option)
+        return new Encrypt(encryptInstance)
+    }
+
+    getTrailer(): IObj {
+        let objInit =  this._instance.getTrailer()
+        return new Obj(objInit)
+    }
 }
