@@ -26,11 +26,11 @@ export interface IDocument {
 
 export type ProtectionOption = 'Copy' | 'Print' | 'Edit' | 'EditNotes' | 'FillAndSign' | 'Accessible' | 'DocAssembly' | 'HighPrint'
 export type DocumentEncryptOption = {
-    userPassword: string
-    ownerPassword: string
-    protection: Array<ProtectionOption>
-    algorithm: 'rc4v1' | 'rc4v2' | 'aesv2' | 'aesv3'
-    keyLength: number
+    userPassword?: string
+    ownerPassword?: string
+    protection?: Array<ProtectionOption>
+    algorithm?: 'rc4v1' | 'rc4v2' | 'aesv2' | 'aesv3'
+    keyLength?: number
 }
 
 

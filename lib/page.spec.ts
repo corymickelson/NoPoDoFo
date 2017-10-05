@@ -36,16 +36,16 @@ test('get trimbox', t => {
     const doc = new Document(filePath),
         page = doc.getPage(0),
         trimBox = page.trimBox
-    t.assert(trimBox.height > 0)
-    t.assert(trimBox.width > 0)
-    t.assert(trimBox.left === 0)
-    t.assert(trimBox.bottom === 0)
+    t.assert(trimBox.height > 0, 'trimbox height is not null')
+    t.assert(trimBox.width > 0, 'trimbox width not null')
+    t.assert(trimBox.left === 0, 'trimbox left')
+    t.assert(trimBox.bottom === 0, 'trimbox bottom')
     t.end()
 })
 test('get number of fields', t => {
     const doc = new Document(filePath),
         page = doc.getPage(0)
-    t.assert(page.getNumFields() === 22)
+    t.assert(page.getNumFields() === 22, 'page get number of fields counts all fields')
     t.end()
 })
 
@@ -54,7 +54,7 @@ test('get fields info', t => {
         page = doc.getPage(0),
         fields = page.getFieldsInfo()
 
-    t.assert(fields.length === 22)
+    t.assert(fields.length === 22, 'page get field info get\'s info for each field')
     t.end()
 })
 
@@ -79,7 +79,7 @@ test('get fields', t => {
 test('page number of annotations', t => {
     const doc = new Document(filePath),
         page = doc.getPage(0)
-    t.assert(page.getNumAnnots() === 22)
+    t.assert(page.getNumAnnots() === 22, 'get\'s all annotations on the page' )
     t.end()
 })
 
@@ -109,8 +109,8 @@ test('page contents', t => {
     const doc = new Document(filePath),
         page = doc.getPage(0),
         contents = page.getContents(false)
-    t.assert(contents instanceof Obj)
-    t.assert(contents.length > 0)
+    t.assert(contents instanceof Obj, 'is an instance of Obj')
+    t.assert(contents.length > 0, 'content is not null or empty')
     t.end()
 })
 
@@ -118,8 +118,8 @@ test('page resources', t => {
     const doc = new Document(filePath),
         page = doc.getPage(0),
         resources = page.getResources()
-    t.assert(resources instanceof Obj)
-    t.assert(resources.length > 0)
+    t.assert(resources instanceof Obj, 'is instance ob Obj')
+    t.assert(resources.length > 0, 'is not null or empty')
     t.end()
 })
 

@@ -10,10 +10,14 @@ set(CMAKE_CXX_FLAGS -fPIC)
 file(GLOB SOURCE_FILES
     "src/*.h"
     "src/*.cc"
-    "src/crypt/*.h",
+    "src/base/*.cc"
+    "src/base/*.h"
+    "src/doc/*.h"
+    "src/doc/*.cc"
+    "src/crypt/*.h"
     "src/crypt/*.cc" )
 
-# Configure for .node 
+# Configure for .node
 add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES})
 set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "" SUFFIX ".node")
 

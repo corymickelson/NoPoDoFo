@@ -1,9 +1,34 @@
 #include "Obj.h"
-#include "ErrorHandler.h"
+#include "../ErrorHandler.h"
+#include "../ValidateArguments.h"
 #include "Ref.h"
-#include "ValidateArguments.h"
+
+using namespace Napi;
+using namespace PoDoFo;
 
 FunctionReference Obj::constructor;
+
+void
+Obj::Initialize(Napi::Env& env, Napi::Object& target)
+{
+  HandleScope scope(env);
+  Function ctor = DefineClass(
+    env,
+    "Obj",
+    { InstanceAccessor("stream", &Obj::GetStream, nullptr),
+      InstanceAccessor("type", &Obj::GetDataType, nullptr),
+      InstanceAccessor("length", &Obj::GetObjectLength, nullptr),
+      InstanceAccessor("owner", &Obj::GetOwner, &Obj::SetOwner),
+      InstanceAccessor("reference", &Obj::Reference, nullptr),
+      InstanceMethod("hasStream", &Obj::HasStream),
+      InstanceMethod("getOffset", &Obj::GetByteOffset),
+      InstanceMethod("write", &Obj::WriteObject),
+      InstanceMethod("flateCompressStream", &Obj::FlateCompressStream),
+      InstanceMethod("delayedStreamLoad", &Obj::DelayedStreamLoad) });
+  constructor = Napi::Persistent(ctor);
+  constructor.SuppressDestruct();
+  target.Set("Obj", constructor);
+}
 
 Obj::Obj(const Napi::CallbackInfo& info)
   : ObjectWrap<Obj>(info)

@@ -3,8 +3,11 @@
 //
 
 #include "Dictionary.h"
+#include "../ValidateArguments.h"
 #include "Obj.h"
-#include "ValidateArguments.h"
+
+using namespace Napi;
+using namespace PoDoFo;
 
 Dictionary::Dictionary(const CallbackInfo& info)
   : ObjectWrap<Dictionary>(info)
@@ -13,7 +16,26 @@ Dictionary::Dictionary(const CallbackInfo& info)
   auto objPtr = Obj::Unwrap(objWrap);
   dict = objPtr->GetObject().GetDictionary();
 }
-
+void
+Dictionary::Initialize(Napi::Env& env, Napi::Object& target)
+{
+  HandleScope scope(env);
+  Function ctor = DefineClass(
+    env,
+    "Dictionary",
+    { InstanceMethod("getKey", &Dictionary::GetKey),
+      InstanceMethod("getKeys", &Dictionary::GetKeys),
+      InstanceMethod("hasKey", &Dictionary::HasKey),
+      InstanceMethod("addKey", &Dictionary::AddKey),
+      InstanceMethod("removeKey", &Dictionary::RemoveKey),
+      InstanceMethod("getKeyAs", &Dictionary::GetKeyAs),
+      InstanceAccessor("dirty", &Dictionary::GetDirty, &Dictionary::SetDirty),
+      InstanceAccessor(
+        "immutable", &Dictionary::GetImmutable, &Dictionary::SetImmutable),
+      InstanceMethod("clear", &Dictionary::Clear),
+      InstanceMethod("write", &Dictionary::Write) });
+  target.Set("Dictionary", ctor);
+}
 void
 Dictionary::AddKey(const CallbackInfo& info)
 {

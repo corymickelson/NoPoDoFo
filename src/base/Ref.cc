@@ -1,6 +1,9 @@
-#include "ErrorHandler.h"
-#include "ValidateArguments.h"
 #include "Ref.h"
+#include "../ErrorHandler.h"
+#include "../ValidateArguments.h"
+
+using namespace Napi;
+using namespace PoDoFo;
 
 Napi::FunctionReference Ref::constructor;
 
@@ -8,6 +11,23 @@ Ref::Ref(const Napi::CallbackInfo& info)
   : ObjectWrap(info)
 {
   ref = *info[0].As<Napi::External<PdfReference>>().Data();
+}
+
+void
+Ref::Initialize(Napi::Env& env, Napi::Object& target)
+{
+  Napi::Function ctor = DefineClass(
+    env,
+    "Ref",
+    { InstanceAccessor(
+        "generation", &Ref::GetGenerationNumber, &Ref::SetGenerationNumber),
+      InstanceAccessor("object", &Ref::GetObjectNumber, &Ref::SetObjectNumber),
+      InstanceMethod("toString", &Ref::ToString),
+      InstanceMethod("write", &Ref::Write),
+      InstanceMethod("isIndirect", &Ref::IsIndirect) });
+  constructor = Napi::Persistent(ctor);
+  constructor.SuppressDestruct();
+  target.Set("Ref", constructor);
 }
 void
 Ref::SetGenerationNumber(const Napi::CallbackInfo& info,

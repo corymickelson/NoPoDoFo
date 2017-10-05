@@ -7,6 +7,16 @@
 
 #include "FileSpec.h"
 
+using namespace Napi;
+using namespace PoDoFo;
+
+void
+FileSpec::Initialize(Napi::Env& env, Napi::Object& target)
+{
+  HandleScope scope(env);
+  Function ctor = DefineClass(env, "FileSpec", {});
+  target.Set("FileSpec", ctor);
+}
 FileSpec::FileSpec(const CallbackInfo& info)
   : ObjectWrap<FileSpec>(info)
 {

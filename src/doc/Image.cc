@@ -3,7 +3,11 @@
 //
 
 #include "Image.h"
-#include "ValidateArguments.h"
+#include "../ValidateArguments.h"
+
+using namespace Napi;
+using namespace PoDoFo;
+using namespace boost;
 
 Image::Image(const CallbackInfo& info)
   : ObjectWrap(info)
@@ -38,9 +42,23 @@ Image::Image(const CallbackInfo& info)
                          "NPdf PoDoFo requires libjpeg for images.");
 #endif
 }
-
 void
-Image::LoadFromFile(const CallbackInfo &info)
+Image::Initialize(Napi::Env& env, Napi::Object& target)
+{
+  HandleScope scope(env);
+  Function ctor =
+    DefineClass(env,
+                "Image",
+                { InstanceMethod("getWidth", &Image::GetWidth),
+                  InstanceMethod("getHeight", &Image::GetHeight),
+                  InstanceMethod("loadFromFile", &Image::LoadFromFile),
+                  InstanceAccessor("isLoaded", &Image::IsLoaded, nullptr),
+                  InstanceMethod("setInterpolate", &Image::SetInterpolate),
+                  InstanceMethod("setData", &Image::LoadFromBuffer) });
+  target.Set("Image", ctor);
+}
+void
+Image::LoadFromFile(const CallbackInfo& info)
 {
 
 #ifdef PODOFO_HAVE_JPEG_LIB
@@ -70,7 +88,7 @@ Image::LoadFromFile(const CallbackInfo &info)
 }
 
 void
-Image::LoadFromBuffer(const CallbackInfo &info)
+Image::LoadFromBuffer(const CallbackInfo& info)
 #ifdef PODOFO_HAVE_JPEG_LIB
 {
   try {
@@ -79,7 +97,7 @@ Image::LoadFromBuffer(const CallbackInfo &info)
         info.Env(), "LoadFromBuffer requires a single argument of type Buffer");
     }
     string jsValue = info[0].As<String>().Utf8Value();
-    auto * value = new unsigned char[jsValue.length()];
+    auto* value = new unsigned char[jsValue.length()];
     strcpy(reinterpret_cast<char*>(value), jsValue.c_str());
     img->LoadFromData(value, static_cast<long>(jsValue.length()));
   } catch (PdfError& err) {
@@ -136,8 +154,8 @@ Image::IsLoaded(const CallbackInfo& info)
 }
 
 void
-Image::SetInterpolate(const CallbackInfo &info)
+Image::SetInterpolate(const CallbackInfo& info)
 {
-  AssertFunctionArgs(info,1,{napi_valuetype::napi_boolean});
+  AssertFunctionArgs(info, 1, { napi_valuetype::napi_boolean });
   img->SetInterpolate(info[0].As<Boolean>());
 }

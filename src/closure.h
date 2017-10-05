@@ -5,7 +5,7 @@
 #ifndef NPDF_CLOSURE_HPP
 #define NPDF_CLOSURE_HPP
 
-#include "Document.h"
+#include "doc/Document.h"
 #include <napi.h>
 #include <sys/user.h>
 

@@ -6,6 +6,9 @@
 #include "Document.h"
 #include "Page.h"
 
+using namespace Napi;
+using namespace PoDoFo;
+
 Field::Field(const CallbackInfo& info)
   : ObjectWrap(info)
 {
@@ -16,6 +19,27 @@ Field::Field(const CallbackInfo& info)
   Page* page = Page::Unwrap(pageObj);
   _page = page->GetPage();
   //  PdfField pdfField = _page->GetField(fieldIndex);
+}
+
+void
+Field::Initialize(Napi::Env& env, Napi::Object& target)
+{
+  HandleScope scope(env);
+  Function ctor =
+    DefineClass(env,
+                "Field",
+                { InstanceMethod("getType", &Field::GetType),
+                  InstanceMethod("getFieldName", &Field::GetFieldName),
+                  InstanceMethod("getAlternateName", &Field::GetAlternateName),
+                  InstanceMethod("getMappingName", &Field::GetMappingName),
+                  InstanceMethod("setAlternateName", &Field::SetAlternateName),
+                  InstanceMethod("setMappingName", &Field::SetMappingName),
+                  InstanceMethod("setRequired", &Field::SetRequired),
+                  InstanceMethod("setFieldIndex", &Field::SetFieldIndex),
+                  InstanceMethod("getFieldIndex", &Field::GetFieldIndex),
+                  //        InstanceMethod("textField", &Field::TextField),
+                  InstanceMethod("isRequired", &Field::IsRequired) });
+  target.Set("Field", ctor);
 }
 
 Napi::Value

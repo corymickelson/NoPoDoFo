@@ -4,6 +4,9 @@
 
 #include "ErrorHandler.h"
 
+using namespace Napi;
+using namespace PoDoFo;
+
 ErrorHandler::ErrorHandler() {}
 
 ErrorHandler::ErrorHandler(PoDoFo::PdfError& err, const CallbackInfo& info)

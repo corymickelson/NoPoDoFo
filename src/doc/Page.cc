@@ -3,11 +3,14 @@
 //
 
 #include "Page.h"
-#include "ErrorHandler.h"
-#include "Field.h"
-#include "Obj.h"
-#include "Rect.h"
+#include "../ErrorHandler.h"
+#include "../base/Obj.h"
 #include "Annotation.h"
+#include "Field.h"
+#include "Rect.h"
+
+using namespace Napi;
+using namespace PoDoFo;
 
 Napi::FunctionReference Page::constructor;
 
@@ -21,7 +24,35 @@ Page::Page(const CallbackInfo& info)
   parent = parentPtr;
   page = pagePtr;
 }
+void
+Page::Initialize(Napi::Env& env, Napi::Object& target)
+{
+  Napi::HandleScope scope(env);
+  Napi::Function ctor = DefineClass(
+    env,
+    "Page",
+    { InstanceAccessor("rotation", &Page::GetRotation, &Page::SetRotation),
+      InstanceAccessor("trimBox", &Page::GetTrimBox, &Page::SetTrimBox),
+      InstanceAccessor("number", &Page::GetPageNumber, nullptr),
+      InstanceAccessor("width", &Page::GetPageWidth, &Page::SetPageWidth),
+      InstanceAccessor("height", &Page::GetPageHeight, &Page::SetPageHeight),
 
+      InstanceMethod("getNumFields", &Page::GetNumFields),
+      InstanceMethod("getFieldsInfo", &Page::GetFields),
+      InstanceMethod("getFieldIndex", &Page::GetFieldIndex),
+      InstanceMethod("getContents", &Page::GetContents),
+      InstanceMethod("getResources", &Page::GetResources),
+      InstanceMethod("getMediaBox", &Page::GetMediaBox),
+      InstanceMethod("getBleedBox", &Page::GetBleedBox),
+      InstanceMethod("getArtBox", &Page::GetArtBox),
+      InstanceMethod("createAnnotation", &Page::CreateAnnotation),
+      InstanceMethod("getAnnotation", &Page::GetAnnotation),
+      InstanceMethod("getNumAnnots", &Page::GetNumAnnots),
+      InstanceMethod("deleteAnnotation", &Page::DeleteAnnotation) });
+  constructor = Napi::Persistent(ctor);
+  constructor.SuppressDestruct();
+  target.Set("Page", constructor);
+}
 Napi::Value
 Page::GetRotation(const CallbackInfo& info)
 {
@@ -298,22 +329,23 @@ Page::DeleteAnnotation(const CallbackInfo& info)
   }
 }
 Napi::Value
-Page::GetAnnotation(const CallbackInfo &info)
+Page::GetAnnotation(const CallbackInfo& info)
 {
-  AssertFunctionArgs(info, 1, {napi_valuetype::napi_number});
+  AssertFunctionArgs(info, 1, { napi_valuetype::napi_number });
   int index = info[0].As<Number>();
   auto ptr = page->GetAnnotation(index);
   auto instance = Napi::External<PdfAnnotation>::New(info.Env(), ptr);
   return Annotation::constructor.New({ instance });
 }
 Napi::Value
-Page::CreateAnnotation(const CallbackInfo &info)
+Page::CreateAnnotation(const CallbackInfo& info)
 {
-  AssertFunctionArgs(info, 2, {napi_valuetype::napi_number, napi_valuetype::napi_object});
+  AssertFunctionArgs(
+    info, 2, { napi_valuetype::napi_number, napi_valuetype::napi_object });
   int flag = info[0].As<Number>();
   auto type = static_cast<EPdfAnnotation>(flag);
   auto obj = info[1].As<Object>();
-  Rect *rect = Rect::Unwrap(obj);
+  Rect* rect = Rect::Unwrap(obj);
   PdfAnnotation* annot = page->CreateAnnotation(type, rect->GetRect());
   auto instance = External<PdfAnnotation>::New(info.Env(), annot);
   return Annotation::constructor.New({ instance });

@@ -3,18 +3,45 @@
 //
 
 #include "Document.h"
-#include "ErrorHandler.h"
-#include "Obj.h"
+#include "../ErrorHandler.h"
+#include "../ValidateArguments.h"
+#include "../base/Obj.h"
 #include "Page.h"
-#include "ValidateArguments.h"
 
+using namespace boost;
+using namespace Napi;
+using namespace std;
+using namespace PoDoFo;
+
+void
+Document::Initialize(Napi::Env& env, Napi::Object& target)
+{
+  HandleScope scope(env);
+  Function ctor =
+    DefineClass(env,
+                "Document",
+                { InstanceMethod("load", &Document::Load),
+                  InstanceMethod("getPageCount", &Document::GetPageCount),
+                  InstanceMethod("getPage", &Document::GetPage),
+                  InstanceMethod("mergeDocument", &Document::MergeDocument),
+                  InstanceMethod("deletePage", &Document::DeletePage),
+                  InstanceAccessor("password", nullptr, &Document::SetPassword),
+                  InstanceMethod("getVersion", &Document::GetVersion),
+                  InstanceMethod("isLinearized", &Document::IsLinearized),
+                  InstanceMethod("getWriteMode", &Document::GetWriteMode),
+                  InstanceMethod("setEncrypt", &Document::SetEncrypted),
+                  InstanceMethod("write", &Document::Write),
+                  InstanceMethod("getObjects", &Document::GetObjects) });
+
+  target.Set("Document", ctor);
+}
 Document::Document(const CallbackInfo& info)
   : ObjectWrap(info)
 {
   document = new PdfMemDocument();
 }
 
-Napi::Value
+void
 Document::Load(const CallbackInfo& info)
 {
   string filePath = info[0].As<String>().Utf8Value();
@@ -41,7 +68,6 @@ Document::Load(const CallbackInfo& info)
       throw Napi::Error::New(info.Env(), msg);
     }
   }
-  return Value();
 }
 
 Napi::Value
@@ -101,7 +127,11 @@ Document::SetPassword(const CallbackInfo& info, const Napi::Value& value)
     throw Napi::Error::New(info.Env(), "password must be of type string");
   }
   string password = value.As<String>().Utf8Value();
-  document->SetPassword(password);
+  try {
+    document->SetPassword(password);
+  } catch (PdfError& err) {
+    ErrorHandler(err, info);
+  }
 }
 
 Napi::Value

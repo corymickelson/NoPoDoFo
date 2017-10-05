@@ -4,6 +4,9 @@
 
 #include "TextField.h"
 
+using namespace Napi;
+using namespace PoDoFo;
+
 TextField::TextField(const CallbackInfo& info)
   : ObjectWrap(info)
 {
@@ -20,10 +23,21 @@ TextField::TextField(const CallbackInfo& info)
 }
 
 void
-TextField::SetText(const CallbackInfo& info, const Napi::Value &value)
+TextField::Initialize(Napi::Env& env, Napi::Object& target)
 {
-  if(!value.IsString()) {
-    throw Napi::Error::New(info.Env(), "TextField value must be of type string");
+  HandleScope scope(env);
+  Function ctor = DefineClass(
+    env,
+    "TextField",
+    { InstanceAccessor("text", &TextField::GetText, &TextField::SetText) });
+  target.Set("TextField", ctor);
+}
+void
+TextField::SetText(const CallbackInfo& info, const Napi::Value& value)
+{
+  if (!value.IsString()) {
+    throw Napi::Error::New(info.Env(),
+                           "TextField value must be of type string");
   }
   string input = value.As<String>().Utf8Value();
   PoDoFo::PdfString text(input);

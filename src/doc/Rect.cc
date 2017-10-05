@@ -4,6 +4,9 @@
 
 #include "Rect.h"
 
+using namespace Napi;
+using namespace PoDoFo;
+
 Rect::Rect(const CallbackInfo& info)
   : ObjectWrap(info)
 {
@@ -35,7 +38,22 @@ Rect::Rect(const CallbackInfo& info)
     rect = *new PoDoFo::PdfRect(left, bottom, width, height);
   }
 }
+void
+Rect::Initialize(Napi::Env& env, Napi::Object& target)
+{
+  HandleScope scope(env);
+  Function ctor = DefineClass(
+    env,
+    "Rect",
+    { InstanceAccessor("left", &Rect::GetLeft, &Rect::SetLeft),
+      InstanceAccessor("bottom", &Rect::GetBottom, &Rect::SetBottom),
+      InstanceAccessor("width", &Rect::GetWidth, &Rect::SetWidth),
+      InstanceAccessor("height", &Rect::GetHeight, &Rect::SetHeight),
+      InstanceMethod("intersect", &Rect::Intersect)
 
+    });
+  target.Set("Rect", ctor);
+}
 void
 Rect::Intersect(const CallbackInfo& info)
 {
@@ -46,7 +64,7 @@ Rect::Intersect(const CallbackInfo& info)
   auto rectObj = info[0].As<Object>();
   Rect* rectIntersect = Rect::Unwrap(rectObj);
   PdfRect _rect = rectIntersect->GetRect();
-//  Rect::GetRect().Intersect(_rect);
+  //  Rect::GetRect().Intersect(_rect);
   rect.Intersect(_rect);
 }
 Napi::Value
@@ -71,41 +89,41 @@ Rect::GetBottom(const CallbackInfo& info)
   return Napi::Number::New(info.Env(), rect.GetBottom());
 }
 void
-Rect::SetWidth(const CallbackInfo& info, const Napi::Value &value)
+Rect::SetWidth(const CallbackInfo& info, const Napi::Value& value)
 {
-    if (!value.IsNumber()) {
-      throw Napi::Error::New(
-        info.Env(), "SetWidth requies a single argument of type number");
-    }
+  if (!value.IsNumber()) {
+    throw Napi::Error::New(info.Env(),
+                           "SetWidth requies a single argument of type number");
+  }
   double width = value.As<Number>();
   rect.SetWidth(width);
 }
 void
-Rect::SetHeight(const CallbackInfo& info, const Napi::Value &value)
+Rect::SetHeight(const CallbackInfo& info, const Napi::Value& value)
 {
-    if (!value.IsNumber()) {
-      throw Napi::Error::New(
-        info.Env(), "SetWidth requies a single argument of type number");
-    }
+  if (!value.IsNumber()) {
+    throw Napi::Error::New(info.Env(),
+                           "SetWidth requies a single argument of type number");
+  }
   double height = value.As<Number>();
   rect.SetHeight(height);
 }
 void
-Rect::SetLeft(const CallbackInfo& info, const Napi::Value &value)
+Rect::SetLeft(const CallbackInfo& info, const Napi::Value& value)
 {
-    if (!value.IsNumber()) {
-      throw Napi::Error::New(
-        info.Env(), "SetWidth requies a single argument of type number");
-    }
+  if (!value.IsNumber()) {
+    throw Napi::Error::New(info.Env(),
+                           "SetWidth requies a single argument of type number");
+  }
   double left = value.As<Number>();
   rect.SetLeft(left);
 }
 void
-Rect::SetBottom(const CallbackInfo& info, const Napi::Value &value)
+Rect::SetBottom(const CallbackInfo& info, const Napi::Value& value)
 {
-    if (!value.IsNumber()) {
-      throw Napi::Error::New(
-        info.Env(), "SetWidth requies a single argument of type number");
+  if (!value.IsNumber()) {
+    throw Napi::Error::New(info.Env(),
+                           "SetWidth requies a single argument of type number");
   }
   double bottom = value.As<Number>();
   rect.SetBottom(bottom);

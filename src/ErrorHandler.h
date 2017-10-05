@@ -10,14 +10,12 @@
 #include <string>
 
 using namespace std;
-using namespace Napi;
-using namespace PoDoFo;
 
 class ErrorHandler
 {
 public:
   ErrorHandler();
-  ErrorHandler(PoDoFo::PdfError&, const CallbackInfo&);
+  ErrorHandler(PoDoFo::PdfError&, const Napi::CallbackInfo&);
   ~ErrorHandler();
   static string WriteMsg(PoDoFo::PdfError&);
 

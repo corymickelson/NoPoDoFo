@@ -1,6 +1,9 @@
 #include "Form.h"
+#include "../base/Obj.h"
 #include "Document.h"
-#include "Obj.h"
+
+using namespace Napi;
+using namespace PoDoFo;
 
 Form::Form(const Napi::CallbackInfo& info)
   : ObjectWrap<Form>(info)
@@ -15,7 +18,18 @@ Form::Form(const Napi::CallbackInfo& info)
     throw Napi::Error::New(info.Env(), "Null Form");
   }
 }
-
+void
+Form::Initialize(Napi::Env& env, Napi::Object& target)
+{
+  HandleScope scope(env);
+  Function ctor = DefineClass(env,
+                              "Form",
+                              { InstanceMethod("getObject", &Form::GetObject),
+                                InstanceAccessor("needAppearances",
+                                                 &Form::GetNeedAppearances,
+                                                 &Form::SetNeedAppearances) });
+  target.Set("Form", ctor);
+}
 void
 Form::SetNeedAppearances(const CallbackInfo& info, const Napi::Value& value)
 {
