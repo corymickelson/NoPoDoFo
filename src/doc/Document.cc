@@ -135,6 +135,8 @@ Document::SetPassword(const CallbackInfo& info, const Napi::Value& value)
     document->SetPassword(password);
   } catch (PdfError& err) {
     ErrorHandler(err, info);
+  } catch (Error& err) {
+    ErrorHandler(err, info);
   }
 }
 
@@ -280,7 +282,6 @@ Document::SetEncrypt(const CallbackInfo& info, const Napi::Value& value)
 Napi::Value
 Document::GetEncrypt(const CallbackInfo& info)
 {
-  return Value();
   const PdfEncrypt* enc = document->GetEncrypt();
   auto ptr = const_cast<PdfEncrypt*>(enc);
   auto encryptPtr = Napi::External<PdfEncrypt>::New(info.Env(), ptr);
@@ -291,7 +292,6 @@ Document::GetEncrypt(const CallbackInfo& info)
 Napi::Value
 Document::CreateEncrypt(const CallbackInfo& info)
 {
-  //  return Value();
   AssertFunctionArgs(info, 1, { napi_valuetype::napi_object });
   auto initObj = info[0].As<Object>();
   string uPwd, oPwd;

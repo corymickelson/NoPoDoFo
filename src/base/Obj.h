@@ -23,8 +23,11 @@ public:
   Napi::Value Reference(const Napi::CallbackInfo&);
   void FlateCompressStream(const Napi::CallbackInfo&);
   void DelayedStreamLoad(const Napi::CallbackInfo&);
+  Napi::Value AsType(const Napi::CallbackInfo&);
 
   const PoDoFo::PdfObject GetObject() { return obj; }
+
+  static Napi::Value ParseToType(const Napi::CallbackInfo&, PoDoFo::PdfObject&);
 
 private:
   PoDoFo::PdfObject obj = *new PoDoFo::PdfObject();

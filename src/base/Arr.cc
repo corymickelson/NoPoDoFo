@@ -4,6 +4,7 @@
 
 #include "Arr.h"
 #include "../ValidateArguments.h"
+#include "Obj.h"
 
 using namespace Napi;
 using namespace PoDoFo;
@@ -24,6 +25,7 @@ Arr::Initialize(Napi::Env& env, Napi::Object& target)
     DefineClass(env,
                 "Arr",
                 { InstanceAccessor("dirty", &Arr::IsDirty, &Arr::SetDirty),
+                  InstanceMethod("getIndex", &Arr::GetIndex),
                   InstanceMethod("contains", &Arr::ContainsString),
                   InstanceMethod("indexOf", &Arr::GetStringIndex),
                   InstanceMethod("write", &Arr::Write) });
@@ -52,15 +54,31 @@ Arr::ContainsString(const CallbackInfo& info)
 Napi::Value
 Arr::GetStringIndex(const CallbackInfo& info)
 {
-  return Value();
+  AssertFunctionArgs(info, 1, { napi_valuetype::napi_string });
+  string str = info[0].As<String>().Utf8Value();
+  return Napi::Number::New(info.Env(), arr.GetStringIndex(str));
 }
 
 Napi::Value
 Arr::IsDirty(const CallbackInfo& info)
 {
-  return Value();
+  return Napi::Boolean::New(info.Env(), arr.IsDirty());
+}
+
+Napi::Value
+Arr::GetIndex(const CallbackInfo& info)
+{
+  AssertFunctionArgs(info, 1, { napi_valuetype::napi_number });
+  size_t index = info[0].As<Number>().Uint32Value();
+  PdfObject item = arr[index];
+  return Obj::ParseToType(info, item);
 }
 
 void
 Arr::SetDirty(const CallbackInfo& info, const Napi::Value& value)
-{}
+{
+  if (!value.IsBoolean()) {
+    throw Napi::Error::New(info.Env(), "dirty must be of type boolean");
+  }
+  arr.SetDirty(value.As<Boolean>());
+}

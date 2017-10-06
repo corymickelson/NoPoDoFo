@@ -17,6 +17,7 @@ public:
   Napi::Value ContainsString(const Napi::CallbackInfo&);
   Napi::Value GetStringIndex(const Napi::CallbackInfo&);
   Napi::Value IsDirty(const Napi::CallbackInfo&);
+  Napi::Value GetIndex(const Napi::CallbackInfo&);
   void SetDirty(const Napi::CallbackInfo&, const Napi::Value&);
 
 private:

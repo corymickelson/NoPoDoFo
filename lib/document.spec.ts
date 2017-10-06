@@ -47,13 +47,13 @@ test('throws JS error on file not found', t => {
 
 test.skip('objects', t => { })
 
-//todo read the trailer object for the encrypt key for test success criterial
 test('encryption: user password', t => {
     const doc = new Document(filePath),
         encryptionOption: EncryptInitOption = {
             ownerPassword: 'secret',
-            keyLength: 40, 
-            protection: ['Edit', 'FillAndSign']
+            keyLength: 40,
+            protection: ['Edit', 'FillAndSign'],
+            algorithm: 'aesv3'
         },
         secureDoc = join(__dirname, '../secure.pdf'),
         enc = new Encrypt(null, encryptionOption)
@@ -62,13 +62,18 @@ test('encryption: user password', t => {
     doc.write(secureDoc)
 
     let sDoc: Document = new Document(secureDoc),
-   trailer:Obj = sDoc.getTrailer()
-   let trailerDict = new Dictionary(trailer)
-   t.assert(trailerDict.hasKey("Encrypt") === true, 'trailer has an encryption object')
-   t.end()
+        trailer: Obj = sDoc.getTrailer()
+    let trailerDict = new Dictionary(trailer)
+    if (!doc.encrypt) {
+        t.fail()
+    }
+    const fillAndSign = doc.encrypt.isAllowed('FillAndSign'),
+        edit = doc.encrypt.isAllowed('Edit')
+
+    t.assert(trailerDict.hasKey("Encrypt") === true, 'trailer has an encryption object')
+    t.end()
 })
 
-test.skip('encryption: owner password', t => { })
 test.skip('encryption: protection => FillAndSign', t => { })
 test.skip('encryption: invalid payload throws PdfError', t => { })
 test.skip('write modes', t => { })

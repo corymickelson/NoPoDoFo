@@ -1,5 +1,10 @@
-import { IRef } from "./reference";
+import { IRef, Ref } from "./reference";
 import { IVecObjects } from "./vecObjects";
+import { Dictionary } from "./dictionary";
+import { Arr } from "./arr";
+
+export type PDType = 'Boolean' | 'Number' | 'Name' | 'Real' | 'String' | 'Array' | 'Dictionary' | 'Reference' | 'RawData'
+export type PDVariant = String | Number | Dictionary | Arr | Ref
 
 export interface IObj {
     stream: any
@@ -7,12 +12,14 @@ export interface IObj {
     owner: IVecObjects
     reference: IRef
     _instance: any
+    type: PDType
 
     hasStream(): boolean
     getOffset(key: string): number
-    write(output:string): void
+    write(output: string): void
     flateCompressStream(): void
     delayedStreamLoad(): void
+    asType(t: PDType): PDVariant
 }
 
 /**
@@ -29,7 +36,7 @@ export class Obj implements IObj {
         return this._instance.reference
     }
 
-    set reference(value:any) {
+    set reference(value: any) {
         throw Error("Reference may not be set manually")
     }
 
@@ -37,7 +44,7 @@ export class Obj implements IObj {
         return this._instance.owner
     }
 
-    set owner(value:IVecObjects) {
+    set owner(value: IVecObjects) {
         this._instance.owner = value
     }
 
@@ -45,7 +52,7 @@ export class Obj implements IObj {
         return this._instance.length
     }
 
-    set length(value:any) {
+    set length(value: any) {
         throw Error("Object Length may not be set manually")
     }
 
@@ -53,9 +60,18 @@ export class Obj implements IObj {
         return this._instance.stream
     }
 
-    set stream(value:any) {
+    set stream(value: any) {
         throw Error("Object stream may not be set manually")
     }
+
+    get type() {
+        return this._instance.type
+    }
+
+    set type(value: PDType) {
+        throw Error('Can not set type')
+    }
+
     constructor(instance: any) {
         this._instance = instance
     }
@@ -76,7 +92,7 @@ export class Obj implements IObj {
     /**
      * @desc Write the complete object to a file
      */
-    write(output:string): void {
+    write(output: string): void {
         try {
             this._instance.write(output)
         } catch (error) {
@@ -96,5 +112,28 @@ export class Obj implements IObj {
      */
     delayedStreamLoad(): void {
         this._instance.delayedStreamLoad()
+    }
+
+    asType(t: PDType): PDVariant {
+        switch (t) {
+            case 'Array':
+                const initArray = this._instance.asType(t)
+                return new Arr(initArray)
+            case 'Boolean':
+            case 'Real':
+            case 'Number':
+            case 'Name':
+            case 'String':
+                return this._instance.asType(t)
+            case 'Dictionary':
+                return new Dictionary(this)
+            case 'Reference':
+                const initRef = this._instance.asType(t)
+                return new Ref(initRef)
+            case 'RawData':
+                throw Error('unimplemented')
+            default:
+                throw Error('type unknown')
+        }
     }
 }

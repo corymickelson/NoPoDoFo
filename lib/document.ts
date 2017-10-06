@@ -31,10 +31,6 @@ export interface IDocument {
     getTrailer():IObj
 }
 
-
-
-
-
 /**
  * @class Document
  * @example

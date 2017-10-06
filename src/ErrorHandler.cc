@@ -4,6 +4,7 @@
 
 #include "ErrorHandler.h"
 
+using namespace std;
 using namespace Napi;
 using namespace PoDoFo;
 
@@ -13,8 +14,17 @@ ErrorHandler::ErrorHandler(PoDoFo::PdfError& err, const CallbackInfo& info)
 {
   string msg = WriteMsg(err);
   stringstream eMsg;
+  streambuf* out = std::cout.rdbuf(eMsg.rdbuf());
   eMsg << "PoDoFo error: " << msg << endl;
+  err.PrintErrorMsg();
   throw Napi::Error::New(info.Env(), eMsg.str());
+}
+
+ErrorHandler::ErrorHandler(Error& err, const Napi::CallbackInfo& info)
+{
+  stringstream msg;
+  msg << "JS error: " << err.Message() << endl;
+  throw Napi::Error::New(info.Env(), msg.str());
 }
 
 string

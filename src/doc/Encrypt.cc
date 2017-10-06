@@ -1,4 +1,5 @@
 #include "Encrypt.h"
+#include "../ErrorHandler.h"
 #include "../ValidateArguments.h"
 
 using namespace Napi;
@@ -38,24 +39,31 @@ Encrypt::IsAllowed(const CallbackInfo& info)
     throw Napi::Error::New(info.Env(), "key must be of type ProtectionOption");
   }
   bool is = false;
-  if (key == "Copy") {
-    is = encrypt->IsCopyAllowed();
-  } else if (key == "Print") {
-    is = encrypt->IsEditAllowed();
-  } else if (key == "Edit") {
-    is = encrypt->IsEditAllowed();
-  } else if (key == "EditNotes") {
-    is = encrypt->IsEditNotesAllowed();
-  } else if (key == "FillAndSign") {
-    is = encrypt->IsFillAndSignAllowed();
-  } else if (key == "Accessible") {
-    is = encrypt->IsAccessibilityAllowed();
-  } else if (key == "DocAssembly") {
-    is = encrypt->IsDocAssemblyAllowed();
-  } else if (key == "HighPrint") {
-    is = encrypt->IsHighPrintAllowed();
-  } else {
-    throw Napi::Error::New(info.Env(), "Key unknown");
+  try {
+    if (key == "Copy") {
+      is = encrypt->IsCopyAllowed();
+    } else if (key == "Print") {
+      is = encrypt->IsEditAllowed();
+    } else if (key == "Edit") {
+      is = encrypt->IsEditAllowed();
+    } else if (key == "EditNotes") {
+      is = encrypt->IsEditNotesAllowed();
+    } else if (key == "FillAndSign") {
+      is = encrypt->IsFillAndSignAllowed();
+    } else if (key == "Accessible") {
+      is = encrypt->IsAccessibilityAllowed();
+    } else if (key == "DocAssembly") {
+      is = encrypt->IsDocAssemblyAllowed();
+    } else if (key == "HighPrint") {
+      is = encrypt->IsHighPrintAllowed();
+    } else {
+      throw Napi::Error::New(info.Env(), "Key unknown");
+    }
+
+  } catch (PdfError& err) {
+    ErrorHandler(err, info);
+  } catch (Error& err) {
+    ErrorHandler(err, info);
   }
   return Napi::Boolean::New(info.Env(), is);
 }

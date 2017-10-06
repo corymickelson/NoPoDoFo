@@ -1,6 +1,8 @@
 #include "Obj.h"
 #include "../ErrorHandler.h"
 #include "../ValidateArguments.h"
+#include "Arr.h"
+#include "Dictionary.h"
 #include "Ref.h"
 
 using namespace Napi;
@@ -24,7 +26,8 @@ Obj::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceMethod("getOffset", &Obj::GetByteOffset),
       InstanceMethod("write", &Obj::WriteObject),
       InstanceMethod("flateCompressStream", &Obj::FlateCompressStream),
-      InstanceMethod("delayedStreamLoad", &Obj::DelayedStreamLoad) });
+      InstanceMethod("delayedStreamLoad", &Obj::DelayedStreamLoad),
+      InstanceMethod("asType", &Obj::AsType) });
   constructor = Napi::Persistent(ctor);
   constructor.SuppressDestruct();
   target.Set("Obj", constructor);
@@ -143,4 +146,69 @@ Obj::DelayedStreamLoad(const CallbackInfo& info)
   } catch (PdfError& err) {
     ErrorHandler(err, info);
   }
+}
+
+Napi::Value
+Obj::AsType(const CallbackInfo& info)
+{
+  return ParseToType(info, obj);
+  //  AssertFunctionArgs(info, 1, { napi_valuetype::napi_string });
+  //  string type = info[0].As<String>().Utf8Value();
+  //  Napi::Value value;
+  //  if (type == "Boolean")
+  //    value = Napi::Boolean::New(info.Env(), obj.GetBool());
+  //  else if (type == "Number")
+  //    value = Napi::Number::New(info.Env(), obj.GetNumber());
+  //  else if (type == "Name")
+  //    value = Napi::String::New(info.Env(), obj.GetName().GetName());
+  //  else if (type == "Real")
+  //    value = Napi::Number::New(info.Env(), obj.GetReal());
+  //  else if (type == "String")
+  //    value = Napi::String::New(info.Env(), obj.GetString().GetStringUtf8());
+  //  else if (type == "Array") {
+  //    auto init = obj.GetArray();
+  //    auto initPtr = Napi::External<PdfArray>::New(info.Env(), &init);
+  //    value = Arr::constructor.New({ initPtr });
+  //  } else if (type == "Dictionary") {
+  //    throw Napi::Error::New(info.Env(), "Init from Dictionary constructor");
+  //  } else if (type == "Reference") {
+  //    auto init = obj.GetReference();
+  //    auto initPtr = Napi::External<PdfReference>::New(info.Env(), &init);
+  //    value = Ref::constructor.New({ initPtr });
+  //  } else if (type == "RawData") {
+  //    throw Napi::Error::New(info.Env(), "unimplemented");
+  //  }
+  //  return value;
+}
+
+static Napi::Value
+ParseToType(const Napi::CallbackInfo& info, PdfObject& obj)
+{
+  AssertFunctionArgs(info, 1, { napi_valuetype::napi_string });
+  string type = info[0].As<String>().Utf8Value();
+  Napi::Value value;
+  if (type == "Boolean")
+    value = Napi::Boolean::New(info.Env(), obj.GetBool());
+  else if (type == "Number")
+    value = Napi::Number::New(info.Env(), obj.GetNumber());
+  else if (type == "Name")
+    value = Napi::String::New(info.Env(), obj.GetName().GetName());
+  else if (type == "Real")
+    value = Napi::Number::New(info.Env(), obj.GetReal());
+  else if (type == "String")
+    value = Napi::String::New(info.Env(), obj.GetString().GetStringUtf8());
+  else if (type == "Array") {
+    auto init = obj.GetArray();
+    auto initPtr = Napi::External<PdfArray>::New(info.Env(), &init);
+    value = Arr::constructor.New({ initPtr });
+  } else if (type == "Dictionary") {
+    value = Napi::String::New(info.Env(), "Dictionary");
+  } else if (type == "Reference") {
+    auto init = obj.GetReference();
+    auto initPtr = Napi::External<PdfReference>::New(info.Env(), &init);
+    value = Ref::constructor.New({ initPtr });
+  } else if (type == "RawData") {
+    throw Napi::Error::New(info.Env(), "unimplemented");
+  }
+  return value;
 }
