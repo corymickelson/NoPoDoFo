@@ -1,4 +1,6 @@
-const mod = require('bindings')('npdf')
+// const mod = require('bindings')('npdf')
+
+import {__mod} from './document'
 import {IPage} from './page'
 
 export interface ITextField {
@@ -45,7 +47,7 @@ export type FieldType = 'TextField' | 'CheckBox' | 'ListBox' | 'RadioButton' | '
 export class Field implements IField {
     _instance: any
     constructor(page: IPage, fieldIndex: number) {
-        this._instance = new mod.Field(page._instance, fieldIndex)
+        this._instance = new __mod.Field(page._instance, fieldIndex)
     }
 
     getType(): FieldType {
@@ -84,7 +86,10 @@ export class Field implements IField {
 export class TextField implements ITextField {
     _instance: any
     constructor(field: IField) {
-        this._instance = new mod.TextField(field._instance)
+        if(field.getType() !== 'TextField') {
+            throw Error('field parameter must be a field of type TextField')
+        }
+        this._instance = new __mod.TextField(field._instance)
     }
     get text(): string {
         return this._instance.text
@@ -103,7 +108,10 @@ export class CheckBox implements ICheckBox {
         this._instance.checked = value
     }
     constructor(field: IField) {
-        this._instance = new mod.CheckBox(field._instance)
+        if(field.getType() !== 'CheckBox') {
+            throw Error('must be of type CheckBox')
+        }
+        this._instance = new __mod.CheckBox(field._instance)
     }
 }
 

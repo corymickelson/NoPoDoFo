@@ -2,7 +2,7 @@ import { IObj, Obj } from './object';
 import { IPage, Page } from './page';
 import { IEncrypt, Encrypt, EncryptInitOption } from './encrypt';
 
-const mod = require('bindings')('npdf')
+export const __mod = require('../build/Release/npdf.node')
 
 export interface IDocument {
     _instance: any
@@ -81,7 +81,7 @@ export class Document implements IDocument {
      * @returns void
      */
     constructor(file: string, update: boolean = false) {
-        this._instance = new mod.Document()
+        this._instance = new __mod.Document()
         if (file) {
             this._instance.load(file, update)
             this._pageCount = this._instance.getPageCount()

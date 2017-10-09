@@ -10,6 +10,43 @@ using namespace PoDoFo;
 
 FunctionReference Obj::constructor;
 
+class ObjWriteAsync : public AsyncWorker
+{
+public:
+  ObjWriteAsync(Napi::Function& cb, Obj* obj, string output)
+    : AsyncWorker(cb)
+    , obj(obj)
+    , output(output)
+  {}
+  ~ObjWriteAsync() {}
+
+protected:
+  void Execute()
+  {
+    try {
+      PdfOutputDevice device(output.c_str());
+      obj->GetObject().WriteObject(&device, ePdfWriteMode_Default, nullptr);
+
+    } catch (PdfError& err) {
+      eMessage = ErrorHandler::WriteMsg(err).c_str();
+      SetError(eMessage);
+    } catch (Napi::Error& err) {
+      eMessage = err.Message().c_str();
+      SetError(eMessage);
+    }
+  }
+  void OnOK()
+  {
+    Napi::HandleScope scope(Env());
+    Callback().Call({ Env().Null(), String::New(Env(), output) });
+  }
+
+private:
+  Obj* obj;
+  string output;
+  const char* eMessage = nullptr;
+};
+
 void
 Obj::Initialize(Napi::Env& env, Napi::Object& target)
 {
@@ -24,10 +61,12 @@ Obj::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceAccessor("reference", &Obj::Reference, nullptr),
       InstanceMethod("hasStream", &Obj::HasStream),
       InstanceMethod("getOffset", &Obj::GetByteOffset),
-      InstanceMethod("write", &Obj::WriteObject),
+      InstanceMethod("writeSync", &Obj::WriteObject),
+      InstanceMethod("write", &Obj::Write),
       InstanceMethod("flateCompressStream", &Obj::FlateCompressStream),
       InstanceMethod("delayedStreamLoad", &Obj::DelayedStreamLoad),
-      InstanceMethod("asType", &Obj::AsType) });
+      InstanceMethod("asType", &Obj::AsType),
+      InstanceMethod("getInstance", &Obj::GetInstance) });
   constructor = Napi::Persistent(ctor);
   constructor.SuppressDestruct();
   target.Set("Obj", constructor);
@@ -46,9 +85,11 @@ Obj::GetStream(const CallbackInfo& info)
   return Value();
 }
 
-Value
-Obj::HasStream(const CallbackInfo&)
-{}
+Napi::Value
+Obj::HasStream(const CallbackInfo& info)
+{
+  return Napi::Boolean::New(info.Env(), obj.HasStream());
+}
 
 Napi::Value
 Obj::GetObjectLength(const CallbackInfo& info)
@@ -89,13 +130,16 @@ Obj::GetDataType(const CallbackInfo& info)
   return Napi::String::New(info.Env(), js);
 }
 
-Napi::Value
+void
 Obj::GetByteOffset(const CallbackInfo& info)
 {
-  AssertFunctionArgs(info, 1, { napi_valuetype::napi_string });
+  AssertFunctionArgs(
+    info, 2, { napi_valuetype::napi_string, napi_valuetype::napi_function });
   string key = info[0].As<String>().Utf8Value();
-  return Napi::Number::New(
+  Function cb = info[1].As<Function>();
+  auto value = Napi::Number::New(
     info.Env(), obj.GetByteOffset(key.c_str(), ePdfWriteMode_Default));
+  cb.MakeCallback(info.Env().Global(), { value });
 }
 
 Napi::Value
@@ -122,10 +166,29 @@ Obj::WriteObject(const CallbackInfo& info)
   }
 }
 
+void
+Obj::Write(const CallbackInfo& info)
+{
+  AssertFunctionArgs(
+    info, 2, { napi_valuetype::napi_string, napi_valuetype::napi_function });
+  string output = info[0].As<String>().Utf8Value();
+  Function cb = info[1].As<Function>();
+  ObjWriteAsync* worker = new ObjWriteAsync(cb, this, output);
+  worker->Queue();
+}
+
 Napi::Value
 Obj::Reference(const CallbackInfo& info)
 {
-  return Value();
+  try {
+    PdfReference init = obj.Reference();
+    auto initPtr = Napi::External<PdfReference>::New(info.Env(), &init);
+    return Ref::constructor.New({ initPtr });
+  } catch (PdfError& err) {
+    ErrorHandler(err, info);
+  } catch (Napi::Error& err) {
+    ErrorHandler(err, info);
+  }
 }
 
 void
@@ -151,40 +214,8 @@ Obj::DelayedStreamLoad(const CallbackInfo& info)
 Napi::Value
 Obj::AsType(const CallbackInfo& info)
 {
-  return ParseToType(info, obj);
-  //  AssertFunctionArgs(info, 1, { napi_valuetype::napi_string });
-  //  string type = info[0].As<String>().Utf8Value();
-  //  Napi::Value value;
-  //  if (type == "Boolean")
-  //    value = Napi::Boolean::New(info.Env(), obj.GetBool());
-  //  else if (type == "Number")
-  //    value = Napi::Number::New(info.Env(), obj.GetNumber());
-  //  else if (type == "Name")
-  //    value = Napi::String::New(info.Env(), obj.GetName().GetName());
-  //  else if (type == "Real")
-  //    value = Napi::Number::New(info.Env(), obj.GetReal());
-  //  else if (type == "String")
-  //    value = Napi::String::New(info.Env(), obj.GetString().GetStringUtf8());
-  //  else if (type == "Array") {
-  //    auto init = obj.GetArray();
-  //    auto initPtr = Napi::External<PdfArray>::New(info.Env(), &init);
-  //    value = Arr::constructor.New({ initPtr });
-  //  } else if (type == "Dictionary") {
-  //    throw Napi::Error::New(info.Env(), "Init from Dictionary constructor");
-  //  } else if (type == "Reference") {
-  //    auto init = obj.GetReference();
-  //    auto initPtr = Napi::External<PdfReference>::New(info.Env(), &init);
-  //    value = Ref::constructor.New({ initPtr });
-  //  } else if (type == "RawData") {
-  //    throw Napi::Error::New(info.Env(), "unimplemented");
-  //  }
-  //  return value;
-}
-
-static Napi::Value
-ParseToType(const Napi::CallbackInfo& info, PdfObject& obj)
-{
   AssertFunctionArgs(info, 1, { napi_valuetype::napi_string });
+  //  Function cb = info[1].As<Function>();
   string type = info[0].As<String>().Utf8Value();
   Napi::Value value;
   if (type == "Boolean")
@@ -202,7 +233,7 @@ ParseToType(const Napi::CallbackInfo& info, PdfObject& obj)
     auto initPtr = Napi::External<PdfArray>::New(info.Env(), &init);
     value = Arr::constructor.New({ initPtr });
   } else if (type == "Dictionary") {
-    value = Napi::String::New(info.Env(), "Dictionary");
+    throw Napi::Error::New(info.Env(), "unimplemented");
   } else if (type == "Reference") {
     auto init = obj.GetReference();
     auto initPtr = Napi::External<PdfReference>::New(info.Env(), &init);
@@ -210,5 +241,13 @@ ParseToType(const Napi::CallbackInfo& info, PdfObject& obj)
   } else if (type == "RawData") {
     throw Napi::Error::New(info.Env(), "unimplemented");
   }
+  //  cb.MakeCallback(info.Env().Global(), { value });
   return value;
+}
+
+Napi::Value
+Obj::GetInstance(const CallbackInfo& info)
+{
+  auto ptr = Napi::External<PdfObject>::New(info.Env(), new PdfObject());
+  return this->constructor.New({ ptr });
 }

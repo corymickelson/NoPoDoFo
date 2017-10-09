@@ -15,11 +15,12 @@ export interface IObj {
     type: PDType
 
     hasStream(): boolean
-    getOffset(key: string): number
-    write(output: string): void
+    getOffset(key: string, cb: Function): void
+    write(output: string, cb: (e:Error, output:string) => void): void
+    writeSync(output: string): void
     flateCompressStream(): void
     delayedStreamLoad(): void
-    asType(t: PDType): PDVariant
+    as<T>(t: PDType): T
 }
 
 /**
@@ -86,18 +87,22 @@ export class Obj implements IObj {
      * @param {string} key object dictionary key
      * @returns {number} - byte offset
      */
-    getOffset(key: string): number {
-        return this._instance.getOffset(key)
+    getOffset(key: string, cb: Function): void {
+        const value = this._instance.getOffset(key)
+        cb(value)
     }
     /**
      * @desc Write the complete object to a file
      */
-    write(output: string): void {
+    writeSync(output: string): void {
         try {
-            this._instance.write(output)
+            this._instance.writeSync(output)
         } catch (error) {
             throw error
         }
+    }
+    write(output:string, cb:(e:Error, output:string) => void): void {
+        this._instance.write(output, cb)
     }
     /**
      * @desc This function compresses any currently set stream using the FlateDecode algorithm.
@@ -114,11 +119,11 @@ export class Obj implements IObj {
         this._instance.delayedStreamLoad()
     }
 
-    asType(t: PDType): PDVariant {
+    as<T>(t: PDType): T {
         switch (t) {
             case 'Array':
-                const initArray = this._instance.asType(t)
-                return new Arr(initArray)
+                let i = this._instance.asType(t)
+                return new Arr(i) as any
             case 'Boolean':
             case 'Real':
             case 'Number':
@@ -126,10 +131,13 @@ export class Obj implements IObj {
             case 'String':
                 return this._instance.asType(t)
             case 'Dictionary':
-                return new Dictionary(this)
+                let dict = new Dictionary(this)
+                return dict as any
             case 'Reference':
-                const initRef = this._instance.asType(t)
-                return new Ref(initRef)
+                const initRef = this._instance.asType(t, (d: T) => {
+                    let ref = new Ref(initRef)
+                    return ref as any
+                })
             case 'RawData':
                 throw Error('unimplemented')
             default:

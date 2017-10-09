@@ -1,5 +1,4 @@
-const mod = require('bindings')('npdf')
-import {IDocument} from './document'
+import {IDocument, __mod} from './document'
 import {IObj} from './object'
 
 export class Form {
@@ -9,7 +8,7 @@ export class Form {
     set needAppearances(value:boolean) {this._instance.needAppearances = value}
 
     constructor(document:IDocument) {
-        this._instance = new mod.Form(document._instance)
+        this._instance = new __mod.Form(document._instance)
     }
 
     getObject():IObj {

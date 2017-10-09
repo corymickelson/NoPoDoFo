@@ -1,8 +1,6 @@
 import { IPage } from './page'
 import { IRect } from './rect'
 
-const mod = require('bindings')('npdf')
-
 export interface IAnnotation {
     title: string
     flag: number

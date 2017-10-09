@@ -1,6 +1,5 @@
-const mod = require('../src/npdf')
 import { IPage, Page } from './page'
-import { Document, IDocument } from './document'
+import { Document, IDocument, __mod } from './document'
 
 export interface IRect {
     left:number
@@ -14,17 +13,17 @@ export class Rect implements IRect {
 
     constructor(position?: IPage | Array<number>) {
         if (Array.isArray(position)) {
-            this._instance = new mod.Rect(
+            this._instance = new __mod.Rect(
                 (position as number[])[0],
                 (position as number[])[1],
                 (position as number[])[2],
                 (position as number[])[3])
         }
         else if(position instanceof Page) {
-            this._instance = new mod.Rect(position)
+            this._instance = new __mod.Rect(position)
         }
         else {
-            this._instance = new mod.Rect()
+            this._instance = new __mod.Rect()
         }
     }
     get bottom(): number {

@@ -36,6 +36,7 @@ init(Napi::Env env, Napi::Object exports)
   Arr::Initialize(env, exports);
   Stream::Initialize(env, exports);
   Encrypt::Initialize(env, exports);
+
   return exports;
 }
 

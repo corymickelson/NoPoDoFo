@@ -1,6 +1,6 @@
-const mod = require('../src/npdf')
+// const mod = require('../src/npdf')
 
-import {IDocument} from './document'
+import {IDocument, __mod} from './document'
 
 export interface IImage {
     _instance: any
@@ -21,10 +21,10 @@ export class Image implements IImage {
      */
     constructor(private _doc: IDocument, data?: string | Buffer) {
         if (data) {
-            this._instance = new mod.Image(_doc._instance, data)
+            this._instance = new __mod.Image(_doc._instance, data)
         }
         else {
-            this._instance = new mod.Image(_doc._instance)
+            this._instance = new __mod.Image(_doc._instance)
         }
     }
     getWidth(): number {

@@ -71,7 +71,9 @@ Arr::GetIndex(const CallbackInfo& info)
   AssertFunctionArgs(info, 1, { napi_valuetype::napi_number });
   size_t index = info[0].As<Number>().Uint32Value();
   PdfObject item = arr[index];
-  return Obj::ParseToType(info, item);
+  auto initPtr = Napi::External<PdfObject>::New(info.Env(), &item);
+  auto instance = Obj::constructor.New({ initPtr });
+  return instance;
 }
 
 void

@@ -22,7 +22,7 @@ export interface IPage {
     getBleedBox(): IRect
     getArtBox(): IRect
     getNumAnnots(): number
-    createAnnotation(type: NPdfAnnotation, rect: IRect): IAnnotation
+    createAnnotation(type: NPdfAnnotation, rect: IRect, cb:(annot:IAnnotation) => void): void
     getAnnotation(index: number): IAnnotation
     getAnnotations(): Array<IAnnotation>
     deleteAnnotation(index: number): void
@@ -117,9 +117,13 @@ export class Page implements IPage {
         }
         return fields
     }
-    createAnnotation(type: NPdfAnnotation, rect: IRect): IAnnotation {
-        const instance = this._instance.createAnnotation((type as number), rect._instance)
-        return new Annotation(instance)
+    createAnnotation(type: NPdfAnnotation, rect: IRect, cb:(annot:IAnnotation) => void): void {
+        this._instance.createAnnotation((type as number), rect._instance, (v:any) => {
+            const instance = new Annotation(v)
+            cb(instance)
+        })
+        // const annot = new Annotation(instance)
+        // cb(annot)
     }
     getAnnotation(index: number): IAnnotation {
         const instance = this._instance.getAnnotation(index)

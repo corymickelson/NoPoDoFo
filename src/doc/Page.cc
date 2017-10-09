@@ -337,16 +337,21 @@ Page::GetAnnotation(const CallbackInfo& info)
   auto instance = Napi::External<PdfAnnotation>::New(info.Env(), ptr);
   return Annotation::constructor.New({ instance });
 }
-Napi::Value
+void
 Page::CreateAnnotation(const CallbackInfo& info)
 {
-  AssertFunctionArgs(
-    info, 2, { napi_valuetype::napi_number, napi_valuetype::napi_object });
+  AssertFunctionArgs(info,
+                     3,
+                     { napi_valuetype::napi_number,
+                       napi_valuetype::napi_object,
+                       napi_valuetype::napi_function });
   int flag = info[0].As<Number>();
   auto type = static_cast<EPdfAnnotation>(flag);
   auto obj = info[1].As<Object>();
+  Function cb = info[2].As<Function>();
   Rect* rect = Rect::Unwrap(obj);
   PdfAnnotation* annot = page->CreateAnnotation(type, rect->GetRect());
-  auto instance = External<PdfAnnotation>::New(info.Env(), annot);
-  return Annotation::constructor.New({ instance });
+  auto instance = Annotation::constructor.New(
+    { External<PdfAnnotation>::New(info.Env(), annot) });
+  cb.MakeCallback(info.Env().Global(), { instance });
 }

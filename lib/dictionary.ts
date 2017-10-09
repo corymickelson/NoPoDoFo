@@ -1,4 +1,5 @@
-const mod = require('bindings')('npdf')
+// const mod = require('bindings')('npdf')
+import {__mod} from './document'
 import {IObj} from "./object";
 
 export type CoerceKeyType = 'boolean' | 'long' | 'name' | 'real'
@@ -67,7 +68,7 @@ export class Dictionary implements IDictionary {
         if (obj === null) {
             throw Error("Can not instantiate Dictionary without valid NPdf Object")
         }
-        this._instance = new mod.Dictionary(obj._instance)
+        this._instance = new __mod.Dictionary(obj._instance)
     }
 
 }

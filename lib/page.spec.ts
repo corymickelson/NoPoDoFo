@@ -1,10 +1,10 @@
-import {unlink} from 'fs'
-import {join} from 'path'
+import { unlink } from 'fs'
+import { join } from 'path'
 import * as test from 'tape'
-import {Document} from './document'
-import {Rect} from "./rect";
-import {NPdfAnnotation} from "./annotation";
-import {Obj} from "./object";
+import { Document } from './document'
+import { Rect } from "./rect";
+import { NPdfAnnotation, IAnnotation, Annotation } from "./annotation";
+import { Obj } from "./object";
 import { Field } from './field';
 
 const filePath = join(__dirname, '../test.pdf'),
@@ -79,7 +79,7 @@ test('get fields', t => {
 test('page number of annotations', t => {
     const doc = new Document(filePath),
         page = doc.getPage(0)
-    t.assert(page.getNumAnnots() === 22, 'get\'s all annotations on the page' )
+    t.assert(page.getNumAnnots() === 22, 'get\'s all annotations on the page')
     t.end()
 })
 
@@ -99,10 +99,12 @@ test('page create annotation', t => {
 
     t.assert(rect.height === 0)
     t.assert(rect.width === 0)
-    const annot = page.createAnnotation(NPdfAnnotation.Widget, rect)
-    t.ok(annot)
-    t.assert(annot.getType() === 'Widget')
-    t.end()
+    page.createAnnotation(NPdfAnnotation.Widget, rect, (v: IAnnotation) => {
+        t.ok(v)
+        t.assert(v instanceof Annotation, 'is an instance of Annotation')
+        t.assert(v.getType() === 'Widget')
+        t.end()
+    })
 })
 
 test('page contents', t => {

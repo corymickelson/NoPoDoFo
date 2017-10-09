@@ -1,4 +1,4 @@
-import { unlink } from 'fs'
+import { unlinkSync } from 'fs'
 import { join } from 'path'
 import * as test from 'tape'
 import { Document } from './document'
@@ -34,7 +34,6 @@ test('document requires password', t => {
     }
 })
 
-test.skip('is not a pdf document', t => { })
 test('throws JS error on file not found', t => {
     let doc: Document
     try {
@@ -44,8 +43,6 @@ test('throws JS error on file not found', t => {
         t.end();
     }
 })
-
-test.skip('objects', t => { })
 
 test('encryption: user password', t => {
     const doc = new Document(filePath),
@@ -74,10 +71,6 @@ test('encryption: user password', t => {
     t.end()
 })
 
-test.skip('encryption: protection => FillAndSign', t => { })
-test.skip('encryption: invalid payload throws PdfError', t => { })
-test.skip('write modes', t => { })
-
 test('document get page count', t => {
     const doc = new Document(filePath)
     const pc = doc.getPageCount()
@@ -95,7 +88,8 @@ test('document delete page', t => {
     const docLessOne = new Document(outFile),
         docLessOnePageCount = docLessOne.getPageCount()
     t.assert(pc === docLessOnePageCount + 1)
-    cleanUp(t.end)
+    unlinkSync(outFile)
+    t.end()
 })
 test('document merger', t => {
     const doc = new Document(filePath),
@@ -108,7 +102,8 @@ test('document merger', t => {
         doc2PC = doc2.getPageCount()
 
     t.assert(originalPC * 2 === doc2PC, "merged document")
-    cleanUp(t.end)
+    unlinkSync(outFile)
+    t.end()
 })
 test('get page', t => {
     const doc = new Document(filePath),
@@ -120,10 +115,3 @@ test('get page', t => {
 test('Document set encrypt', t => {
     t.end()
 })
-
-function cleanUp(cb: Function) {
-    unlink(outFile, e => {
-        if (e) throw e
-        cb()
-    })
-}

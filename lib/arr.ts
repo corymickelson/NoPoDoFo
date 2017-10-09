@@ -1,4 +1,4 @@
-import { IObj } from "./object";
+import { IObj, Obj } from "./object";
 
 export interface IArr {
     dirty: boolean
@@ -13,15 +13,16 @@ export class Arr implements IArr {
     constructor(public _instance: any) { }
 
     contains(key: string): boolean {
-        throw new Error("Method not implemented.");
+        return this._instance.contains(key)
     }
     indexOf(key: string): number {
-        throw new Error("Method not implemented.");
+        return this._instance.indexOf(key)
     }
     write(output: string): void {
-        throw new Error("Method not implemented.");
+        this._instance.write(output)
     }
     at(index:number): IObj {
-        return this._instance.getIndex(index)
+        const item = this._instance.getIndex(index)
+        return new Obj(item)
     }
 }

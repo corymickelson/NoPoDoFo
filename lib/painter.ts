@@ -1,6 +1,7 @@
 import {IPage} from './page'
 import {IImage} from './image'
-const mod = require('bindings')('npdf')
+import {__mod} from './document'
+// const mod = require('bindings')('npdf')
 
 export interface IPainter {
     _instance:any
@@ -20,7 +21,7 @@ export class Painter implements IPainter {
     set page(value:IPage) {this._instance.page = value._instance }
 
     constructor(page?:IPage) {
-        this._instance = new mod.Painter()
+        this._instance = new __mod.Painter()
         if(page)
             this._instance.setPage(page)
     }
