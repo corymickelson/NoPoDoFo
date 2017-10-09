@@ -10,43 +10,6 @@ using namespace PoDoFo;
 
 FunctionReference Obj::constructor;
 
-class ObjWriteAsync : public AsyncWorker
-{
-public:
-  ObjWriteAsync(Napi::Function& cb, Obj* obj, string output)
-    : AsyncWorker(cb)
-    , obj(obj)
-    , output(output)
-  {}
-  ~ObjWriteAsync() {}
-
-protected:
-  void Execute()
-  {
-    try {
-      PdfOutputDevice device(output.c_str());
-      obj->GetObject().WriteObject(&device, ePdfWriteMode_Default, nullptr);
-
-    } catch (PdfError& err) {
-      eMessage = ErrorHandler::WriteMsg(err).c_str();
-      SetError(eMessage);
-    } catch (Napi::Error& err) {
-      eMessage = err.Message().c_str();
-      SetError(eMessage);
-    }
-  }
-  void OnOK()
-  {
-    Napi::HandleScope scope(Env());
-    Callback().Call({ Env().Null(), String::New(Env(), output) });
-  }
-
-private:
-  Obj* obj;
-  string output;
-  const char* eMessage = nullptr;
-};
-
 void
 Obj::Initialize(Napi::Env& env, Napi::Object& target)
 {
@@ -250,4 +213,32 @@ Obj::GetInstance(const CallbackInfo& info)
 {
   auto ptr = Napi::External<PdfObject>::New(info.Env(), new PdfObject());
   return this->constructor.New({ ptr });
+}
+
+ObjWriteAsync::ObjWriteAsync(Napi::Function& cb, Obj* obj, string output)
+  : AsyncWorker(cb)
+  , obj(obj)
+  , output(output)
+{}
+
+void
+ObjWriteAsync::Execute()
+{
+  try {
+    PdfOutputDevice device(output.c_str());
+    obj->GetObject().WriteObject(&device, ePdfWriteMode_Default, nullptr);
+
+  } catch (PdfError& err) {
+    eMessage = ErrorHandler::WriteMsg(err).c_str();
+    SetError(eMessage);
+  } catch (Napi::Error& err) {
+    eMessage = err.Message().c_str();
+    SetError(eMessage);
+  }
+}
+void
+ObjWriteAsync::OnOK()
+{
+  Napi::HandleScope scope(Env());
+  Callback().Call({ Env().Null(), String::New(Env(), output) });
 }

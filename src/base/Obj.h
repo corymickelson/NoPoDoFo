@@ -5,6 +5,8 @@
 #include <napi.h>
 #include <podofo/podofo.h>
 
+using namespace std;
+
 class Obj : public Napi::ObjectWrap<Obj>
 {
 public:
@@ -31,6 +33,26 @@ public:
 
 private:
   PoDoFo::PdfObject obj = *new PoDoFo::PdfObject();
+};
+
+class ObjWriteAsync : public Napi::AsyncWorker
+{
+public:
+  ObjWriteAsync(Napi::Function& cb, Obj* obj, string outptut);
+  ~ObjWriteAsync() {}
 
 protected:
+  void Execute();
+  void OnOK();
+
+private:
+  Obj* obj;
+  string output;
+  const char* eMessage = nullptr;
 };
+
+class ObjOffsetAsync : public Napi::AsyncWorker
+{};
+
+class ObjAsTypeAsync : public Napi::AsyncWorker
+{};
