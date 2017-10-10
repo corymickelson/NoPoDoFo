@@ -23,7 +23,7 @@ export interface IDictionary {
 
     clear(): void
 
-    write(output: string): void
+    write(dest: string, cb: (e:any, v:string) => void): void
 }
 
 export class Dictionary implements IDictionary {
@@ -58,7 +58,7 @@ export class Dictionary implements IDictionary {
         this._instance.clear()
     }
 
-    write(output: string): void {
+    write(output: string, cb: (e:any, v: string) => void): void {
         this._instance.write(output)
     }
 

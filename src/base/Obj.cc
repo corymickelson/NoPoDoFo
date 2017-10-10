@@ -110,7 +110,7 @@ Obj::GetByteOffset(const CallbackInfo& info)
   AssertFunctionArgs(
     info, 2, { napi_valuetype::napi_string, napi_valuetype::napi_function });
   string arg = info[0].As<String>().Utf8Value();
-  Function cb = info[1].As<Function>();
+  auto cb = info[1].As<Function>();
   ObjOffsetAsync* worker = new ObjOffsetAsync(cb, this, arg);
   worker->Queue();
 }
@@ -145,7 +145,7 @@ Obj::Write(const CallbackInfo& info)
   AssertFunctionArgs(
     info, 2, { napi_valuetype::napi_string, napi_valuetype::napi_function });
   string output = info[0].As<String>().Utf8Value();
-  Function cb = info[1].As<Function>();
+  auto cb = info[1].As<Function>();
   ObjWriteAsync* worker = new ObjWriteAsync(cb, this, output);
   worker->Queue();
 }

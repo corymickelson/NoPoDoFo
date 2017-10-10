@@ -154,3 +154,12 @@ export class Obj implements IObj {
         }
     }
 }
+
+
+
+
+
+
+function test() {
+    return [1,2,3].map(i => {return ++i})
+}

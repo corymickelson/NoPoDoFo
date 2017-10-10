@@ -3,6 +3,7 @@
 //
 
 #include "Dictionary.h"
+#include "../ErrorHandler.h"
 #include "../ValidateArguments.h"
 #include "Obj.h"
 
@@ -132,4 +133,31 @@ Dictionary::GetKeyAs(const CallbackInfo& info)
 
 void
 Dictionary::Write(const CallbackInfo& info)
-{}
+{
+  AssertFunctionArgs(
+    info, 2, { napi_valuetype::napi_string, napi_valuetype::napi_function });
+  string output = info[0].As<String>().Utf8Value();
+  Function cb = info[1].As<Function>();
+  DictWriteAsync* worker = new DictWriteAsync(cb, this, output);
+  worker->Queue();
+}
+
+void
+DictWriteAsync::Execute()
+{
+  try {
+    PdfOutputDevice device(arg.c_str());
+    dict->GetDictionary()->Write(&device, ePdfWriteMode_Default);
+  } catch (PdfError& err) {
+    SetError(ErrorHandler::WriteMsg(err));
+  } catch (Napi::Error& err) {
+    SetError(err.Message());
+  }
+}
+
+void
+DictWriteAsync::OnOK()
+{
+  HandleScope scope(Env());
+  Callback().Call({ Env().Null(), Napi::String::New(Env(), arg) });
+}
