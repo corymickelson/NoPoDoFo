@@ -15,12 +15,14 @@ export interface IObj {
     type: PDType
 
     hasStream(): boolean
-    getOffset(key: string, cb: Function): void
-    write(output: string, cb: (e:Error, output:string) => void): void
+    getOffsetSync(key: string): number
+    getOffset(key: string, cb: (e: Error, v: number) => void): void
+    write(output: string, cb: (e: Error, output: string) => void): void
     writeSync(output: string): void
     flateCompressStream(): void
     delayedStreamLoad(): void
     as<T>(t: PDType): T
+
 }
 
 /**
@@ -87,9 +89,11 @@ export class Obj implements IObj {
      * @param {string} key object dictionary key
      * @returns {number} - byte offset
      */
+    getOffsetSync(key: string): number {
+        return this._instance.getOffsetSync(key)
+    }
     getOffset(key: string, cb: Function): void {
-        const value = this._instance.getOffset(key)
-        cb(value)
+        this._instance.getOffset(key, cb)
     }
     /**
      * @desc Write the complete object to a file
@@ -101,7 +105,7 @@ export class Obj implements IObj {
             throw error
         }
     }
-    write(output:string, cb:(e:Error, output:string) => void): void {
+    write(output: string, cb: (e: Error, output: string) => void): void {
         this._instance.write(output, cb)
     }
     /**
@@ -119,6 +123,11 @@ export class Obj implements IObj {
         this._instance.delayedStreamLoad()
     }
 
+    /**
+     * 
+     * @param t - NPdf types enum
+     * @todo Fix generic and heavy usage of "any"
+     */
     as<T>(t: PDType): T {
         switch (t) {
             case 'Array':

@@ -5,12 +5,14 @@
 #include <napi.h>
 #include <podofo/podofo.h>
 
+#include <utility>
+
 using namespace std;
 
 class Obj : public Napi::ObjectWrap<Obj>
 {
 public:
-  Obj(const Napi::CallbackInfo&);
+  explicit Obj(const Napi::CallbackInfo&);
   ~Obj() {}
   static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
@@ -18,6 +20,7 @@ public:
   Napi::Value HasStream(const Napi::CallbackInfo&);
   Napi::Value GetObjectLength(const Napi::CallbackInfo&);
   Napi::Value GetDataType(const Napi::CallbackInfo&);
+  Napi::Value GetByteOffsetSync(const Napi::CallbackInfo&);
   void GetByteOffset(const Napi::CallbackInfo&);
   Napi::Value GetOwner(const Napi::CallbackInfo&);
   void SetOwner(const Napi::CallbackInfo&, const Napi::Value&);
@@ -38,21 +41,48 @@ private:
 class ObjWriteAsync : public Napi::AsyncWorker
 {
 public:
-  ObjWriteAsync(Napi::Function& cb, Obj* obj, string outptut);
-  ~ObjWriteAsync() {}
+  ObjWriteAsync(Napi::Function& cb, Obj* obj, string dest)
+    : AsyncWorker(cb)
+    , obj(obj)
+    , arg(std::move(dest))
+  {}
+  ~ObjWriteAsync()
+  {
+    delete obj;
+    delete eMessage;
+  }
 
 protected:
-  void Execute();
-  void OnOK();
+  void Execute() override;
+  void OnOK() override;
 
 private:
   Obj* obj;
-  string output;
+  string arg;
   const char* eMessage = nullptr;
 };
 
 class ObjOffsetAsync : public Napi::AsyncWorker
-{};
+{
+public:
+  ObjOffsetAsync(Napi::Function& cb, Obj* obj, string arg)
+    : Napi::AsyncWorker(cb)
+    , obj(obj)
+    , arg(std::move(arg))
+  {}
+  ~ObjOffsetAsync()
+  {
+    delete obj;
+    delete eMessage;
+  }
 
-class ObjAsTypeAsync : public Napi::AsyncWorker
-{};
+protected:
+  void Execute() override;
+  void OnOK() override;
+
+private:
+  Obj* obj;
+  string arg;
+  long value = -1;
+  const char* eMessage = nullptr;
+};
