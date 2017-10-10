@@ -14,6 +14,8 @@ public:
   static void Initialize(Napi::Env& env, Napi::Object& target);
 
   void Write(const Napi::CallbackInfo&);
+	Napi::Value ToArray(const Napi::CallbackInfo &);
+	Napi::Value Length(const Napi::CallbackInfo &);
   Napi::Value ContainsString(const Napi::CallbackInfo&);
   Napi::Value GetStringIndex(const Napi::CallbackInfo&);
   Napi::Value IsDirty(const Napi::CallbackInfo&);

@@ -43,7 +43,7 @@ public:
     , dict(dict)
     , arg(std::move(arg))
   {}
-  ~DictWriteAsync() { delete dict; }
+  ~DictWriteAsync() {}
 
 protected:
   void Execute() override;

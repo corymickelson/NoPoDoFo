@@ -137,7 +137,7 @@ Dictionary::Write(const CallbackInfo& info)
   AssertFunctionArgs(
     info, 2, { napi_valuetype::napi_string, napi_valuetype::napi_function });
   string output = info[0].As<String>().Utf8Value();
-  Function cb = info[1].As<Function>();
+  auto cb = info[1].As<Function>();
   DictWriteAsync* worker = new DictWriteAsync(cb, this, output);
   worker->Queue();
 }

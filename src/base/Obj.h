@@ -46,11 +46,7 @@ public:
     , obj(obj)
     , arg(std::move(dest))
   {}
-  ~ObjWriteAsync()
-  {
-    delete obj;
-    delete eMessage;
-  }
+  ~ObjWriteAsync() { }
 
 protected:
   void Execute() override;
@@ -70,11 +66,7 @@ public:
     , obj(obj)
     , arg(std::move(arg))
   {}
-  ~ObjOffsetAsync()
-  {
-    delete obj;
-    delete eMessage;
-  }
+  ~ObjOffsetAsync() { }
 
 protected:
   void Execute() override;

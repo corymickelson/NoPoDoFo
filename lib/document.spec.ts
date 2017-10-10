@@ -52,10 +52,8 @@ test('encryption: user password', t => {
             protection: ['Edit', 'FillAndSign'],
             algorithm: 'aesv3'
         },
-        secureDoc = join(__dirname, '../secure.pdf'),
-        enc = new Encrypt(null, encryptionOption)
-
-    doc.encrypt = enc
+        secureDoc = join(__dirname, '../secure.pdf')
+    doc.encrypt = new Encrypt(null, encryptionOption)
     doc.write(secureDoc)
 
     let sDoc: Document = new Document(secureDoc),

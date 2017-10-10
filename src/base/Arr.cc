@@ -5,6 +5,7 @@
 #include "Arr.h"
 #include "../ValidateArguments.h"
 #include "Obj.h"
+#include "../ErrorHandler.h"
 
 using namespace Napi;
 using namespace PoDoFo;
@@ -25,6 +26,8 @@ Arr::Initialize(Napi::Env& env, Napi::Object& target)
     DefineClass(env,
                 "Arr",
                 { InstanceAccessor("dirty", &Arr::IsDirty, &Arr::SetDirty),
+                  InstanceAccessor("length", &Arr::Length, nullptr),
+                  InstanceMethod("toArray", &Arr::ToArray),
                   InstanceMethod("getIndex", &Arr::GetIndex),
                   InstanceMethod("contains", &Arr::ContainsString),
                   InstanceMethod("indexOf", &Arr::GetStringIndex),
@@ -32,6 +35,11 @@ Arr::Initialize(Napi::Env& env, Napi::Object& target)
   constructor = Persistent(ctor);
   constructor.SuppressDestruct();
   target.Set("Arr", constructor);
+}
+Napi::Value
+Arr::Length(const Napi::CallbackInfo &info)
+{
+  return Number::New(info.Env(), arr.size());
 }
 void
 Arr::Write(const CallbackInfo& info)
@@ -83,4 +91,26 @@ Arr::SetDirty(const CallbackInfo& info, const Napi::Value& value)
     throw Napi::Error::New(info.Env(), "dirty must be of type boolean");
   }
   arr.SetDirty(value.As<Boolean>());
+}
+
+Napi::Value
+Arr::ToArray(const Napi::CallbackInfo& info) {
+	auto js = Array::New(info.Env());
+	try {
+		uint32_t counter = 0;
+		for(auto it = arr.begin(); it != arr.end(); it++) {
+			if(it.base() == nullptr) continue;
+			auto initPtr = External<PdfObject>::New(Env(), it.base());
+			auto instance = Obj::constructor.New({ initPtr });
+			js.Set(counter, instance);
+			counter++;
+		}
+	}
+	catch(PdfError &err) {
+		ErrorHandler(err, info);
+	}
+	catch(Napi::Error &err) {
+		ErrorHandler(err, info);
+	}
+	return js;
 }
