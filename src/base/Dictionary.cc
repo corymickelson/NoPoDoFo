@@ -34,7 +34,9 @@ Dictionary::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceAccessor(
         "immutable", &Dictionary::GetImmutable, &Dictionary::SetImmutable),
       InstanceMethod("clear", &Dictionary::Clear),
-      InstanceMethod("write", &Dictionary::Write) });
+      InstanceMethod("write", &Dictionary::Write),
+      InstanceMethod("writeSync", &Dictionary::WriteSync),
+      InstanceMethod("toObject", &Dictionary::ToObject) });
   target.Set("Dictionary", ctor);
 }
 void
@@ -143,15 +145,41 @@ Dictionary::Write(const CallbackInfo& info)
 }
 
 void
+Dictionary::WriteSync(const CallbackInfo& info)
+{
+  AssertFunctionArgs(info, 1, { napi_valuetype::napi_string });
+  string output = info[0].As<String>().Utf8Value();
+  PdfOutputDevice device(output.c_str());
+  dict.Write(&device, ePdfWriteMode_Default);
+}
+
+Napi::Value
+Dictionary::ToObject(const CallbackInfo& info)
+{
+  Object js = Object::New(info.Env());
+  const TKeyMap& keys = dict.GetKeys();
+  map<PoDoFo::PdfName, PoDoFo::PdfObject*>::const_iterator it;
+  for (it = keys.begin(); it != keys.end(); it++) {
+    auto key = String::New(info.Env(), (*it).first.GetName());
+    auto value = External<PdfObject>::New(info.Env(), (*it).second);
+    js.Set(key, value);
+  }
+  return js;
+}
+
+void
 DictWriteAsync::Execute()
 {
   try {
     PdfOutputDevice device(arg.c_str());
     dict->GetDictionary()->Write(&device, ePdfWriteMode_Default);
+
   } catch (PdfError& err) {
-    SetError(ErrorHandler::WriteMsg(err));
+    eMessage = ErrorHandler::WriteMsg(err).c_str();
+    SetError(eMessage);
   } catch (Napi::Error& err) {
-    SetError(err.Message());
+    eMessage = err.Message().c_str();
+    SetError(eMessage);
   }
 }
 

@@ -27,6 +27,8 @@ public:
   Napi::Value GetDirty(const Napi::CallbackInfo&);
   Napi::Value GetKeyAs(const Napi::CallbackInfo&);
   void Write(const Napi::CallbackInfo&);
+  void WriteSync(const Napi::CallbackInfo&);
+  Napi::Value ToObject(const Napi::CallbackInfo&);
 
   PoDoFo::PdfDictionary* GetDictionary() { return &dict; }
 
@@ -38,18 +40,19 @@ private:
 class DictWriteAsync : public Napi::AsyncWorker
 {
 public:
-  DictWriteAsync(Napi::Function& cb, Dictionary* dict, string arg)
+  DictWriteAsync(Napi::Function& cb, Dictionary* dict, string dest)
     : Napi::AsyncWorker(cb)
     , dict(dict)
-    , arg(std::move(arg))
+    , arg(std::move(dest))
   {}
   ~DictWriteAsync() {}
 
 protected:
-  void Execute() override;
-  void OnOK() override;
+  void Execute();
+  void OnOK();
 
 private:
   Dictionary* dict;
   string arg;
+  const char* eMessage = nullptr;
 };

@@ -21,7 +21,7 @@ export interface IObj {
     writeSync(output: string): void
     flateCompressStream(): void
     delayedStreamLoad(): void
-    as<T>(t: PDType): T
+    as(t: PDType): any
 
 }
 
@@ -128,11 +128,11 @@ export class Obj implements IObj {
      * @param t - NPdf types enum
      * @todo Fix generic and heavy usage of "any"
      */
-    as<T>(t: PDType): T {
+    as(t: PDType): any {
         switch (t) {
             case 'Array':
                 let i = this._instance.asType(t)
-                return new Arr(i) as any
+                return new Arr(i)
             case 'Boolean':
             case 'Real':
             case 'Number':
@@ -140,13 +140,9 @@ export class Obj implements IObj {
             case 'String':
                 return this._instance.asType(t)
             case 'Dictionary':
-                let dict = new Dictionary(this)
-                return dict as any
+                return new Dictionary(this)
             case 'Reference':
-                const initRef = this._instance.asType(t, (d: T) => {
-                    let ref = new Ref(initRef)
-                    return ref as any
-                })
+                return new Ref(this._instance.asType(t))
             case 'RawData':
                 throw Error('unimplemented')
             default:

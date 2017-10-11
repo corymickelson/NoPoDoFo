@@ -46,11 +46,11 @@ public:
     , obj(obj)
     , arg(std::move(dest))
   {}
-  ~ObjWriteAsync() { }
+  ~ObjWriteAsync(){}
 
 protected:
-  void Execute() override;
-  void OnOK() override;
+  void Execute();
+  void OnOK();
 
 private:
   Obj* obj;
@@ -66,7 +66,7 @@ public:
     , obj(obj)
     , arg(std::move(arg))
   {}
-  ~ObjOffsetAsync() { }
+  ~ObjOffsetAsync() { delete obj; }
 
 protected:
   void Execute() override;
