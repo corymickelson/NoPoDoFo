@@ -130,7 +130,24 @@ Dictionary::GetDirty(const CallbackInfo& info)
 Napi::Value
 Dictionary::GetKeyAs(const CallbackInfo& info)
 {
-  return Value();
+  AssertFunctionArgs(info, 2, { napi_valuetype::napi_string });
+  string type = info[0].As<String>().Utf8Value();
+  string key = info[1].As<String>().Utf8Value();
+  vector<string> valid = { "boolean", "long", "name", "real" };
+  if (find(valid.begin(), valid.end(), type) != valid.end()) {
+    if (type == "boolean") {
+      return Boolean::New(info.Env(), dict.GetKeyAsBool(key));
+    } else if (type == "long") {
+      return Number::New(info.Env(), dict.GetKeyAsLong(key));
+    } else if (type == "name") {
+      return String::New(info.Env(), dict.GetKeyAsName(key).GetName());
+    } else if (type == "real") {
+      return Number::New(info.Env(), dict.GetKeyAsReal(key));
+    } else {
+      throw Napi::Error::New(info.Env(),
+                             "Type must be one of: boolean, long, real, name.");
+    }
+  }
 }
 
 Napi::Value

@@ -12,7 +12,7 @@ export interface IDictionary {
 
     getKeys(): Array<string>
 
-    getKeyAs(type: CoerceKeyType): IObj
+    getKeyAs(type: CoerceKeyType, key: string): IObj
 
     hasKey(key: string): boolean
 
@@ -41,8 +41,8 @@ export class Dictionary implements IDictionary {
         return this._instance.getKeys()
     }
 
-    getKeyAs(type: CoerceKeyType): IObj {
-        return this._instance.getKeyAs(type)
+    getKeyAs(type: CoerceKeyType, key: string): IObj {
+        return this._instance.getKeyAs(type, key)
     }
 
     hasKey(key: string): boolean {
