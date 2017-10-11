@@ -2,6 +2,9 @@
 // Created by red on 10/04/17
 //
 
+#ifndef NPDF_ENCRYPT_H
+#define NPDF_ENCRYPT_H
+
 #include <napi.h>
 #include <podofo/podofo.h>
 
@@ -24,3 +27,5 @@ private:
   PoDoFo::PdfEncrypt* encrypt;
   PoDoFo::PdfMemDocument* document;
 };
+
+#endif

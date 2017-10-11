@@ -139,7 +139,7 @@ Obj::WriteObject(const CallbackInfo& info)
   }
 }
 
-void
+Napi::Value
 Obj::Write(const CallbackInfo& info)
 {
   AssertFunctionArgs(
@@ -148,6 +148,7 @@ Obj::Write(const CallbackInfo& info)
   auto cb = info[1].As<Function>();
   ObjWriteAsync* worker = new ObjWriteAsync(cb, this, output);
   worker->Queue();
+  return info.Env().Undefined();
 }
 
 Napi::Value

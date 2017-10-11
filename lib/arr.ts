@@ -31,9 +31,9 @@ export class Arr implements IArr {
     constructor(public _instance: any) { }
 
     /**
-     * Creates an instance of javascript array.
-     * Loses any optimization made by underlying PdfArray implementation,
-     * but gains higher level methods available on javascript array prototype.
+     * Converts PdfArray to javascript array.
+     * Any modifications to javascript array will NOT be persisted to PdfArray.
+     * Use for lookup only
      * @returns {Array<IObj>}
      */
     toArray(): Array<IObj> {

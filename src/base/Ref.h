@@ -2,6 +2,9 @@
 // Created by red on 10/1/17
 //
 
+#ifndef NPDF_REF_H
+#define NPDF_REF_H
+
 #include <napi.h>
 #include <podofo/podofo.h>
 
@@ -25,3 +28,5 @@ public:
 private:
   PoDoFo::PdfReference ref = *new PoDoFo::PdfReference();
 };
+
+#endif

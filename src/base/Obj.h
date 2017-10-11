@@ -2,6 +2,9 @@
 // Created by red on 9/23/17
 //
 
+#ifndef NPDF_OBJ_H
+#define NPDF_OBJ_H
+
 #include <napi.h>
 #include <podofo/podofo.h>
 
@@ -25,7 +28,7 @@ public:
   Napi::Value GetOwner(const Napi::CallbackInfo&);
   void SetOwner(const Napi::CallbackInfo&, const Napi::Value&);
   void WriteObject(const Napi::CallbackInfo&);
-  void Write(const Napi::CallbackInfo&);
+  Napi::Value Write(const Napi::CallbackInfo&);
   Napi::Value Reference(const Napi::CallbackInfo&);
   void FlateCompressStream(const Napi::CallbackInfo&);
   void DelayedStreamLoad(const Napi::CallbackInfo&);
@@ -46,7 +49,7 @@ public:
     , obj(obj)
     , arg(std::move(dest))
   {}
-  ~ObjWriteAsync(){}
+  ~ObjWriteAsync() {}
 
 protected:
   void Execute();
@@ -78,3 +81,5 @@ private:
   long value = -1;
   const char* eMessage = nullptr;
 };
+
+#endif

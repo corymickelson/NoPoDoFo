@@ -2,8 +2,8 @@
 // Created by red on 9/6/17.
 //
 
-#ifndef NPDF_PDFMEMDOCUMENT_H
-#define NPDF_PDFMEMDOCUMENT_H
+#ifndef NPDF_DOCUMENT_H
+#define NPDF_DOCUMENT_H
 
 #include <boost/filesystem.hpp>
 #include <napi.h>

@@ -1,4 +1,3 @@
-// const mod = require('bindings')('npdf')
 import {__mod} from './document'
 import {IObj, Obj} from "./object";
 
@@ -23,10 +22,11 @@ export interface IDictionary {
 
     clear(): void
 
-    write(dest: string, cb: (e:Error, v:string) => void): void
+    write(dest: string, cb: (e: Error, v: string) => void): void
 
-    writeSync(dest:string):void
-    toObject(): {[key:string]: IObj}
+    writeSync(dest: string): void
+
+    toObject(): { [key: string]: IObj }
 }
 
 export class Dictionary implements IDictionary {
@@ -61,16 +61,22 @@ export class Dictionary implements IDictionary {
         this._instance.clear()
     }
 
-    write(output: string, cb: (e:any, v: string) => void): void {
+    write(output: string, cb: (e: any, v: string) => void): void {
         this._instance.write(output, cb)
     }
-    writeSync(output:string):void {
+
+    writeSync(output: string): void {
         this._instance.writeSync(output)
     }
 
-    toObject(): {[key:string]: IObj} {
-        const init:{[key:string]: any} = this._instance.toObject()
-        for(let prop in init) {
+    /**
+     * WARNING!!! Use this only for key lookup. Modifications made to this object will not persist
+     * back to the underlying pdf object
+     * @returns Object
+     */
+    toObject(): { [key: string]: IObj } {
+        const init: { [key: string]: any } = this._instance.toObject()
+        for (let prop in init) {
             init[prop] = new Obj(init[prop])
         }
         return init;

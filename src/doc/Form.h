@@ -2,6 +2,9 @@
 // Created by red on 9/11/17.
 //
 
+#ifndef NPDF_FORM_H
+#define NPDF_FORM_H
+
 #include <napi.h>
 #include <podofo/podofo.h>
 
@@ -19,3 +22,5 @@ public:
 private:
   PoDoFo::PdfMemDocument* doc;
 };
+
+#endif

@@ -133,7 +133,7 @@ Dictionary::GetKeyAs(const CallbackInfo& info)
   return Value();
 }
 
-void
+Napi::Value
 Dictionary::Write(const CallbackInfo& info)
 {
   AssertFunctionArgs(
@@ -142,6 +142,7 @@ Dictionary::Write(const CallbackInfo& info)
   auto cb = info[1].As<Function>();
   DictWriteAsync* worker = new DictWriteAsync(cb, this, output);
   worker->Queue();
+  return info.Env().Undefined();
 }
 
 void

@@ -1,6 +1,8 @@
 //
 // Created by red on 9/23/17.
 //
+#ifndef NPDF_DICTIONARY_H
+#define NPDF_DICTIONARY_H
 
 #include <napi.h>
 #include <podofo/podofo.h>
@@ -26,7 +28,7 @@ public:
   void SetDirty(const Napi::CallbackInfo&, const Napi::Value&);
   Napi::Value GetDirty(const Napi::CallbackInfo&);
   Napi::Value GetKeyAs(const Napi::CallbackInfo&);
-  void Write(const Napi::CallbackInfo&);
+  Napi::Value Write(const Napi::CallbackInfo&);
   void WriteSync(const Napi::CallbackInfo&);
   Napi::Value ToObject(const Napi::CallbackInfo&);
 
@@ -56,3 +58,5 @@ private:
   string arg;
   const char* eMessage = nullptr;
 };
+
+#endif
