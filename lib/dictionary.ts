@@ -34,7 +34,8 @@ export class Dictionary implements IDictionary {
     immutable: boolean;
 
     getKey(key: string): IObj {
-        return this._instance.getKey(key)
+        const instance = this._instance.getKey(key)
+        return new Obj(instance)
     }
 
     getKeys(): Array<string> {

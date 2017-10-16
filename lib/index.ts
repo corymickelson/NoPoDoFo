@@ -30,5 +30,6 @@ export const Document = doc,
     Image = image,
     Painter = painter,
     Rect = rect,
-    Signature = sign
+    Signature = sign,
+    CONVERSION = 0.0028346456693
 

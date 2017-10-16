@@ -16,6 +16,7 @@ public:
   static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
   void Write(const Napi::CallbackInfo&);
+  Napi::Value GetBuffer(const Napi::CallbackInfo&);
 
 private:
   PoDoFo::PdfStream* stream;

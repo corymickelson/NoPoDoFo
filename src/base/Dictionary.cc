@@ -6,9 +6,11 @@
 #include "../ErrorHandler.h"
 #include "../ValidateArguments.h"
 #include "Obj.h"
+#include <boost/filesystem.hpp>
 
 using namespace Napi;
 using namespace PoDoFo;
+using namespace boost;
 
 Dictionary::Dictionary(const CallbackInfo& info)
   : ObjectWrap<Dictionary>(info)
@@ -56,10 +58,21 @@ Dictionary::GetKey(const CallbackInfo& info)
 {
   AssertFunctionArgs(info, 1, { napi_valuetype::napi_string });
   string k = info[0].As<String>().Utf8Value();
-  PdfObject* v = dict.GetKey(PdfName(k));
-  auto objPtr = Napi::External<PdfObject>::New(info.Env(), v);
-  auto instance = Obj::constructor.New({ objPtr });
-  return instance;
+  if (!dict.HasKey(PdfName(k))) {
+    throw Napi::Error::New(info.Env(),
+                           "Key could not be found, please use "
+                           "Dictionary.HasKey before accessing key value");
+  }
+  try {
+    PdfObject* v = dict.GetKey(PdfName(k));
+    auto objPtr = Napi::External<PdfObject>::New(info.Env(), v);
+    auto instance = Obj::constructor.New({ objPtr });
+    return instance;
+  } catch (PdfError& err) {
+    ErrorHandler(err, info);
+  } catch (Napi::Error& err) {
+    ErrorHandler(err, info);
+  }
 }
 
 Napi::Value
@@ -153,42 +166,70 @@ Dictionary::GetKeyAs(const CallbackInfo& info)
 Napi::Value
 Dictionary::Write(const CallbackInfo& info)
 {
-  AssertFunctionArgs(
-    info, 2, { napi_valuetype::napi_string, napi_valuetype::napi_function });
-  string output = info[0].As<String>().Utf8Value();
-  auto cb = info[1].As<Function>();
-  DictWriteAsync* worker = new DictWriteAsync(cb, this, output);
-  worker->Queue();
-  return info.Env().Undefined();
+  try {
+    AssertFunctionArgs(
+      info, 2, { napi_valuetype::napi_string, napi_valuetype::napi_function });
+    string output = info[0].As<String>().Utf8Value();
+    if (filesystem::exists(output)) {
+      filesystem::remove(output);
+    }
+    auto cb = info[1].As<Function>();
+    DictWriteAsync* worker = new DictWriteAsync(cb, this, output);
+    worker->Queue();
+    return info.Env().Undefined();
+  } catch (PdfError& err) {
+    ErrorHandler(err, info);
+  } catch (Napi::Error& err) {
+    ErrorHandler(err, info);
+  }
 }
 
 void
 Dictionary::WriteSync(const CallbackInfo& info)
 {
   AssertFunctionArgs(info, 1, { napi_valuetype::napi_string });
-  string output = info[0].As<String>().Utf8Value();
-  PdfOutputDevice device(output.c_str());
-  dict.Write(&device, ePdfWriteMode_Default);
+  try {
+    string output = info[0].As<String>().Utf8Value();
+    if (filesystem::exists(output)) {
+      filesystem::remove(output);
+    }
+    PdfOutputDevice device(output.c_str());
+    dict.Write(&device, ePdfWriteMode_Default);
+  } catch (PdfError& err) {
+    ErrorHandler(err, info);
+  } catch (Napi::Error& err) {
+    ErrorHandler(err, info);
+  }
 }
 
 Napi::Value
 Dictionary::ToObject(const CallbackInfo& info)
 {
-  Object js = Object::New(info.Env());
-  const TKeyMap& keys = dict.GetKeys();
-  map<PoDoFo::PdfName, PoDoFo::PdfObject*>::const_iterator it;
-  for (it = keys.begin(); it != keys.end(); it++) {
-    auto key = String::New(info.Env(), (*it).first.GetName());
-    auto value = External<PdfObject>::New(info.Env(), (*it).second);
-    js.Set(key, value);
+  try {
+    Object js = Object::New(info.Env());
+    const TKeyMap& keys = dict.GetKeys();
+    map<PoDoFo::PdfName, PoDoFo::PdfObject*>::const_iterator it;
+    for (it = keys.begin(); it != keys.end(); it++) {
+      auto key = String::New(info.Env(), (*it).first.GetName());
+      auto value = External<PdfObject>::New(info.Env(), (*it).second);
+      js.Set(key, value);
+    }
+    return js;
+
+  } catch (PdfError& err) {
+    ErrorHandler(err, info);
+  } catch (Napi::Error& err) {
+    ErrorHandler(err, info);
   }
-  return js;
 }
 
 void
 DictWriteAsync::Execute()
 {
   try {
+    if (!arg.c_str()) {
+      throw Napi::Error::New(Env(), "output required");
+    }
     PdfOutputDevice device(arg.c_str());
     dict->GetDictionary()->Write(&device, ePdfWriteMode_Default);
 

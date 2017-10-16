@@ -1,10 +1,18 @@
-import { IRef, Ref } from "./reference";
-import { IVecObjects } from "./vecObjects";
-import { Dictionary } from "./dictionary";
-import { Arr } from "./arr";
+import {IRef, Ref} from "./reference";
+import {IVecObjects} from "./vecObjects";
+import {Dictionary, IDictionary} from "./dictionary";
+import {Arr, IArr} from "./arr";
 
-export type PDType = 'Boolean' | 'Number' | 'Name' | 'Real' | 'String' | 'Array' | 'Dictionary' | 'Reference' | 'RawData'
-export type PDVariant = String | Number | Dictionary | Arr | Ref
+export type PDType =
+    'Boolean'
+    | 'Number'
+    | 'Name'
+    | 'Real'
+    | 'String'
+    | 'Array'
+    | 'Dictionary'
+    | 'Reference'
+    | 'RawData'
 
 export interface IObj {
     stream: any
@@ -15,14 +23,36 @@ export interface IObj {
     type: PDType
 
     hasStream(): boolean
-    getOffsetSync(key: string): number
-    getOffset(key: string, cb: (e: Error, v: number) => void): void
-    write(output: string, cb: (e: Error, output: string) => void): void
-    writeSync(output: string): void
-    flateCompressStream(): void
-    delayedStreamLoad(): void
-    as(t: PDType): any
 
+    getOffsetSync(key: string): number
+
+    getOffset(key: string, cb: (e: Error, v: number) => void): void
+
+    write(output: string, cb: (e: Error, output: string) => void): void
+
+    writeSync(output: string): void
+
+    flateCompressStream(): void
+
+    delayedStreamLoad(): void
+
+    asBool(): boolean
+
+    asString(): string
+
+    asName(): string
+
+    asReal(): number
+
+    asNumber(): number
+
+    asArray(): IArr
+
+    asDictionary(): Dictionary
+
+    asReference(): IRef
+
+    asBuffer(): Buffer
 }
 
 /**
@@ -30,11 +60,12 @@ export interface IObj {
  *      It is possible to manipulate the stream which can be appended to the object(if the object is of underlying type dictionary)
  *      A PdfObject is uniquely identified by an object number and generation number
  *      The object can easily be written to a file using the write function
- * 
+ *
  * @todo New instance object not yet supported. Objects can only be instantiated from an existing object
  */
 export class Obj implements IObj {
     _instance: any
+
     get reference() {
         return this._instance.reference
     }
@@ -82,19 +113,22 @@ export class Obj implements IObj {
     hasStream(): boolean {
         return this._instance.hasStream()
     }
+
     /**
      * @desc Calculates the byte offset of key from the start of the object if the object was written to disk at the moment of calling the function
-     *      This function is very calculation instensive!
-     * 
+     *      This function is very calculation intensive!
+     *
      * @param {string} key object dictionary key
      * @returns {number} - byte offset
      */
     getOffsetSync(key: string): number {
         return this._instance.getOffsetSync(key)
     }
+
     getOffset(key: string, cb: Function): void {
         this._instance.getOffset(key, cb)
     }
+
     /**
      * @desc Write the complete object to a file
      */
@@ -105,9 +139,11 @@ export class Obj implements IObj {
             throw error
         }
     }
+
     write(output: string, cb: (e: Error, output: string) => void): void {
         this._instance.write(output, cb)
     }
+
     /**
      * @desc This function compresses any currently set stream using the FlateDecode algorithm.
      *  JPEG compressed streams will not be compressed again using this function.
@@ -116,6 +152,7 @@ export class Obj implements IObj {
     flateCompressStream(): void {
         this._instance.flateCompressStream()
     }
+
     /**
      * @desc Dynamically load this object and any associated stream from a PDF file
      */
@@ -123,39 +160,42 @@ export class Obj implements IObj {
         this._instance.delayedStreamLoad()
     }
 
-    /**
-     * 
-     * @param t - NPdf types enum
-     * @todo Fix generic and heavy usage of "any"
-     */
-    as(t: PDType): any {
-        switch (t) {
-            case 'Array':
-                let i = this._instance.asType(t)
-                return new Arr(i)
-            case 'Boolean':
-            case 'Real':
-            case 'Number':
-            case 'Name':
-            case 'String':
-                return this._instance.asType(t)
-            case 'Dictionary':
-                return new Dictionary(this)
-            case 'Reference':
-                return new Ref(this._instance.asType(t))
-            case 'RawData':
-                throw Error('unimplemented')
-            default:
-                throw Error('type unknown')
-        }
+    asBool(): boolean {
+        return this._instance.getBool()
+    }
+
+    asString(): string {
+        return this._instance.getString()
+    }
+
+    asName(): string {
+        return this._instance.getName()
+    }
+
+    asReal(): number {
+        return this._instance.getReal()
+    }
+
+    asNumber(): number {
+        return this._instance.getNumber()
+    }
+
+    asArray(): IArr {
+        const i = this._instance.getArray()
+        return new Arr(i)
+    }
+
+    asDictionary(): Dictionary {
+        return new Dictionary(this)
+    }
+
+    asReference(): IRef {
+        const i = this._instance.getReference()
+        return new Ref(i)
+    }
+
+    asBuffer(): Buffer {
+        throw Error("unimplmented")
     }
 }
 
-
-
-
-
-
-function test() {
-    return [1,2,3].map(i => {return ++i})
-}

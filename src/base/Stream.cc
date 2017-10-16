@@ -22,7 +22,10 @@ void
 Stream::Initialize(Napi::Env& env, Napi::Object& target)
 {
   Function ctor =
-    DefineClass(env, "Stream", { InstanceMethod("write", &Stream::Write) });
+    DefineClass(env,
+                "Stream",
+                { InstanceMethod("write", &Stream::Write),
+                  InstanceMethod("getBuffer", &Stream::GetBuffer) });
   constructor = Napi::Persistent(ctor);
   constructor.SuppressDestruct();
   target.Set("Stream", constructor);
@@ -41,4 +44,14 @@ Stream::Write(const CallbackInfo& info)
   } catch (Napi::Error& err) {
     ErrorHandler(err, info);
   }
+}
+
+Napi::Value
+Stream::GetBuffer(const CallbackInfo& info)
+{
+  pdf_long bufferLength = stream->GetLength();
+  const uint8_t* alloc = static_cast<uint8_t*>(
+    calloc(sizeof(char), sizeof(char) * static_cast<size_t>(bufferLength)));
+  return Buffer<uint8_t>::Copy(
+    info.Env(), alloc, static_cast<size_t>(bufferLength));
 }

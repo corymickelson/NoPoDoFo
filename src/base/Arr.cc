@@ -3,9 +3,9 @@
 //
 
 #include "Arr.h"
+#include "../ErrorHandler.h"
 #include "../ValidateArguments.h"
 #include "Obj.h"
-#include "../ErrorHandler.h"
 
 using namespace Napi;
 using namespace PoDoFo;
@@ -31,13 +31,14 @@ Arr::Initialize(Napi::Env& env, Napi::Object& target)
                   InstanceMethod("getIndex", &Arr::GetIndex),
                   InstanceMethod("contains", &Arr::ContainsString),
                   InstanceMethod("indexOf", &Arr::GetStringIndex),
-                  InstanceMethod("write", &Arr::Write) });
+                  InstanceMethod("write", &Arr::Write),
+                  InstanceMethod("push", &Arr::Push) });
   constructor = Persistent(ctor);
   constructor.SuppressDestruct();
   target.Set("Arr", constructor);
 }
 Napi::Value
-Arr::Length(const Napi::CallbackInfo &info)
+Arr::Length(const Napi::CallbackInfo& info)
 {
   return Number::New(info.Env(), arr.size());
 }
@@ -93,24 +94,43 @@ Arr::SetDirty(const CallbackInfo& info, const Napi::Value& value)
   arr.SetDirty(value.As<Boolean>());
 }
 
+void
+Arr::Push(const CallbackInfo& info)
+{
+  AssertFunctionArgs(info, 1, { napi_valuetype::napi_object });
+  auto wrapper = info[0].As<Object>();
+  if (!wrapper.InstanceOf(Obj::constructor.Value())) {
+    throw Error::New(info.Env(), "must be an instance of Obj");
+  }
+  try {
+    auto item = Obj::Unwrap(wrapper);
+    arr.push_back(item->GetObject());
+
+  } catch (PdfError& err) {
+    ErrorHandler(err, info);
+  } catch (Napi::Error& err) {
+    ErrorHandler(err, info);
+  }
+}
+
 Napi::Value
-Arr::ToArray(const Napi::CallbackInfo& info) {
-	auto js = Array::New(info.Env());
-	try {
-		uint32_t counter = 0;
-		for(auto it = arr.begin(); it != arr.end(); it++) {
-			if(it.base() == nullptr) continue;
-			auto initPtr = External<PdfObject>::New(Env(), it.base());
-			auto instance = Obj::constructor.New({ initPtr });
-			js.Set(counter, instance);
-			counter++;
-		}
-	}
-	catch(PdfError &err) {
-		ErrorHandler(err, info);
-	}
-	catch(Napi::Error &err) {
-		ErrorHandler(err, info);
-	}
-	return js;
+Arr::ToArray(const Napi::CallbackInfo& info)
+{
+  auto js = Array::New(info.Env());
+  try {
+    uint32_t counter = 0;
+    for (auto it = arr.begin(); it != arr.end(); it++) {
+      if (it.base() == nullptr)
+        continue;
+      auto initPtr = External<PdfObject>::New(Env(), it.base());
+      auto instance = Obj::constructor.New({ initPtr });
+      js.Set(counter, instance);
+      counter++;
+    }
+  } catch (PdfError& err) {
+    ErrorHandler(err, info);
+  } catch (Napi::Error& err) {
+    ErrorHandler(err, info);
+  }
+  return js;
 }

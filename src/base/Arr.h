@@ -23,6 +23,7 @@ public:
   Napi::Value IsDirty(const Napi::CallbackInfo&);
   Napi::Value GetIndex(const Napi::CallbackInfo&);
   void SetDirty(const Napi::CallbackInfo&, const Napi::Value&);
+  void Push(const Napi::CallbackInfo&);
 
 private:
   PoDoFo::PdfArray arr = *new PoDoFo::PdfArray();

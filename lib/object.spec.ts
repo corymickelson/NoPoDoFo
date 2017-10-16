@@ -14,7 +14,6 @@ const doc = new Document(filePath),
     obj = doc.getObjects()[0]
 
 test('obj write sync', t => {
-
     obj.writeSync(outTxtFile)
     t.ok(existsSync(outTxtFile), 'write to destination successful')
     unlinkSync(outTxtFile)
@@ -49,77 +48,3 @@ test('obj getOffset', t => {
     })
 })
 
-test('obj get as T', t => {
-    try {
-        const obj = doc.getObjects().filter(i => i.type === 'Array')[0],
-            sync = obj.as(obj.type)
-        t.ok(sync instanceof Arr, 'is instance of Arr')
-        t.end()
-    }
-    catch (e) {
-        console.log(e)
-        t.fail('threw error')
-    }
-})
-
-test('dictionary construct', t => {
-    const obj = doc.getObjects().filter(i => i.type === 'Dictionary')[0],
-        dict = new Dictionary(obj)
-    t.ok(dict, 'Dictionary not null')
-    t.assert(dict instanceof Dictionary, 'is instance of Dictionary')
-    t.end()
-})
-test('dictionary writer', t => {
-    const obj = doc.getObjects().filter(i => i.type === 'Dictionary')[0],
-        dict = new Dictionary(obj),
-        out = './test.out.txt'
-    dict.writeSync(out)
-    t.assert(existsSync(out))
-    unlinkSync(out)
-    dict.write(out, (e, v) => {
-        t.assert(e === null, 'error is null')
-        t.ok(existsSync(out), 'write file exists')
-        unlinkSync(out)
-        t.end()
-    })
-
-})
-test('array constructor', t => {
-    try {
-        const obj = doc.getObjects().filter(i => i.type === 'Array')[0],
-            arr = obj.as('Array')
-        t.assert(arr instanceof Arr, 'instance of Arr')
-        t.end()
-    }
-    catch (e) {
-        console.log(e)
-        t.fail('threw error')
-    }
-})
-test('Arr to js Array', t => {
-    try {
-        const obj = doc.getObjects().filter(i => i.type === 'Array')[0],
-            arr = obj.as('Array'),
-            js = arr.toArray()
-        t.assert(js instanceof Array)
-        t.end()
-    }
-    catch (e) {
-        console.log(e)
-        t.fail('threw error')
-    }
-})
-
-test('to js', t => {
-    try {
-        const obj = doc.getObjects().filter(i => i.type === 'Dictionary')[0],
-            o = obj.as('Dictionary'),
-            js = o.toObject()
-        t.assert(js instanceof Object)
-        t.end()
-    }
-    catch (e) {
-        console.log(e)
-        t.fail('threw error')
-    }
-})

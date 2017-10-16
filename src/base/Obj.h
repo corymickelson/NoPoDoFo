@@ -32,8 +32,15 @@ public:
   Napi::Value Reference(const Napi::CallbackInfo&);
   void FlateCompressStream(const Napi::CallbackInfo&);
   void DelayedStreamLoad(const Napi::CallbackInfo&);
-  Napi::Value AsType(const Napi::CallbackInfo&);
-  Napi::Value GetInstance(const Napi::CallbackInfo&);
+  Napi::Value GetNumber(const Napi::CallbackInfo&);
+  Napi::Value GetReal(const Napi::CallbackInfo&);
+  Napi::Value GetString(const Napi::CallbackInfo&);
+  Napi::Value GetName(const Napi::CallbackInfo&);
+  Napi::Value GetArray(const Napi::CallbackInfo&);
+  //  Napi::Value GetDictionary(const Napi::CallbackInfo&);
+  Napi::Value GetBool(const Napi::CallbackInfo&);
+  Napi::Value GetReference(const Napi::CallbackInfo&);
+  Napi::Value GetRawData(const Napi::CallbackInfo&);
 
   const PoDoFo::PdfObject GetObject() { return obj; }
 

@@ -39,8 +39,7 @@ Painter::SetPage(const Napi::CallbackInfo& info, const Napi::Value& value)
   }
   auto pageObj = value.As<Object>();
   Page* pagePtr = Page::Unwrap(pageObj);
-  if (!pageObj.InstanceOf(
-        reinterpret_cast<const Function&>(Page::constructor))) {
+  if (!pageObj.InstanceOf(Page::constructor.Value())) {
     throw Napi::Error::New(info.Env(), "Page must be an instance of Page.");
   }
   PoDoFo::PdfPage* page = pagePtr->GetPage();
@@ -69,46 +68,45 @@ Painter::DrawText(const CallbackInfo& info)
 void
 Painter::DrawImage(const CallbackInfo& info)
 {
-  if (info.Length() < 3) {
-    throw Napi::Error::New(
-      info.Env(),
-      "DrawImage requires a minimum of three parameters: Image, x, y");
-  }
-  // Image
-  auto imgObj = info[0].As<Object>();
-  Image* imgInstance = Image::Unwrap(imgObj);
-  PdfImage img = imgInstance->GetImage();
-
-  // Coordinates
-  double x, y;
-  if (!info[1].IsNumber() || !info[2].IsNumber()) {
-    throw Napi::Error::New(info.Env(), "coorindates must be of type number");
-  }
-  x = info[1].As<Number>().DoubleValue();
-  y = info[2].As<Number>().DoubleValue();
-
-  // Scaling
-  double width = 0, height = 0;
-  if (info.Length() == 5) {
-    if (!info[3].IsNumber() || !info[4].IsNumber()) {
-      throw Napi::Error::New(info.Env(),
-                             "scaling width & height must be of type number");
-    }
-    width = info[3].As<Number>().DoubleValue();
-    height = info[4].As<Number>().DoubleValue();
-  }
   try {
-    if (width != 0 && height != 0)
+    if (info.Length() < 3) {
+      throw Napi::Error::New(
+        info.Env(),
+        "DrawImage requires a minimum of three parameters: Image, x, y");
+    }
+    // Image
+    auto imgObj = info[0].As<Object>();
+    Image* imgInstance = Image::Unwrap(imgObj);
+    PdfImage img = imgInstance->GetImage();
+
+    // Coordinates
+    double x, y;
+    if (!info[1].IsNumber() || !info[2].IsNumber()) {
+      throw Napi::Error::New(info.Env(), "coorindates must be of type number");
+    }
+    x = info[1].As<Number>().DoubleValue();
+    y = info[2].As<Number>().DoubleValue();
+
+    // Scaling
+    double width = 0.0, height = 0.0;
+    if (info.Length() == 5) {
+      if (!info[3].IsNumber() || !info[4].IsNumber()) {
+        throw Napi::Error::New(info.Env(),
+                               "scaling width & height must be of type number");
+      }
+      width = info[3].As<Number>().DoubleValue();
+      height = info[4].As<Number>().DoubleValue();
+    }
+    if (width != 0.0 && height != 0.0)
       painter->DrawImage(x, y, &img, width, height);
     else
       painter->DrawImage(x, y, &img);
 
   } catch (PdfError& err) {
     ErrorHandler(err, info);
+  } catch (Napi::Error& err) {
+    ErrorHandler(err, info);
   }
-
-  //  painter->DrawImage(0.0, pageSize.GetHeight() - image.GetHeight(),
-  //  &image);
 }
 
 Napi::Value

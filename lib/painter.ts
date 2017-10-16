@@ -42,7 +42,9 @@ export class Painter implements IPainter {
      * @param {{width:number, heigth:number}} scale - optional scaling
      */
     drawImage(img: IImage, x: number, y: number, scale?: {width: number, height: number}): void {
-        scale ? this._instance.drawImage(img, x, y, scale.width, scale.height) : this._instance.drawImage(img, x, y)
+        scale ?
+            this._instance.drawImage(img._instance, x, y, scale.width, scale.height) :
+            this._instance.drawImage(img._instance, x, y)
     }
 
     getPrecision(): number {

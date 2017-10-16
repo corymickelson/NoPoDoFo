@@ -40,7 +40,7 @@ public:
   Napi::Value GetMediaBox(const Napi::CallbackInfo&);
   Napi::Value GetBleedBox(const Napi::CallbackInfo&);
   Napi::Value GetArtBox(const Napi::CallbackInfo&);
-  void CreateAnnotation(const Napi::CallbackInfo&);
+  Napi::Value CreateAnnotation(const Napi::CallbackInfo&);
   Napi::Value GetAnnotation(const Napi::CallbackInfo&);
   Napi::Value GetNumAnnots(const Napi::CallbackInfo&);
   void DeleteAnnotation(const Napi::CallbackInfo&);

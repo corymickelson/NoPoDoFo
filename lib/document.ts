@@ -29,6 +29,8 @@ export interface IDocument {
     createEncrypt(option: EncryptInitOption): IEncrypt
 
     getTrailer():IObj
+
+    freeObjMem(target:Obj): void
 }
 
 /**
@@ -176,5 +178,9 @@ export class Document implements IDocument {
     getTrailer(): IObj {
         let objInit =  this._instance.getTrailer()
         return new Obj(objInit)
+    }
+
+    freeObjMem(target:Obj): void {
+        this._instance.freeObjMem(target._instance)
     }
 }
