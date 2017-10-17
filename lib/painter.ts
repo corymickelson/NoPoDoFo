@@ -1,21 +1,10 @@
 import {IPage} from './page'
-import {IImage} from './image'
+import {Image} from './image'
 import {__mod} from './document'
 // const mod = require('bindings')('npdf')
 
-export interface IPainter {
-    _instance:any
-    page:IPage
 
-    finishPage(): void
-
-    drawText(): void
-
-    drawImage(img: IImage, x: number, y: number, scale?: {width: number, height: number}): void
-
-    getPrecision(): number
-}
-export class Painter implements IPainter {
+export class Painter {
     _instance: any
     get page() { return this._instance.page }
     set page(value:IPage) {this._instance.page = value._instance }
@@ -41,7 +30,7 @@ export class Painter implements IPainter {
      * @param {number} y - y coordinate (bottom position of image)
      * @param {{width:number, heigth:number}} scale - optional scaling
      */
-    drawImage(img: IImage, x: number, y: number, scale?: {width: number, height: number}): void {
+    drawImage(img: Image, x: number, y: number, scale?: {width: number, height: number}): void {
         scale ?
             this._instance.drawImage(img._instance, x, y, scale.width, scale.height) :
             this._instance.drawImage(img._instance, x, y)

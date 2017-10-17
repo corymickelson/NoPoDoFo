@@ -2,16 +2,7 @@
 
 import {IDocument, __mod} from './document'
 
-export interface IImage {
-    _instance: any
-    getWidth(): number
-    getHeight(): number
-    loadFromFile(file: string): void
-    loadFromBuffer(data: Buffer): void
-    isLoaded(): boolean
-    setInterpolate(value:boolean):void
-}
-export class Image implements IImage {
+export class Image {
     _instance:any
 
     /**

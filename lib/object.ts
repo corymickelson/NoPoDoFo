@@ -1,7 +1,6 @@
-import {IRef, Ref} from "./reference";
-import {IVecObjects} from "./vecObjects";
-import {Dictionary, IDictionary} from "./dictionary";
-import {Arr, IArr} from "./arr";
+import {Ref} from "./reference";
+import {Dictionary} from "./dictionary";
+import {Arr} from "./arr";
 
 export type PDType =
     'Boolean'
@@ -14,47 +13,6 @@ export type PDType =
     | 'Reference'
     | 'RawData'
 
-export interface IObj {
-    stream: any
-    length: number
-    owner: IVecObjects
-    reference: IRef
-    _instance: any
-    type: PDType
-
-    hasStream(): boolean
-
-    getOffsetSync(key: string): number
-
-    getOffset(key: string, cb: (e: Error, v: number) => void): void
-
-    write(output: string, cb: (e: Error, output: string) => void): void
-
-    writeSync(output: string): void
-
-    flateCompressStream(): void
-
-    delayedStreamLoad(): void
-
-    asBool(): boolean
-
-    asString(): string
-
-    asName(): string
-
-    asReal(): number
-
-    asNumber(): number
-
-    asArray(): IArr
-
-    asDictionary(): Dictionary
-
-    asReference(): IRef
-
-    asBuffer(): Buffer
-}
-
 /**
  * @desc This class represents a PDF indirect Object in memory
  *      It is possible to manipulate the stream which can be appended to the object(if the object is of underlying type dictionary)
@@ -63,22 +21,18 @@ export interface IObj {
  *
  * @todo New instance object not yet supported. Objects can only be instantiated from an existing object
  */
-export class Obj implements IObj {
+export class Obj {
     _instance: any
 
     get reference() {
         return this._instance.reference
     }
 
-    set reference(value: any) {
-        throw Error("Reference may not be set manually")
-    }
-
     get owner() {
         return this._instance.owner
     }
 
-    set owner(value: IVecObjects) {
+    set owner(value: Array<Obj>) {
         this._instance.owner = value
     }
 
@@ -86,27 +40,19 @@ export class Obj implements IObj {
         return this._instance.length
     }
 
-    set length(value: any) {
-        throw Error("Object Length may not be set manually")
-    }
-
     get stream() {
         return this._instance.stream
-    }
-
-    set stream(value: any) {
-        throw Error("Object stream may not be set manually")
     }
 
     get type() {
         return this._instance.type
     }
 
-    set type(value: PDType) {
-        throw Error('Can not set type')
+    constructor(instance: any) {
+        this._instance = instance
     }
 
-    constructor(instance: any) {
+    setInstance(instance:any): void {
         this._instance = instance
     }
 
@@ -121,27 +67,12 @@ export class Obj implements IObj {
      * @param {string} key object dictionary key
      * @returns {number} - byte offset
      */
-    getOffsetSync(key: string): number {
-        return this._instance.getOffsetSync(key)
+    getOffset(key: string): Promise<number> {
+        return this._instance.getOffset(key)
     }
 
-    getOffset(key: string, cb: Function): void {
-        this._instance.getOffset(key, cb)
-    }
-
-    /**
-     * @desc Write the complete object to a file
-     */
-    writeSync(output: string): void {
-        try {
-            this._instance.writeSync(output)
-        } catch (error) {
-            throw error
-        }
-    }
-
-    write(output: string, cb: (e: Error, output: string) => void): void {
-        this._instance.write(output, cb)
+    write(output: string): Promise<string> {
+        return this._instance.write(output)
     }
 
     /**
@@ -177,10 +108,10 @@ export class Obj implements IObj {
     }
 
     asNumber(): number {
-        return this._instance.getNumber()
+       return this._instance.getNumber()
     }
 
-    asArray(): IArr {
+    asArray(): Arr {
         const i = this._instance.getArray()
         return new Arr(i)
     }
@@ -189,7 +120,7 @@ export class Obj implements IObj {
         return new Dictionary(this)
     }
 
-    asReference(): IRef {
+    asReference(): Ref {
         const i = this._instance.getReference()
         return new Ref(i)
     }

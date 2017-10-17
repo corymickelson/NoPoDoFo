@@ -1,17 +1,10 @@
-import { IPage, Page } from './page'
-import { Document, IDocument, __mod } from './document'
+import { Page } from './page'
+import { Document, __mod } from './document'
 
-export interface IRect {
-    left:number
-    bottom:number
-    width:number
-    height:number
-    _instance:any
-}
-export class Rect implements IRect {
+export class Rect {
     _instance: any
 
-    constructor(position?: IPage | Array<number>) {
+    constructor(position?: Page | Array<number>) {
         if (Array.isArray(position)) {
             this._instance = new __mod.Rect(
                 (position as number[])[0],
@@ -58,7 +51,7 @@ export class Rect implements IRect {
         this._instance.height = value
     }
 
-    intersect(rect: IRect): void {
+    intersect(rect: Rect): void {
         this._instance.intersect(rect)
     }
 }

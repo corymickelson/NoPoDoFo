@@ -1,39 +1,15 @@
 import {__mod} from './document'
-import {IObj, Obj} from "./object";
+import { Obj} from "./object";
+import {Ref} from "./reference";
+import {Arr} from "./arr";
 
 export type CoerceKeyType = 'boolean' | 'long' | 'name' | 'real'
 
-export interface IDictionary {
-    dirty: boolean
-    immutable: boolean
-    _instance: any
-
-    getKey(key: string): IObj
-
-    getKeys(): Array<string>
-
-    getKeyAs(type: CoerceKeyType, key: string): IObj
-
-    hasKey(key: string): boolean
-
-    addKey(key: string, value: IObj): void
-
-    removeKey(key: string): void
-
-    clear(): void
-
-    write(dest: string, cb: (e: Error, v: string) => void): void
-
-    writeSync(dest: string): void
-
-    toObject(): { [key: string]: IObj }
-}
-
-export class Dictionary implements IDictionary {
+export class Dictionary {
     dirty: boolean;
     immutable: boolean;
 
-    getKey(key: string): IObj {
+    getKey(key: string): Obj {
         const instance = this._instance.getKey(key)
         return new Obj(instance)
     }
@@ -42,7 +18,7 @@ export class Dictionary implements IDictionary {
         return this._instance.getKeys()
     }
 
-    getKeyAs(type: CoerceKeyType, key: string): IObj {
+    getKeyAs(type: CoerceKeyType, key: string): Obj {
         return this._instance.getKeyAs(type, key)
     }
 
@@ -50,7 +26,7 @@ export class Dictionary implements IDictionary {
         return this._instance.hasKey(key)
     }
 
-    addKey(key: string, value: IObj): void {
+    addKey(key: string, value: Obj): void {
         this._instance.addKey(key, value._instance)
     }
 
@@ -62,8 +38,8 @@ export class Dictionary implements IDictionary {
         this._instance.clear()
     }
 
-    write(output: string, cb: (e: any, v: string) => void): void {
-        this._instance.write(output, cb)
+    write(output: string): Promise<string> {
+        return this._instance.write(output)
     }
 
     writeSync(output: string): void {
@@ -75,17 +51,53 @@ export class Dictionary implements IDictionary {
      * back to the underlying pdf object
      * @returns Object
      */
-    toObject(): { [key: string]: IObj } {
-        const init: { [key: string]: any } = this._instance.toObject()
-        for (let prop in init) {
-            init[prop] = new Obj(init[prop])
-        }
-        return init;
+    toObject(): Promise<{ [key: string]: Obj }> {
+        return new Promise((fulfill, reject) => {
+            const init: { [key: string]: any } = this._instance.toObject()
+            for (let prop in init) {
+                const value = new Obj(init[prop])
+
+                switch (value.type) {
+                    case 'Dictionary': {
+                        break
+                    }
+                    case 'Array': {
+                        const instance = value.asArray()
+                        init[prop] = instance.toArray()
+                        break
+                    }
+                    case 'Reference': {
+                        const instance = value.asReference()
+                        init[prop] = new Ref(instance)
+                        break
+                    }
+                    case 'Name': {
+                        break
+                    }
+                    case 'Number': {
+                        break
+                    }
+                    case 'String': {
+                        break
+                    }
+                    case 'Real': {
+                        break
+                    }
+                    case 'Boolean': {
+                        break
+                    }
+                    case 'RawData': {
+                        break
+                    }
+                }
+            }
+        })
+
     }
 
     _instance: any
 
-    constructor(obj: IObj) {
+    constructor(obj: Obj) {
         if (obj === null) {
             throw Error("Can not instantiate Dictionary without valid NPdf Object")
         }

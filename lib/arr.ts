@@ -1,15 +1,4 @@
-import { IObj, Obj } from "./object";
-
-export interface IArr {
-    dirty: boolean
-    length: number
-    toArray(): Array<IObj>
-    contains(key: string): boolean
-    indexOf(key: string): number
-    write(output: string): void
-    at(index: number): IObj
-    push(value: IObj): void
-}
+import { Obj } from "./object";
 
 /**
  * @class Arr wraps PdfArray
@@ -18,9 +7,9 @@ export interface IArr {
  * Pdf array's.
  * If you would like to use Arr as an instance of a javascript array call ToArray()
  */
-export class Arr implements IArr {
+export class Arr {
     dirty: boolean;
-    private _array: Array<IObj>;
+    private _array: Array<Obj>;
 
     get length() {
         return this._instance.length
@@ -36,9 +25,9 @@ export class Arr implements IArr {
      * Converts PdfArray to javascript array.
      * Any modifications to javascript array will NOT be persisted to PdfArray.
      * Use for lookup only
-     * @returns {Array<IObj>}
+     * @returns {Array<Obj>}
      */
-    toArray(): Array<IObj> {
+    toArray(): Array<Obj> {
         const init: Array<any> = this._instance.toArray()
         this._array = init.map(i => new Obj(i))
 
@@ -60,7 +49,7 @@ export class Arr implements IArr {
         return proxy._array
     }
 
-    push(value: IObj): void {
+    push(value: Obj): void {
         this._instance.push(value)
     }
 
@@ -93,9 +82,9 @@ export class Arr implements IArr {
     /**
      * Retrieve the PdfObject at index
      * @param {number} index
-     * @returns {IObj}
+     * @returns {Obj}
      */
-    at(index: number): IObj {
+    at(index: number): Obj {
         const item = this._instance.getIndex(index)
         return new Obj(item)
     }

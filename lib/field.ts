@@ -3,32 +3,7 @@
 import {__mod} from './document'
 import {IPage} from './page'
 
-export interface ITextField {
-    _instance:any
-    text:string
-}
-export interface ICheckBox {
-    _instance:any
-    checked:boolean
-}
-export interface IField {
-    _instance:any
-    getType(): string
 
-    getFieldName(): string
-
-    getAlternateName(): string
-
-    getMappingName(): string
-
-    isRequired(): boolean
-
-    setRequired(required: boolean): void
-
-    setAlternateName(name: string): void
-
-    setMappingName(name: string): void
-}
 export interface IFieldInfo {
     name: string,
     alternateName: string,
@@ -44,7 +19,7 @@ export interface IFieldInfo {
 }
 
 export type FieldType = 'TextField' | 'CheckBox' | 'ListBox' | 'RadioButton' | 'ComboBox' | 'PushButton' | 'Signature'
-export class Field implements IField {
+export class Field  {
     _instance: any
     constructor(page: IPage, fieldIndex: number) {
         this._instance = new __mod.Field(page._instance, fieldIndex)
@@ -83,9 +58,9 @@ export class Field implements IField {
     }
 }
 
-export class TextField implements ITextField {
+export class TextField {
     _instance: any
-    constructor(field: IField) {
+    constructor(field: Field) {
         if(field.getType() !== 'TextField') {
             throw Error('field parameter must be a field of type TextField')
         }
@@ -99,7 +74,7 @@ export class TextField implements ITextField {
     }
 }
 
-export class CheckBox implements ICheckBox {
+export class CheckBox {
     _instance:any
     get checked() {
         return this._instance.checked
@@ -107,7 +82,7 @@ export class CheckBox implements ICheckBox {
     set checked(value:boolean) {
         this._instance.checked = value
     }
-    constructor(field: IField) {
+    constructor(field: Field) {
         if(field.getType() !== 'CheckBox') {
             throw Error('must be of type CheckBox')
         }

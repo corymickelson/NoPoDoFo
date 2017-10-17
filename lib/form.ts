@@ -1,5 +1,5 @@
 import {IDocument, __mod} from './document'
-import {IObj} from './object'
+import {Obj} from "./object";
 
 export class Form {
     _instance:any
@@ -11,7 +11,7 @@ export class Form {
         this._instance = new __mod.Form(document._instance)
     }
 
-    getObject():IObj {
+    getObject():Obj {
         return this._instance.getObject()
     }
 }

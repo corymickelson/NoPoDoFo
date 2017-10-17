@@ -6,13 +6,7 @@ export type EncryptInitOption = {
     algorithm?: 'rc4v1' | 'rc4v2' | 'aesv2' | 'aesv3'
     keyLength?: number
 }
-export interface IEncrypt { 
-    _instance: any
-    option?: EncryptInitOption
-    isAllowed(action:ProtectionOption):boolean
-    authenticate(pwd: {ownerPassword?: string, userPassword?:string}):boolean
-}
-export class Encrypt implements IEncrypt {
+export class Encrypt {
     private _complete = true;
     constructor(public _instance: any, public option?:EncryptInitOption) { 
         if(_instance === null && option instanceof Object) {

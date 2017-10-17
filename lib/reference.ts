@@ -1,23 +1,15 @@
-export interface IRef {
-    object: number
-    generation: number
+import {Obj} from "./object";
 
-    write(output: string): void
 
-    toString(): string
-
-    isIndirect(): boolean
-}
-
-export class Ref implements IRef {
+export class Ref {
     _instance: any
 
-    get object() {
-        return this._instance.object
+    get objectNumber() {
+        return this._instance.objectNumber
     }
 
-    set object(value: number) {
-        this._instance.object = value
+    set objectNumber(value: number) {
+        this._instance.objectNumber = value
     }
 
     get generation() {
@@ -43,6 +35,10 @@ export class Ref implements IRef {
 
     toString(): string {
         return this._instance.toString()
+    }
+
+    getNObj(): Obj {
+        return new Obj(this._instance.getObject())
     }
 
 }

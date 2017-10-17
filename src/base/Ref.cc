@@ -1,6 +1,7 @@
 #include "Ref.h"
 #include "../ErrorHandler.h"
 #include "../ValidateArguments.h"
+#include "Obj.h"
 
 using namespace Napi;
 using namespace PoDoFo;
@@ -21,9 +22,11 @@ Ref::Initialize(Napi::Env& env, Napi::Object& target)
     "Ref",
     { InstanceAccessor(
         "generation", &Ref::GetGenerationNumber, &Ref::SetGenerationNumber),
-      InstanceAccessor("object", &Ref::GetObjectNumber, &Ref::SetObjectNumber),
+      InstanceAccessor(
+        "objectNumber", &Ref::GetObjectNumber, &Ref::SetObjectNumber),
       InstanceMethod("toString", &Ref::ToString),
       InstanceMethod("write", &Ref::Write),
+      InstanceMethod("getObject", &Ref::GetObj),
       InstanceMethod("isIndirect", &Ref::IsIndirect) });
   constructor = Napi::Persistent(ctor);
   constructor.SuppressDestruct();
@@ -80,4 +83,12 @@ Napi::Value
 Ref::IsIndirect(const Napi::CallbackInfo& info)
 {
   return Napi::Boolean::New(info.Env(), ref.IsIndirect());
+}
+
+Napi::Value
+Ref::GetObj(const CallbackInfo& info)
+{
+  PdfObject obj(ref);
+  auto instancePtr = External<PdfObject>::New(info.Env(), &obj);
+  return Obj::constructor.New({ instancePtr });
 }

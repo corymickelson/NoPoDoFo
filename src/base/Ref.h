@@ -25,6 +25,9 @@ public:
   void Write(const Napi::CallbackInfo&);
   Napi::Value IsIndirect(const Napi::CallbackInfo&);
 
+  Napi::Value GetObj(const Napi::CallbackInfo&);
+  PoDoFo::PdfReference GetRef() { return ref; }
+
 private:
   PoDoFo::PdfReference ref = *new PoDoFo::PdfReference();
 };

@@ -23,11 +23,9 @@ public:
   Napi::Value HasStream(const Napi::CallbackInfo&);
   Napi::Value GetObjectLength(const Napi::CallbackInfo&);
   Napi::Value GetDataType(const Napi::CallbackInfo&);
-  Napi::Value GetByteOffsetSync(const Napi::CallbackInfo&);
-  void GetByteOffset(const Napi::CallbackInfo&);
+  Napi::Value GetByteOffset(const Napi::CallbackInfo&);
   Napi::Value GetOwner(const Napi::CallbackInfo&);
   void SetOwner(const Napi::CallbackInfo&, const Napi::Value&);
-  void WriteObject(const Napi::CallbackInfo&);
   Napi::Value Write(const Napi::CallbackInfo&);
   Napi::Value Reference(const Napi::CallbackInfo&);
   void FlateCompressStream(const Napi::CallbackInfo&);
@@ -37,7 +35,6 @@ public:
   Napi::Value GetString(const Napi::CallbackInfo&);
   Napi::Value GetName(const Napi::CallbackInfo&);
   Napi::Value GetArray(const Napi::CallbackInfo&);
-  //  Napi::Value GetDictionary(const Napi::CallbackInfo&);
   Napi::Value GetBool(const Napi::CallbackInfo&);
   Napi::Value GetReference(const Napi::CallbackInfo&);
   Napi::Value GetRawData(const Napi::CallbackInfo&);
@@ -46,47 +43,6 @@ public:
 
 private:
   PoDoFo::PdfObject obj = *new PoDoFo::PdfObject();
-};
-
-class ObjWriteAsync : public Napi::AsyncWorker
-{
-public:
-  ObjWriteAsync(Napi::Function& cb, Obj* obj, string dest)
-    : AsyncWorker(cb)
-    , obj(obj)
-    , arg(std::move(dest))
-  {}
-  ~ObjWriteAsync() {}
-
-protected:
-  void Execute();
-  void OnOK();
-
-private:
-  Obj* obj;
-  string arg;
-  const char* eMessage = nullptr;
-};
-
-class ObjOffsetAsync : public Napi::AsyncWorker
-{
-public:
-  ObjOffsetAsync(Napi::Function& cb, Obj* obj, string arg)
-    : Napi::AsyncWorker(cb)
-    , obj(obj)
-    , arg(std::move(arg))
-  {}
-  ~ObjOffsetAsync() { delete obj; }
-
-protected:
-  void Execute() override;
-  void OnOK() override;
-
-private:
-  Obj* obj;
-  string arg;
-  long value = -1;
-  const char* eMessage = nullptr;
 };
 
 #endif

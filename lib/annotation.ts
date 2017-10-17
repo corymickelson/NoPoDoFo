@@ -1,5 +1,5 @@
-import { IPage } from './page'
-import { IRect } from './rect'
+import { Page } from './page'
+import { Rect } from './rect'
 
 export interface IAnnotation {
     title: string
@@ -107,7 +107,7 @@ export enum NpdfAction {
     RichMediaExecute,
 }
 export type NPdfRgb = [number, number, number]
-export class Annotation implements IAnnotation {
+export class Annotation {
     get quadPoints() {
         throw Error("unimplemented")
     }

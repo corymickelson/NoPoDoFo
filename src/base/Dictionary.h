@@ -39,24 +39,4 @@ private:
   PoDoFo::PdfDictionary dict = PoDoFo::PdfDictionary();
 };
 
-class DictWriteAsync : public Napi::AsyncWorker
-{
-public:
-  DictWriteAsync(Napi::Function& cb, Dictionary* dict, string dest)
-    : Napi::AsyncWorker(cb)
-    , dict(dict)
-    , arg(std::move(dest))
-  {}
-  ~DictWriteAsync() {}
-
-protected:
-  void Execute();
-  void OnOK();
-
-private:
-  Dictionary* dict;
-  string arg;
-  const char* eMessage = nullptr;
-};
-
 #endif

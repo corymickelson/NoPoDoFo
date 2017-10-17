@@ -1,20 +1,20 @@
-import { IObj, Obj } from './object';
-import { IPage, Page } from './page';
-import { IEncrypt, Encrypt, EncryptInitOption } from './encrypt';
+import { Obj } from './object';
+import { Page } from './page';
+import { Encrypt, EncryptInitOption } from './encrypt';
 
 export const __mod = require('../build/Release/npdf.node')
 
 export interface IDocument {
     _instance: any
-    encrypt: IEncrypt
+    encrypt: Encrypt
 
     load(file: string, update?: boolean): void
 
     getPageCount(): number
 
-    getPage(pageN: number): IPage
+    getPage(pageN: number): Page
 
-    getObjects(): Array<IObj>
+    getObjects(): Array<Obj>
 
     mergeDocument(doc: string): void
 
@@ -26,9 +26,9 @@ export interface IDocument {
 
     write(file: string): void
 
-    createEncrypt(option: EncryptInitOption): IEncrypt
+    createEncrypt(option: EncryptInitOption): Encrypt
 
-    getTrailer():IObj
+    getTrailer():Obj
 
     freeObjMem(target:Obj): void
 }
@@ -65,7 +65,7 @@ export class Document implements IDocument {
         throw Error("Can not get password from loaded document")
     }
 
-    set encrypt(instance: IEncrypt) {
+    set encrypt(instance: Encrypt) {
         if (instance.option) this._instance.encrypt = instance.option
         else {
             throw Error("Set document encrypt with an instance of Encrypt with the optional EncryptInitOption defined at construction")
@@ -108,18 +108,18 @@ export class Document implements IDocument {
         return this._instance.getPageCount()
     }
 
-    getPage(pageN: number): IPage {
+    getPage(pageN: number): Page {
         if (pageN > this.pageCount || pageN < 0) {
             throw new RangeError("pageN out of range")
         }
         if (!this._loaded) {
             throw new Error('load a pdf file before calling this method')
         }
-        const page: IPage = this._instance.getPage(pageN)
+        const page: Page = this._instance.getPage(pageN)
         return new Page(page);
     }
 
-    getObjects(): Array<IObj> {
+    getObjects(): Array<Obj> {
         const objects: Array<any> = this._instance.getObjects()
         return objects.map(value => {
             return new Obj(value)
@@ -170,12 +170,12 @@ export class Document implements IDocument {
         this._instance.write(file)
     }
 
-    createEncrypt(option: EncryptInitOption): IEncrypt {
+    createEncrypt(option: EncryptInitOption): Encrypt {
         const encryptInstance = this._instance.createEncrypt(option)
         return new Encrypt(encryptInstance)
     }
 
-    getTrailer(): IObj {
+    getTrailer(): Obj {
         let objInit =  this._instance.getTrailer()
         return new Obj(objInit)
     }

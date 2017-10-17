@@ -1,11 +1,11 @@
-import { IFieldInfo, IField, Field } from './field'
-import { IRect, Rect } from './rect';
-import { IObj, Obj } from './object';
-import { IAnnotation, Annotation, NPdfAnnotationType, NPdfAnnotation } from './annotation';
+import { IFieldInfo, Field } from './field'
+import {  Rect } from './rect';
+import {  Obj } from './object';
+import { Annotation, NPdfAnnotationType, NPdfAnnotation } from './annotation';
 
 export interface IPage {
     rotation: number
-    trimBox: IRect
+    trimBox: Rect
     number: number
     width: number
     height: number
@@ -13,18 +13,18 @@ export interface IPage {
 
     getNumFields(): number
     getFieldsInfo(): Array<IFieldInfo>
-    getField(index: number): IField
-    getFields(): Array<IField>
+    getField(index: number): Field
+    getFields(): Array<Field>
     getFieldIndex(fieldName: string): number
-    getContents(append: boolean): IObj
-    getResources(): IObj
-    getMediaBox(): IRect
-    getBleedBox(): IRect
-    getArtBox(): IRect
+    getContents(append: boolean): Obj
+    getResources(): Obj
+    getMediaBox(): Rect
+    getBleedBox(): Rect
+    getArtBox(): Rect
     getNumAnnots(): number
-    createAnnotation(type: NPdfAnnotation, rect: IRect): IAnnotation
-    getAnnotation(index: number): IAnnotation
-    getAnnotations(): Array<IAnnotation>
+    createAnnotation(type: NPdfAnnotation, rect: Rect): Annotation
+    getAnnotation(index: number): Annotation
+    getAnnotations(): Array<Annotation>
     deleteAnnotation(index: number): void
 }
 
@@ -33,7 +33,7 @@ export class Page implements IPage {
         const trimBoxRect = this._instance.trimBox
         return new Rect([trimBoxRect.left, trimBoxRect.bottom, trimBoxRect.width, trimBoxRect.height])
     }
-    set trimBox(rect: IRect) {
+    set trimBox(rect: Rect) {
         Page.assertRect(rect)
         this._instance.trimBox = rect
     }
@@ -74,24 +74,24 @@ export class Page implements IPage {
 
     constructor(public _instance: any) { }
 
-    getContents(append: boolean): IObj {
+    getContents(append: boolean): Obj {
         const objInstance = this._instance.getContents(append)
         return new Obj(objInstance)
     }
-    getResources(): IObj {
+    getResources(): Obj {
         const objInstance = this._instance.getResources()
         return new Obj(objInstance)
     }
-    getMediaBox(): IRect {
+    getMediaBox(): Rect {
         const mediaBoxPositions = this._instance.getMediaBox()
         const mediaBoxRect = new Rect([mediaBoxPositions.left, mediaBoxPositions.bottom, mediaBoxPositions.width, mediaBoxPositions.height])
         return mediaBoxPositions
     }
-    getBleedBox(): IRect {
+    getBleedBox(): Rect {
         const positions = this._instance.getBleedBox()
         return new Rect([positions.left, positions.bottom, positions.width, positions.height])
     }
-    getArtBox(): IRect {
+    getArtBox(): Rect {
         const positions = this._instance.getArtBox()
         return new Rect([positions.left, positions.bottom, positions.width, positions.height])
     }
@@ -104,10 +104,10 @@ export class Page implements IPage {
     getFieldIndex(fieldName: string): number {
         return this._instance.getFieldIndex(fieldName)
     }
-    getField(index: number): IField {
+    getField(index: number): Field {
         return new Field(this, index)
     }
-    getFields(): Array<IField> {
+    getFields(): Array<Field> {
         const fields = []
         let count = this.getNumFields(),
             i = 0;
@@ -116,11 +116,11 @@ export class Page implements IPage {
         }
         return fields
     }
-    createAnnotation(type: NPdfAnnotation, rect: IRect):IAnnotation {
+    createAnnotation(type: NPdfAnnotation, rect: Rect):Annotation {
         const instance = this._instance.createAnnotation((type as number), rect._instance)
         return new Annotation(instance)
     }
-    getAnnotation(index: number): IAnnotation {
+    getAnnotation(index: number): Annotation {
         const instance = this._instance.getAnnotation(index)
         return new Annotation(instance)
     }
@@ -128,7 +128,7 @@ export class Page implements IPage {
         return this._instance.getNumAnnots()
     }
 
-    getAnnotations(): Array<IAnnotation> {
+    getAnnotations(): Array<Annotation> {
         const count = this.getNumAnnots()
         const output = []
         for (let i = 0; i < count; i++) {
@@ -146,7 +146,7 @@ export class Page implements IPage {
         this._instance.deleteAnnotation(index)
     }
 
-    private static assertRect(rect: IRect) {
+    private static assertRect(rect: Rect) {
         if (rect.bottom === null ||
             rect.height === null ||
             rect.left === null ||
