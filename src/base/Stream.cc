@@ -50,8 +50,9 @@ Napi::Value
 Stream::GetBuffer(const CallbackInfo& info)
 {
   pdf_long bufferLength = stream->GetLength();
-  const uint8_t* alloc = static_cast<uint8_t*>(
-    calloc(sizeof(char), sizeof(char) * static_cast<size_t>(bufferLength)));
+  char* copy = static_cast<char*>(malloc(sizeof(char) * bufferLength));
+  stream->GetFilteredCopy(&copy, &bufferLength);
+  uint8_t* buffer = reinterpret_cast<uint8_t*>(copy);
   return Buffer<uint8_t>::Copy(
-    info.Env(), alloc, static_cast<size_t>(bufferLength));
+    info.Env(), buffer, static_cast<size_t>(bufferLength));
 }

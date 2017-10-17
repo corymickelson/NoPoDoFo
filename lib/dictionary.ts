@@ -55,41 +55,7 @@ export class Dictionary {
         return new Promise((fulfill, reject) => {
             const init: { [key: string]: any } = this._instance.toObject()
             for (let prop in init) {
-                const value = new Obj(init[prop])
-
-                switch (value.type) {
-                    case 'Dictionary': {
-                        break
-                    }
-                    case 'Array': {
-                        const instance = value.asArray()
-                        init[prop] = instance.toArray()
-                        break
-                    }
-                    case 'Reference': {
-                        const instance = value.asReference()
-                        init[prop] = new Ref(instance)
-                        break
-                    }
-                    case 'Name': {
-                        break
-                    }
-                    case 'Number': {
-                        break
-                    }
-                    case 'String': {
-                        break
-                    }
-                    case 'Real': {
-                        break
-                    }
-                    case 'Boolean': {
-                        break
-                    }
-                    case 'RawData': {
-                        break
-                    }
-                }
+                init[prop] = new Obj(init[prop])
             }
         })
 
