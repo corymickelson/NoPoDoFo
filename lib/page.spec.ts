@@ -134,7 +134,7 @@ function pageResources() {
 function pageAddImg() {
     test('add image', t => {
         const painter = new Painter(),
-            img = new Image(doc, '/home/red/test.jpg')
+        img = new Image(doc, join(__dirname, '../test.jpg'))
 
         painter.page = page
         painter.drawImage(img, 0, page.height - img.getHeight())
