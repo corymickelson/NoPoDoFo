@@ -51,8 +51,23 @@ Obj::Obj(const Napi::CallbackInfo& info)
 Napi::Value
 Obj::GetStream(const CallbackInfo& info)
 {
-  auto stream = obj.GetStream();
-  return Value();
+  try {
+    PdfMemStream* pStream = dynamic_cast<PdfMemStream*>(obj.GetStream());
+    //    auto stream = obj.GetStream();
+    auto stream = pStream->Get();
+    auto length = pStream->GetLength();
+    //    char* alloc =
+    //      static_cast<char*>(malloc(sizeof(char) *
+    //      static_cast<size_t>(length)));
+    //    stream->GetCopy(&alloc, &length);
+    auto value = Buffer<char>::Copy(info.Env(), stream, length);
+    //    free(alloc);
+    return value;
+  } catch (PdfError& err) {
+    ErrorHandler(err, info);
+  } catch (Napi::Error& err) {
+    ErrorHandler(err, info);
+  }
 }
 
 Napi::Value
@@ -254,5 +269,6 @@ Obj::GetRawData(const CallbackInfo& info)
   if (!obj.IsRawData()) {
     throw Napi::Error::New(info.Env(), "Obj not accessible as a buffer");
   }
-  throw Error::New(info.Env(), "unimplemented");
+  string data = obj.GetRawData().data();
+  return Buffer<char>::Copy(info.Env(), data.c_str(), data.length());
 }

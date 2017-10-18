@@ -53,6 +53,8 @@ Stream::GetBuffer(const CallbackInfo& info)
   char* copy = static_cast<char*>(malloc(sizeof(char) * bufferLength));
   stream->GetFilteredCopy(&copy, &bufferLength);
   uint8_t* buffer = reinterpret_cast<uint8_t*>(copy);
-  return Buffer<uint8_t>::Copy(
+  auto value = Buffer<uint8_t>::Copy(
     info.Env(), buffer, static_cast<size_t>(bufferLength));
+  free(copy);
+  return value;
 }

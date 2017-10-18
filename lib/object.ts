@@ -126,7 +126,7 @@ export class Obj {
     }
 
     asBuffer(): Buffer {
-        throw Error("unimplmented")
+        return this._instance.getRawData()
     }
 }
 

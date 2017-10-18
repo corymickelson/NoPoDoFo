@@ -156,7 +156,9 @@ function pageAddImg() {
                     (objSubType && objSubType.type === 'Name')) {
 
                     if ((objType && (objType as Obj).asName() === 'XObject' ) || (objSubType && (objSubType as Obj).asName() === 'Image')) {
-                        let imgObj = o.asDictionary().hasKey('Filter') ? o.asDictionary().getKey('Filter') : null
+                        let imgObj = o.asDictionary().hasKey('Filter') ?
+                            o.asDictionary().getKey('Filter') :
+                            null
 
                         if (imgObj && imgObj.type === 'Array') {
                             if (imgObj.asArray().length === 1) {
