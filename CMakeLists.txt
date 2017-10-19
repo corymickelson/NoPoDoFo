@@ -31,8 +31,8 @@ find_library(PODOFO_LIBRARY NAMES podofo PATHS /usr/lib64 /usr/lib /usr/local/li
 target_include_directories(${PROJECT_NAME}
         PRIVATE ${CMAKE_JS_INC}
         PRIVATE ${PODOFO_INCLUDE_DIR}
-        PRIVATE ${CMAKE_SOURCE_DIR}/deps/node-addon-api/src
-        PRIVATE ${CMAKE_SOURCE_DIR}/deps/node-addon-api)
+        PRIVATE ${CMAKE_SOURCE_DIR}/node_modules/node-addon-api/src
+        PRIVATE ${CMAKE_SOURCE_DIR}/node_modules/node-addon-api)
 
 target_link_libraries(${PROJECT_NAME}
         ${CMAKE_JS_LIB}

@@ -24,7 +24,7 @@ Encrypt::Initialize(Napi::Env& env, Napi::Object& target)
                   InstanceMethod("authenticate", &Encrypt::Authenticate) });
   constructor = Persistent(ctor);
   constructor.SuppressDestruct();
-  target.Set("Encrypt", constructor);
+  target.Set("Encrypt", ctor);
 }
 
 Napi::Value

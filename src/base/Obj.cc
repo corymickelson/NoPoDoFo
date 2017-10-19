@@ -36,7 +36,7 @@ Obj::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceMethod("getRawData", &Obj::GetRawData) });
   constructor = Napi::Persistent(ctor);
   constructor.SuppressDestruct();
-  target.Set("Obj", constructor);
+  target.Set("Obj", ctor);
 }
 
 Obj::Obj(const Napi::CallbackInfo& info)
