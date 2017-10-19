@@ -7,6 +7,7 @@ NPdf, a native node module for reading, parsing, modifying, and creating pdf doc
 
 # New Features!
  - Get / Set Form Fields
+ - Access to Pdf data types (PdfObject, PdfArray, etc..., allows for things such as extracting images from a document [example](https://github.com/corymickelson/npdf/blob/master/lib/page.spec.ts#L145-L190))
 
 ## In Progress:
  - Add Images
