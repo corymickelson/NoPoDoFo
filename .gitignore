@@ -20,3 +20,4 @@ generators/
 *.user
 *.user.*
 dist/*
+*.out.pdf

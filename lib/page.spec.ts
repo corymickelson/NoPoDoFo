@@ -1,13 +1,11 @@
-import {existsSync, unlink, unlinkSync} from 'fs'
+import {existsSync, unlink, unlinkSync, writeFile} from 'fs'
 import {join} from 'path'
 import * as test from 'tape'
-import {Document} from '../lib/document'
-import {Rect} from "../lib/rect";
-import {NPdfAnnotation, IAnnotation, Annotation} from "../lib/annotation";
-import {Obj} from "../lib/object";
-import {Field} from '../lib/field';
-import {Painter} from "../lib/painter";
-import {Image} from "../lib/image";
+import {Document} from './document'
+import {Obj} from "./object";
+import {Field} from './field';
+import {Painter} from "./painter";
+import {Image} from "./image";
 
 
 const filePath = join(__dirname, '../test.pdf'),
@@ -185,7 +183,10 @@ function pageAddImg() {
 
         function extractImg(obj: Obj, jpg: Boolean) {
             let ext = jpg ? '.jpg' : '.ppm'
-            t.end()
+            writeFile(`/tmp/npdf_img_test${ext}`, obj.stream, err => {
+                if(err) t.fail('failed to extract img')
+                else t.end()
+            })
         }
 
         t.fail('should have been able to find the DCTDecode object')

@@ -11,7 +11,7 @@ class Arr : public Napi::ObjectWrap<Arr>
 {
 public:
   explicit Arr(const Napi::CallbackInfo&);
-  ~Arr() {}
+  ~Arr() { delete arr; }
   static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
 
@@ -26,7 +26,7 @@ public:
   void Push(const Napi::CallbackInfo&);
 
 private:
-  PoDoFo::PdfArray arr = *new PoDoFo::PdfArray();
+  PoDoFo::PdfArray* arr;
 };
 
 #endif
