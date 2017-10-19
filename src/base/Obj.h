@@ -16,7 +16,7 @@ class Obj : public Napi::ObjectWrap<Obj>
 {
 public:
   explicit Obj(const Napi::CallbackInfo&);
-  ~Obj() {}
+  ~Obj() { delete obj; }
   static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
   Napi::Value GetStream(const Napi::CallbackInfo&);
@@ -24,8 +24,6 @@ public:
   Napi::Value GetObjectLength(const Napi::CallbackInfo&);
   Napi::Value GetDataType(const Napi::CallbackInfo&);
   Napi::Value GetByteOffset(const Napi::CallbackInfo&);
-  Napi::Value GetOwner(const Napi::CallbackInfo&);
-  void SetOwner(const Napi::CallbackInfo&, const Napi::Value&);
   Napi::Value Write(const Napi::CallbackInfo&);
   Napi::Value Reference(const Napi::CallbackInfo&);
   void FlateCompressStream(const Napi::CallbackInfo&);
@@ -39,10 +37,11 @@ public:
   Napi::Value GetReference(const Napi::CallbackInfo&);
   Napi::Value GetRawData(const Napi::CallbackInfo&);
 
-  const PoDoFo::PdfObject GetObject() { return obj; }
+  const PoDoFo::PdfObject GetObject() { return *obj; }
 
 private:
-  PoDoFo::PdfObject obj = *new PoDoFo::PdfObject();
+//  PoDoFo::PdfObject obj = *new PoDoFo::PdfObject();
+  PoDoFo::PdfObject* obj;
 };
 
 #endif

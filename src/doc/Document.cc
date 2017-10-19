@@ -312,13 +312,21 @@ Napi::Value
 Document::GetObjects(const CallbackInfo& info)
 {
   auto js = Napi::Array::New(info.Env());
-  auto objs = document->GetObjects();
-  for (size_t i = 0; i < objs.GetSize(); i++) {
-    auto obj = objs[i];
-    auto nObj = Napi::External<PdfObject>::New(info.Env(), obj);
-    auto objInstance = Obj::constructor.New({ nObj });
-    js.Set(Napi::Number::New(info.Env(), static_cast<int>(i)), objInstance);
+  auto it = document->GetObjects().begin();
+  int count = 0;
+  while (it != document->GetObjects().end()) {
+    auto instance = External<PdfObject>::New(info.Env(), (*it));
+    js.Set(Number::New(info.Env(), count), Obj::constructor.New({ instance }));
+    ++it;
+    ++count;
   }
+  //  auto objs = document->GetObjects();
+  //  for (size_t i = 0; i < objs.GetSize(); i++) {
+  //    auto obj = objs[i];
+  //    auto nObj = Napi::External<PdfObject>::New(info.Env(), obj);
+  //    auto objInstance = Obj::constructor.New({ nObj });
+  //    js.Set(Napi::Number::New(info.Env(), static_cast<int>(i)), objInstance);
+  //  }
   return js;
 }
 
