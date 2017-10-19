@@ -51,7 +51,7 @@ Page::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceMethod("deleteAnnotation", &Page::DeleteAnnotation) });
   constructor = Napi::Persistent(ctor);
   constructor.SuppressDestruct();
-  target.Set("Page", constructor);
+  target.Set("Page", ctor);
 }
 Napi::Value
 Page::GetRotation(const CallbackInfo& info)

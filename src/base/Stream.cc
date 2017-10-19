@@ -28,7 +28,7 @@ Stream::Initialize(Napi::Env& env, Napi::Object& target)
                   InstanceMethod("getBuffer", &Stream::GetBuffer) });
   constructor = Napi::Persistent(ctor);
   constructor.SuppressDestruct();
-  target.Set("Stream", constructor);
+  target.Set("Stream", ctor);
 }
 
 void

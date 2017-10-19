@@ -35,7 +35,7 @@ Arr::Initialize(Napi::Env& env, Napi::Object& target)
                   InstanceMethod("push", &Arr::Push) });
   constructor = Persistent(ctor);
   constructor.SuppressDestruct();
-  target.Set("Arr", constructor);
+  target.Set("Arr", ctor);
 }
 Napi::Value
 Arr::Length(const Napi::CallbackInfo& info)

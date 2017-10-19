@@ -43,6 +43,7 @@
   },
   "dependencies": {
     "bindings": "^1.3.0",
-    "cmake-js": "^3.5.0"
+    "cmake-js": "^3.5.0",
+    "node-addon-api": "github:rolftimmermans/node-addon-api#master"
   }
 }

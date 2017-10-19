@@ -30,7 +30,7 @@ Ref::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceMethod("isIndirect", &Ref::IsIndirect) });
   constructor = Napi::Persistent(ctor);
   constructor.SuppressDestruct();
-  target.Set("Ref", constructor);
+  target.Set("Ref", ctor);
 }
 void
 Ref::SetGenerationNumber(const Napi::CallbackInfo& info,
