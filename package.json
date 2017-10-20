@@ -10,7 +10,7 @@
     "postinstall": "npm run compile && npm run lib-build",
     "lib-build": "tsc --p tsconfig.json",
     "docs": "typedoc --mode modules --module commonjs --target es6 --out ./docs",
-    "test": "npm run test:document && npm run test:page && npm run test:field",
+    "test": "npm run test:document && npm run test:page && npm run test:field && npm run test:object",
     "test:document": "node --expose-gc ./dist/document.spec.js",
     "test:page": "node --expose-gc ./dist/page.spec.js",
     "test:field": "node --expose-gc ./dist/field.spec.js",
@@ -29,16 +29,11 @@
   },
   "license": "ISC",
   "devDependencies": {
-    "@types/benchmark": "^1.0.30",
     "@types/node": "^8.0.41",
     "@types/tape": "^4.2.30",
-    "benchmark": "^2.1.4",
     "husky": "^0.14.3",
-    "microtime": "^2.1.6",
-    "platform.js": "^1.0.0",
     "tap-spec": "^4.1.1",
     "tape": "^4.8.0",
-    "typedoc": "^0.8.0",
     "typescript": "~2.5.3"
   },
   "dependencies": {
