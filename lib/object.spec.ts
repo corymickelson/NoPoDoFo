@@ -12,18 +12,27 @@ const filePath = join(__dirname, '../test.pdf'),
     doc = new Document(filePath),
     objs = doc.getObjects()
 
-function objectInstance() {
-    // ok(objs[0] instanceof Obj, 'Objects array, instance of nopodofo.Obj')
-    test('document objects instance of nopodofo.Obj', t => {
-        t.assert(objs[0] instanceof Obj, 'Objects array, instance of nopodofo.Obj')
-        t.end()
-    })
-}
+// function objectInstance() {
+// ok(objs[0] instanceof Obj, 'Objects array, instance of nopodofo.Obj')
+test('document objects instance of nopodofo.Obj', t => {
+    t.assert(objs[0] instanceof Obj, 'Objects array, instance of nopodofo.Obj')
+    t.end()
+})
+// }
 
+// function objToObject() {
+test('npdf.Obj to Object', t => {
+    let nObj = objs[1].asDictionary(),
+        jsObj = nObj.toObject()
+    for (let key in jsObj) {
+        t.assert(jsObj[key] instanceof Obj)
+    }
+    t.end()
+})
+// }
 // function objectType() {
 // ok(failures.length === 0, 'all object types defined')
 test('object type defined', t => {
-
     let failures = objs.some(i => !i.type)
     t.assert(!failures, 'all object types defined')
     t.end()
@@ -40,7 +49,8 @@ test('object streams available', t => {
 // }
 
 // function objectRefDeref() {
-test.skip('object ref, deref Ref to object', t => {
+test('object ref, deref Ref to object', t => {
+    let found = false;
     for (let i = 0; i < objs.length; i++) {
         if (objs[i].type === 'Dictionary') {
             let dictObj = objs[i].asDictionary().toObject()
@@ -50,9 +60,12 @@ test.skip('object ref, deref Ref to object', t => {
                 let refObj = ref.deref()
                 t.assert(refObj instanceof Obj)
                 t.end()
+                found = true
+                break
             }
         }
     }
+    if(!found) t.fail()
 })
 // }
 

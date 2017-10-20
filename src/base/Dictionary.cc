@@ -212,7 +212,8 @@ Dictionary::ToObject(const CallbackInfo& info)
     map<PoDoFo::PdfName, PoDoFo::PdfObject*>::const_iterator it;
     for (it = keys.begin(); it != keys.end(); it++) {
       auto key = String::New(info.Env(), (*it).first.GetName());
-      auto value = External<PdfObject>::New(info.Env(), (*it).second);
+      auto ptr = External<PdfObject>::New(info.Env(), (*it).second);
+      auto value = Obj::constructor.New({ ptr });
       js.Set(key, value);
     }
     return js;

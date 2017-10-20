@@ -235,8 +235,8 @@ Obj::GetBool(const CallbackInfo& info)
 Napi::Value
 Obj::GetReference(const CallbackInfo& info)
 {
-  if (!obj->IsNumber()) {
-    throw Napi::Error::New(info.Env(), "Obj only accessible as a Ref");
+  if(!obj->IsReference()) {
+    throw Napi::Error::New(info.Env(), "Obj only accessible as Ref");
   }
   auto init = obj->GetReference();
   auto ptr = External<PdfReference>::New(info.Env(), &init);
