@@ -50,15 +50,9 @@ Obj::GetStream(const CallbackInfo& info)
 {
   try {
     auto * pStream = dynamic_cast<PdfMemStream*>(obj->GetStream());
-    //    auto stream = obj->GetStream();
     auto stream = pStream->Get();
     auto length = pStream->GetLength();
-    //    char* alloc =
-    //      static_cast<char*>(malloc(sizeof(char) *
-    //      static_cast<size_t>(length)));
-    //    stream->GetCopy(&alloc, &length);
     auto value = Buffer<char>::Copy(info.Env(), stream, length);
-    //    free(alloc);
     return value;
   } catch (PdfError& err) {
     ErrorHandler(err, info);

@@ -21,6 +21,7 @@ public:
   ErrorHandler(Napi::Error&, const Napi::CallbackInfo&);
   ~ErrorHandler();
   static string WriteMsg(PoDoFo::PdfError&);
+  static string WriteMsg(Napi::Error&);
 
 private:
   static string ParseMsgFromPdfError(PoDoFo::PdfError&);

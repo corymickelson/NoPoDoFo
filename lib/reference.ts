@@ -37,7 +37,7 @@ export class Ref {
         return this._instance.toString()
     }
 
-    getNObj(): Obj {
+    deref(): Obj {
         return new Obj(this._instance.getObject())
     }
 

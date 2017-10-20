@@ -141,7 +141,6 @@ function pageAddImg() {
             unlinkSync('./img.out.pdf')
         doc.write('./img.out.pdf')
 
-        // todo: finish extracting img, requires stream wrapper completion
         let objs = doc.getObjects()
         for (let i = 0; i < objs.length; i++) {
             let o = objs[i]

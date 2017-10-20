@@ -35,6 +35,14 @@ ErrorHandler::WriteMsg(PoDoFo::PdfError& err)
 }
 
 string
+ErrorHandler::WriteMsg(Napi::Error &err)
+{
+  stringstream msg;
+  msg << "JS error: " << err.Message() << endl;
+  return msg.str();
+}
+
+string
 ErrorHandler::ParseMsgFromPdfError(PoDoFo::PdfError& err)
 {
   string text;

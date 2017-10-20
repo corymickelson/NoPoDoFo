@@ -1,7 +1,7 @@
-import {__mod} from './document'
-import { Obj} from "./object";
-import {Ref} from "./reference";
-import {Arr} from "./arr";
+import { __mod } from './document'
+import { Obj } from "./object";
+import { Ref } from "./reference";
+import { Arr } from "./arr";
 
 export type CoerceKeyType = 'boolean' | 'long' | 'name' | 'real'
 
@@ -51,14 +51,13 @@ export class Dictionary {
      * back to the underlying pdf object
      * @returns Object
      */
-    toObject(): Promise<{ [key: string]: Obj }> {
-        return new Promise((fulfill, reject) => {
-            const init: { [key: string]: any } = this._instance.toObject()
-            for (let prop in init) {
-                init[prop] = new Obj(init[prop])
-            }
-        })
-
+    toObject(): { [key: string]: Obj } {
+        const init: { [key: string]: any } = this._instance.toObject(),
+            js:any= {}
+        for (let prop in init) {
+            js[prop] = new Obj(init[prop])
+        }
+        return js
     }
 
     _instance: any
