@@ -1,4 +1,4 @@
-import { Obj } from "./object";
+import { Obj } from "./object"
 
 /**
  * @class Arr wraps PdfArray
@@ -15,8 +15,25 @@ export class Arr {
         return this._instance.length
     }
 
-    set length(value: number) {
-        throw Error("Can not set length")
+    static initialize(instance: any) {
+        const nArr = new Arr(instance)
+        nArr._array = nArr.toArray()
+        const nProxy = new Proxy(nArr, {
+            get(target, prop) {
+                return target._array[prop as number]
+            },
+            set(target, prop, value):boolean {
+                let success = true
+                if(value instanceof Obj === false) {
+                    success = false
+                    throw Error('pdf array can only contain an instance of Obj')
+                }
+                target._array[prop as number] = value
+                nArr.push(value)
+                return success
+            }
+        })
+        return nArr
     }
 
     constructor(public _instance: any) { }
@@ -30,23 +47,7 @@ export class Arr {
     toArray(): Array<Obj> {
         const init: Array<any> = this._instance.toArray()
         this._array = init.map(i => new Obj(i))
-
-        const proxy = new Proxy(this, {
-            get(target, prop) {
-                if (prop instanceof Number || typeof prop === 'number') {
-                    if (prop > -1 && prop < target._array.length)
-                        return target._array[prop]
-                }
-                else return target._array
-            },
-            set(target, prop, value) {
-                let success = false
-                target.push(value)
-                target._array.push(value)
-                return success
-            }
-        })
-        return proxy._array
+        return this._array
     }
 
     push(value: Obj): void {

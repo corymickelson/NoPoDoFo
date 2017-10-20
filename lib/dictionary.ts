@@ -1,5 +1,5 @@
 import {__mod} from './document'
-import { Obj} from "./object";
+import { Obj} from "./object"
 import {Ref} from "./reference";
 import {Arr} from "./arr";
 
