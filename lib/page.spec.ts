@@ -1,11 +1,13 @@
-import {existsSync, unlink, unlinkSync, writeFile} from 'fs'
-import {join} from 'path'
+import { existsSync, unlink, unlinkSync, writeFile } from 'fs'
+import { join } from 'path'
 import * as test from 'tape'
-import {Document} from './document'
-import {Obj} from "./object";
-import {Field} from './field';
-import {Painter} from "./painter";
-import {Image} from "./image";
+import { Document } from '../lib/document'
+import { Rect } from "../lib/rect";
+import { NPdfAnnotation, IAnnotation, Annotation } from "../lib/annotation";
+import { Obj } from "../lib/object";
+import { Field } from '../lib/field';
+import { Painter } from "../lib/painter";
+import { Image } from "../lib/image";
 
 
 const filePath = join(__dirname, '../test.pdf'),
@@ -132,7 +134,7 @@ function pageResources() {
 function pageAddImg() {
     test('add image', t => {
         const painter = new Painter(),
-        img = new Image(doc, join(__dirname, '../test.jpg'))
+            img = new Image(doc, '/home/red/test.jpg')
 
         painter.page = page
         painter.drawImage(img, 0, page.height - img.getHeight())
@@ -152,10 +154,8 @@ function pageAddImg() {
                 if ((objType && objType.type === 'Name') ||
                     (objSubType && objSubType.type === 'Name')) {
 
-                    if ((objType && (objType as Obj).asName() === 'XObject' ) || (objSubType && (objSubType as Obj).asName() === 'Image')) {
-                        let imgObj = o.asDictionary().hasKey('Filter') ?
-                            o.asDictionary().getKey('Filter') :
-                            null
+                    if ((objType && (objType as Obj).asName() === 'XObject') || (objSubType && (objSubType as Obj).asName() === 'Image')) {
+                        let imgObj = o.asDictionary().hasKey('Filter') ? o.asDictionary().getKey('Filter') : null
 
                         if (imgObj && imgObj.type === 'Array') {
                             if (imgObj.asArray().length === 1) {
@@ -182,13 +182,13 @@ function pageAddImg() {
 
         function extractImg(obj: Obj, jpg: Boolean) {
             let ext = jpg ? '.jpg' : '.ppm'
-            writeFile(`/tmp/npdf_img_test${ext}`, obj.stream, err => {
-                if(err) t.fail('failed to extract img')
-                else t.end()
+            writeFile(`/tmp/test.img.extract.${ext}`, obj.stream, err => {
+                if (err instanceof Error)
+                    t.fail()
+                t.assert(existsSync(`/tmp/test.img.extract.${ext}`) === true)
+                t.end()
             })
         }
-
-        t.fail('should have been able to find the DCTDecode object')
     })
 }
 

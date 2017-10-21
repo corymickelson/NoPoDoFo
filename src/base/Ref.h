@@ -12,7 +12,7 @@ class Ref : public Napi::ObjectWrap<Ref>
 {
 public:
   explicit Ref(const Napi::CallbackInfo&);
-  ~Ref() {}
+  ~Ref() { delete ref; }
   static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
 
@@ -26,10 +26,10 @@ public:
   Napi::Value IsIndirect(const Napi::CallbackInfo&);
 
   Napi::Value GetObj(const Napi::CallbackInfo&);
-  PoDoFo::PdfReference GetRef() { return ref; }
+  PoDoFo::PdfReference GetRef() { return *ref; }
 
 private:
-  PoDoFo::PdfReference ref = *new PoDoFo::PdfReference();
+  PoDoFo::PdfReference* ref;
 };
 
 #endif

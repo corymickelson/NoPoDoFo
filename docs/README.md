@@ -1,4 +1,4 @@
-# N_Pdf
+# NoPoDoFo <small>Node-Portable-Document-Format</small>
 
 
 nopodofo, a native node module for reading, parsing, modifying, and creating pdf documents with [PoDoFo](http://podofo.sourceforge.net/index.html).
@@ -38,40 +38,12 @@ To install nopodofo run
  - Add build dependencies to project repo
  - Add older Node.js version (v4.x, v6.x) support
 
-### Usage
 
-TypeDocs available [here](https://corymickelson.github.io/nopodofo/index.html)
-
-
-Getting started
-``` javascript
-import {...} from 'nopodofo'
-```
-nopodofo includes a definition file for developer happiness. If your editor does not detect the type file import `dist/index.d.ts` into your editor of choice.
-
-For Webstorm go to settings > language & frameworks > javascript > libraries and add and select the definitions file.
-
-### Document
-
-nopodofo wraps [PoDoFo::PdfMemDocument](http://podofo.sourceforge.net/doc/html/classPoDoFo_1_1PdfMemDocument.html#ae72a4141ed85e8abda6a368b220854fa) class as Document. 
-Document is the core class for reading and modifying existing pdf documents. 
-
-Loading a document
-``` javascript
-import {Document} from 'nopodofo'
-const pdf:Document
-try {
-    pdf = new Document('/path/to/pdf') // if invalid password is thrown set password
-} catch(e) {
-    if(e.message === 'Password required to modify this document') {
-        pdf.password = 'secret'
-    }
-}
-```
-
-At this point the document has been loaded into memory and we can now make modifications to the document and write back to disk.
-
-### Page
+### [Document](https://corymickelson.github.io/nopodofo/index.html/#/document)
+### [Page](https://corymickelson.github.io/nopodofo/index.html/#/page)
+### [Form](https://corymickelson.github.io/nopodofo/index.html/#/form)
+### [Annotation](https://corymickelson.github.io/nopodofo/index.html/#/annotation)
+### [Values](https://corymickelson.github.io/nopodofo/index.html/#/values)
 
 To start let's get a page, and rotate it 90 degrees and then save back to disk. 
 
