@@ -1,14 +1,7 @@
-<<<<<<< HEAD
-import { __mod } from './document'
-import { Obj } from "./object";
-import { Ref } from "./reference";
-import { Arr } from "./arr";
-=======
 import {__mod} from './document'
 import { Obj} from "./object"
 import {Ref} from "./reference";
 import {Arr} from "./arr";
->>>>>>> docs
 
 export type CoerceKeyType = 'boolean' | 'long' | 'name' | 'real'
 

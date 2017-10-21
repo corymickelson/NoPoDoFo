@@ -6,7 +6,6 @@
 #define NPDF_IMAGE_H
 
 #include "Document.h"
-#include <boost/filesystem.hpp>
 #include <napi.h>
 #include <podofo/podofo.h>
 

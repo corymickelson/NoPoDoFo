@@ -1,13 +1,13 @@
 import { existsSync, unlink, unlinkSync, writeFile } from 'fs'
 import { join } from 'path'
 import * as test from 'tape'
-import { Document } from '../lib/document'
-import { Rect } from "../lib/rect";
-import { NPdfAnnotation, IAnnotation, Annotation } from "../lib/annotation";
-import { Obj } from "../lib/object";
-import { Field } from '../lib/field';
-import { Painter } from "../lib/painter";
-import { Image } from "../lib/image";
+import { Document } from './document'
+import { Rect } from "./rect";
+import { NPdfAnnotation, IAnnotation, Annotation } from "./annotation";
+import { Obj } from "./object";
+import { Field } from './field';
+import { Painter } from "./painter";
+import { Image } from "./image";
 
 
 const filePath = join(__dirname, '../test.pdf'),

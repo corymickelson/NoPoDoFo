@@ -21,3 +21,5 @@ generators/
 *.user.*
 dist/*
 *.out.pdf
+lib/*.js
+boost-cmake/*

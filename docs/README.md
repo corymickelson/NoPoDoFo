@@ -39,42 +39,5 @@ To install nopodofo run
  - Add older Node.js version (v4.x, v6.x) support
 
 
-### [Document](https://corymickelson.github.io/nopodofo/index.html/#/document)
-### [Page](https://corymickelson.github.io/nopodofo/index.html/#/page)
-### [Form](https://corymickelson.github.io/nopodofo/index.html/#/form)
-### [Annotation](https://corymickelson.github.io/nopodofo/index.html/#/annotation)
-### [Values](https://corymickelson.github.io/nopodofo/index.html/#/values)
-
-To start let's get a page, and rotate it 90 degrees and then save back to disk. 
-
-Note: The page definition is defined as an interface, not a concrete class.
-
-``` javascript
-import {Document, IPage} from 'nopodofo'
-const pdf = new Document('/path/to/pdf')
-/** Pages are zero indexed */
-const pageCount = doc.getPageCount()
-for(let i = 0; i < pageCount; i++) {
-    let page:IPage = doc.getPage(i)
-    page.setRotation(90) // value must be increment of 90 (valid:0,90,180, 270)
-}
-doc.write('/destination')
-```
-
-And that's all, we've loaded a pdf, iterated through it's pages setting the rotate value to 90 and then written the modified file back to disk.
-
-Check a page for fields
-``` javascript
-import {Document, IPage} from 'nopodofo'
-const pdf = new Document('/path/to/pdf')
-const pageCount = doc.getPageCount()
-for(let i = 0; i < pageCount; i++) {
-    let page:IPage = doc.getPage(i)
-    let fieldCount = page.getNumFields()
-    if(fieldCount > 0) {
-        let fieldsSummary:Array<IFieldInfo> = page.getFields()
-    }
-}
-```
-
-PoDoFo Install Instructions:
+### [Documentation]()
+#### [TypeDocs]()

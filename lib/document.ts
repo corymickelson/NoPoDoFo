@@ -1,3 +1,4 @@
+import {exists, existsSync} from 'fs'
 import { Obj } from './object';
 import { Page } from './page';
 import { Encrypt, EncryptInitOption } from './encrypt';
@@ -85,6 +86,8 @@ export class Document implements IDocument {
     constructor(file: string, update: boolean = false) {
         this._instance = new __mod.Document()
         if (file) {
+            if(!existsSync(file))
+                throw new Error('file not found')
             this._instance.load(file, update)
             this._pageCount = this._instance.getPageCount()
             this._loaded = true

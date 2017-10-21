@@ -9,7 +9,6 @@
 #include "Encrypt.h"
 #include "Page.h"
 
-using namespace boost;
 using namespace Napi;
 using namespace std;
 using namespace PoDoFo;
@@ -52,12 +51,6 @@ Document::Load(const CallbackInfo& info)
   bool forUpdate = false;
   if (info.Length() == 2) {
     forUpdate = info[1].As<Boolean>();
-  }
-  if (!filesystem::exists(filePath)) {
-    stringstream ss;
-    ss << "File: " << filePath << " not found. Try using absolute path instead "
-       << endl;
-    throw Napi::Error::New(info.Env(), ss.str());
   }
   originPdf = filePath;
   try {
@@ -205,12 +198,6 @@ Document::MergeDocument(const CallbackInfo& info)
   AssertFunctionArgs(info, 1, { napi_valuetype::napi_string });
   string docPath = info[0].As<String>().Utf8Value();
   PdfMemDocument mergedDoc;
-  if (filesystem::exists(docPath) == false) {
-    stringstream msg;
-    msg << "File: " << docPath << " not found" << endl;
-    throw Napi::Error::New(info.Env(), msg.str());
-  }
-
   try {
     mergedDoc.Load(docPath.c_str());
   } catch (PdfError& err) {

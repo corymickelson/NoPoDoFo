@@ -6,11 +6,9 @@
 #include "../ErrorHandler.h"
 #include "../ValidateArguments.h"
 #include "Obj.h"
-#include <boost/filesystem.hpp>
 
 using namespace Napi;
 using namespace PoDoFo;
-using namespace boost;
 
 Dictionary::Dictionary(const CallbackInfo& info)
   : ObjectWrap<Dictionary>(info)
@@ -171,9 +169,6 @@ Dictionary::Write(const CallbackInfo& info)
     AssertFunctionArgs(
       info, 1, { napi_valuetype::napi_string });
     string output = info[0].As<String>().Utf8Value();
-    if (filesystem::exists(output)) {
-      filesystem::remove(output);
-    }
     PdfOutputDevice device(output.c_str());
     dict.Write(&device, ePdfWriteMode_Default);
     resolver.Resolve(String::New(info.Env(), output));
@@ -191,9 +186,6 @@ Dictionary::WriteSync(const CallbackInfo& info)
   AssertFunctionArgs(info, 1, { napi_valuetype::napi_string });
   try {
     string output = info[0].As<String>().Utf8Value();
-    if (filesystem::exists(output)) {
-      filesystem::remove(output);
-    }
     PdfOutputDevice device(output.c_str());
     dict.Write(&device, ePdfWriteMode_Default);
   } catch (PdfError& err) {

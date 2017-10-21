@@ -5,7 +5,6 @@
 #ifndef NPDF_DOCUMENT_H
 #define NPDF_DOCUMENT_H
 
-#include <boost/filesystem.hpp>
 #include <napi.h>
 #include <podofo/podofo.h>
 

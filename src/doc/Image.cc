@@ -7,7 +7,6 @@
 
 using namespace Napi;
 using namespace PoDoFo;
-using namespace boost;
 
 Image::Image(const CallbackInfo& info)
   : ObjectWrap(info)
@@ -24,11 +23,6 @@ Image::Image(const CallbackInfo& info)
     img = new PdfImage(doc);
     if (info.Length() == 2 && info[1].IsString()) {
       string imgFile = info[1].As<String>().Utf8Value();
-      if (!filesystem::exists(imgFile)) {
-        stringstream msg;
-        msg << "File: " << imgFile << " not found." << endl;
-        throw Napi::Error::New(info.Env(), msg.str());
-      }
       img->LoadFromFile(imgFile.c_str());
       loaded = true;
     }
@@ -65,11 +59,6 @@ Image::LoadFromFile(const CallbackInfo& info)
   try {
     if (info[0].IsString()) {
       string file = info[0].As<String>().Utf8Value();
-      if (!filesystem::exists(file)) {
-        stringstream msg;
-        msg << "File: " << file << " not found." << endl;
-        throw Napi::Error::New(info.Env(), msg.str());
-      }
       img->LoadFromFile(file.c_str());
       loaded = true;
     } else {

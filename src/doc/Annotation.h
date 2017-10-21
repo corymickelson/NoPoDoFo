@@ -54,7 +54,6 @@ public:
     constructor = Persistent(ctor);
     constructor.SuppressDestruct();
     target.Set("Annotation", ctor);
-//    target.Set("Annotation", ctor);
   }
   Napi::Value HasAppearanceStream(const CallbackInfo&);
   void SetFlags(const CallbackInfo&, const Napi::Value&);
