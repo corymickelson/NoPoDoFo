@@ -100,21 +100,26 @@ Document::GetPage(const CallbackInfo& info)
 Napi::Value
 Document::Write(const CallbackInfo& info)
 {
-  if (info.Length() == 1 && info[0].IsString()) {
-    string destinationFile = info[0].As<String>().Utf8Value();
-    PdfOutputDevice device(destinationFile.c_str());
-    document->Write(&device);
-    return Napi::String::New(info.Env(), destinationFile);
-  } else if (info.Length() == 0) {
-    throw Napi::Error::New(info.Env(),
-                           "Writing to node buffer not currently supported :(");
-  } else {
-    throw Napi::Error::New(
-      info.Env(),
-      "Invalid argument. Write(arg:string) will write the the file path"
-      "defined by arg. Write() will return a Buffer containing the "
-      "document.");
+  auto resolver = Promise::Resolver::New(info.Env());
+  try {
+    if (info.Length() == 1 && info[0].IsString()) {
+      string destinationFile = info[0].As<String>().Utf8Value();
+      PdfOutputDevice device(destinationFile.c_str());
+      document->Write(&device);
+      resolver.Resolve(Napi::String::New(info.Env(), destinationFile));
+    } else if (info.Length() == 0) {
+      PdfRefCountedBuffer docBuffer;
+      PdfOutputDevice device(&docBuffer);
+      document->Write(&device);
+      resolver.Resolve(Buffer<char>::Copy(
+        info.Env(), docBuffer.GetBuffer(), docBuffer.GetSize()));
+    }
+  } catch (PdfError& err) {
+    resolver.Reject(String::New(info.Env(), ErrorHandler::WriteMsg(err)));
+  } catch (Napi::Error& err) {
+    resolver.Reject(String::New(info.Env(), ErrorHandler::WriteMsg(err)));
   }
+  return resolver.Promise();
 }
 
 void

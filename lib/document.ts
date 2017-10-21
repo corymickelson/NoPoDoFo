@@ -25,7 +25,7 @@ export interface IDocument {
 
     isLinearized(): boolean
 
-    write(file: string): void
+    write(file?: string): Promise<string|Buffer>
 
     createEncrypt(option: EncryptInitOption): Encrypt
 
@@ -160,11 +160,22 @@ export class Document implements IDocument {
     }
 
 
-    write(file: string): void {
+    /**
+     * Persist changes and write to disk or if no arguments provided returns Buffer
+     * @param {string} [file] - optional, if provided, will try to write to file
+     */
+    write(file?: string): Promise<string|Buffer> {
         if (!this._loaded) {
             throw new Error('load a pdf file before calling this method')
         }
-        this._instance.write(file)
+        if(file) {
+            if(existsSync(file))
+                console.warn(`File at ${file} will be overwritten`)
+            return this._instance.write(file) as Promise<string>
+        } else {
+            console.warn('persisting pdf file changes to buffer')
+            return this._instance.write() as Promise<Buffer>
+        }
     }
 
     createEncrypt(option: EncryptInitOption): Encrypt {

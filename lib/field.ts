@@ -18,7 +18,7 @@ export interface IFieldInfo {
     selected?: string
 }
 
-export type FieldType = 'TextField' | 'CheckBox' | 'ListBox' | 'RadioButton' | 'ComboBox' | 'PushButton' | 'Signature'
+export type FieldType = 'TextField' | 'CheckBox' | 'RadioButton' | 'PushButton' | 'Signature' | 'ListField'
 export class Field  {
     _instance: any
     constructor(page: IPage, fieldIndex: number) {
@@ -26,7 +26,9 @@ export class Field  {
     }
 
     getType(): FieldType {
-        return this._instance.getType()
+        const type = this._instance.getType()
+        return type === 'ComboBox' || type === 'ListBox' ? // Combobox and Listbox both implement ListField
+            'ListField': type
     }
 
     getFieldName(): string {
@@ -106,8 +108,8 @@ export class ListField {
         return this._instance.length
     }
     constructor(field: Field) {
-        if(field.getType() !== 'ListBox') {
-            throw Error('must be of type ListBox')
+        if(field.getType() !== 'ListField') {
+            throw Error('must be of type ListField')
         }
         this._instance = new __mod.ListBox(field._instance)
     }

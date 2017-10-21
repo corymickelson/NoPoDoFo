@@ -62,19 +62,20 @@ function userPassword() {
             secureDoc = join(__dirname, '../secure.pdf')
         doc.encrypt = new Encrypt(null, encryptionOption)
         doc.write(secureDoc)
+            .then(_ => {
+                let sDoc: Document = new Document(secureDoc),
+                    trailer: Obj = sDoc.getTrailer()
+                let trailerDict = new Dictionary(trailer)
+                if (!doc.encrypt) {
+                    t.fail()
+                }
+                const fillAndSign = doc.encrypt.isAllowed('FillAndSign'),
+                    edit = doc.encrypt.isAllowed('Edit')
 
-        let sDoc: Document = new Document(secureDoc),
-            trailer: Obj = sDoc.getTrailer()
-        let trailerDict = new Dictionary(trailer)
-        if (!doc.encrypt) {
-            t.fail()
-        }
-        const fillAndSign = doc.encrypt.isAllowed('FillAndSign'),
-            edit = doc.encrypt.isAllowed('Edit')
-
-        t.assert(trailerDict.hasKey("Encrypt") === true, 'trailer has an encryption object')
-        t.end()
-    })
+                t.assert(trailerDict.hasKey("Encrypt") === true, 'trailer has an encryption object')
+                t.end()
+            })
+   })
 }
 
 function pageCount() {
@@ -94,12 +95,14 @@ function deletePage() {
 
         doc.deletePage(pc - 1)
         doc.write(outFile)
+            .then(_ => {
+                const docLessOne = new Document(outFile),
+                    docLessOnePageCount = docLessOne.getPageCount()
+                t.assert(pc === docLessOnePageCount + 1)
+                unlinkSync(outFile)
+                t.end()
+            })
 
-        const docLessOne = new Document(outFile),
-            docLessOnePageCount = docLessOne.getPageCount()
-        t.assert(pc === docLessOnePageCount + 1)
-        unlinkSync(outFile)
-        t.end()
     })
 }
 
@@ -110,13 +113,14 @@ function merge() {
 
         doc.mergeDocument(filePath)
         doc.write(outFile)
+            .then(_ => {
+                const doc2 = new Document(outFile),
+                    doc2PC = doc2.getPageCount()
 
-        const doc2 = new Document(outFile),
-            doc2PC = doc2.getPageCount()
-
-        t.assert(originalPC * 2 === doc2PC, "merged document")
-        unlinkSync(outFile)
-        t.end()
+                t.assert(originalPC * 2 === doc2PC, "merged document")
+                unlinkSync(outFile)
+                t.end()
+            })
     })
 }
 
