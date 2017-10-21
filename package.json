@@ -8,8 +8,8 @@
   "scripts": {
     "compile": "cmake-js compile --std c++17 --prefer-clang",
     "postinstall": "npm run compile && npm run lib-build",
-    "lib-build": "tsc --p tsconfig.json",
-    "docs": "typedoc --mode modules --module commonjs --target es6 --out ./docs",
+    "lib-build": "tsc -p tsconfig.json",
+    "docs": "typedoc --mode modules --module commonjs --target es6 --exclude **/.spec.* --out ./docs",
     "test": "npm run test:document && npm run test:page && npm run test:field && npm run test:object",
     "test:document": "node --expose-gc ./dist/document.spec.js",
     "test:page": "node --expose-gc ./dist/page.spec.js",

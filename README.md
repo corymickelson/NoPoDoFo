@@ -11,7 +11,6 @@ nopodofo, a native node module for reading, parsing, modifying, and creating pdf
 
 ## In Progress:
  - Add Images
- - Save to Buffer
  - Add Digital Signature
 
 ### Installation
@@ -26,7 +25,6 @@ nopodofo requires:
  - [PoDoFo](http://podofo.sourceforge.net/index.html)
  - [cmake-js](https://www.npmjs.com/package/cmake-js)
  - [Node.js](https://nodejs.org/) v8.6+ (nopodofo is built with [N-Api](https://nodejs.org/dist/latest-v8.x/docs/api/n-api.html))
- - [Boost](http://www.boost.org/) FileSystem module only
 
 For usage in AWS Lambda, PoDoFo prebuilt binaries are available [here](https://github.com/corymickelson/Commonopodofo_PoDoFo)
 

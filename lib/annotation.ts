@@ -106,6 +106,9 @@ export enum NpdfAction {
     GoTo3DView,
     RichMediaExecute,
 }
+/**
+ * @desc Red, Green, Blue
+ */
 export type NPdfRgb = [number, number, number]
 export class Annotation {
     get quadPoints() {

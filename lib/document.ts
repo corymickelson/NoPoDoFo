@@ -36,16 +36,10 @@ export interface IDocument {
 
 /**
  * @class Document
- * @example
- * import {Document} from 'npdf'
- * const doc = new Document('/path/to/file')
- * const pageCount = doc.getPageCount()
- * const page = doc.getPage(0) // pages are zero indexed
- * const mergeDocs = doc.mergeDocument('/path/to/other/doc')
- * doc.setPassword('secret')
- * doc.write('/file/destination')
- * const fileBuffer = fs.readFile('/file/destination', (e,d) => e ? e : d)
- * // do something with the file or the file buffer
+ * @desc Document represents a PdfMemDocument, construct from an existing pdf document.
+ * Document is the core class for reading and manipulating PDF files and writing them back to disk.
+ * Document was designed to allow easy access to the object structur of a PDF file.
+ * Document should be used whenever you want to change the object structure of a PDF file.
  */
 export class Document implements IDocument {
 
@@ -73,7 +67,7 @@ export class Document implements IDocument {
         }
     }
 
-    get encrypt() {
+    get encrypt():Encrypt {
         const instance = this._instance.encrypt
         return new Encrypt(instance)
     }
@@ -184,6 +178,10 @@ export class Document implements IDocument {
     }
 
     freeObjMem(target:Obj): void {
-        this._instance.freeObjMem(target._instance)
+        try {
+            this._instance.freeObjMem(target._instance)
+        } catch(e) {
+            throw e
+        }
     }
 }

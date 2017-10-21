@@ -11,6 +11,7 @@
 #include "doc/FileSpec.h"
 #include "doc/Form.h"
 #include "doc/Image.h"
+#include "doc/ListField.h"
 #include "doc/Painter.h"
 #include "doc/Rect.h"
 #include "doc/TextField.h"
@@ -36,7 +37,7 @@ init(Napi::Env env, Napi::Object exports)
   Arr::Initialize(env, exports);
   Stream::Initialize(env, exports);
   Encrypt::Initialize(env, exports);
-
+  ListField::Initialize(env, exports);
   return exports;
 }
 

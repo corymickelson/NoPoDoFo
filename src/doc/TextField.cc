@@ -11,7 +11,6 @@ TextField::TextField(const CallbackInfo& info)
   : ObjectWrap(info)
 {
   try {
-
     auto fieldObj = info[0].As<Object>();
     field = Field::Unwrap(fieldObj);
   } catch (PdfError& err) {

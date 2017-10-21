@@ -90,3 +90,37 @@ export class CheckBox {
     }
 }
 
+export type IListItem = {
+    value:string,
+    display:string
+}
+export class ListField {
+    private _instance: any
+    get selected(): number {
+        return this._instance.selected
+    }
+    set selected(index: number) {
+        this._instance.selected = index
+    }
+    get length() {
+        return this._instance.length
+    }
+    constructor(field: Field) {
+        if(field.getType() !== 'ListBox') {
+            throw Error('must be of type ListBox')
+        }
+        this._instance = new __mod.ListBox(field._instance)
+    }
+
+    getItem(index:number): IListItem {
+        return this._instance.getItem(index)
+    }
+
+    setItem(item: IListItem): void {
+        this._instance.insertItem(item.value, item.display)
+    }
+    removeItem(index: number): void {
+        this._instance.removeItem(index)
+    }
+}
+

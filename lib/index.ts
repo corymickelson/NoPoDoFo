@@ -1,7 +1,7 @@
-import {Document as doc} from './document'
-import {Dictionary as dict} from './dictionary'
-import {Obj as obj} from './object'
-import {Page as page} from './page'
+import { Document as doc } from './document'
+import { Dictionary as dict } from './dictionary'
+import { Obj as obj } from './object'
+import { Page as page } from './page'
 import {
     Annotation as annot,
     NpdfAction as action,
@@ -9,11 +9,16 @@ import {
     NpdfAnnotationFlag as annotflags,
     NPdfAnnotationType as annottype
 } from './annotation'
-import {CheckBox as checkbox, Field as field, TextField as textfield} from './field'
-import {Image as image} from './image'
-import {Painter as painter} from './painter'
-import {Rect as rect} from './rect'
-import {Signature as sign} from './signature'
+import {
+    CheckBox as checkbox,
+    Field as field,
+    TextField as textfield,
+    ListField as listfield
+} from './field'
+import { Image as image } from './image'
+import { Painter as painter } from './painter'
+import { Rect as rect } from './rect'
+import { Signature as sign } from './signature'
 
 export const Document = doc,
     Page = page,
@@ -27,6 +32,7 @@ export const Document = doc,
     Field = field,
     CheckBox = checkbox,
     TextField = textfield,
+    ListField = listfield,
     Image = image,
     Painter = painter,
     Rect = rect,
