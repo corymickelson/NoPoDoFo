@@ -40,4 +40,4 @@ To install nopodofo run
 
 ### Usage
 
-TypeDocs available [here](https://corymickelson.github.io/nopodofo/index.html)
+TypeDocs available [here](https://corymickelson.github.io/NoPoDoFo/index)
