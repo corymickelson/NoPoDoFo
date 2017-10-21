@@ -36,6 +36,13 @@ try {
 
 The Document class does not immediatley load the entire pdf document into memory, when an object is needed it is loaded on demand.
 
+## Properties
+#### <u>encrypt</u>
+The page encryption object
+</br>
+<b><i>Get</i></b>: Encrypt
+</br>
+<b><i>Set</i></b>: EncryptInitOption
 ## Methods
 
 #### <u>getPageCount</u>
@@ -83,7 +90,7 @@ doc.mergeDocument('/some/other/file.pdf')
 doc.write('/dest/output.pdf')
 ```
 #### <u>deletePage</u>
-Remove page object
+Remove page object at index
 </br>
 <b><i>Returns</i></b>:void
 </br>
