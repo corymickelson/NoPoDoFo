@@ -18,7 +18,8 @@ public:
   string originPdf;
 
   static void Initialize(Napi::Env& env, Napi::Object& target);
-  void Load(const Napi::CallbackInfo&);
+  Napi::Value Load(const Napi::CallbackInfo&);
+  Napi::Value LoadBuffer(const Napi::CallbackInfo&);
   Napi::Value GetPageCount(const Napi::CallbackInfo&);
   Napi::Value GetPage(const Napi::CallbackInfo&);
   void MergeDocument(const Napi::CallbackInfo&);

@@ -22,7 +22,6 @@ Document::Initialize(Napi::Env& env, Napi::Object& target)
     "Document",
     { InstanceAccessor("password", nullptr, &Document::SetPassword),
       InstanceAccessor("encrypt", &Document::GetEncrypt, &Document::SetEncrypt),
-
       InstanceMethod("load", &Document::Load),
       InstanceMethod("getPageCount", &Document::GetPageCount),
       InstanceMethod("getPage", &Document::GetPage),
@@ -44,9 +43,10 @@ Document::Document(const CallbackInfo& info)
   document = new PdfMemDocument();
 }
 
-void
+Napi::Value
 Document::Load(const CallbackInfo& info)
 {
+  auto resolver = Promise::Resolver::New(info.Env());
   string filePath = info[0].As<String>().Utf8Value();
   bool forUpdate = false;
   if (info.Length() == 2) {
@@ -55,6 +55,7 @@ Document::Load(const CallbackInfo& info)
   originPdf = filePath;
   try {
     document->Load(filePath.c_str(), forUpdate);
+    resolver.Resolve(String::New(info.Env(), filePath));
   } catch (PdfError& e) {
     if (e.GetError() == ePdfError_InvalidPassword) {
       throw Napi::Error::New(info.Env(),
@@ -65,6 +66,20 @@ Document::Load(const CallbackInfo& info)
       throw Napi::Error::New(info.Env(), msg);
     }
   }
+  return resolver.Promise();
+}
+
+Napi::Value
+Document::LoadBuffer(const CallbackInfo& info)
+{
+  auto resolver = Promise::Resolver::New(info.Env());
+  if (!info[0].IsBuffer()) {
+    throw Error::New(info.Env(), "Buffer required");
+  }
+  Buffer<char> buffer = info[0].As<Buffer<char>>();
+  document->LoadFromBuffer(buffer.Data(), buffer.Length());
+  resolver.Resolve(info.Env().Undefined());
+  return resolver.Promise();
 }
 
 Napi::Value
@@ -312,13 +327,6 @@ Document::GetObjects(const CallbackInfo& info)
     ++it;
     ++count;
   }
-  //  auto objs = document->GetObjects();
-  //  for (size_t i = 0; i < objs.GetSize(); i++) {
-  //    auto obj = objs[i];
-  //    auto nObj = Napi::External<PdfObject>::New(info.Env(), obj);
-  //    auto objInstance = Obj::constructor.New({ nObj });
-  //    js.Set(Napi::Number::New(info.Env(), static_cast<int>(i)), objInstance);
-  //  }
   return js;
 }
 

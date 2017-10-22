@@ -9,7 +9,7 @@ export interface IDocument {
     _instance: any
     encrypt: Encrypt
 
-    load(file: string, update?: boolean): void
+    load(file: string, update?: boolean): Promise<string|void>
 
     getPageCount(): number
 
@@ -93,9 +93,10 @@ export class Document implements IDocument {
      * @param {string} file - pdf file path
      * @param update
      */
-    load(file: string, update: boolean = false): void {
-        this._instance.load(file, update)
-        this._loaded = true
+    load(file: string|Buffer, update: boolean = false): Promise<string|void> {
+        return this._instance.load(file, update)
+            .then(() => this._loaded = true)
+            .catch((e:Error) => console.error(e))
     }
 
     getPageCount(): number {
@@ -192,7 +193,7 @@ export class Document implements IDocument {
         try {
             this._instance.freeObjMem(target._instance)
         } catch(e) {
-            throw e
+            console.error(e)
         }
     }
 }
