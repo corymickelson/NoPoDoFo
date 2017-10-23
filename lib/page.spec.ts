@@ -134,51 +134,53 @@ function pageResources() {
 function pageAddImg() {
     test('add image', t => {
         const painter = new Painter(),
-            img = new Image(doc, '/home/red/test.jpg')
+            img = new Image(doc, join(__dirname, '../test.jpg'))
 
         painter.page = page
         painter.drawImage(img, 0, page.height - img.getHeight())
         painter.finishPage()
         if (existsSync('./img.out.pdf'))
             unlinkSync('./img.out.pdf')
+
         doc.write('./img.out.pdf')
+            .then(dest => {
+                let objs = doc.getObjects()
+                for (let i = 0; i < objs.length; i++) {
+                    let o = objs[i]
+                    if (o.type === 'Dictionary') {
+                        let objDict = o.asDictionary(),
+                            objType = objDict.hasKey('Type') ? objDict.getKey('Type') : null,
+                            objSubType = objDict.hasKey('SubType') ? objDict.getKey('SubType') : null
 
-        let objs = doc.getObjects()
-        for (let i = 0; i < objs.length; i++) {
-            let o = objs[i]
-            if (o.type === 'Dictionary') {
-                let objDict = o.asDictionary(),
-                    objType = objDict.hasKey('Type') ? objDict.getKey('Type') : null,
-                    objSubType = objDict.hasKey('SubType') ? objDict.getKey('SubType') : null
+                        if ((objType && objType.type === 'Name') ||
+                            (objSubType && objSubType.type === 'Name')) {
 
-                if ((objType && objType.type === 'Name') ||
-                    (objSubType && objSubType.type === 'Name')) {
+                            if ((objType && (objType as Obj).asName() === 'XObject') || (objSubType && (objSubType as Obj).asName() === 'Image')) {
+                                let imgObj = o.asDictionary().hasKey('Filter') ? o.asDictionary().getKey('Filter') : null
 
-                    if ((objType && (objType as Obj).asName() === 'XObject') || (objSubType && (objSubType as Obj).asName() === 'Image')) {
-                        let imgObj = o.asDictionary().hasKey('Filter') ? o.asDictionary().getKey('Filter') : null
-
-                        if (imgObj && imgObj.type === 'Array') {
-                            if (imgObj.asArray().length === 1) {
-                                if (imgObj.asArray().at(0).type === 'Name') {
-                                    if (imgObj.asArray().at(0).asName() === 'DCTDecode') {
-                                        extractImg(o, true)
-                                        return
+                                if (imgObj && imgObj.type === 'Array') {
+                                    if (imgObj.asArray().length === 1) {
+                                        if (imgObj.asArray().at(0).type === 'Name') {
+                                            if (imgObj.asArray().at(0).asName() === 'DCTDecode') {
+                                                extractImg(o, true)
+                                                return
+                                            }
+                                        }
                                     }
+                                }
+                                else if (imgObj && imgObj.type === 'Name' && imgObj.asName() === 'DCTDecode') {
+                                    extractImg(o, true)
+                                    return
+                                }
+                                else {
+                                    extractImg(o, false)
+                                    return
                                 }
                             }
                         }
-                        else if (imgObj && imgObj.type === 'Name' && imgObj.asName() === 'DCTDecode') {
-                            extractImg(o, true)
-                            return
-                        }
-                        else {
-                            extractImg(o, false)
-                            return
-                        }
                     }
                 }
-            }
-        }
+            })
 
         function extractImg(obj: Obj, jpg: Boolean) {
             let ext = jpg ? '.jpg' : '.ppm'

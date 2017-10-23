@@ -29,6 +29,9 @@ export class Ref {
         this._instance.write(output)
     }
 
+    /**
+     * Check if ref points to an indirect object. Object is indirect if both object and generation numbers are not 0
+     */
     isIndirect(): boolean {
         return this._instance.isIndirect()
     }
@@ -37,6 +40,9 @@ export class Ref {
         return this._instance.toString()
     }
 
+    /**
+     * If ref is an indirect object, de-reference ref to PdfObject
+     */
     deref(): Obj {
         return new Obj(this._instance.getObject())
     }
