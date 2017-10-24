@@ -49,7 +49,7 @@ Napi::Value
 Obj::GetStream(const CallbackInfo& info)
 {
   try {
-    auto * pStream = dynamic_cast<PdfMemStream*>(obj->GetStream());
+    auto* pStream = dynamic_cast<PdfMemStream*>(obj->GetStream());
     auto stream = pStream->Get();
     auto length = pStream->GetLength();
     auto value = Buffer<char>::Copy(info.Env(), stream, length);
@@ -111,25 +111,55 @@ Obj::GetDataType(const CallbackInfo& info)
 Napi::Value
 Obj::GetByteOffset(const CallbackInfo& info)
 {
-  AssertFunctionArgs(info, 1, { napi_valuetype::napi_string });
-  auto resolver = Promise::Resolver::New(info.Env());
-  string key = info[0].As<String>().Utf8Value();
-  auto value = Napi::Number::New(
-    info.Env(), obj->GetByteOffset(key.c_str(), ePdfWriteMode_Default));
-  resolver.Resolve(value);
-  return resolver.Promise();
+  AssertFunctionArgs(
+    info, 2, { napi_valuetype::napi_string, napi_valuetype::napi_function });
+  string arg = info[0].As<String>().Utf8Value();
+  auto cb = info[1].As<Function>();
+  ObjOffsetAsync* worker = new ObjOffsetAsync(cb, this, arg);
+  worker->Queue();
+  return info.Env().Undefined();
+
+  //  AssertFunctionArgs(info, 1, { napi_valuetype::napi_string });
+  //  auto resolver = Promise::Resolver::New(info.Env());
+  //  string key = info[0].As<String>().Utf8Value();
+  //  auto value = Napi::Number::New(
+  //    info.Env(), obj->GetByteOffset(key.c_str(), ePdfWriteMode_Default));
+  //  resolver.Resolve(value);
+  //  return resolver.Promise();
 }
 
 Napi::Value
 Obj::Write(const CallbackInfo& info)
 {
-  AssertFunctionArgs(info, 1, { napi_valuetype::napi_string });
-  string output = info[0].As<String>().Utf8Value();
-  auto resolver = Promise::Resolver::New(info.Env());
-  PdfOutputDevice device(output.c_str());
-  obj->Write(&device, ePdfWriteMode_Default, nullptr);
-  resolver.Resolve(String::New(info.Env(), output));
-  return resolver.Promise();
+  // ASYNCRESOLVER
+  //  try {
+  //    AssertFunctionArgs(info, 1, { napi_valuetype::napi_string });
+  //    ObjWritePromise* worker =
+  //      new ObjWritePromise(this, info[0].As<String>().Utf8Value());
+  //    worker->Queue();
+  //    return worker->Promise();
+  //  } catch (PdfError& err) {
+  //    ErrorHandler(err, info);
+  //  } catch (Napi::Error& err) {
+  //    ErrorHandler(err, info);
+  //  }
+
+  // ASYNCWORKER
+  AssertFunctionArgs(
+    info, 2, { napi_valuetype::napi_string, napi_valuetype::napi_function });
+  auto cb = info[1].As<Function>();
+  ObjWriteAsync* worker =
+    new ObjWriteAsync(cb, this, info[0].As<String>().Utf8Value());
+  worker->Queue();
+  return info.Env().Undefined();
+
+  // PROMISE
+  // string output = info[0].As<String>().Utf8Value();
+  // auto resolver = Promise::Resolver::New(info.Env());
+  // PdfOutputDevice device(output.c_str());
+  // obj->Write(&device, ePdfWriteMode_Default, nullptr);
+  // resolver.Resolve(String::New(info.Env(), output));
+  // return resolver.Promise();
 }
 
 Napi::Value
@@ -235,7 +265,7 @@ Obj::GetBool(const CallbackInfo& info)
 Napi::Value
 Obj::GetReference(const CallbackInfo& info)
 {
-  if(!obj->IsReference()) {
+  if (!obj->IsReference()) {
     throw Napi::Error::New(info.Env(), "Obj only accessible as Ref");
   }
   auto init = obj->GetReference();
@@ -252,4 +282,61 @@ Obj::GetRawData(const CallbackInfo& info)
   }
   string data = obj->GetRawData().data();
   return Buffer<char>::Copy(info.Env(), data.c_str(), data.length());
+}
+
+void
+ObjWriteAsync::Execute()
+{
+  try {
+    PdfOutputDevice device(arg.c_str());
+    obj->GetObject().WriteObject(&device, ePdfWriteMode_Default, nullptr);
+
+  } catch (PdfError& err) {
+    eMessage = ErrorHandler::WriteMsg(err).c_str();
+    SetError(eMessage);
+  } catch (Napi::Error& err) {
+    eMessage = err.Message().c_str();
+    SetError(eMessage);
+  }
+}
+void
+ObjWriteAsync::OnOK()
+{
+  HandleScope scope(Env());
+  Callback().Call({ Env().Null(), String::New(Env(), arg) });
+}
+
+void
+ObjOffsetAsync::Execute()
+{
+  try {
+    PdfObject o = obj->GetObject();
+    value = o.GetByteOffset(arg.c_str(), ePdfWriteMode_Default);
+  } catch (PdfError& err) {
+    string msg = ErrorHandler::WriteMsg(err);
+    SetError(msg);
+  } catch (Napi::Error& err) {
+    SetError(err.Message());
+  }
+}
+
+void
+ObjOffsetAsync::OnOK()
+{
+  HandleScope scope(Env());
+  Callback().Call({ Env().Null(), Napi::Number::New(Env(), value) });
+}
+
+void
+ObjWritePromise::Execute()
+{
+  try {
+    PdfOutputDevice device(arg.c_str());
+    obj->GetObject().WriteObject(&device, ePdfWriteMode_Default, nullptr);
+    value = arg;
+  } catch (PdfError& err) {
+    SetError(ErrorHandler::WriteMsg(err).c_str());
+  } catch (Napi::Error& err) {
+    SetError(err.Message().c_str());
+  }
 }
