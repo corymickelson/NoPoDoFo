@@ -165,14 +165,21 @@ Napi::Value
 Dictionary::Write(const CallbackInfo& info)
 {
   try {
-    auto resolver = Promise::Resolver::New(info.Env());
     AssertFunctionArgs(
-      info, 1, { napi_valuetype::napi_string });
+      info, 2, { napi_valuetype::napi_string, napi_valuetype::napi_function });
     string output = info[0].As<String>().Utf8Value();
-    PdfOutputDevice device(output.c_str());
-    dict.Write(&device, ePdfWriteMode_Default);
-    resolver.Resolve(String::New(info.Env(), output));
-    return resolver.Promise();
+    auto cb = info[1].As<Function>();
+    DictWriteAsync* worker = new DictWriteAsync(cb, this, output);
+    worker->Queue();
+    return info.Env().Undefined();
+
+    //    auto resolver = Promise::Resolver::New(info.Env());
+    //    AssertFunctionArgs(info, 1, { napi_valuetype::napi_string });
+    //    string output = info[0].As<String>().Utf8Value();
+    //    PdfOutputDevice device(output.c_str());
+    //    dict.Write(&device, ePdfWriteMode_Default);
+    //    resolver.Resolve(String::New(info.Env(), output));
+    //    return resolver.Promise();
   } catch (PdfError& err) {
     ErrorHandler(err, info);
   } catch (Napi::Error& err) {
@@ -217,3 +224,28 @@ Dictionary::ToObject(const CallbackInfo& info)
   }
 }
 
+void
+DictWriteAsync::Execute()
+{
+  try {
+    if (!arg.c_str()) {
+      throw Napi::Error::New(Env(), "output required");
+    }
+    PdfOutputDevice device(arg.c_str());
+    dict->GetDictionary()->Write(&device, ePdfWriteMode_Default);
+
+  } catch (PdfError& err) {
+    eMessage = ErrorHandler::WriteMsg(err).c_str();
+    SetError(eMessage);
+  } catch (Napi::Error& err) {
+    eMessage = err.Message().c_str();
+    SetError(eMessage);
+  }
+}
+
+void
+DictWriteAsync::OnOK()
+{
+  HandleScope scope(Env());
+  Callback().Call({ Env().Null(), Napi::String::New(Env(), arg) });
+}
