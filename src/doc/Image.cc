@@ -4,6 +4,7 @@
 
 #include "Image.h"
 #include "../ValidateArguments.h"
+#include "../ErrorHandler.h"
 
 using namespace Napi;
 using namespace PoDoFo;
@@ -27,9 +28,7 @@ Image::Image(const CallbackInfo& info)
       loaded = true;
     }
   } catch (PdfError& err) {
-    stringstream msg;
-    msg << "PoDoFo error: " << err.GetError() << endl;
-    throw Napi::Error::New(info.Env(), msg.str());
+    ErrorHandler(err, info);
   }
 #else
   throw Napi::Error::New(info.Env(),

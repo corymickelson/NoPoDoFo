@@ -125,4 +125,3 @@ export class ListField {
         this._instance.removeItem(index)
     }
 }
-

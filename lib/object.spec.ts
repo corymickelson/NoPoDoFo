@@ -57,6 +57,7 @@ test('object ref, deref Ref to object', t => {
             let refs = Object.values(dictObj).filter(v => v.type === 'Reference')
             if (refs.length > 0) {
                 let ref = refs[0].asReference()
+                if(!ref.isIndirect()) continue
                 let refObj = ref.deref()
                 t.assert(refObj instanceof Obj)
                 t.end()
