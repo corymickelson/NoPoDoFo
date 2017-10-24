@@ -40,8 +40,70 @@ public:
   const PoDoFo::PdfObject GetObject() { return *obj; }
 
 private:
-//  PoDoFo::PdfObject obj = *new PoDoFo::PdfObject();
+  //  PoDoFo::PdfObject obj = *new PoDoFo::PdfObject();
   PoDoFo::PdfObject* obj;
+};
+
+class ObjWritePromise : public Napi::AsyncResolver
+{
+public:
+  ObjWritePromise(Obj* obj, string dest)
+    : AsyncResolver(Env())
+    , obj(obj)
+    , arg(std::move(dest))
+  {}
+  ~ObjWritePromise() { delete obj; }
+
+private:
+  Obj* obj;
+  string arg;
+  string value;
+
+  // AsyncResolver interface
+protected:
+  void Execute();
+  Napi::Value GetValue() { return Napi::String::New(Env(), value); }
+};
+
+class ObjWriteAsync : public Napi::AsyncWorker
+{
+public:
+  ObjWriteAsync(Napi::Function& cb, Obj* obj, string dest)
+    : AsyncWorker(cb)
+    , obj(obj)
+    , arg(std::move(dest))
+  {}
+  ~ObjWriteAsync() { delete obj; }
+
+protected:
+  void Execute();
+  void OnOK();
+
+private:
+  Obj* obj;
+  string arg;
+  const char* eMessage = nullptr;
+};
+
+class ObjOffsetAsync : public Napi::AsyncWorker
+{
+public:
+  ObjOffsetAsync(Napi::Function& cb, Obj* obj, string arg)
+    : Napi::AsyncWorker(cb)
+    , obj(obj)
+    , arg(std::move(arg))
+  {}
+  ~ObjOffsetAsync() { delete obj; }
+
+protected:
+  void Execute() override;
+  void OnOK() override;
+
+private:
+  Obj* obj;
+  string arg;
+  long value = -1;
+  const char* eMessage = nullptr;
 };
 
 #endif

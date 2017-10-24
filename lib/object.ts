@@ -71,8 +71,11 @@ export class Obj {
         return this._instance.getOffset(key)
     }
 
-    write(output: string): Promise<string> {
-        return this._instance.write(output)
+    // write(output: string): Promise<string> {
+    //     return this._instance.write(output)
+    // }
+    write(output:string, cb:Function): void {
+        this._instance.write(output, cb)
     }
 
     /**
