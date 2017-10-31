@@ -21,35 +21,15 @@ Stream::Stream(const CallbackInfo& info)
 void
 Stream::Initialize(Napi::Env& env, Napi::Object& target)
 {
-  Function ctor =
-    DefineClass(env,
-                "Stream",
-                { InstanceMethod("write", &Stream::Write),
-                  InstanceMethod("getBuffer", &Stream::GetBuffer),
-                  InstanceMethod("getFilteredBuffer", &Stream::GetFilteredBuffer) });
+  Function ctor = DefineClass(
+    env,
+    "Stream",
+    { InstanceMethod("write", &Stream::Write),
+      InstanceMethod("getBuffer", &Stream::GetBuffer),
+      InstanceMethod("getFilteredBuffer", &Stream::GetFilteredBuffer) });
   constructor = Napi::Persistent(ctor);
   constructor.SuppressDestruct();
   target.Set("Stream", ctor);
-}
-
-Napi::Value
-Stream::Write(const CallbackInfo& info)
-{
-  auto resolver = Promise::Resolver::New(info.Env());
-  if(info.Length() != 1 && !info[0].IsString()) {
-    resolver.Reject(String::New(info.Env(), "write requires a single string argument"));
-  }
-  string output = info[0].As<String>().Utf8Value();
-  try {
-    PdfOutputDevice device(output.c_str());
-    stream->Write(&device);
-    resolver.Resolve(String::New(info.Env(), output));
-  } catch (PdfError& err) {
-    resolver.Reject(String::New(info.Env(), ErrorHandler::WriteMsg(err)));
-  } catch (Napi::Error& err) {
-    resolver.Reject(String::New(info.Env(), ErrorHandler::WriteMsg(err)));
-  }
-  return resolver.Promise();
 }
 
 Napi::Value
@@ -58,20 +38,64 @@ Stream::GetBuffer(const CallbackInfo& info)
   pdf_long bufferLength = stream->GetLength();
   char* copy = static_cast<char*>(malloc(sizeof(char) * bufferLength));
   stream->GetCopy(&copy, &bufferLength);
-  auto value = Buffer<char>::Copy(
-    info.Env(), copy, static_cast<size_t>(bufferLength));
+  auto value =
+    Buffer<char>::Copy(info.Env(), copy, static_cast<size_t>(bufferLength));
   free(copy);
   return value;
 }
 
 Napi::Value
-Stream::GetFilteredBuffer(const CallbackInfo &info)
+Stream::GetFilteredBuffer(const CallbackInfo& info)
 {
   pdf_long bufferLength = stream->GetLength();
   char* copy = static_cast<char*>(malloc(sizeof(char) * bufferLength));
   stream->GetFilteredCopy(&copy, &bufferLength);
-  auto value = Buffer<char>::Copy(
-    info.Env(), copy, static_cast<size_t>(bufferLength));
+  auto value =
+    Buffer<char>::Copy(info.Env(), copy, static_cast<size_t>(bufferLength));
   free(copy);
   return value;
+}
+
+class StreamWriteAsync : public Napi::AsyncWorker
+{
+public:
+  StreamWriteAsync(Napi::Function& cb, Stream* stream, string arg)
+    : AsyncWorker(cb)
+    , stream(stream)
+    , arg(std::move(arg))
+  {}
+  ~StreamWriteAsync() {}
+
+private:
+  Stream* stream;
+  string arg;
+
+  // AsyncWorker interface
+protected:
+  void Execute()
+  {
+    try {
+      PdfOutputDevice device(arg.c_str());
+      stream->GetStream()->Write(&device);
+    } catch (PdfError& err) {
+      SetError(String::New(Env(), ErrorHandler::WriteMsg(err)));
+    }
+  }
+  void OnOK()
+  {
+    HandleScope scope(Env());
+    Callback().Call({ Env().Null(), String::New(Env(), arg) });
+  }
+};
+
+Napi::Value
+Stream::Write(const CallbackInfo& info)
+{
+  AssertFunctionArgs(
+    info, 2, { napi_valuetype::napi_string, napi_valuetype::napi_function });
+  string output = info[0].As<String>().Utf8Value();
+  Function cb = info[1].As<Function>();
+  StreamWriteAsync* worker = new StreamWriteAsync(cb, this, output);
+  worker->Queue();
+  return info.Env().Undefined();
 }

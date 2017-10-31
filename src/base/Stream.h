@@ -7,6 +7,9 @@
 
 #include <napi.h>
 #include <podofo/podofo.h>
+#include <string>
+
+using namespace std;
 
 class Stream : public Napi::ObjectWrap<Stream>
 {
@@ -18,6 +21,7 @@ public:
   Napi::Value Write(const Napi::CallbackInfo&);
   Napi::Value GetBuffer(const Napi::CallbackInfo&);
   Napi::Value GetFilteredBuffer(const Napi::CallbackInfo&);
+  PoDoFo::PdfStream* GetStream() { return stream; }
 
 private:
   PoDoFo::PdfStream* stream;

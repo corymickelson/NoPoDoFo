@@ -1,5 +1,3 @@
-// const mod = require('bindings')('npdf')
-
 import {__mod} from './document'
 import {IPage} from './page'
 

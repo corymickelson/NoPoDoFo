@@ -8,6 +8,8 @@
 #include <napi.h>
 #include <podofo/podofo.h>
 
+#include <utility>
+
 using namespace std;
 
 class Document : public Napi::ObjectWrap<Document>
@@ -28,13 +30,14 @@ public:
   Napi::Value GetVersion(const Napi::CallbackInfo&);
   Napi::Value IsLinearized(const Napi::CallbackInfo&);
   Napi::Value Write(const Napi::CallbackInfo&);
+  Napi::Value WriteBuffer(const Napi::CallbackInfo&);
   Napi::Value GetWriteMode(const Napi::CallbackInfo&);
   void SetEncrypt(const Napi::CallbackInfo&, const Napi::Value&);
   Napi::Value GetEncrypt(const Napi::CallbackInfo&);
   Napi::Value CreateEncrypt(const Napi::CallbackInfo&);
   Napi::Value GetObjects(const Napi::CallbackInfo&);
-  Napi::Value Authenticate(const Napi::CallbackInfo&);
   Napi::Value GetTrailer(const Napi::CallbackInfo&);
+  Napi::Value IsAllowed(const Napi::CallbackInfo&);
 
   PoDoFo::PdfMemDocument* GetDocument() { return document; }
 

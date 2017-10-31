@@ -32,6 +32,7 @@ Document::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceMethod("getWriteMode", &Document::GetWriteMode),
       InstanceMethod("createEncrypt", &Document::CreateEncrypt),
       InstanceMethod("write", &Document::Write),
+      InstanceMethod("writeBuffer", &Document::WriteBuffer),
       InstanceMethod("getObjects", &Document::GetObjects),
       InstanceMethod("getTrailer", &Document::GetTrailer) });
 
@@ -44,39 +45,13 @@ Document::Document(const CallbackInfo& info)
 }
 
 Napi::Value
-Document::Load(const CallbackInfo& info)
-{
-  auto resolver = Promise::Resolver::New(info.Env());
-  string filePath = info[0].As<String>().Utf8Value();
-  bool forUpdate = false;
-  if (info.Length() == 2) {
-    forUpdate = info[1].As<Boolean>();
-  }
-  originPdf = filePath;
-  try {
-    document->Load(filePath.c_str(), forUpdate);
-    resolver.Resolve(String::New(info.Env(), filePath));
-  } catch (PdfError& e) {
-    if (e.GetError() == ePdfError_InvalidPassword) {
-      throw Napi::Error::New(info.Env(),
-                             "Password required to modify this document");
-    } else {
-      ErrorHandler err;
-      string msg = err.WriteMsg(e);
-      throw Napi::Error::New(info.Env(), msg);
-    }
-  }
-  return resolver.Promise();
-}
-
-Napi::Value
 Document::LoadBuffer(const CallbackInfo& info)
 {
-  auto resolver = Promise::Resolver::New(info.Env());
+  auto resolver = Promise::Deferred::New(info.Env());
   if (!info[0].IsBuffer()) {
     throw Error::New(info.Env(), "Buffer required");
   }
-  Buffer<char> buffer = info[0].As<Buffer<char>>();
+  auto buffer = info[0].As<Buffer<char>>();
   document->LoadFromBuffer(buffer.Data(), buffer.Length());
   resolver.Resolve(info.Env().Undefined());
   return resolver.Promise();
@@ -110,31 +85,6 @@ Document::GetPage(const CallbackInfo& info)
   } catch (PdfError& err) {
     ErrorHandler(err, info);
   }
-}
-
-Napi::Value
-Document::Write(const CallbackInfo& info)
-{
-  auto resolver = Promise::Resolver::New(info.Env());
-  try {
-    if (info.Length() == 1 && info[0].IsString()) {
-      string destinationFile = info[0].As<String>().Utf8Value();
-      PdfOutputDevice device(destinationFile.c_str());
-      document->Write(&device);
-      resolver.Resolve(Napi::String::New(info.Env(), destinationFile));
-    } else if (info.Length() == 0) {
-      PdfRefCountedBuffer docBuffer;
-      PdfOutputDevice device(&docBuffer);
-      document->Write(&device);
-      resolver.Resolve(Buffer<char>::Copy(
-        info.Env(), docBuffer.GetBuffer(), docBuffer.GetSize()));
-    }
-  } catch (PdfError& err) {
-    resolver.Reject(String::New(info.Env(), ErrorHandler::WriteMsg(err)));
-  } catch (Napi::Error& err) {
-    resolver.Reject(String::New(info.Env(), ErrorHandler::WriteMsg(err)));
-  }
-  return resolver.Promise();
 }
 
 void
@@ -334,10 +284,40 @@ Napi::Value
 Document::GetTrailer(const CallbackInfo& info)
 {
   const PdfObject* trailerPdObject = document->GetTrailer();
-  PdfObject* ptr = const_cast<PdfObject*>(trailerPdObject);
+  auto* ptr = const_cast<PdfObject*>(trailerPdObject);
   auto initPtr = Napi::External<PdfObject>::New(info.Env(), ptr);
   auto instance = Obj::constructor.New({ initPtr });
   return instance;
+}
+
+Value
+Document::IsAllowed(const CallbackInfo& info)
+{
+  AssertFunctionArgs(info, 1, { napi_valuetype::napi_string });
+  string allowed = info[0].As<String>().Utf8Value();
+  bool is;
+  if (allowed == "Print") {
+    is = document->IsPrintAllowed();
+  } else if (allowed == "Edit") {
+    is = document->IsEditAllowed();
+  } else if (allowed == "Copy") {
+    is = document->IsCopyAllowed();
+  } else if (allowed == "EditNotes") {
+    is = document->IsEditNotesAllowed();
+  } else if (allowed == "FillAndSign") {
+    is = document->IsFillAndSignAllowed();
+  } else if (allowed == "Accessible") {
+    is = document->IsAccessibilityAllowed();
+  } else if (allowed == "DocAssembly") {
+    is = document->IsDocAssemblyAllowed();
+  } else if (allowed == "HighPrint") {
+    is = document->IsHighPrintAllowed();
+  } else {
+    throw Napi::Error::New(
+      info.Env(),
+      "Unknown argument. Please see definitions file for isAllowed args");
+  }
+  return Boolean::New(info.Env(), is);
 }
 
 void
@@ -446,4 +426,173 @@ Document::ParseJsEncryptObj(const CallbackInfo& info,
     msg << "Parse Encrypt Object failed with error: " << err.GetError() << endl;
     throw Napi::Error::New(info.Env(), msg.str());
   }
+}
+
+class DocumentWriteAsync : public Napi::AsyncWorker
+{
+public:
+  DocumentWriteAsync(Napi::Function& cb, Document* doc, string arg)
+    : Napi::AsyncWorker(cb)
+    , doc(doc)
+    , arg(std::move(arg))
+  {}
+  ~DocumentWriteAsync() {}
+
+private:
+  Document* doc;
+  string arg = "";
+
+  // AsyncWorker interface
+protected:
+  void Execute()
+  {
+    try {
+      PdfOutputDevice device(arg.c_str());
+      doc->GetDocument()->Write(&device);
+    } catch (PdfError& err) {
+      SetError(String::New(Env(), ErrorHandler::WriteMsg(err)));
+    } catch (Napi::Error& err) {
+      SetError(String::New(Env(), ErrorHandler::WriteMsg(err)));
+    }
+  }
+  void OnOK()
+  {
+    HandleScope scope(Env());
+    Callback().Call({ Env().Null(), String::New(Env(), arg) });
+  }
+};
+
+Napi::Value
+Document::Write(const CallbackInfo& info)
+{
+  try {
+    if (info.Length() == 2 && info[0].IsString() && info[1].IsFunction()) {
+      string arg = info[0].As<String>();
+      auto cb = info[1].As<Function>();
+      DocumentWriteAsync* worker = new DocumentWriteAsync(cb, this, arg);
+      worker->Queue();
+    } else {
+      throw Error::New(
+        info.Env(),
+        String::New(info.Env(), "Requires at least a callback argument"));
+    }
+  } catch (PdfError& err) {
+    ErrorHandler(err, info);
+  } catch (Napi::Error& err) {
+    ErrorHandler(err, info);
+  }
+
+  return Env().Undefined();
+}
+
+class DocumentLoadAsync : public Napi::AsyncWorker
+{
+public:
+  DocumentLoadAsync(Napi::Function& cb, Document* doc, string arg)
+    : AsyncWorker(cb)
+    , doc(doc)
+    , arg(std::move(arg))
+  {}
+  ~DocumentLoadAsync() {}
+
+  void ForUpdate(bool v) { update = v; }
+
+private:
+  Document* doc;
+  string arg;
+  bool update = false;
+
+  // AsyncWorker interface
+protected:
+  void Execute()
+  {
+    try {
+      if (arg.empty()) {
+        throw Napi::Error::New(Env(), "null destination path");
+      }
+      doc->GetDocument()->Load(arg.c_str());
+    } catch (PdfError& err) {
+      SetError(ErrorHandler::WriteMsg(err));
+    } catch (Napi::Error& err) {
+      SetError(ErrorHandler::WriteMsg(err));
+    }
+  }
+  void OnOK()
+  {
+    HandleScope scope(Env());
+    Callback().Call({ Env().Null(), String::New(Env(), arg) });
+  }
+};
+
+Napi::Value
+Document::Load(const CallbackInfo& info)
+{
+  try {
+    AssertFunctionArgs(
+      info, 2, { napi_valuetype::napi_string, napi_valuetype::napi_function });
+    string filePath = info[0].As<String>().Utf8Value();
+    auto cb = info[1].As<Function>();
+    bool forUpdate = false;
+    if (info.Length() == 3) {
+      forUpdate = info[2].As<Boolean>();
+    }
+    originPdf = filePath;
+    DocumentLoadAsync* worker = new DocumentLoadAsync(cb, this, filePath);
+    worker->ForUpdate(forUpdate);
+    worker->Queue();
+  } catch (PdfError& e) {
+    if (e.GetError() == ePdfError_InvalidPassword) {
+      throw Napi::Error::New(info.Env(),
+                             "Password required to modify this document");
+    } else {
+      ErrorHandler err;
+      string msg = err.WriteMsg(e);
+      throw Napi::Error::New(info.Env(), msg);
+    }
+  }
+  return info.Env().Undefined();
+}
+
+class DocumentWriteBufferAsync : public AsyncWorker
+{
+public:
+  DocumentWriteBufferAsync(Function& cb, Document* doc)
+    : AsyncWorker(cb)
+    , doc(doc)
+  {}
+  ~DocumentWriteBufferAsync() {}
+
+private:
+  Document* doc;
+  string value = "";
+  size_t size = 0;
+
+protected:
+  void Execute()
+  {
+    PdfRefCountedBuffer docBuffer;
+    PdfOutputDevice device(&docBuffer);
+    doc->GetDocument()->Write(&device);
+    value = string(docBuffer.GetBuffer());
+    size = docBuffer.GetSize();
+  }
+  void OnOK()
+  {
+    HandleScope scope(Env());
+    if (value.empty() || size == 0) {
+      SetError("Error, failed to write to buffer");
+    }
+    Callback().Call(
+      { Env().Null(), Buffer<char>::Copy(Env(), value.c_str(), size) });
+  }
+};
+
+Napi::Value
+Document::WriteBuffer(const CallbackInfo& info)
+{
+  AssertFunctionArgs(info, 1, { napi_valuetype::napi_function });
+  auto cb = info[0].As<Function>();
+  DocumentWriteBufferAsync* worker = new DocumentWriteBufferAsync(cb, this);
+  worker->Queue();
+  return info.Env().Undefined();
 }

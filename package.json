@@ -29,8 +29,8 @@
   },
   "license": "ISC",
   "devDependencies": {
-    "@types/node": "^8.0.41",
-    "@types/tape": "^4.2.30",
+    "@types/node": "^8.0.47",
+    "@types/tape": "^4.2.31",
     "husky": "^0.14.3",
     "tap-spec": "^4.1.1",
     "tape": "^4.8.0",
@@ -39,6 +39,6 @@
   "dependencies": {
     "bindings": "^1.3.0",
     "cmake-js": "^3.5.0",
-    "node-addon-api": "github:rolftimmermans/node-addon-api#master"
+    "node-addon-api": "github:nodejs/node-addon-api#master"
   }
 }

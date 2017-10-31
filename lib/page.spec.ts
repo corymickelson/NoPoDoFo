@@ -1,32 +1,41 @@
-import { existsSync, unlink, unlinkSync, writeFile } from 'fs'
-import { join } from 'path'
+import {existsSync, unlink, unlinkSync, writeFile} from 'fs'
+import {join} from 'path'
 import * as test from 'tape'
-import { Document } from './document'
-import { Rect } from "./rect";
-import { NPdfAnnotation, IAnnotation, Annotation } from "./annotation";
-import { Obj } from "./object";
-import { Field } from './field';
-import { Painter } from "./painter";
-import { Image } from "./image";
+import {Document} from './document'
+import {Rect} from "./rect";
+import {NPdfAnnotation, IAnnotation, Annotation} from "./annotation";
+import {Obj} from "./object";
+import {Field} from './field';
+import {Painter} from "./painter";
+import {Image} from "./image";
+import {Page} from "./page";
 
 
 const filePath = join(__dirname, '../test.pdf'),
     outFile = './test.out.pdf',
-    doc = new Document(filePath),
+    doc = new Document(filePath)
+let page: Page;
+
+doc.on('ready', e => {
     page = doc.getPage(0)
+    runAll()
+})
 
 function pageRotation() {
+
     test('set page rotation', t => {
         const originalRotation = page.rotation,
             newRotation = originalRotation + 90
         page.rotation = newRotation
-        doc.write(outFile)
+        doc.write(e => {
+            const testDoc = new Document(outFile),
+                testPage = testDoc.getPage(0)
+            t.assert(testPage.rotation === newRotation, 'Page rotation updated')
+            unlinkSync(outFile)
+            t.end()
+        }, outFile)
 
-        const testDoc = new Document(outFile),
-            testPage = testDoc.getPage(0)
-        t.assert(testPage.rotation === newRotation, 'Page rotation updated')
-        unlinkSync(outFile)
-        t.end()
+
     })
 }
 
@@ -142,45 +151,45 @@ function pageAddImg() {
         if (existsSync('./img.out.pdf'))
             unlinkSync('./img.out.pdf')
 
-        doc.write('./img.out.pdf')
-            .then(dest => {
-                let objs = doc.getObjects()
-                for (let i = 0; i < objs.length; i++) {
-                    let o = objs[i]
-                    if (o.type === 'Dictionary') {
-                        let objDict = o.asDictionary(),
-                            objType = objDict.hasKey('Type') ? objDict.getKey('Type') : null,
-                            objSubType = objDict.hasKey('SubType') ? objDict.getKey('SubType') : null
+        doc.write(e => {
 
-                        if ((objType && objType.type === 'Name') ||
-                            (objSubType && objSubType.type === 'Name')) {
+            let objs = doc.getObjects()
+            for (let i = 0; i < objs.length; i++) {
+                let o = objs[i]
+                if (o.type === 'Dictionary') {
+                    let objDict = o.asDictionary(),
+                        objType = objDict.hasKey('Type') ? objDict.getKey('Type') : null,
+                        objSubType = objDict.hasKey('SubType') ? objDict.getKey('SubType') : null
 
-                            if ((objType && (objType as Obj).asName() === 'XObject') || (objSubType && (objSubType as Obj).asName() === 'Image')) {
-                                let imgObj = o.asDictionary().hasKey('Filter') ? o.asDictionary().getKey('Filter') : null
+                    if ((objType && objType.type === 'Name') ||
+                        (objSubType && objSubType.type === 'Name')) {
 
-                                if (imgObj && imgObj.type === 'Array') {
-                                    if (imgObj.asArray().length === 1) {
-                                        if (imgObj.asArray().at(0).type === 'Name') {
-                                            if (imgObj.asArray().at(0).asName() === 'DCTDecode') {
-                                                extractImg(o, true)
-                                                return
-                                            }
+                        if ((objType && (objType as Obj).asName() === 'XObject') || (objSubType && (objSubType as Obj).asName() === 'Image')) {
+                            let imgObj = o.asDictionary().hasKey('Filter') ? o.asDictionary().getKey('Filter') : null
+
+                            if (imgObj && imgObj.type === 'Array') {
+                                if (imgObj.asArray().length === 1) {
+                                    if (imgObj.asArray().at(0).type === 'Name') {
+                                        if (imgObj.asArray().at(0).asName() === 'DCTDecode') {
+                                            extractImg(o, true)
+                                            return
                                         }
                                     }
                                 }
-                                else if (imgObj && imgObj.type === 'Name' && imgObj.asName() === 'DCTDecode') {
-                                    extractImg(o, true)
-                                    return
-                                }
-                                else {
-                                    extractImg(o, false)
-                                    return
-                                }
+                            }
+                            else if (imgObj && imgObj.type === 'Name' && imgObj.asName() === 'DCTDecode') {
+                                extractImg(o, true)
+                                return
+                            }
+                            else {
+                                extractImg(o, false)
+                                return
                             }
                         }
                     }
                 }
-            })
+            }
+        }, './img.out.pdf')
 
         function extractImg(obj: Obj, jpg: Boolean) {
             let ext = jpg ? '.jpg' : '.ppm'
@@ -203,19 +212,18 @@ function runTest(test: Function) {
 
 export function runAll() {
     [
-        pageRotation,
-        pageProperties,
-        pageTrimBox,
-        pageFields,
-        pageFieldInfoArray,
-        pageGetField,
-        pageGetFields,
-        pageGetAnnotsCount,
-        pageGetAnnot,
-        pageContents,
-        pageResources,
+        // pageRotation,
+        // pageProperties,
+        // pageTrimBox,
+        // pageFields,
+        // pageFieldInfoArray,
+        // pageGetField,
+        // pageGetFields,
+        // pageGetAnnotsCount,
+        // pageGetAnnot,
+        // pageContents,
+        // pageResources,
         pageAddImg
     ].map(i => runTest(i))
 }
 
-runAll()
