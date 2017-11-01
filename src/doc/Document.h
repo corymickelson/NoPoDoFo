@@ -38,8 +38,10 @@ public:
   Napi::Value IsAllowed(const Napi::CallbackInfo&);
 
   PoDoFo::PdfMemDocument* GetDocument() { return document; }
+  bool LoadedForIncrementalUpdates() { return loadForIncrementalUpdates; }
 
 private:
+  bool loadForIncrementalUpdates = false;
   PoDoFo::PdfMemDocument* document;
   void ParseJsEncryptObj(const Napi::CallbackInfo& info,
                          Napi::Object& obj,

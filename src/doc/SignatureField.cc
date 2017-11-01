@@ -10,7 +10,7 @@ using namespace PoDoFo;
 SignatureField::SignatureField(const CallbackInfo& info)
   : ObjectWrap<SignatureField>(info)
 {
-  // page, rect, document
+  // annotation, acroform, document
 }
 
 void

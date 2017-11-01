@@ -535,6 +535,8 @@ Document::Load(const CallbackInfo& info)
     bool forUpdate = false;
     if (info.Length() == 3) {
       forUpdate = info[2].As<Boolean>();
+      if (forUpdate)
+        loadForIncrementalUpdates = true;
     }
     originPdf = filePath;
     DocumentLoadAsync* worker = new DocumentLoadAsync(cb, this, filePath);

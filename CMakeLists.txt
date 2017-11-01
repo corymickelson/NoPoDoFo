@@ -6,12 +6,12 @@ project(npdf)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_FLAGS -fPIC)
-set(CMAKE_CXX_FLAGS -fno-exceptions)
-set(CMAKE_C_FLAGS -fno-exceptions)
+#set(CMAKE_CXX_FLAGS -fno-exceptions)
+#set(CMAKE_C_FLAGS -fno-exceptions)
 set(NAPI_CPP_EXCEPTIONS "yes")
 if(MSVC)
-	set(CMAKE_CXX_FLAGS /EH)
-	set(CMAKE_CXX_FLAGS /EHsc)
+        set(CMAKE_CXX_FLAGS /EH)
+        set(CMAKE_CXX_FLAGS /EHsc)
 endif(MSVC)
 
 file(GLOB SOURCE_FILES
@@ -35,10 +35,10 @@ find_path(PODOFO_INCLUDE_DIR podofo/podofo.h PATHS /usr/include /usr/local/inclu
 # Using LitePDF in place of PoDoFo is an experiment with windows. Allowing windows user's easier access to building and running npdf
 find_library(PODOFO_LIBRARY NAMES podofo litePDF PATHS /usr/lib64 /usr/lib /usr/local/lib ${CMAKE_SOURCE_DIR}/deps/podofo/lib/x64)
 
-target_include_directories(${PROJECT_NAME} PRIVATE 
-		${CMAKE_JS_INC}
-        ${PODOFO_INCLUDE_DIR} 
-        ${CMAKE_SOURCE_DIR}/node_modules/node-addon-api/src 
+target_include_directories(${PROJECT_NAME} PRIVATE
+                ${CMAKE_JS_INC}
+        ${PODOFO_INCLUDE_DIR}
+        ${CMAKE_SOURCE_DIR}/node_modules/node-addon-api/src
         ${CMAKE_SOURCE_DIR}/node_modules/node-addon-api )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
