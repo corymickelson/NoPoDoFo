@@ -176,16 +176,16 @@ Annotation::SetColor(const CallbackInfo& info, const Napi::Value& value)
 Napi::Value
 Annotation::GetColor(const CallbackInfo& info)
 {
-  Array rgbArray = Napi::Array::New(info.Env());
-  PdfArray pdfRgb = annot->GetColor();
+  auto rgbArray = Napi::Array::New(info.Env());
+  auto pdfRgb = annot->GetColor();
   if (pdfRgb.size() != 3) {
   }
-  double r = pdfRgb[0].GetNumber();
-  double g = pdfRgb[1].GetNumber();
-  double b = pdfRgb[2].GetNumber();
-  rgbArray.Set(static_cast<uint8_t>(0), Napi::Number::New(info.Env(), r));
-  rgbArray.Set(static_cast<uint8_t>(1), Napi::Number::New(info.Env(), g));
-  rgbArray.Set(static_cast<uint8_t>(2), Napi::Number::New(info.Env(), b));
+  const double r = pdfRgb[0].GetNumber();
+  const double g = pdfRgb[1].GetNumber();
+  const double b = pdfRgb[2].GetNumber();
+  rgbArray.Set(1, Napi::Number::New(info.Env(), r));
+  rgbArray.Set(2, Napi::Number::New(info.Env(), g));
+  rgbArray.Set(3, Napi::Number::New(info.Env(), b));
   return rgbArray;
 }
 
@@ -316,7 +316,9 @@ Annotation::SetQuadPoints(const CallbackInfo& info, const Napi::Value& value)
 
 Napi::Value
 Annotation::GetQuadPoints(const CallbackInfo& info)
-{}
+{
+  return Value();
+}
 
 void
 Annotation::SetFileAttachment(const CallbackInfo& info)

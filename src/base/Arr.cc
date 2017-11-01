@@ -119,11 +119,9 @@ Arr::ToArray(const Napi::CallbackInfo& info)
   auto js = Array::New(info.Env());
   try {
     uint32_t counter = 0;
-    for (auto it = arr->begin(); it != arr->end(); it++) {
-      if (it.base() == nullptr)
-        continue;
-      auto initPtr = External<PdfObject>::New(Env(), it.base());
-      auto instance = Obj::constructor.New({ initPtr });
+    for (auto it = arr->begin(); it != arr->end(); ++it) {
+      const auto initPtr = External<PdfObject>::New(Env(), &(*it));
+      const auto instance = Obj::constructor.New({ initPtr });
       js.Set(counter, instance);
       counter++;
     }

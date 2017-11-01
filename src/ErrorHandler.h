@@ -19,7 +19,7 @@ public:
   ErrorHandler();
   ErrorHandler(PoDoFo::PdfError&, const Napi::CallbackInfo&);
   ErrorHandler(Napi::Error&, const Napi::CallbackInfo&);
-  ~ErrorHandler();
+  ~ErrorHandler() {}
   static string WriteMsg(PoDoFo::PdfError&);
   static string WriteMsg(Napi::Error&);
 
