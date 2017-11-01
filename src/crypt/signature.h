@@ -36,6 +36,7 @@ public:
   Napi::Value GetPage(const Napi::CallbackInfo&);
   void SetField(const Napi::CallbackInfo&, const Napi::Value&);
   Napi::Value GetField(const Napi::CallbackInfo&);
+  void WritesTo(const Napi::CallbackInfo&);
 
 private:
   X509* cert;
@@ -44,6 +45,7 @@ private:
   PoDoFo::PdfSignOutputDevice* signer;
   PoDoFo::PdfSignatureField* signatureField = nullptr;
   PoDoFo::PdfAnnotation* annot = nullptr;
+  PoDoFo::PdfRefCountedBuffer refBuffer;
   std::string reason;
   std::string password;
   int pageIndex;

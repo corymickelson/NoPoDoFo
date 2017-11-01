@@ -44,6 +44,7 @@ Signature::Initialize(Napi::Env& env, Object& target)
       InstanceMethod("loadCert", &Signature::LoadCert),
       InstanceMethod("loadPKey", &Signature::LoadPKey),
       InstanceMethod("sign", &Signature::Sign),
+      InstanceMethod("writesTo", &Signature::WritesTo),
       InstanceMethod("hasField", &Signature::HasExistingField) });
   target.Set("Signature", ctor);
 }
@@ -118,14 +119,6 @@ Signature::Sign(const CallbackInfo& info)
   try {
     if (!cert || !key) {
       throw Napi::Error::New(info.Env(), "Key and Cert must be loaded first");
-    }
-    PdfRefCountedBuffer refBuffer;
-    if (info[0].IsNull()) {
-      PdfOutputDevice device(&refBuffer);
-      signer = new PdfSignOutputDevice(&device);
-    } else if (info[0].IsString()) {
-      PdfOutputDevice device(info[0].As<String>().Utf8Value().c_str());
-      signer = new PdfSignOutputDevice(&device);
     }
     if (!signer) {
       throw Napi::Error::New(info.Env(),
@@ -255,4 +248,19 @@ Signature::GetField(const CallbackInfo& info)
   return !signatureField
            ? info.Env().Null()
            : Napi::External<PdfSignatureField>::New(info.Env(), signatureField);
+}
+
+void
+Signature::WritesTo(const CallbackInfo& info)
+{
+  if (!cert || !key) {
+    throw Napi::Error::New(info.Env(), "Key and Cert must be loaded first");
+  }
+  if (info[0].IsNull()) {
+    PdfOutputDevice device(&refBuffer);
+    signer = new PdfSignOutputDevice(&device);
+  } else if (info[0].IsString()) {
+    PdfOutputDevice device(info[0].As<String>().Utf8Value().c_str());
+    signer = new PdfSignOutputDevice(&device);
+  }
 }
