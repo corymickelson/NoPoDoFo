@@ -34,7 +34,8 @@ Document::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceMethod("write", &Document::Write),
       InstanceMethod("writeBuffer", &Document::WriteBuffer),
       InstanceMethod("getObjects", &Document::GetObjects),
-      InstanceMethod("getTrailer", &Document::GetTrailer) });
+      InstanceMethod("getTrailer", &Document::GetTrailer),
+      InstanceMethod("isAllowed", &Document::IsAllowed)});
 
   target.Set("Document", ctor);
 }
@@ -290,7 +291,7 @@ Document::GetTrailer(const CallbackInfo& info)
   return instance;
 }
 
-Value
+Napi::Value
 Document::IsAllowed(const CallbackInfo& info)
 {
   AssertFunctionArgs(info, 1, { napi_valuetype::napi_string });
@@ -317,7 +318,7 @@ Document::IsAllowed(const CallbackInfo& info)
       info.Env(),
       "Unknown argument. Please see definitions file for isAllowed args");
   }
-  return Boolean::New(info.Env(), is);
+  return Napi::Boolean::New(info.Env(), is);
 }
 
 void
@@ -496,26 +497,32 @@ public:
   ~DocumentLoadAsync() {}
 
   void ForUpdate(bool v) { update = v; }
+  void LoadFromBuffer(bool v) { loadBuffer = v; }
 
 private:
   Document* doc;
   string arg;
   bool update = false;
+  bool loadBuffer = false;
 
   // AsyncWorker interface
 protected:
   void Execute()
   {
     try {
-      if (arg.empty()) {
-        throw Napi::Error::New(Env(), "null destination path");
+      if(loadBuffer) {
+        doc->GetDocument()->LoadFromBuffer(arg.c_str(), arg.length());
       }
-      doc->GetDocument()->Load(arg.c_str());
-    } catch (PdfError& err) {
-      SetError(ErrorHandler::WriteMsg(err));
-    } catch (Napi::Error& err) {
-      SetError(ErrorHandler::WriteMsg(err));
+      else {
+        doc->GetDocument()->Load(arg.c_str(), update);
+      }
+    } catch (PdfError& e) {
+    if (e.GetError() == ePdfError_InvalidPassword) {
+      SetError("Password required to modify this document");
+    } else {
+      SetError(ErrorHandler::WriteMsg(e));
     }
+  }
   }
   void OnOK()
   {
@@ -527,29 +534,28 @@ protected:
 Napi::Value
 Document::Load(const CallbackInfo& info)
 {
-  try {
-    AssertFunctionArgs(
-      info, 2, { napi_valuetype::napi_string, napi_valuetype::napi_function });
-    string filePath = info[0].As<String>().Utf8Value();
+    if(info.Length() < 2) {
+      throw Napi::Error::New(info.Env(), "Load requires data (filepath or buffer) and callback");
+    }
+    string source;
+    if(info[0].IsString()) {
+      source = info[0].As<String>().Utf8Value();
+    }
+    bool loadBuffer = false;
+    if(info[0].IsBuffer()) {
+      source = info[0].As<Buffer<char>>().Data();
+      loadBuffer = true;
+    }
     auto cb = info[1].As<Function>();
     bool forUpdate = false;
     if (info.Length() == 3) {
       forUpdate = info[2].As<Boolean>();
     }
-    originPdf = filePath;
-    DocumentLoadAsync* worker = new DocumentLoadAsync(cb, this, filePath);
+    originPdf = source;
+    DocumentLoadAsync* worker = new DocumentLoadAsync(cb, this, source);
     worker->ForUpdate(forUpdate);
+    worker->LoadFromBuffer(loadBuffer);
     worker->Queue();
-  } catch (PdfError& e) {
-    if (e.GetError() == ePdfError_InvalidPassword) {
-      throw Napi::Error::New(info.Env(),
-                             "Password required to modify this document");
-    } else {
-      ErrorHandler err;
-      string msg = err.WriteMsg(e);
-      throw Napi::Error::New(info.Env(), msg);
-    }
-  }
   return info.Env().Undefined();
 }
 

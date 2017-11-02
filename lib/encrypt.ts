@@ -14,7 +14,9 @@ export class Encrypt {
         }
     }
     isAllowed(action: ProtectionOption): boolean {
-        if(!this._complete) {}
+        if(!this._complete) {
+            throw Error('Encryption has not yet been persisted. Use Document.encrypt = {this} to set encryption')
+        }
         return this._instance.isAllowed(action)
     }
     /**
@@ -23,7 +25,9 @@ export class Encrypt {
      * @returns {boolean} - true / false is password correct
      */
     authenticate(pwd: { ownerPassword?: string | undefined; userPassword?: string | undefined; }): boolean {
-        if(!this._complete) {}
+        if(!this._complete) {
+            throw Error('Encryption has not yet been persisted. Use Document.encrypt = {this} to set encryption')
+        }
         return this._instance.authenticate(pwd)
     }
 }
