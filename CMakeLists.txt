@@ -2,10 +2,17 @@ cmake_minimum_required(VERSION 3.8)
 
 project(npdf)
 
-enable_testing()
+#enable_testing()
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_FLAGS -fPIC)
+set(CMAKE_CXX_FLAGS -fno-exceptions)
+set(CMAKE_C_FLAGS -fno-exceptions)
+set(NAPI_CPP_EXCEPTIONS "yes")
+if(MSVC)
+	set(CMAKE_CXX_FLAGS /EH)
+	set(CMAKE_CXX_FLAGS /EHsc)
+endif(MSVC)
 
 file(GLOB SOURCE_FILES
     "src/*.h"
@@ -23,18 +30,17 @@ set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "" SUFFIX ".node")
 
 # Add Boost and CMakeJS Deps
 # add_subdirectory(boost-cmake)
-
 # Find podofo
-find_path(PODOFO_INCLUDE_DIR podofo/podofo.h PATHS /usr/include /usr/local/include)
-find_library(PODOFO_LIBRARY NAMES podofo PATHS /usr/lib64 /usr/lib /usr/local/lib)
+find_path(PODOFO_INCLUDE_DIR podofo/podofo.h PATHS /usr/include /usr/local/include ${CMAKE_SOURCE_DIR}/deps/podofo/include)
+# Using LitePDF in place of PoDoFo is an experiment with windows. Allowing windows user's easier access to building and running npdf
+find_library(PODOFO_LIBRARY NAMES podofo litePDF PATHS /usr/lib64 /usr/lib /usr/local/lib ${CMAKE_SOURCE_DIR}/deps/podofo/lib/x64)
 
-target_include_directories(${PROJECT_NAME}
-        PRIVATE ${CMAKE_JS_INC}
-        PRIVATE ${PODOFO_INCLUDE_DIR}
-        PRIVATE ${CMAKE_SOURCE_DIR}/node_modules/node-addon-api/src
-        PRIVATE ${CMAKE_SOURCE_DIR}/node_modules/node-addon-api)
+target_include_directories(${PROJECT_NAME} PRIVATE 
+		${CMAKE_JS_INC}
+        ${PODOFO_INCLUDE_DIR} 
+        ${CMAKE_SOURCE_DIR}/node_modules/node-addon-api/src 
+        ${CMAKE_SOURCE_DIR}/node_modules/node-addon-api )
 
-target_link_libraries(${PROJECT_NAME}
+target_link_libraries(${PROJECT_NAME} PRIVATE
         ${CMAKE_JS_LIB}
-        # PUBLIC Boost::filesystem
-        PUBLIC ${PODOFO_LIBRARY})
+        ${PODOFO_LIBRARY} )

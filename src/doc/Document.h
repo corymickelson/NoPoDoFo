@@ -8,8 +8,6 @@
 #include <napi.h>
 #include <podofo/podofo.h>
 
-#include <utility>
-
 using namespace std;
 
 class Document : public Napi::ObjectWrap<Document>

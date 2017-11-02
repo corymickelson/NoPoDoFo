@@ -13,6 +13,7 @@ CTestTestfile.cmake
 
 .idea/
 .vscode/
+.vs/
 build/
 cmake-build-debug/
 node_modules/
