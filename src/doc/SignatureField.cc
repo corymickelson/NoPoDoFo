@@ -15,17 +15,26 @@ using namespace PoDoFo;
 SignatureField::SignatureField(const CallbackInfo& info)
   : ObjectWrap<SignatureField>(info)
 {
-  // annotation, acroform, document
-  AssertFunctionArgs(info,
-                     3,
-                     { napi_valuetype::napi_object,
-                       napi_valuetype::napi_object,
-                       napi_valuetype::napi_object });
-  auto annot = Annotation::Unwrap(info[0].As<Object>());
-  auto form = Form::Unwrap(info[1].As<Object>());
-  auto doc = Document::Unwrap(info[2].As<Object>());
-  field = new PdfSignatureField(
-    annot->GetAnnotation(), form->GetForm(), doc->GetDocument());
+  try {
+    if (info.Length() == 3) {
+      AssertFunctionArgs(info,
+                         3,
+                         { napi_valuetype::napi_object,
+                           napi_valuetype::napi_object,
+                           napi_valuetype::napi_object });
+      auto annot = Annotation::Unwrap(info[0].As<Object>());
+      auto form = Form::Unwrap(info[1].As<Object>());
+      auto doc = Document::Unwrap(info[2].As<Object>());
+      field = new PdfSignatureField(
+        annot->GetAnnotation(), form->GetForm(), doc->GetDocument());
+
+    } else if (info.Length() == 1) {
+      AssertFunctionArgs(info, 1, { napi_valuetype::napi_external });
+      field = info[0].As<External<PdfSignatureField>>().Data();
+    }
+  } catch (PdfError& err) {
+    ErrorHandler(err, info);
+  }
 }
 
 void
@@ -60,8 +69,8 @@ SignatureField::SetSignature(const CallbackInfo& info)
   AssertFunctionArgs(info, 1, { napi_valuetype::napi_string });
   string data = info[0].As<String>().Utf8Value();
   try {
-    PdfData signature(data.c_str());
-    field->SetSignature(signature);
+    signatureBuffer = new PdfData(data.c_str());
+    field->SetSignature(*signatureBuffer);
   } catch (PdfError& err) {
     ErrorHandler(err, info);
   }
@@ -95,6 +104,13 @@ void
 SignatureField::SetDate(const CallbackInfo& info)
 {
   field->SetSignatureDate(PdfDate());
+}
+
+void
+SignatureField::SetFieldName(const CallbackInfo& info)
+{
+  AssertFunctionArgs(info, 1, { napi_valuetype::napi_string });
+  field->SetFieldName(info[0].As<String>().Utf8Value());
 }
 
 void

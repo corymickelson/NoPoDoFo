@@ -26,8 +26,10 @@ export class Dictionary {
         return this._instance.hasKey(key)
     }
 
-    addKey(key: string, value: Obj): void {
-        this._instance.addKey(key, value._instance)
+    addKey(key: string, value: Obj|number|boolean|string): void {
+        if(value instanceof Obj)
+            this._instance.addKey(key, value._instance)
+        else this._instance.addKey(key, value)
     }
 
     removeKey(key: string): void {

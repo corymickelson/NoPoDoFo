@@ -1,13 +1,13 @@
 //
 // Created by red on 9/6/17.
 //
-
 #include "Document.h"
 #include "../ErrorHandler.h"
 #include "../ValidateArguments.h"
 #include "../base/Obj.h"
 #include "Encrypt.h"
 #include "Page.h"
+#include "SignatureField.h"
 
 using namespace Napi;
 using namespace std;
@@ -510,7 +510,7 @@ protected:
       if (arg.empty()) {
         throw Napi::Error::New(Env(), "null destination path");
       }
-      doc->GetDocument()->Load(arg.c_str());
+      doc->GetDocument()->Load(arg.c_str(), doc->LoadedForIncrementalUpdates());
     } catch (PdfError& err) {
       SetError(ErrorHandler::WriteMsg(err));
     } catch (Napi::Error& err) {
