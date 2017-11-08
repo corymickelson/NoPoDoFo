@@ -30,8 +30,10 @@
   "license": "ISC",
   "devDependencies": {
     "@types/node": "^8.0.47",
+    "@types/node-forge": "^0.6.10",
     "@types/tape": "^4.2.31",
     "husky": "^0.14.3",
+    "node-forge": "^0.7.1",
     "tap-spec": "^4.1.1",
     "tape": "^4.8.0",
     "typescript": "~2.5.3"

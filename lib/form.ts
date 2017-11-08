@@ -12,6 +12,6 @@ export class Form {
     }
 
     getObject():Obj {
-        return this._instance.getObject()
+        return new Obj(this._instance.getObject())
     }
 }
