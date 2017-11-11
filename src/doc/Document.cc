@@ -350,18 +350,24 @@ Document::GetEncrypt(const CallbackInfo& info)
 Napi::Value
 Document::GetObjects(const CallbackInfo& info)
 {
-  auto js = Napi::Array::New(info.Env());
-  auto it = document->GetObjects().begin();
-  int count = 0;
-  while (it != document->GetObjects().end()) {
-    if (!(*it))
-      break;
-    auto instance = External<PdfObject>::New(info.Env(), (*it));
-    js[count] = Obj::constructor.New({ instance });
-    ++it;
-    ++count;
+  try {
+    auto js = Napi::Array::New(info.Env());
+    auto it = document->GetObjects().begin();
+    uint32_t count = 0;
+    while (it != document->GetObjects().end()) {
+      if (!(*it))
+        break;
+      auto instance = External<PdfObject>::New(info.Env(), (*it));
+      js[count] = Obj::constructor.New({ instance });
+      ++it;
+      ++count;
+    }
+    return js;
+  } catch (PdfError& err) {
+    ErrorHandler(err, info);
+  } catch (Error& err) {
+    ErrorHandler(err, info);
   }
-  return js;
 }
 
 Napi::Value

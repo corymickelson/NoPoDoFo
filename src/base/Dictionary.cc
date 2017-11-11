@@ -14,7 +14,14 @@ Dictionary::Dictionary(const CallbackInfo& info)
   : ObjectWrap<Dictionary>(info)
 {
   auto objWrap = info[0].As<Object>();
+  if (!objWrap.InstanceOf(Obj::constructor.Value())) {
+    throw Error::New(
+      info.Env(), "Dictionary constructor requires an instance of PdfObject");
+  }
   auto objPtr = Obj::Unwrap(objWrap);
+  if (!objPtr->GetObject().IsDictionary()) {
+    throw Error::New(info.Env(), "PdfObject must be of type 'Dictionary'");
+  }
   dict = objPtr->GetObject().GetDictionary();
 }
 void

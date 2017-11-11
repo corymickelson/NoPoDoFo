@@ -42,6 +42,9 @@ Obj::Initialize(Napi::Env& env, Napi::Object& target)
 Obj::Obj(const Napi::CallbackInfo& info)
   : ObjectWrap<Obj>(info)
 {
+  if (info.Length() < 1) {
+    throw Error::New(info.Env(), "requires PdfObject external pointer");
+  }
   obj = info[0].As<Napi::External<PdfObject>>().Data();
 }
 
