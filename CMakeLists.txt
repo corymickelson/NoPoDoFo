@@ -6,8 +6,6 @@ project(npdf)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_FLAGS -fPIC)
-set(CMAKE_CXX_FLAGS -fno-exceptions)
-set(CMAKE_C_FLAGS -fno-exceptions)
 set(NAPI_CPP_EXCEPTIONS "yes")
 if(MSVC)
 	set(CMAKE_CXX_FLAGS /EH)

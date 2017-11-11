@@ -14,7 +14,11 @@ class Document : public Napi::ObjectWrap<Document>
 {
 public:
   explicit Document(const Napi::CallbackInfo& callbackInfo); // constructor
-  ~Document() { delete document; }
+  ~Document()
+  {
+    PoDoFo::podofo_free(document);
+    document = nullptr;
+  }
   string originPdf;
 
   static void Initialize(Napi::Env& env, Napi::Object& target);
@@ -32,7 +36,6 @@ public:
   Napi::Value GetWriteMode(const Napi::CallbackInfo&);
   void SetEncrypt(const Napi::CallbackInfo&, const Napi::Value&);
   Napi::Value GetEncrypt(const Napi::CallbackInfo&);
-  Napi::Value CreateEncrypt(const Napi::CallbackInfo&);
   Napi::Value GetObjects(const Napi::CallbackInfo&);
   Napi::Value GetTrailer(const Napi::CallbackInfo&);
   Napi::Value IsAllowed(const Napi::CallbackInfo&);
@@ -41,13 +44,6 @@ public:
 
 private:
   PoDoFo::PdfMemDocument* document;
-  void ParseJsEncryptObj(const Napi::CallbackInfo& info,
-                         Napi::Object& obj,
-                         string& owner,
-                         string& user,
-                         int& pro,
-                         int& algo,
-                         int& key);
 };
 
 #endif // NPDF_PDFMEMDOCUMENT_H

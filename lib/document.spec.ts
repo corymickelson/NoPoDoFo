@@ -28,22 +28,21 @@ test('password protected, \'Password required\' error bubbles up', t => {
     })
         .on('error', e => {
             t.ok(e instanceof Error, 'should bubble up error')
-            t.assert(e.message === 'InvalidPassword')
+            t.assert(e.message === "Password required to modify this document")
             t.end()
         })
 })
-
 test('throws JS error on file not found', t => {
     t.throws(() => {
         let doc = new Document('/bad/path')
     })
     t.end()
 })
-
-test.skip('encryption: user password', t => {
+test('encryption: user password', t => {
     const doc = new Document(filePath),
         encryptionOption: EncryptInitOption = {
             ownerPassword: 'secret',
+            userPassword: 'secret',
             keyLength: 40,
             protection: ['Edit', 'FillAndSign'],
             algorithm: 'aesv3'
@@ -55,19 +54,12 @@ test.skip('encryption: user password', t => {
             if (e) t.fail(e.message)
             let sDoc: Document = new Document(secureDoc)
             sDoc.on('ready', () => {
-                let trailer: Obj = sDoc.getTrailer()
-                let trailerDict = new Dictionary(trailer)
-                if (!sDoc.encrypt) {
-                    t.fail()
-                }
-                const fillAndSign = sDoc.encrypt.isAllowed('FillAndSign'),
-                    edit = sDoc.encrypt.isAllowed('Edit')
-
-                t.assert(trailerDict.hasKey("Encrypt") === true, 'trailer has an encryption object')
-                t.end()
+                t.fail("Password required error should have been thrown.")
             })
                 .on('error', e => {
-                    t.fail('error thrown')
+                    if(e instanceof Error) {
+                        t.end()
+                    }
                 })
         }, secureDoc)
     })
@@ -87,7 +79,6 @@ test('document get page count', t => {
 
 test('document delete page', t => {
     const doc = new Document(filePath)
-
     doc.on('ready', () => {
         let pc = doc.getPageCount()
 
@@ -105,7 +96,6 @@ test('document delete page', t => {
         }, outFile)
     })
         .on('error', e => t.fail(e))
-
 })
 
 test('document merger', t => {

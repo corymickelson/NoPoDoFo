@@ -35,9 +35,8 @@ public:
   PoDoFo::PdfDictionary* GetDictionary() { return &dict; }
 
 private:
-  const PoDoFo::PdfObject* _obj;
+  PoDoFo::PdfObject* _obj;
   PoDoFo::PdfDictionary dict = PoDoFo::PdfDictionary();
 };
-
 
 #endif

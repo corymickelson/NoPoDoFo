@@ -28,8 +28,6 @@ export interface IDocument {
 
     write(cb: (e: Error) => void, file?: string): void,
 
-    createEncrypt(option: EncryptInitOption): Encrypt
-
     getTrailer(): Obj
 
     isAllowed(protection: ProtectionOption): boolean
@@ -183,11 +181,6 @@ export class Document extends EventEmitter implements IDocument {
         } else {
             this._instance.writeBuffer(cb)
         }
-    }
-
-    createEncrypt(option: EncryptInitOption): Encrypt {
-        const encryptInstance = this._instance.createEncrypt(option)
-        return new Encrypt(encryptInstance)
     }
 
     getTrailer(): Obj {

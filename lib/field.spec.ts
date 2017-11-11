@@ -1,4 +1,3 @@
-import {unlink} from 'fs'
 import {join} from 'path'
 import * as test from 'tape'
 import {Document} from './document'
@@ -9,8 +8,6 @@ const filePath = join(__dirname, '../test.pdf'),
 
 test('create field instance from existing pdf field', t => {
     const doc = new Document(filePath)
-
-
     doc.on('ready', () => {
             const page = doc.getPage(0),
     field = page.getField(0)
@@ -20,12 +17,9 @@ test('create field instance from existing pdf field', t => {
         t.assert(field.getType() === 'TextField')
         t.end()
     })
-
 })
 test('Can instantiate a TextField given a field of type TextField', t => {
     const doc = new Document(filePath)
-
-
     doc.on('ready', () => {
         const page = doc.getPage(0),
     field = page.getField(0)
@@ -34,12 +28,9 @@ test('Can instantiate a TextField given a field of type TextField', t => {
         t.assert(text.text === '')
         t.end()
     })
-
 })
 test('Can instantiate a Checkbox given a field of type CheckBox', t => {
     const doc = new Document(filePath)
-
-
     doc.on('ready', () => {
         const page = doc.getPage(0)
         const fields = page.getFieldsInfo()
@@ -53,9 +44,7 @@ test('Can instantiate a Checkbox given a field of type CheckBox', t => {
         }
         const field = new Field(page, index)
         t.assert(field.getType() === 'CheckBox')
-
         const checkbox = new CheckBox(field)
-
         t.ok(checkbox)
         t.assert(checkbox.checked === false)
         t.end()
