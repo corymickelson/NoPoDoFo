@@ -3,9 +3,22 @@ import {Obj} from './object';
 import {Page} from './page';
 import {Encrypt, EncryptInitOption, ProtectionOption} from './encrypt';
 import {EventEmitter} from 'events';
+import {Font} from "./painter";
 
 export const __mod = require('../build/Release/npdf.node')
-
+export enum FontEncoding {
+    GlobalWinAnsi = 1,
+    GlobalStandard = 2,
+    GlobalPdfDoc = 3
+}
+export interface CreateFontOpts {
+    fontName:string,
+    bold?:boolean,
+    italic?:boolean,
+    encoding?: FontEncoding,
+    embed?:boolean,
+    fileName?:string
+}
 export interface IDocument {
     _instance: any
     encrypt: Encrypt
@@ -31,6 +44,8 @@ export interface IDocument {
     getTrailer(): Obj
 
     isAllowed(protection: ProtectionOption): boolean
+
+    createFont(opts:CreateFontOpts): Font
 }
 
 
@@ -192,4 +207,14 @@ export class Document extends EventEmitter implements IDocument {
         return this._instance.isAllowed(protection)
     }
 
+    createFont(opts:CreateFontOpts & Object): Font {
+        const instance = this._instance.createFont(
+            opts.fontName,
+            opts.hasOwnProperty('bold') ? opts.bold : false,
+            opts.hasOwnProperty('italic') ? opts.italic : false,
+            opts.hasOwnProperty('encoding') ? opts.encoding : 1,
+            opts.hasOwnProperty('embed') ? opts.embed : false,
+            opts.hasOwnProperty('fileName')? opts.fileName : null)
+        return new Font(instance)
+    }
 }

@@ -6,9 +6,12 @@
 #include "doc/Annotation.h"
 #include "doc/CheckBox.h"
 #include "doc/Document.h"
+#include "doc/Encoding.h"
 #include "doc/Encrypt.h"
+#include "doc/ExtGState.h"
 #include "doc/Field.h"
 #include "doc/FileSpec.h"
+#include "doc/Font.h"
 #include "doc/Form.h"
 #include "doc/Image.h"
 #include "doc/ListField.h"
@@ -38,6 +41,9 @@ init(Napi::Env env, Napi::Object exports)
   Stream::Initialize(env, exports);
   Encrypt::Initialize(env, exports);
   ListField::Initialize(env, exports);
+  Font::Initialize(env, exports);
+  Encoding::Initialize(env, exports);
+  ExtGState::Initialize(env, exports);
   return exports;
 }
 

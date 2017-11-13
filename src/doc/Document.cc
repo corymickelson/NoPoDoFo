@@ -7,7 +7,10 @@
 #include "../ValidateArguments.h"
 #include "../base/Obj.h"
 #include "Encrypt.h"
+#include "Font.h"
 #include "Page.h"
+
+#include <podofo/base/PdfEncodingFactory.h>
 
 using namespace Napi;
 using namespace std;
@@ -408,6 +411,60 @@ Document::IsAllowed(const CallbackInfo& info)
       "Unknown argument. Please see definitions file for isAllowed args");
   }
   return Napi::Boolean::New(info.Env(), is);
+}
+
+Value
+Document::CreateFont(const CallbackInfo& info)
+{
+  AssertFunctionArgs(info, 1, { napi_valuetype::napi_string });
+  auto fontname = info[0].As<String>().Utf8Value();
+  bool bold = false;
+  bool italic = false;
+  const PdfEncoding* encoding = nullptr;
+  bool embed = false;
+  const char* filename = nullptr;
+  if (info.Length() >= 2 && info[1].IsBoolean())
+    bold = info[1].As<Boolean>();
+  if (info.Length() >= 3 && info[2].IsBoolean())
+    italic = info[2].As<Boolean>();
+  if (info.Length() >= 4 && info[3].IsNumber()) {
+    int n = info[3].As<Number>();
+    if (n < 1 || n > 3) {
+      throw Error::New(info.Env(), "encoding out of range");
+    }
+    switch (n) {
+      case 1:
+        encoding = PdfEncodingFactory::GlobalWinAnsiEncodingInstance();
+        break;
+      case 2:
+        encoding = PdfEncodingFactory::GlobalStandardEncodingInstance();
+        break;
+      case 3:
+        encoding = PdfEncodingFactory::GlobalPdfDocEncodingInstance();
+        break;
+      default:
+        encoding = PdfEncodingFactory::GlobalWinAnsiEncodingInstance();
+    }
+  }
+  if (info.Length() >= 5 && info[4].IsBoolean())
+    embed = info[4].As<Boolean>();
+  if (info.Length() >= 6 && info[5].IsString())
+    filename = info[5].As<String>().Utf8Value().c_str();
+  PdfFont* font;
+  try {
+    font =
+      document->CreateFont(fontname.c_str(),
+                           bold,
+                           italic,
+                           false,
+                           encoding,
+                           PdfFontCache::eFontCreationFlags_AutoSelectBase14,
+                           embed,
+                           filename);
+  } catch (PdfError& err) {
+    ErrorHandler(err, info);
+  }
+  return Font::constructor.New({ External<PdfFont>::New(info.Env(), font) });
 }
 
 class DocumentWriteAsync : public Napi::AsyncWorker
