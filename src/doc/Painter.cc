@@ -48,6 +48,7 @@ Painter::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceMethod("setMiterLimit", &Painter::SetMiterLimit),
       InstanceMethod("rectangle", &Painter::Rectangle),
       InstanceMethod("ellipse", &Painter::Ellipse),
+      InstanceMethod("circle", &Painter::Circle),
       InstanceMethod("closePath", &Painter::ClosePath),
       InstanceMethod("lineTo", &Painter::LineTo),
       InstanceMethod("moveTo", &Painter::MoveTo),
@@ -649,13 +650,13 @@ Painter::SetTabWidth(const CallbackInfo& info, const Napi::Value& value)
   }
 }
 
-Value
+Napi::Value
 Painter::GetTabWidth(const CallbackInfo& info)
 {
   return Number::New(info.Env(), painter->GetTabWidth());
 }
 
-Value
+Napi::Value
 Painter::GetCurrentPath(const CallbackInfo& info)
 {
   return String::New(info.Env(), painter->GetCurrentPath().str());

@@ -28,6 +28,7 @@ ExtGState::Initialize(Napi::Env& env, Object& target)
       InstanceMethod("setOverprint", &ExtGState::SetOverprint),
       InstanceMethod("SetFillOverprint", &ExtGState::SetFillOverprint),
       InstanceMethod("setStrokeOverprint", &ExtGState::SetStrokeOverprint),
+      InstanceMethod("setStrokeOpacity", &ExtGState::SetStrokeOpacity),
       InstanceMethod("setNonZeroOverprint", &ExtGState::SetNonZeroOverprint),
       InstanceMethod("setRenderingIntent", &ExtGState::SetRenderingIntent),
       InstanceMethod("setFrequency", &ExtGState::SetFrequency) });
