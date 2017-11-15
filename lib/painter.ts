@@ -273,7 +273,7 @@ export class Painter {
     }
 
     bt(point:NPDFPoint): void {
-        this._instance.beginText()
+        this._instance.beginText(point)
     }
 
     et(): void {

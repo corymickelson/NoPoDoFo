@@ -692,7 +692,7 @@ Painter::DrawTextAligned(const CallbackInfo& info)
   double x, y, width;
   int alignmentIndex = info[2].As<Number>();
   string text = info[1].As<String>().Utf8Value();
-  EPdfAlignment alignment = static_cast<EPdfAlignment>(alignmentIndex);
+  auto alignment = static_cast<EPdfAlignment>(alignmentIndex);
   auto o = info[0].As<Object>();
   x = o.Get("x").As<Number>();
   y = o.Get("y").As<Number>();
@@ -704,7 +704,7 @@ Painter::DrawTextAligned(const CallbackInfo& info)
   }
 }
 
-Value
+Napi::Value
 Painter::GetMultiLineText(const CallbackInfo& info)
 {
   AssertFunctionArgs(info,
@@ -718,7 +718,6 @@ Painter::GetMultiLineText(const CallbackInfo& info)
   vector<PdfString> lines =
     painter->GetMultiLineTextAsLines(width, PdfString(text), skipSpaces);
   auto js = Array::New(info.Env());
-  PdfString str("");
   uint32_t count = 0;
   for (auto& i : lines) {
     js.Set(count, i.GetStringUtf8());
