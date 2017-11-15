@@ -204,7 +204,11 @@ Painter::DrawText(const CallbackInfo& info)
   auto d = info[0].As<Object>();
   x = d.Get("x").As<Number>();
   y = d.Get("y").As<Number>();
-  painter->DrawText(x, y, PdfString(text));
+  try {
+    painter->DrawText(x, y, text.c_str());
+  } catch(PdfError &err) {
+    ErrorHandler(err, info);
+  }
 }
 void
 Painter::DrawMultiLineText(const CallbackInfo& info)

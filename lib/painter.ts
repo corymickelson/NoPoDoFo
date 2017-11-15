@@ -261,7 +261,7 @@ export class Painter {
     }
 
     drawText(point:NPDFPoint, text:string): void {
-        this._instance.drawTextAligned(point, text)
+        this._instance.drawText(point, text)
     }
 
     drawTextAligned(point:NPDFPoint, text:string, alignment:NPDFAlignment): void {

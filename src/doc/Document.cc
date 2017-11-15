@@ -37,7 +37,8 @@ Document::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceMethod("writeBuffer", &Document::WriteBuffer),
       InstanceMethod("getObjects", &Document::GetObjects),
       InstanceMethod("getTrailer", &Document::GetTrailer),
-      InstanceMethod("isAllowed", &Document::IsAllowed) });
+      InstanceMethod("isAllowed", &Document::IsAllowed),
+    InstanceMethod("createFont", &Document::CreateFont)});
 
   target.Set("Document", ctor);
 }

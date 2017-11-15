@@ -140,20 +140,20 @@ Font::GetFontMetric(const Napi::CallbackInfo& info)
 {
   auto obj = Object::New(info.Env());
   const PdfFontMetrics* metrics = font->GetFontMetrics();
-  obj.Set("lineSpacing", metrics->GetLineSpacing());
-  obj.Set("underlineThickness", metrics->GetUnderlineThickness());
-  obj.Set("underlinePosition", metrics->GetUnderlinePosition());
-  obj.Set("strikeOutPosition", metrics->GetStrikeOutPosition());
-  obj.Set("strikeOutThickness", metrics->GetStrikeoutThickness());
-  obj.Set("fileName", metrics->GetFilename());
-  obj.Set("fontData", metrics->GetFontData());
-  obj.Set("fontName", metrics->GetFontname());
-  obj.Set("fontWeight", metrics->GetWeight());
-  obj.Set("fontSize", metrics->GetFontSize());
-  obj.Set("fontScale", metrics->GetFontScale());
-  obj.Set("charSpace", metrics->GetFontCharSpace());
-  obj.Set("wordSpace", metrics->GetWordSpace());
-  //  obj.Set("fontType", metrics->GetFontType());
+  obj.Set("lineSpacing", Number::New(info.Env(), metrics->GetLineSpacing()));
+  obj.Set("underlineThickness", Number::New(info.Env(), metrics->GetUnderlineThickness()));
+  obj.Set("underlinePosition", Number::New(info.Env(), metrics->GetUnderlinePosition()));
+  obj.Set("strikeOutPosition", Number::New(info.Env(), metrics->GetStrikeOutPosition()));
+  obj.Set("strikeOutThickness", Number::New(info.Env(), metrics->GetStrikeoutThickness()));
+  obj.Set("fileName", String::New(info.Env(), metrics->GetFilename()));
+//  obj.Set("fontData", String::New(info.Env(), metrics->GetFontData()));
+  obj.Set("fontName", String::New(info.Env(), metrics->GetFontname()));
+  obj.Set("fontWeight", Number::New(info.Env(), metrics->GetWeight()));
+  obj.Set("fontSize", Number::New(info.Env(), metrics->GetFontSize()));
+  obj.Set("fontScale", Number::New(info.Env(), metrics->GetFontScale()));
+  obj.Set("charSpace", Number::New(info.Env(), metrics->GetFontCharSpace()));
+  obj.Set("wordSpace", Number::New(info.Env(), metrics->GetWordSpace()));
+//    obj.Set("fontType", metrics->GetFontType());
   return obj;
 }
 Napi::Value
