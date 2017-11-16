@@ -226,7 +226,7 @@ Painter::DrawMultiLineText(const CallbackInfo& info)
   EPdfAlignment alignment =
     static_cast<EPdfAlignment>(info[2].As<Number>().Int32Value());
   EPdfVerticalAlignment verticalAlignment =
-    static_cast<EPdfVerticalAlignment>(info[3].As<Number>().Int64Value());
+    static_cast<EPdfVerticalAlignment>(info[3].As<Number>().Int32Value());
   bool clip = info[4].As<Boolean>();
   bool skipSpaces = info[5].As<Boolean>();
   try {

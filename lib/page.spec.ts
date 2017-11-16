@@ -28,11 +28,15 @@ function pageRotation() {
             newRotation = originalRotation + 90
         page.rotation = newRotation
         doc.write(e => {
-            const testDoc = new Document(outFile),
-                testPage = testDoc.getPage(0)
-            t.assert(testPage.rotation === newRotation, 'Page rotation updated')
-            unlinkSync(outFile)
-            t.end()
+            const testDoc = new Document(outFile)
+            testDoc.on('ready', e => {
+                if (e instanceof Error) t.fail()
+                const testPage = testDoc.getPage(0)
+                t.assert(testPage.rotation === newRotation, 'Page rotation updated')
+                unlinkSync(outFile)
+                t.end()
+            })
+
         }, outFile)
 
 
@@ -212,17 +216,17 @@ function runTest(test: Function) {
 
 export function runAll() {
     [
-        // pageRotation,
-        // pageProperties,
-        // pageTrimBox,
-        // pageFields,
-        // pageFieldInfoArray,
-        // pageGetField,
-        // pageGetFields,
-        // pageGetAnnotsCount,
-        // pageGetAnnot,
-        // pageContents,
-        // pageResources,
+        pageRotation,
+        pageProperties,
+        pageTrimBox,
+        pageFields,
+        pageFieldInfoArray,
+        pageGetField,
+        pageGetFields,
+        pageGetAnnotsCount,
+        pageGetAnnot,
+        pageContents,
+        pageResources,
         pageAddImg
     ].map(i => runTest(i))
 }
