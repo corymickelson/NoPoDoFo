@@ -9,20 +9,17 @@
 class Signer : public Napi::ObjectWrap<Signer>
 {
 public:
-  Signer(const Napi::CallbackInfo&);
-  ~Signer()
-  {
-    delete doc;
-    delete signer;
-    delete buffer;
-    delete field;
-  }
+	static Napi::FunctionReference constructor;
+  explicit Signer(const Napi::CallbackInfo&);
+  ~Signer();
+
   static void Initialize(Napi::Env& env, Napi::Object& target);
   Napi::Value Sign(const Napi::CallbackInfo&);
   Napi::Value PoDoFoSign(const Napi::CallbackInfo&);
 
   Document* doc;
   SignatureField* field;
+  PoDoFo::PdfOutputDevice* device;
   PoDoFo::PdfSignOutputDevice* signer;
   PoDoFo::PdfRefCountedBuffer* buffer;
 
