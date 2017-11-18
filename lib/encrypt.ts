@@ -8,6 +8,21 @@ export type EncryptInitOption = {
 }
 export class Encrypt {
     private _complete = true;
+    public get owner() {
+        return this._instance.owner
+    }
+    public get user() {
+        return this._instance.user
+    }
+    public get encryptionKey() {
+        return this._instance.encryptionKey
+    }
+    public get keyLength() {
+        return this._instance.keyLength
+    }
+    public get permission() {
+        return this._instance.permission
+    }
     constructor(public _instance: any, public option?:EncryptInitOption) { 
         if(_instance === null && option instanceof Object) {
             this._complete = false;

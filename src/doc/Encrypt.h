@@ -22,6 +22,11 @@ public:
 
   Napi::Value IsAllowed(const Napi::CallbackInfo&);
   Napi::Value Authenticate(const Napi::CallbackInfo&);
+  Napi::Value GetOwnerValue(const Napi::CallbackInfo&);
+  Napi::Value GetUserValue(const Napi::CallbackInfo&);
+  Napi::Value GetPermissionValue(const Napi::CallbackInfo&);
+  Napi::Value GetEncryptionKey(const Napi::CallbackInfo&);
+  Napi::Value GetKeyLength(const Napi::CallbackInfo&);
 
 private:
   PoDoFo::PdfEncrypt* encrypt;

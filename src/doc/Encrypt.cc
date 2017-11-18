@@ -17,11 +17,16 @@ Encrypt::Encrypt(const Napi::CallbackInfo& info)
 void
 Encrypt::Initialize(Napi::Env& env, Napi::Object& target)
 {
-  Function ctor =
-    DefineClass(env,
-                "Encrypt",
-                { InstanceMethod("isAllowed", &Encrypt::IsAllowed),
-                  InstanceMethod("authenticate", &Encrypt::Authenticate) });
+  Function ctor = DefineClass(
+    env,
+    "Encrypt",
+    { InstanceAccessor("user", &Encrypt::GetUserValue, nullptr),
+      InstanceAccessor("owner", &Encrypt::GetOwnerValue, nullptr),
+      InstanceAccessor("permission", &Encrypt::GetOwnerValue, nullptr),
+      InstanceAccessor("encryptionKey", &Encrypt::GetEncryptionKey, nullptr),
+      InstanceAccessor("keyLength", &Encrypt::GetKeyLength, nullptr),
+      InstanceMethod("isAllowed", &Encrypt::IsAllowed),
+      InstanceMethod("authenticate", &Encrypt::Authenticate) });
   constructor = Persistent(ctor);
   constructor.SuppressDestruct();
   target.Set("Encrypt", ctor);
@@ -94,4 +99,37 @@ Encrypt::Authenticate(const CallbackInfo& info)
                 .GetString()
                 .GetStringUtf8();
   return Napi::Boolean::New(info.Env(), encrypt->Authenticate(pwd, id));
+}
+
+Value
+Encrypt::GetOwnerValue(const CallbackInfo& info)
+{
+  return String::New(info.Env(),
+                     reinterpret_cast<const char*>(encrypt->GetOValue()));
+}
+
+Value
+Encrypt::GetUserValue(const CallbackInfo& info)
+{
+  return String::New(info.Env(),
+                     reinterpret_cast<const char*>(encrypt->GetUValue()));
+}
+
+Value
+Encrypt::GetPermissionValue(const CallbackInfo& info)
+{
+  return Number::New(info.Env(), encrypt->GetPValue());
+}
+
+Value
+Encrypt::GetEncryptionKey(const CallbackInfo& info)
+{
+  return String::New(
+    info.Env(), reinterpret_cast<const char*>(encrypt->GetEncryptionKey()));
+}
+
+Value
+Encrypt::GetKeyLength(const CallbackInfo& info)
+{
+  return Number::New(info.Env(), encrypt->GetKeyLength());
 }

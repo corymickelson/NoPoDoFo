@@ -1,9 +1,7 @@
-import {existsSync, unlink, unlinkSync, writeFile} from 'fs'
+import {existsSync, unlinkSync, writeFile} from 'fs'
 import {join} from 'path'
 import * as test from 'tape'
 import {Document} from './document'
-import {Rect} from "./rect";
-import {NPdfAnnotation, IAnnotation, Annotation} from "./annotation";
 import {Obj} from "./object";
 import {Field} from './field';
 import {Painter} from "./painter";

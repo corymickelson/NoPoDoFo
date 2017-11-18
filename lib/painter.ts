@@ -400,6 +400,10 @@ export class Font {
         return this._instance.getMetrics()
     }
 
+    stringWidth(v:string): number {
+        return this._instance.stringWidth(v)
+    }
+
     write(content: string, stream: Stream): void {
         this._instance.write(content, (stream as any)._instance)
     }

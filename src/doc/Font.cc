@@ -39,7 +39,8 @@ Font::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceMethod("getMetrics", &Font::GetFontMetric),
       InstanceMethod("getEncoding", &Font::GetEncoding),
       InstanceMethod("write", &Font::WriteToStream),
-      InstanceMethod("embed", &Font::EmbedFont) });
+      InstanceMethod("embed", &Font::EmbedFont),
+      InstanceMethod("stringWidth", &Font::StringWidth) });
   constructor = Persistent(ctor);
   constructor.SuppressDestruct();
   target.Set("Font", ctor);
@@ -141,19 +142,30 @@ Font::GetFontMetric(const Napi::CallbackInfo& info)
   auto obj = Object::New(info.Env());
   const PdfFontMetrics* metrics = font->GetFontMetrics();
   obj.Set("lineSpacing", Number::New(info.Env(), metrics->GetLineSpacing()));
-  obj.Set("underlineThickness", Number::New(info.Env(), metrics->GetUnderlineThickness()));
-  obj.Set("underlinePosition", Number::New(info.Env(), metrics->GetUnderlinePosition()));
-  obj.Set("strikeOutPosition", Number::New(info.Env(), metrics->GetStrikeOutPosition()));
-  obj.Set("strikeOutThickness", Number::New(info.Env(), metrics->GetStrikeoutThickness()));
+  obj.Set("underlineThickness",
+          Number::New(info.Env(), metrics->GetUnderlineThickness()));
+  obj.Set("underlinePosition",
+          Number::New(info.Env(), metrics->GetUnderlinePosition()));
+  obj.Set("strikeOutPosition",
+          Number::New(info.Env(), metrics->GetStrikeOutPosition()));
+  obj.Set("strikeOutThickness",
+          Number::New(info.Env(), metrics->GetStrikeoutThickness()));
   obj.Set("fileName", String::New(info.Env(), metrics->GetFilename()));
-//  obj.Set("fontData", String::New(info.Env(), metrics->GetFontData()));
+  //  obj.Set("fontData", String::New(info.Env(), metrics->GetFontData()));
   obj.Set("fontName", String::New(info.Env(), metrics->GetFontname()));
   obj.Set("fontWeight", Number::New(info.Env(), metrics->GetWeight()));
-  obj.Set("fontSize", Number::New(info.Env(), metrics->GetFontSize()));
-  obj.Set("fontScale", Number::New(info.Env(), metrics->GetFontScale()));
-  obj.Set("charSpace", Number::New(info.Env(), metrics->GetFontCharSpace()));
-  obj.Set("wordSpace", Number::New(info.Env(), metrics->GetWordSpace()));
-//    obj.Set("fontType", metrics->GetFontType());
+  obj.Set("fontSize",
+          Number::New(info.Env(), static_cast<double>(metrics->GetFontSize())));
+  obj.Set(
+    "fontScale",
+    Number::New(info.Env(), static_cast<double>(metrics->GetFontScale())));
+  obj.Set(
+    "charSpace",
+    Number::New(info.Env(), static_cast<double>(metrics->GetFontCharSpace())));
+  obj.Set(
+    "wordSpace",
+    Number::New(info.Env(), static_cast<double>(metrics->GetWordSpace())));
+  //    obj.Set("fontType", metrics->GetFontType());
   return obj;
 }
 Napi::Value
@@ -165,6 +177,14 @@ Napi::Value
 Font::IsItalic(const Napi::CallbackInfo& info)
 {
   return Boolean::New(info.Env(), font->IsItalic());
+}
+
+Value
+Font::StringWidth(const CallbackInfo& info)
+{
+  AssertFunctionArgs(info, 1, { napi_valuetype::napi_string });
+  string text = info[0].As<String>().Utf8Value();
+  return Number::New(info.Env(), font->GetFontMetrics()->StringWidth(text));
 }
 void
 Font::WriteToStream(const Napi::CallbackInfo& info)
