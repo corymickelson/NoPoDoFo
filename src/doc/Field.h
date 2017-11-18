@@ -15,6 +15,7 @@ class Field : public Napi::ObjectWrap<Field>
 public:
   Field(const CallbackInfo& info);
   ~Field() { delete _page; }
+  static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
 
   Napi::Value GetType(const CallbackInfo&);

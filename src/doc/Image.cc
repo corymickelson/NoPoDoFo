@@ -3,11 +3,13 @@
 //
 
 #include "Image.h"
-#include "../ValidateArguments.h"
 #include "../ErrorHandler.h"
+#include "../ValidateArguments.h"
 
 using namespace Napi;
 using namespace PoDoFo;
+
+FunctionReference Image::constructor;
 
 Image::Image(const CallbackInfo& info)
   : ObjectWrap(info)

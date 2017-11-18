@@ -16,6 +16,7 @@ using namespace std;
 class TextField : public Napi::ObjectWrap<TextField>
 {
 public:
+  static Napi::FunctionReference constructor;
   explicit TextField(const Napi::CallbackInfo&);
   ~TextField() { delete field; }
   static void Initialize(Napi::Env& env, Napi::Object& target);

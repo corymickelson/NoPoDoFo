@@ -17,6 +17,7 @@ public:
     delete field;
     delete signatureBuffer;
   }
+  static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
   void SetAppearanceStream(const Napi::CallbackInfo&);
   void SetSignature(const Napi::CallbackInfo&);

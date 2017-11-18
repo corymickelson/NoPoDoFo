@@ -4,6 +4,8 @@
 using namespace PoDoFo;
 using namespace Napi;
 
+FunctionReference ListField::constructor;
+
 ListField::ListField(const CallbackInfo& info)
   : ObjectWrap(info)
 {

@@ -15,6 +15,7 @@ class Rect : public Napi::ObjectWrap<Rect>
 public:
   Rect(const Napi::CallbackInfo& callbackInfo);
   ~Rect() {}
+  static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
 
   void Intersect(const Napi::CallbackInfo&);

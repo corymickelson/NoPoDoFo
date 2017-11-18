@@ -18,6 +18,7 @@ public:
     delete _doc;
     delete img;
   }
+  static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
   Napi::Value GetWidth(const Napi::CallbackInfo&);
   Napi::Value GetHeight(const Napi::CallbackInfo&);

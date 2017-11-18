@@ -9,10 +9,9 @@
 class Signer : public Napi::ObjectWrap<Signer>
 {
 public:
-	static Napi::FunctionReference constructor;
+  static Napi::FunctionReference constructor;
   explicit Signer(const Napi::CallbackInfo&);
   ~Signer();
-
   static void Initialize(Napi::Env& env, Napi::Object& target);
   Napi::Value Sign(const Napi::CallbackInfo&);
   Napi::Value PoDoFoSign(const Napi::CallbackInfo&);

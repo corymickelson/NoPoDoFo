@@ -9,6 +9,8 @@
 using namespace Napi;
 using namespace PoDoFo;
 
+FunctionReference Field::constructor;
+
 Field::Field(const CallbackInfo& info)
   : ObjectWrap(info)
 {

@@ -4,6 +4,8 @@
 
 #include "CheckBox.h"
 
+FunctionReference CheckBox::constructor;
+
 CheckBox::CheckBox(const CallbackInfo& info)
   : ObjectWrap<CheckBox>(info)
 {

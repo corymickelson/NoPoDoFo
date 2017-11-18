@@ -10,6 +10,8 @@
 using namespace Napi;
 using namespace PoDoFo;
 
+FunctionReference Dictionary::constructor;
+
 Dictionary::Dictionary(const CallbackInfo& info)
   : ObjectWrap<Dictionary>(info)
 {

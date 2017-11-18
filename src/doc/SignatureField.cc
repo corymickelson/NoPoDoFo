@@ -12,6 +12,8 @@
 using namespace Napi;
 using namespace PoDoFo;
 
+FunctionReference SignatureField::constructor;
+
 SignatureField::SignatureField(const CallbackInfo& info)
   : ObjectWrap<SignatureField>(info)
 {

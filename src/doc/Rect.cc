@@ -7,6 +7,8 @@
 using namespace Napi;
 using namespace PoDoFo;
 
+FunctionReference Rect::constructor;
+
 Rect::Rect(const CallbackInfo& info)
   : ObjectWrap(info)
 {

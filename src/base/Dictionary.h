@@ -15,6 +15,7 @@ class Dictionary : public Napi::ObjectWrap<Dictionary>
 public:
   explicit Dictionary(const Napi::CallbackInfo&);
   ~Dictionary() { delete _obj; }
+  static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
 
   void AddKey(const Napi::CallbackInfo&);

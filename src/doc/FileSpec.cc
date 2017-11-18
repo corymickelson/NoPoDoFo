@@ -10,6 +10,8 @@
 using namespace Napi;
 using namespace PoDoFo;
 
+FunctionReference FileSpec::constructor;
+
 void
 FileSpec::Initialize(Napi::Env& env, Napi::Object& target)
 {

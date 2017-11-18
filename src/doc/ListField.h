@@ -19,6 +19,7 @@ public:
     delete field;
     delete list;
   }
+  static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
   void InsertItem(const Napi::CallbackInfo&);
   void RemoveItem(const Napi::CallbackInfo&);

@@ -16,6 +16,7 @@ class FileSpec : public Napi::ObjectWrap<FileSpec>
 public:
   FileSpec(const Napi::CallbackInfo&);
   ~FileSpec() { delete spec; }
+  static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
 
 private:

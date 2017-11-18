@@ -16,6 +16,7 @@
 using namespace Napi;
 using namespace PoDoFo;
 
+FunctionReference Painter::constructor;
 Painter::Painter(const Napi::CallbackInfo& info)
   : ObjectWrap(info)
 {}
@@ -206,7 +207,7 @@ Painter::DrawText(const CallbackInfo& info)
   y = d.Get("y").As<Number>();
   try {
     painter->DrawText(x, y, text.c_str());
-  } catch(PdfError &err) {
+  } catch (PdfError& err) {
     ErrorHandler(err, info);
   }
 }

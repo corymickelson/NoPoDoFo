@@ -20,6 +20,7 @@ public:
     delete document;
   }
   PoDoFo::PdfRect pageSize;
+  static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
   void SetPage(const Napi::CallbackInfo&, const Napi::Value&);
   Napi::Value GetPage(const Napi::CallbackInfo&);

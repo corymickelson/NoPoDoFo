@@ -5,6 +5,8 @@
 using namespace Napi;
 using namespace PoDoFo;
 
+FunctionReference Form::constructor;
+
 Form::Form(const Napi::CallbackInfo& info)
   : ObjectWrap<Form>(info)
 {

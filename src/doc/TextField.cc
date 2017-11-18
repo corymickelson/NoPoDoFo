@@ -7,6 +7,7 @@
 using namespace Napi;
 using namespace PoDoFo;
 
+FunctionReference TextField::constructor;
 TextField::TextField(const CallbackInfo& info)
   : ObjectWrap(info)
 {
