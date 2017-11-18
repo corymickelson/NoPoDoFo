@@ -9,6 +9,7 @@
 using namespace Napi;
 using namespace PoDoFo;
 
+namespace NoPoDoFo {
 FunctionReference Field::constructor;
 
 Field::Field(const CallbackInfo& info)
@@ -145,4 +146,5 @@ Napi::Value
 Field::GetFieldIndex(const CallbackInfo& info)
 {
   return Napi::Number::New(info.Env(), fieldIndex);
+}
 }

@@ -9,7 +9,7 @@
 #include "Page.h"
 #include <napi.h>
 #include <podofo/podofo.h>
-
+namespace NoPoDoFo {
 class Rect : public Napi::ObjectWrap<Rect>
 {
 public:
@@ -32,5 +32,5 @@ public:
 private:
   PoDoFo::PdfRect rect = *new PoDoFo::PdfRect();
 };
-
+}
 #endif // NPDF_RECT_H

@@ -1,13 +1,13 @@
 #include "Obj.h"
 #include "../ErrorHandler.h"
 #include "../ValidateArguments.h"
-#include "Arr.h"
+#include "Array.h"
 #include "Dictionary.h"
 #include "Ref.h"
 
 using namespace Napi;
 using namespace PoDoFo;
-
+namespace NoPoDoFo {
 FunctionReference Obj::constructor;
 
 void
@@ -198,7 +198,7 @@ Obj::GetArray(const CallbackInfo& info)
   }
   auto init = obj->GetArray();
   auto ptr = External<PdfArray>::New(info.Env(), &init);
-  auto instance = Arr::constructor.New({ ptr });
+  auto instance = NoPoDoFo::Array::constructor.New({ ptr });
   return instance;
 }
 
@@ -241,10 +241,9 @@ public:
     , obj(obj)
     , arg(std::move(arg))
   {}
-  ~ObjOffsetAsync() {}
 
 protected:
-  void Execute()
+  void Execute() override
   {
     try {
       PdfObject o = obj->GetObject();
@@ -255,7 +254,7 @@ protected:
       SetError(err.Message());
     }
   }
-  void OnOK()
+  void OnOK() override
   {
     HandleScope scope(Env());
     Callback().Call({ Env().Null(), Napi::Number::New(Env(), value) });
@@ -287,21 +286,20 @@ public:
     , obj(obj)
     , arg(std::move(dest))
   {}
-  ~ObjWriteAsync() {}
 
 protected:
-  void Execute()
+  void Execute() override
   {
     try {
       PdfOutputDevice device(arg.c_str());
       obj->GetObject().WriteObject(&device, ePdfWriteMode_Default, nullptr);
     } catch (PdfError& err) {
-      SetError(ErrorHandler::WriteMsg(err).c_str());
+      SetError(ErrorHandler::WriteMsg(err));
     } catch (Napi::Error& err) {
-      SetError(err.Message().c_str());
+      SetError(err.Message());
     }
   }
-  void OnOK()
+  void OnOK() override
   {
     HandleScope scope(Env());
     Callback().Call({ Env().Null(), String::New(Env(), arg) });
@@ -322,4 +320,5 @@ Obj::Write(const CallbackInfo& info)
     new ObjWriteAsync(cb, this, info[0].As<String>().Utf8Value());
   worker->Queue();
   return info.Env().Undefined();
+}
 }

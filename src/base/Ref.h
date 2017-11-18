@@ -8,6 +8,7 @@
 #include <napi.h>
 #include <podofo/podofo.h>
 
+namespace NoPoDoFo {
 class Ref : public Napi::ObjectWrap<Ref>
 {
 public:
@@ -31,5 +32,5 @@ public:
 private:
   PoDoFo::PdfReference* ref;
 };
-
+}
 #endif

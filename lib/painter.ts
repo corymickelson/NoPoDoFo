@@ -3,11 +3,11 @@ import {Image} from './image'
 import {Stream} from './stream'
 import {__mod} from './document'
 import {Dictionary} from "./dictionary";
-import {NPdfRgb} from "./annotation";
 import {Rect} from "./rect";
 import {NPDFPoint} from "./painter";
 
-export type NPDFCMYK = [number, number, number, number]
+export type NPDFcmyk = [number, number, number, number]
+export type NPDFrgb = [number, number, number]
 export type NPDFPoint = {x:number, y:number}
 
 export enum NPDFStokeStyle {
@@ -75,7 +75,7 @@ export class Painter {
     }
 
     set page(value: IPage) {
-        this._instance.page = value._instance
+        this._instance.page = (value as any)._instance
     }
 
     get tabWidth(): number {
@@ -110,10 +110,10 @@ export class Painter {
     constructor(page?: IPage) {
         this._instance = new __mod.Painter()
         if (page)
-            this._instance.page = page._instance
+            this._instance.page = (page as any)._instance
     }
 
-    setColor(rgb:NPdfRgb):void {
+    setColor(rgb:NPDFrgb):void {
         this._instance.setColor(rgb)
     }
 
@@ -135,11 +135,11 @@ export class Painter {
         this._instance.setStrokingGrey(v)
     }
 
-    setColorCMYK(cmyk: NPDFCMYK):void {
+    setColorCMYK(cmyk: NPDFcmyk):void {
         this._instance.setColorCMYK(cmyk)
     }
 
-    setStrokingColorCMYK(cmyk:NPDFCMYK): void {
+    setStrokingColorCMYK(cmyk:NPDFcmyk): void {
         this._instance.setStrokingColorCMYK(cmyk)
     }
 
@@ -305,8 +305,8 @@ export class Painter {
      */
     drawImage(img: Image, x: number, y: number, scale?: { width: number, height: number }): void {
         scale ?
-            this._instance.drawImage(img._instance, x, y, scale.width, scale.height) :
-            this._instance.drawImage(img._instance, x, y)
+            this._instance.drawImage((img as any)._instance, x, y, scale.width, scale.height) :
+            this._instance.drawImage((img as any)._instance, x, y)
     }
 
 }

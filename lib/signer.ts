@@ -10,10 +10,10 @@ export class Signer {
             if(existsSync(output)) {
                 throw Error("Do not write signed doc to the same path as the loaded document")
             } else {
-                this._instance = new __mod.Signer(doc._instance, (field as any)._instance, output)
+                this._instance = new __mod.Signer((doc as any)._instance, (field as any)._instance, output)
             }
         } else
-            this._instance = new __mod.Signer(doc._instance, (field as any)._instance)
+            this._instance = new __mod.Signer((doc as any)._instance, (field as any)._instance)
     }
 
     signWithCertificateAndKey(certfile:string, keyfile:string, password?: string): Buffer {

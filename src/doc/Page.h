@@ -11,7 +11,7 @@
 #include <podofo/podofo.h>
 
 using namespace std;
-
+namespace NoPoDoFo {
 class Page : public Napi::ObjectWrap<Page>
 {
 public:
@@ -55,5 +55,5 @@ private:
   Napi::Object ExtractAndApplyRectValues(const Napi::CallbackInfo&,
                                          PoDoFo::PdfRect&);
 };
-
+}
 #endif // NPDF_PDFPAGE_HPP

@@ -5,6 +5,7 @@
 using namespace Napi;
 using namespace PoDoFo;
 
+namespace NoPoDoFo {
 FunctionReference ExtGState::constructor;
 
 ExtGState::ExtGState(const Napi::CallbackInfo& info)
@@ -126,3 +127,4 @@ ExtGState::SetFrequency(const CallbackInfo& info)
   double v = info[0].As<Number>();
   self->SetFrequency(v);
 };
+}

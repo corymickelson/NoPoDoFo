@@ -8,14 +8,12 @@
 #include "Encrypt.h"
 #include "Font.h"
 #include "Page.h"
-#include "SignatureField.h"
-
-#include <podofo/base/PdfEncodingFactory.h>
 
 using namespace Napi;
 using namespace std;
 using namespace PoDoFo;
 
+namespace NoPoDoFo {
 void
 Document::Initialize(Napi::Env& env, Napi::Object& target)
 {
@@ -224,10 +222,10 @@ Document::SetEncrypt(const CallbackInfo& info, const Napi::Value& value)
     int nperm = 0;
     int algoParameter = 0;
     int key = 0;
-    if (encryption.Has("ownerPassword") == false ||
-        encryption.Has("keyLength") == false ||
-        encryption.Has("protection") == false ||
-        encryption.Has("algorithm") == false) {
+    if (!encryption.Has("ownerPassword") ||
+        !encryption.Has("keyLength") ||
+        !encryption.Has("protection") ||
+        !encryption.Has("algorithm")) {
       throw Error::New(info.Env(), "something is not right");
     }
     try {
@@ -476,7 +474,6 @@ public:
     , doc(doc)
     , arg(std::move(arg))
   {}
-  ~DocumentWriteAsync() {}
 
 private:
   Document* doc;
@@ -484,7 +481,7 @@ private:
 
   // AsyncWorker interface
 protected:
-  void Execute()
+  void Execute() override
   {
     try {
       PdfOutputDevice device(arg.c_str());
@@ -495,7 +492,7 @@ protected:
       SetError(String::New(Env(), ErrorHandler::WriteMsg(err)));
     }
   }
-  void OnOK()
+  void OnOK() override
   {
     HandleScope scope(Env());
     Callback().Call({ Env().Null(), String::New(Env(), arg) });
@@ -533,7 +530,6 @@ public:
     , doc(doc)
     , arg(std::move(arg))
   {}
-  ~DocumentLoadAsync() {}
 
   void ForUpdate(bool v) { update = v; }
   void LoadFromBuffer(bool v) { loadBuffer = v; }
@@ -546,7 +542,7 @@ private:
 
   // AsyncWorker interface
 protected:
-  void Execute()
+  void Execute() override
   {
     try {
       if (loadBuffer) {
@@ -562,7 +558,7 @@ protected:
       }
     }
   }
-  void OnOK()
+  void OnOK() override
   {
     HandleScope scope(Env());
     Callback().Call({ Env().Null(), String::New(Env(), arg) });
@@ -605,7 +601,6 @@ public:
     : AsyncWorker(cb)
     , doc(doc)
   {}
-  ~DocumentWriteBufferAsync() {}
 
 private:
   Document* doc;
@@ -613,7 +608,7 @@ private:
   size_t size = 0;
 
 protected:
-  void Execute()
+  void Execute() override
   {
     PdfRefCountedBuffer docBuffer;
     PdfOutputDevice device(&docBuffer);
@@ -621,7 +616,7 @@ protected:
     value = string(docBuffer.GetBuffer());
     size = docBuffer.GetSize();
   }
-  void OnOK()
+  void OnOK() override
   {
     HandleScope scope(Env());
     if (value.empty() || size == 0) {
@@ -640,4 +635,5 @@ Document::WriteBuffer(const CallbackInfo& info)
   DocumentWriteBufferAsync* worker = new DocumentWriteBufferAsync(cb, this);
   worker->Queue();
   return info.Env().Undefined();
+}
 }

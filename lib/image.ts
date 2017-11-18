@@ -3,7 +3,7 @@
 import {IDocument, __mod} from './document'
 
 export class Image {
-    _instance:any
+    private _instance:any
 
     /**
      *
@@ -12,10 +12,10 @@ export class Image {
      */
     constructor(private _doc: IDocument, data?: string | Buffer) {
         if (data) {
-            this._instance = new __mod.Image(_doc._instance, data)
+            this._instance = new __mod.Image((_doc as any)._instance, data)
         }
         else {
-            this._instance = new __mod.Image(_doc._instance)
+            this._instance = new __mod.Image((_doc as any)._instance)
         }
     }
     getWidth(): number {

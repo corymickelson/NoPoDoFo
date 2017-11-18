@@ -1,7 +1,7 @@
 import { IFieldInfo, Field } from './field'
 import {  Rect } from './rect';
 import {  Obj } from './object';
-import { Annotation, NPdfAnnotationType, NPdfAnnotation } from './annotation';
+import { Annotation, NPDFAnnotationType, NPDFAnnotation } from './annotation';
 
 export interface IPage {
     rotation: number
@@ -9,7 +9,6 @@ export interface IPage {
     number: number
     width: number
     height: number
-    _instance: any
 
     getNumFields(): number
     getFieldsInfo(): Array<IFieldInfo>
@@ -22,7 +21,7 @@ export interface IPage {
     getBleedBox(): Rect
     getArtBox(): Rect
     getNumAnnots(): number
-    createAnnotation(type: NPdfAnnotation, rect: Rect): Annotation
+    createAnnotation(type: NPDFAnnotation, rect: Rect): Annotation
     getAnnotation(index: number): Annotation
     getAnnotations(): Array<Annotation>
     deleteAnnotation(index: number): void
@@ -72,7 +71,7 @@ export class Page implements IPage {
         this._instance.rotation = degree
     }
 
-    constructor(public _instance: any) { }
+    constructor(private _instance: any) { }
 
     getContents(append: boolean): Obj {
         const objInstance = this._instance.getContents(append)
@@ -116,8 +115,8 @@ export class Page implements IPage {
         }
         return fields
     }
-    createAnnotation(type: NPdfAnnotation, rect: Rect):Annotation {
-        const instance = this._instance.createAnnotation((type as number), rect._instance)
+    createAnnotation(type: NPDFAnnotation, rect: Rect):Annotation {
+        const instance = this._instance.createAnnotation((type as number), (rect as any)._instance)
         return new Annotation(instance)
     }
     getAnnotation(index: number): Annotation {

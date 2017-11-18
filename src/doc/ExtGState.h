@@ -4,6 +4,7 @@
 #include <napi.h>
 #include <podofo/podofo.h>
 
+namespace NoPoDoFo {
 class ExtGState : public Napi::ObjectWrap<ExtGState>
 {
 public:
@@ -32,5 +33,5 @@ private:
   PoDoFo::PdfExtGState* self;
   PoDoFo::PdfMemDocument* doc;
 };
-
+}
 #endif

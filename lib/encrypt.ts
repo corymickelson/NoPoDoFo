@@ -23,7 +23,7 @@ export class Encrypt {
     public get permission() {
         return this._instance.permission
     }
-    constructor(public _instance: any, public option?:EncryptInitOption) { 
+    constructor(private _instance: any, public option?:EncryptInitOption) { 
         if(_instance === null && option instanceof Object) {
             this._complete = false;
         }

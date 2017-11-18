@@ -15,7 +15,7 @@
 
 using namespace Napi;
 using namespace PoDoFo;
-
+namespace NoPoDoFo {
 FunctionReference Painter::constructor;
 Painter::Painter(const Napi::CallbackInfo& info)
   : ObjectWrap(info)
@@ -811,4 +811,5 @@ Painter::GetRGB(Napi::Value& value, int* rgb)
   for (uint8_t i = 0; i < js.Length(); i++) {
     rgb[i] = js.Get(i).As<Number>();
   }
+}
 }

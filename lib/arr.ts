@@ -36,7 +36,7 @@ export class Arr {
         return nArr
     }
 
-    constructor(public _instance: any) { }
+    constructor(private _instance: any) { }
 
     /**
      * Converts PdfArray to javascript array.

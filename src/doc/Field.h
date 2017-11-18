@@ -10,6 +10,7 @@
 #include <podofo/podofo.h>
 #include <string>
 
+namespace NoPoDoFo {
 class Field : public Napi::ObjectWrap<Field>
 {
 public:
@@ -34,5 +35,5 @@ private:
   int fieldIndex;
   PoDoFo::PdfPage* _page;
 };
-
+}
 #endif // NPDF_PDFFIELD_H

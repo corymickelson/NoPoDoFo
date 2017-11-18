@@ -6,6 +6,7 @@
 using namespace Napi;
 using namespace PoDoFo;
 
+namespace NoPoDoFo {
 Napi::FunctionReference Ref::constructor;
 
 Ref::Ref(const Napi::CallbackInfo& info)
@@ -91,4 +92,5 @@ Ref::GetObj(const CallbackInfo& info)
   PdfObject obj(*ref);
   auto instancePtr = External<PdfObject>::New(info.Env(), &obj);
   return Obj::constructor.New({ instancePtr });
+}
 }

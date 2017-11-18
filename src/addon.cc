@@ -1,4 +1,4 @@
-#include "base/Arr.h"
+#include "base/Array.h"
 #include "base/Dictionary.h"
 #include "base/Obj.h"
 #include "base/Ref.h"
@@ -25,29 +25,29 @@
 Napi::Object
 init(Napi::Env env, Napi::Object exports)
 {
-  Document::Initialize(env, exports);
-  Page::Initialize(env, exports);
-  Field::Initialize(env, exports);
-  TextField::Initialize(env, exports);
-  Image::Initialize(env, exports);
-  Annotation::Initialize(env, exports);
-  Rect::Initialize(env, exports);
-  Painter::Initialize(env, exports);
-  CheckBox::Initialize(env, exports);
-  Form::Initialize(env, exports);
-  Dictionary::Initialize(env, exports);
-  FileSpec::Initialize(env, exports);
-  Obj::Initialize(env, exports);
-  Ref::Initialize(env, exports);
-  Arr::Initialize(env, exports);
-  Stream::Initialize(env, exports);
-  Encrypt::Initialize(env, exports);
-  ListField::Initialize(env, exports);
-  Font::Initialize(env, exports);
-  Encoding::Initialize(env, exports);
-  ExtGState::Initialize(env, exports);
-  Signer::Initialize(env, exports);
-  SignatureField::Initialize(env, exports);
+  NoPoDoFo::Document::Initialize(env, exports);
+  NoPoDoFo::Page::Initialize(env, exports);
+  NoPoDoFo::Field::Initialize(env, exports);
+  NoPoDoFo::TextField::Initialize(env, exports);
+  NoPoDoFo::Image::Initialize(env, exports);
+  NoPoDoFo::Annotation::Initialize(env, exports);
+  NoPoDoFo::Rect::Initialize(env, exports);
+  NoPoDoFo::Painter::Initialize(env, exports);
+  NoPoDoFo::CheckBox::Initialize(env, exports);
+  NoPoDoFo::Form::Initialize(env, exports);
+  NoPoDoFo::Dictionary::Initialize(env, exports);
+  NoPoDoFo::FileSpec::Initialize(env, exports);
+  NoPoDoFo::Obj::Initialize(env, exports);
+  NoPoDoFo::Ref::Initialize(env, exports);
+  NoPoDoFo::Array::Initialize(env, exports);
+  NoPoDoFo::Stream::Initialize(env, exports);
+  NoPoDoFo::Encrypt::Initialize(env, exports);
+  NoPoDoFo::ListField::Initialize(env, exports);
+  NoPoDoFo::Font::Initialize(env, exports);
+  NoPoDoFo::Encoding::Initialize(env, exports);
+  NoPoDoFo::ExtGState::Initialize(env, exports);
+  NoPoDoFo::Signer::Initialize(env, exports);
+  NoPoDoFo::SignatureField::Initialize(env, exports);
   return exports;
 }
 

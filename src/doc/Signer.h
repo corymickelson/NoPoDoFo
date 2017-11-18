@@ -6,6 +6,7 @@
 #include <napi.h>
 #include <podofo/podofo.h>
 
+namespace NoPoDoFo {
 class Signer : public Napi::ObjectWrap<Signer>
 {
 public:
@@ -24,5 +25,5 @@ public:
 
 private:
 };
-
+}
 #endif

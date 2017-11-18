@@ -2,7 +2,6 @@ import {Obj} from "./object";
 
 
 export class Ref {
-    _instance: any
 
     get objectNumber() {
         return this._instance.objectNumber
@@ -20,8 +19,7 @@ export class Ref {
         this._instance.generation = value
     }
 
-    constructor(instance: any) {
-        this._instance = instance
+    constructor(private _instance: any) {
     }
 
     write(output: string): void {

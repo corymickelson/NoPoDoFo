@@ -10,6 +10,7 @@
 using namespace Napi;
 using namespace PoDoFo;
 
+namespace NoPoDoFo {
 FunctionReference Dictionary::constructor;
 
 Dictionary::Dictionary(const CallbackInfo& info)
@@ -229,22 +230,20 @@ public:
     , dict(dict)
     , arg(std::move(dest))
   {}
-  ~DictWriteAsync() {}
 
 protected:
-  void Execute()
+  void Execute() override
   {
     try {
       PdfOutputDevice device(arg.c_str());
       dict->GetDictionary()->Write(&device, ePdfWriteMode_Default);
     } catch (PdfError& err) {
-      SetError(ErrorHandler::WriteMsg(err).c_str());
+      SetError(ErrorHandler::WriteMsg(err));
     } catch (Napi::Error& err) {
-      SetError(err.Message().c_str());
+      SetError(err.Message());
     }
   }
-  void OnOK()
-  {
+  void OnOK() override {
     HandleScope scope(Env());
     Callback().Call({ Env().Null(), Napi::String::New(Env(), arg) });
   }
@@ -270,4 +269,5 @@ Dictionary::Write(const CallbackInfo& info)
   } catch (Napi::Error& err) {
     ErrorHandler(err, info);
   }
+}
 }

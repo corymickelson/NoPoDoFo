@@ -12,7 +12,7 @@
 #include <string>
 
 using namespace std;
-
+namespace NoPoDoFo {
 class TextField : public Napi::ObjectWrap<TextField>
 {
 public:
@@ -31,4 +31,5 @@ private:
     return PoDoFo::PdfTextField(field->GetField());
   }
 };
+}
 #endif // NPDF_TEXTFIELD_H

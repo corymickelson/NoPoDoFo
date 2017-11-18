@@ -4,10 +4,10 @@ import { Obj as obj } from './object'
 import { Page as page } from './page'
 import {
     Annotation as annot,
-    NpdfAction as action,
-    NPdfAnnotation as annotenum,
-    NpdfAnnotationFlag as annotflags,
-    NPdfAnnotationType as annottype
+    NPDFAction as action,
+    NPDFAnnotation as annotenum,
+    NPDFAnnotationFlag as annotflags,
+    NPDFAnnotationType as annottype
 } from './annotation'
 import {
     CheckBox as checkbox,
@@ -19,6 +19,7 @@ import { Image as image } from './image'
 import { Painter as painter } from './painter'
 import { Rect as rect } from './rect'
 import { Signer as sign } from './signer'
+import {Stream as stream} from './stream'
 
 export const Document = doc,
     Page = page,
@@ -37,5 +38,6 @@ export const Document = doc,
     Painter = painter,
     Rect = rect,
     Signature = sign,
+    Stream = stream,
     CONVERSION = 0.0028346456693
 

@@ -20,7 +20,6 @@ export interface CreateFontOpts {
     fileName?:string
 }
 export interface IDocument {
-    _instance: any
     encrypt: Encrypt
 
     load(file: string, update?: boolean): void
@@ -58,7 +57,7 @@ export interface IDocument {
  */
 export class Document extends EventEmitter implements IDocument {
 
-    _instance: any
+    private _instance: any
     private _loaded: boolean = false;
     private _pageCount: number
     private _password: string

@@ -5,6 +5,7 @@
 using namespace Napi;
 using namespace PoDoFo;
 
+namespace NoPoDoFo {
 FunctionReference Form::constructor;
 
 Form::Form(const Napi::CallbackInfo& info)
@@ -38,7 +39,7 @@ Form::SetNeedAppearances(const CallbackInfo& info, const Napi::Value& value)
   if (value.IsEmpty()) {
     throw Napi::Error::New(info.Env(), "value required");
   }
-  if (value.IsBoolean() == false) {
+  if (!value.IsBoolean()) {
     throw Napi::Error::New(info.Env(), "requires boolean value type");
   }
   GetForm()->SetNeedAppearances(value.As<Boolean>());
@@ -57,4 +58,5 @@ Form::GetObject(const CallbackInfo& info)
   auto nObj = Napi::External<PdfObject>::New(info.Env(), obj);
   auto objInstance = Obj::constructor.New({ nObj });
   return objInstance;
+}
 }

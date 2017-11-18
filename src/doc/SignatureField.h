@@ -7,7 +7,7 @@
 
 #include <napi.h>
 #include <podofo/podofo.h>
-
+namespace NoPoDoFo {
 class SignatureField : public Napi::ObjectWrap<SignatureField>
 {
 public:
@@ -37,5 +37,5 @@ private:
   PoDoFo::PdfSignatureField* field;
   PoDoFo::PdfData* signatureBuffer;
 };
-
+}
 #endif

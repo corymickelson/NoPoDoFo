@@ -10,6 +10,7 @@
 
 using namespace std;
 
+namespace NoPoDoFo {
 class Dictionary : public Napi::ObjectWrap<Dictionary>
 {
 public:
@@ -39,5 +40,5 @@ private:
   PoDoFo::PdfObject* _obj;
   PoDoFo::PdfDictionary dict = PoDoFo::PdfDictionary();
 };
-
+}
 #endif

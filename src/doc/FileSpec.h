@@ -10,11 +10,11 @@
 #include <podofo/podofo.h>
 
 using namespace std;
-
+namespace NoPoDoFo {
 class FileSpec : public Napi::ObjectWrap<FileSpec>
 {
 public:
-  FileSpec(const Napi::CallbackInfo&);
+  explicit FileSpec(const Napi::CallbackInfo&);
   ~FileSpec() { delete spec; }
   static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
@@ -22,4 +22,5 @@ public:
 private:
   PoDoFo::PdfFileSpec* spec;
 };
+}
 #endif // NPDF_FILESPEC_H

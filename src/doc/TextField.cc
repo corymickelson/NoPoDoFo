@@ -6,7 +6,7 @@
 
 using namespace Napi;
 using namespace PoDoFo;
-
+namespace NoPoDoFo {
 FunctionReference TextField::constructor;
 TextField::TextField(const CallbackInfo& info)
   : ObjectWrap(info)
@@ -49,4 +49,5 @@ TextField::GetText(const CallbackInfo& info)
 {
   return Napi::String::New(info.Env(),
                            TextField::GetField().GetText().GetStringUtf8());
+}
 }

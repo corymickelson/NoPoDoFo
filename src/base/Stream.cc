@@ -9,6 +9,7 @@
 using namespace Napi;
 using namespace PoDoFo;
 
+namespace NoPoDoFo {
 FunctionReference Stream::constructor;
 
 Stream::Stream(const CallbackInfo& info)
@@ -98,4 +99,5 @@ Stream::Write(const CallbackInfo& info)
   StreamWriteAsync* worker = new StreamWriteAsync(cb, this, output);
   worker->Queue();
   return info.Env().Undefined();
+}
 }

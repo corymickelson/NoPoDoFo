@@ -14,10 +14,11 @@
 using namespace std;
 using namespace PoDoFo;
 
+namespace NoPoDoFo {
 class Annotation : public ObjectWrap<Annotation>
 {
 public:
-  Annotation(const CallbackInfo& callbackInfo);
+  explicit Annotation(const CallbackInfo& callbackInfo);
   ~Annotation()
   {
     delete annot;
@@ -85,4 +86,5 @@ private:
   PdfAnnotation* annot;
   PdfMemDocument* doc;
 };
+}
 #endif // NPDF_ANNOTATION_H

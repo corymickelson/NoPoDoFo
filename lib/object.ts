@@ -22,7 +22,7 @@ export type PDType =
  * @todo New instance object not yet supported. Objects can only be instantiated from an existing object
  */
 export class Obj {
-    _instance: any
+    private _instance: any
 
     get reference() {
         return this._instance.reference

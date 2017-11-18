@@ -11,7 +11,7 @@
 
 using namespace Napi;
 using namespace PoDoFo;
-
+namespace NoPoDoFo {
 FunctionReference SignatureField::constructor;
 
 SignatureField::SignatureField(const CallbackInfo& info)
@@ -119,7 +119,7 @@ void
 SignatureField::AddCertificateReference(const CallbackInfo& info)
 {}
 
-Value
+Napi::Value
 SignatureField::GetSignatureObject(const CallbackInfo& info)
 {
   return External<PdfObject>::New(info.Env(), field->GetSignatureObject());
@@ -133,4 +133,5 @@ SignatureField::EnsureSignatureObject(const CallbackInfo& info)
   } catch (PdfError& err) {
     ErrorHandler(err, info);
   }
+}
 }

@@ -2,7 +2,7 @@
 // Created by red on 10/2/17
 //
 
-#include "Arr.h"
+#include "Array.h"
 #include "../ErrorHandler.h"
 #include "../ValidateArguments.h"
 #include "Obj.h"
@@ -10,40 +10,41 @@
 using namespace Napi;
 using namespace PoDoFo;
 
-Napi::FunctionReference Arr::constructor;
+namespace NoPoDoFo {
+Napi::FunctionReference Array::constructor;
 
-Arr::Arr(const CallbackInfo& info)
-  : ObjectWrap<Arr>(info)
+Array::Array(const CallbackInfo& info)
+  : ObjectWrap<Array>(info)
 {
   AssertFunctionArgs(info, 1, { napi_valuetype::napi_external });
   arr = info[0].As<External<PdfArray>>().Data();
 }
 
 void
-Arr::Initialize(Napi::Env& env, Napi::Object& target)
+Array::Initialize(Napi::Env& env, Napi::Object& target)
 {
   Function ctor =
     DefineClass(env,
-                "Arr",
-                { InstanceAccessor("dirty", &Arr::IsDirty, &Arr::SetDirty),
-                  InstanceAccessor("length", &Arr::Length, nullptr),
-                  InstanceMethod("toArray", &Arr::ToArray),
-                  InstanceMethod("getIndex", &Arr::GetIndex),
-                  InstanceMethod("contains", &Arr::ContainsString),
-                  InstanceMethod("indexOf", &Arr::GetStringIndex),
-                  InstanceMethod("write", &Arr::Write),
-                  InstanceMethod("push", &Arr::Push) });
+                "Array",
+                { InstanceAccessor("dirty", &Array::IsDirty, &Array::SetDirty),
+                  InstanceAccessor("length", &Array::Length, nullptr),
+                  InstanceMethod("toArray", &Array::ToArray),
+                  InstanceMethod("getIndex", &Array::GetIndex),
+                  InstanceMethod("contains", &Array::ContainsString),
+                  InstanceMethod("indexOf", &Array::GetStringIndex),
+                  InstanceMethod("write", &Array::Write),
+                  InstanceMethod("push", &Array::Push) });
   constructor = Persistent(ctor);
   constructor.SuppressDestruct();
-  target.Set("Arr", ctor);
+  target.Set("Array", ctor);
 }
 Napi::Value
-Arr::Length(const Napi::CallbackInfo& info)
+Array::Length(const Napi::CallbackInfo& info)
 {
   return Number::New(info.Env(), arr->size());
 }
 void
-Arr::Write(const CallbackInfo& info)
+Array::Write(const CallbackInfo& info)
 {
   AssertFunctionArgs(info, 1, { napi_valuetype::napi_string });
   string output = info[0].As<String>().Utf8Value();
@@ -52,7 +53,7 @@ Arr::Write(const CallbackInfo& info)
 }
 
 Napi::Value
-Arr::ContainsString(const CallbackInfo& info)
+Array::ContainsString(const CallbackInfo& info)
 {
   AssertFunctionArgs(info, 1, { napi_valuetype::napi_string });
   string searchString = info[0].As<String>().Utf8Value();
@@ -61,7 +62,7 @@ Arr::ContainsString(const CallbackInfo& info)
 }
 
 Napi::Value
-Arr::GetStringIndex(const CallbackInfo& info)
+Array::GetStringIndex(const CallbackInfo& info)
 {
   AssertFunctionArgs(info, 1, { napi_valuetype::napi_string });
   string str = info[0].As<String>().Utf8Value();
@@ -69,13 +70,13 @@ Arr::GetStringIndex(const CallbackInfo& info)
 }
 
 Napi::Value
-Arr::IsDirty(const CallbackInfo& info)
+Array::IsDirty(const CallbackInfo& info)
 {
   return Napi::Boolean::New(info.Env(), arr->IsDirty());
 }
 
 Napi::Value
-Arr::GetIndex(const CallbackInfo& info)
+Array::GetIndex(const CallbackInfo& info)
 {
   AssertFunctionArgs(info, 1, { napi_valuetype::napi_number });
   size_t index = info[0].As<Number>().Uint32Value();
@@ -86,7 +87,7 @@ Arr::GetIndex(const CallbackInfo& info)
 }
 
 void
-Arr::SetDirty(const CallbackInfo& info, const Napi::Value& value)
+Array::SetDirty(const CallbackInfo& info, const Napi::Value& value)
 {
   if (!value.IsBoolean()) {
     throw Napi::Error::New(info.Env(), "dirty must be of type boolean");
@@ -95,7 +96,7 @@ Arr::SetDirty(const CallbackInfo& info, const Napi::Value& value)
 }
 
 void
-Arr::Push(const CallbackInfo& info)
+Array::Push(const CallbackInfo& info)
 {
   AssertFunctionArgs(info, 1, { napi_valuetype::napi_object });
   auto wrapper = info[0].As<Object>();
@@ -114,9 +115,9 @@ Arr::Push(const CallbackInfo& info)
 }
 
 Napi::Value
-Arr::ToArray(const Napi::CallbackInfo& info)
+Array::ToArray(const Napi::CallbackInfo& info)
 {
-  auto js = Array::New(info.Env());
+  auto js = Napi::Array::New(info.Env());
   try {
     uint32_t counter = 0;
     for (auto it = arr->begin(); it != arr->end(); ++it) {
@@ -131,4 +132,5 @@ Arr::ToArray(const Napi::CallbackInfo& info)
     ErrorHandler(err, info);
   }
   return js;
+}
 }

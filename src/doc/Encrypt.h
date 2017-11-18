@@ -8,6 +8,7 @@
 #include <napi.h>
 #include <podofo/podofo.h>
 
+namespace NoPoDoFo {
 class Encrypt : public Napi::ObjectWrap<Encrypt>
 {
 public:
@@ -32,5 +33,5 @@ private:
   PoDoFo::PdfEncrypt* encrypt;
   PoDoFo::PdfMemDocument* document;
 };
-
+}
 #endif

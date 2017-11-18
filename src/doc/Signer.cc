@@ -4,7 +4,7 @@
 
 using namespace Napi;
 using namespace PoDoFo;
-
+namespace NoPoDoFo {
 FunctionReference Signer::constructor;
 
 Signer::Signer(const Napi::CallbackInfo&info)
@@ -171,4 +171,5 @@ Signer::Sign(const CallbackInfo&info) {
 	} catch (Error&err) {
 		ErrorHandler(err, info);
 	}
+}
 }

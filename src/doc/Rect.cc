@@ -6,7 +6,7 @@
 
 using namespace Napi;
 using namespace PoDoFo;
-
+namespace NoPoDoFo {
 FunctionReference Rect::constructor;
 
 Rect::Rect(const CallbackInfo& info)
@@ -129,4 +129,5 @@ Rect::SetBottom(const CallbackInfo& info, const Napi::Value& value)
   }
   double bottom = value.As<Number>();
   rect.SetBottom(bottom);
+}
 }

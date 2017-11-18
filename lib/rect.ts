@@ -2,7 +2,7 @@ import { Page } from './page'
 import { Document, __mod } from './document'
 
 export class Rect {
-    _instance: any
+    private _instance: any
 
     constructor(position?: Page | Array<number>) {
         if (Array.isArray(position)) {

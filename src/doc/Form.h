@@ -8,6 +8,7 @@
 #include <napi.h>
 #include <podofo/podofo.h>
 
+namespace NoPoDoFo {
 class Form : public Napi::ObjectWrap<Form>
 {
 public:
@@ -23,5 +24,5 @@ public:
 private:
   PoDoFo::PdfMemDocument* doc;
 };
-
+}
 #endif

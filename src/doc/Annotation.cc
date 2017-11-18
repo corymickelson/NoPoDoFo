@@ -4,6 +4,8 @@
 
 #include "Annotation.h"
 
+namespace NoPoDoFo {
+
 FunctionReference Annotation::constructor;
 
 Annotation::Annotation(const CallbackInfo& info)
@@ -55,7 +57,7 @@ Annotation::SetBorderStyle(const CallbackInfo& info)
 void
 Annotation::SetTitle(const CallbackInfo& info, const Napi::Value& value)
 {
-  if (value.IsString() == false) {
+  if (!value.IsString()) {
     throw Napi::TypeError::New(
       info.Env(), "SetTitle requires a single argument of type string.");
   }
@@ -113,10 +115,10 @@ Annotation::HasDestination(const CallbackInfo& info)
 void
 Annotation::SetAction(const CallbackInfo& info, const Napi::Value& value)
 {
-  Object actionObj = value.As<Object>();
+  auto actionObj = value.As<Object>();
   int type = actionObj.Get("type").As<Number>();
   string uri = actionObj.Get("uri").As<String>().Utf8Value();
-  PoDoFo::EPdfAction flag = static_cast<PoDoFo::EPdfAction>(type);
+  auto flag = static_cast<PoDoFo::EPdfAction>(type);
   PdfAction action(flag, doc);
   action.SetURI(uri);
   annot->SetAction(action);
@@ -145,7 +147,7 @@ Annotation::HasAction(const CallbackInfo& info)
 void
 Annotation::SetOpen(const CallbackInfo& info, const Napi::Value& value)
 {
-  if (value.IsBoolean() == false) {
+  if (!value.IsBoolean()) {
     throw Napi::Error::New(info.Env(), "Requires Boolean type");
   }
   annot->SetOpen(value.As<Boolean>());
@@ -161,7 +163,7 @@ void
 Annotation::SetColor(const CallbackInfo& info, const Napi::Value& value)
 {
   if (value.IsArray()) {
-    Array jsValue = value.As<Array>();
+    auto jsValue = value.As<Array>();
     int rgb[3];
     for (uint8_t i = 0; i < jsValue.Length(); i++) {
       rgb[i] = jsValue.Get(i).As<Number>();
@@ -328,4 +330,5 @@ Napi::Value
 Annotation::HasFileAttachment(const CallbackInfo& info)
 {
   return Napi::Boolean::New(info.Env(), annot->HasFileAttachement());
+}
 }

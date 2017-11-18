@@ -1,19 +1,20 @@
 import { Page } from './page'
 import { Rect } from './rect'
+import { NPDFrgb } from './painter';
 
 export interface IAnnotation {
     title: string
     flag: number
-    color: NPdfRgb
+    color: NPDFrgb
     hasAppearanceStream(): boolean
     setBorderStyle(horizontalRadius: number, verticalRadius: number, width: number): void
     hasDestination(): boolean
     hasAction(): boolean
-    getType(): NPdfAnnotationType
+    getType(): NPDFAnnotationType
     setFileAttachment(): void
     hasFileAttachment(): boolean
 }
-export enum NPdfAnnotationType {
+export enum NPDFAnnotationType {
     Text = 'Text',
     Link = 'Link',
     FreeText = 'FreeText',
@@ -42,7 +43,7 @@ export enum NPdfAnnotationType {
     RichMedia = 'RichMedia',
     WebMedia = 'WebMedia'
 }
-export enum NPdfAnnotation {
+export enum NPDFAnnotation {
     Text = 0,                   // - supported
     Link,                       // - supported
     FreeText,       // PDF 1.3  // - supported
@@ -72,7 +73,7 @@ export enum NPdfAnnotation {
     WebMedia,       // PDF 1.7 IPDF ExtensionLevel 3
 }
 
-export enum NpdfAnnotationFlag {
+export enum NPDFAnnotationFlag {
     Invisible = 0x0001,
     Hidden = 0x0002,
     Print = 0x0004,
@@ -85,7 +86,7 @@ export enum NpdfAnnotationFlag {
     LockedContents = 0x0200
 }
 
-export enum NpdfAction {
+export enum NPDFAction {
     GoTo = 0,
     GoToR,
     GoToE,
@@ -109,7 +110,6 @@ export enum NpdfAction {
 /**
  * @desc Red, Green, Blue
  */
-export type NPdfRgb = [number, number, number]
 export class Annotation {
     get quadPoints() {
         throw Error("unimplemented")
@@ -123,16 +123,16 @@ export class Annotation {
     set title(value:string) {
         this._instance.title = value
     }
-    get flag(): NpdfAnnotationFlag {
+    get flag(): NPDFAnnotationFlag {
         return this._instance.flag
     }
-    set flag(value: NpdfAnnotationFlag) {
+    set flag(value: NPDFAnnotationFlag) {
         this._instance.flag = value
     }
     get color() {
         return this._instance.color
     }
-    set color(value: NPdfRgb) {
+    set color(value: NPDFrgb) {
         let rgbErr = Error("RGB value must be an integer >= 0 || <= 256")
         if (value.length !== 3) {
             throw rgbErr
@@ -162,7 +162,7 @@ export class Annotation {
     hasAction(): boolean {
         return this._instance.hasAction()
     }
-    getType(): NPdfAnnotationType {
+    getType(): NPDFAnnotationType {
         return this._instance.getType()
     }
     setFileAttachment(): void {

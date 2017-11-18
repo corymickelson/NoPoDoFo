@@ -8,7 +8,7 @@
 #include "Document.h"
 #include <napi.h>
 #include <podofo/podofo.h>
-
+namespace NoPoDoFo {
 class Image : public Napi::ObjectWrap<Image>
 {
 public:
@@ -33,5 +33,5 @@ private:
   PoDoFo::PdfImage* img;
   bool loaded = false;
 };
-
+}
 #endif // NPDF_IMAGE_H

@@ -7,11 +7,12 @@
 #include <napi.h>
 #include <podofo/podofo.h>
 
-class Arr : public Napi::ObjectWrap<Arr>
+namespace NoPoDoFo {
+class Array : public Napi::ObjectWrap<Array>
 {
 public:
-  explicit Arr(const Napi::CallbackInfo&);
-  ~Arr() { delete arr; }
+  explicit Array(const Napi::CallbackInfo&);
+  ~Array() { delete arr; }
   static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
 
@@ -28,5 +29,5 @@ public:
 private:
   PoDoFo::PdfArray* arr;
 };
-
+}
 #endif

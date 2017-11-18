@@ -11,7 +11,7 @@
 
 using namespace Napi;
 using namespace PoDoFo;
-
+namespace NoPoDoFo {
 Napi::FunctionReference Page::constructor;
 
 Page::Page(const CallbackInfo& info)
@@ -350,4 +350,5 @@ Page::CreateAnnotation(const CallbackInfo& info)
   auto instance = Annotation::constructor.New(
     { External<PdfAnnotation>::New(info.Env(), annot) });
   return instance;
+}
 }

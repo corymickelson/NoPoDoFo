@@ -3,7 +3,7 @@
 
 using namespace PoDoFo;
 using namespace Napi;
-
+namespace NoPoDoFo {
 FunctionReference ListField::constructor;
 
 ListField::ListField(const CallbackInfo& info)
@@ -53,7 +53,7 @@ ListField::RemoveItem(const CallbackInfo& info)
   list->RemoveItem(index);
 }
 
-Value
+Napi::Value
 ListField::GetItem(const CallbackInfo& info)
 {
   AssertFunctionArgs(info, 1, { napi_valuetype::napi_number });
@@ -67,7 +67,7 @@ ListField::GetItem(const CallbackInfo& info)
   return item;
 }
 
-Value
+Napi::Value
 ListField::GetItemCount(const CallbackInfo& info)
 {
   return Number::New(info.Env(), list->GetItemCount());
@@ -82,10 +82,11 @@ ListField::SetSelectedItem(const CallbackInfo& info, const Napi::Value& value)
   list->SetSelectedItem(value.As<Number>());
 }
 
-Value
+Napi::Value
 ListField::GetSelectedItem(const CallbackInfo& info)
 {
   AssertFunctionArgs(info, 1, { napi_valuetype::napi_number });
   int index = list->GetSelectedItem();
   return Number::New(info.Env(), index);
+}
 }

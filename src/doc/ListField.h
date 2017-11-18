@@ -9,7 +9,7 @@
 #include <napi.h>
 #include <podofo/podofo.h>
 #include <string>
-
+namespace NoPoDoFo {
 class ListField : public Napi::ObjectWrap<ListField>
 {
 public:
@@ -32,5 +32,5 @@ private:
   PoDoFo::PdfField* field;
   PoDoFo::PdfListField* list;
 };
-
+}
 #endif

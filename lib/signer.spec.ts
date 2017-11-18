@@ -1,7 +1,7 @@
 import {writeFile, writeFileSync} from 'fs'
 import {Document} from './document'
 import {SignatureField} from './field'
-import {Annotation, NPdfAnnotation, NpdfAnnotationFlag} from './annotation'
+import {Annotation, NPDFAnnotation, NPDFAnnotationFlag} from './annotation'
 import {Rect} from './rect'
 import {join} from 'path'
 import {Form} from "./form";
@@ -144,8 +144,8 @@ function signatureBuffer(): any {
                 // create signature field
                 const rect = new Rect([0, 0, 10, 10]),
                     page = doc.getPage(doc.pageCount - 1),
-                    annot = page.createAnnotation(NPdfAnnotation.Widget, rect)
-                annot.flag = NpdfAnnotationFlag.Hidden | NpdfAnnotationFlag.Invisible
+                    annot = page.createAnnotation(NPDFAnnotation.Widget, rect)
+                annot.flag = NPDFAnnotationFlag.Hidden | NPDFAnnotationFlag.Invisible
                 const field = new SignatureField(annot, form, doc)
                 field.setReason('test')
                 field.setLocation('here')

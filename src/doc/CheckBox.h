@@ -12,10 +12,11 @@
 using namespace Napi;
 using namespace PoDoFo;
 
+namespace NoPoDoFo {
 class CheckBox : public ObjectWrap<CheckBox>
 {
 public:
-  CheckBox(const CallbackInfo& callbackInfo);
+  explicit CheckBox(const CallbackInfo& callbackInfo);
   ~CheckBox() { delete box; }
   static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target)
@@ -35,4 +36,5 @@ public:
 private:
   PdfCheckBox* box;
 };
+}
 #endif // NPDF_CHECKBOX_H

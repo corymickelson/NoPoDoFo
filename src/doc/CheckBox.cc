@@ -4,6 +4,7 @@
 
 #include "CheckBox.h"
 
+namespace NoPoDoFo {
 FunctionReference CheckBox::constructor;
 
 CheckBox::CheckBox(const CallbackInfo& info)
@@ -33,4 +34,5 @@ CheckBox::SetChecked(const CallbackInfo& info, const Napi::Value& value)
   }
   bool checked = value.As<Boolean>();
   box->SetChecked(checked);
+}
 }

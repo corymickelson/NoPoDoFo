@@ -10,6 +10,7 @@
 #include <napi.h>
 #include <podofo/podofo.h>
 
+namespace NoPoDoFo {
 class Painter : public Napi::ObjectWrap<Painter>
 {
 public:
@@ -87,5 +88,5 @@ private:
   void GetCMYK(Napi::Value&, int* cmyk);
   void GetRGB(Napi::Value&, int* rgb);
 };
-
+}
 #endif // NPDF_PAINTER_H

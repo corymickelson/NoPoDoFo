@@ -8,6 +8,7 @@
 #include <napi.h>
 #include <podofo/podofo.h>
 
+namespace NoPoDoFo {
 class Font : public Napi::ObjectWrap<Font>
 {
 public:
@@ -47,5 +48,5 @@ public:
 private:
   PoDoFo::PdfFont* font;
 };
-
+}
 #endif // NPDF_FONT_H

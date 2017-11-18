@@ -10,6 +10,8 @@
 
 using namespace PoDoFo;
 
+namespace NoPoDoFo {
+
 FunctionReference Encoding::constructor;
 
 Encoding::Encoding(const Napi::CallbackInfo& info)
@@ -41,6 +43,8 @@ Encoding::AddToDictionary(const Napi::CallbackInfo& info)
   Dictionary* d = Dictionary::Unwrap(wrap);
   PdfDictionary* dict = d->GetDictionary();
   encoding->AddToDictionary(*dict);
+  delete d;
+  delete dict;
   return info.Env().Undefined();
 }
 Napi::Value
@@ -69,4 +73,5 @@ Napi::Value
 Encoding::GetData(const Napi::CallbackInfo& info)
 {
   return Value();
+}
 }

@@ -5,6 +5,7 @@
 using namespace Napi;
 using namespace PoDoFo;
 
+namespace NoPoDoFo {
 Napi::FunctionReference Encrypt::constructor;
 
 Encrypt::Encrypt(const Napi::CallbackInfo& info)
@@ -101,35 +102,36 @@ Encrypt::Authenticate(const CallbackInfo& info)
   return Napi::Boolean::New(info.Env(), encrypt->Authenticate(pwd, id));
 }
 
-Value
+Napi::Value
 Encrypt::GetOwnerValue(const CallbackInfo& info)
 {
   return String::New(info.Env(),
                      reinterpret_cast<const char*>(encrypt->GetOValue()));
 }
 
-Value
+Napi::Value
 Encrypt::GetUserValue(const CallbackInfo& info)
 {
   return String::New(info.Env(),
                      reinterpret_cast<const char*>(encrypt->GetUValue()));
 }
 
-Value
+Napi::Value
 Encrypt::GetPermissionValue(const CallbackInfo& info)
 {
   return Number::New(info.Env(), encrypt->GetPValue());
 }
 
-Value
+Napi::Value
 Encrypt::GetEncryptionKey(const CallbackInfo& info)
 {
   return String::New(
     info.Env(), reinterpret_cast<const char*>(encrypt->GetEncryptionKey()));
 }
 
-Value
+Napi::Value
 Encrypt::GetKeyLength(const CallbackInfo& info)
 {
   return Number::New(info.Env(), encrypt->GetKeyLength());
+}
 }

@@ -22,9 +22,9 @@ export interface IFieldInfo {
 
 export type FieldType = 'TextField' | 'CheckBox' | 'RadioButton' | 'PushButton' | 'Signature' | 'ListField'
 export class Field  {
-    _instance: any
+    private _instance: any
     constructor(page: IPage, fieldIndex: number) {
-        this._instance = new __mod.Field(page._instance, fieldIndex)
+        this._instance = new __mod.Field((page as any)._instance, fieldIndex)
     }
 
     getType(): FieldType {
@@ -68,7 +68,7 @@ export class TextField {
         if(field.getType() !== 'TextField') {
             throw Error('field parameter must be a field of type TextField')
         }
-        this._instance = new __mod.TextField(field._instance)
+        this._instance = new __mod.TextField((field as any)._instance)
     }
     get text(): string {
         return this._instance.text
@@ -90,7 +90,7 @@ export class CheckBox {
         if(field.getType() !== 'CheckBox') {
             throw Error('must be of type CheckBox')
         }
-        this._instance = new __mod.CheckBox(field._instance)
+        this._instance = new __mod.CheckBox((field as any)._instance)
     }
 }
 
@@ -113,7 +113,7 @@ export class ListField {
         if(field.getType() !== 'ListField') {
             throw Error('must be of type ListField')
         }
-        this._instance = new __mod.ListBox(field._instance)
+        this._instance = new __mod.ListBox((field as any)._instance)
     }
 
     getItem(index:number): IListItem {
@@ -132,7 +132,7 @@ export class SignatureField {
     private _instance:any
     constructor(annot:Annotation|any, form?:Form, doc?:Document) {
         if(form instanceof Form && doc instanceof Document) {
-            this._instance = new __mod.SignatureField((annot as any)._instance, form._instance, doc._instance)
+            this._instance = new __mod.SignatureField((annot as any)._instance, (form as any)._instance, (doc as any)._instance)
         }
         else {
             this._instance = new __mod.SignatureField(annot)

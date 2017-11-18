@@ -10,6 +10,7 @@
 
 using namespace PoDoFo;
 
+namespace NoPoDoFo {
 FunctionReference Font::constructor;
 
 Font::Font(const Napi::CallbackInfo& info)
@@ -179,7 +180,7 @@ Font::IsItalic(const Napi::CallbackInfo& info)
   return Boolean::New(info.Env(), font->IsItalic());
 }
 
-Value
+Napi::Value
 Font::StringWidth(const CallbackInfo& info)
 {
   AssertFunctionArgs(info, 1, { napi_valuetype::napi_string });
@@ -211,4 +212,5 @@ Font::EmbedFont(const Napi::CallbackInfo& info)
   } catch (PdfError& err) {
     ErrorHandler(err, info);
   }
+}
 }

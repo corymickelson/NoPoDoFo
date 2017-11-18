@@ -28,7 +28,7 @@ export class Dictionary {
 
     addKey(key: string, value: Obj|number|boolean|string): void {
         if(value instanceof Obj)
-            this._instance.addKey(key, value._instance)
+            this._instance.addKey(key, (value as any)._instance)
         else this._instance.addKey(key, value)
     }
 
@@ -62,13 +62,13 @@ export class Dictionary {
         return js
     }
 
-    _instance: any
+    private _instance: any
 
     constructor(obj: Obj) {
         if (obj === null) {
             throw Error("Can not instantiate Dictionary without valid NPdf Object")
         }
-        this._instance = new __mod.Dictionary(obj._instance)
+        this._instance = new __mod.Dictionary((obj as any)._instance)
     }
 
 }

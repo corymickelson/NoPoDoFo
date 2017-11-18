@@ -10,6 +10,7 @@
 
 using namespace std;
 
+namespace NoPoDoFo {
 class Document : public Napi::ObjectWrap<Document>
 {
 public:
@@ -48,5 +49,5 @@ private:
   bool loadForIncrementalUpdates = false;
   PoDoFo::PdfMemDocument* document;
 };
-
+}
 #endif // NPDF_PDFMEMDOCUMENT_H

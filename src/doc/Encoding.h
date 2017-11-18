@@ -8,6 +8,7 @@
 #include <napi.h>
 #include <podofo/podofo.h>
 
+namespace NoPoDoFo {
 class Encoding: public Napi::ObjectWrap<Encoding> {
 public:
   explicit Encoding(const Napi::CallbackInfo &callbackInfo);
@@ -25,5 +26,5 @@ public:
 private:
   PoDoFo::PdfEncoding *encoding;
 };
-
+}
 #endif //NPDF_ENCODING_H

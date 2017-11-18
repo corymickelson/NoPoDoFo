@@ -12,6 +12,7 @@
 
 using namespace std;
 
+namespace NoPoDoFo {
 class Obj : public Napi::ObjectWrap<Obj>
 {
 public:
@@ -46,5 +47,5 @@ public:
 private:
   PoDoFo::PdfObject* obj;
 };
-
+}
 #endif

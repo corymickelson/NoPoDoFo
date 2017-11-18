@@ -11,6 +11,7 @@
 
 using namespace std;
 
+namespace NoPoDoFo {
 class Stream : public Napi::ObjectWrap<Stream>
 {
 public:
@@ -26,5 +27,5 @@ public:
 private:
   PoDoFo::PdfStream* stream;
 };
-
+}
 #endif // NPDF_STREAM_H
