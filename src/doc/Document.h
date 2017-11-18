@@ -42,8 +42,10 @@ public:
   Napi::Value CreateFont(const Napi::CallbackInfo&);
 
   PoDoFo::PdfMemDocument* GetDocument() { return document; }
+  bool LoadedForIncrementalUpdates() { return loadForIncrementalUpdates; }
 
 private:
+  bool loadForIncrementalUpdates = false;
   PoDoFo::PdfMemDocument* document;
 };
 

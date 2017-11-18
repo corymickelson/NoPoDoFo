@@ -1,7 +1,6 @@
 //
 // Created by red on 9/6/17.
 //
-
 #include "Document.h"
 #include "../ErrorHandler.h"
 #include "../ValidateArguments.h"
@@ -9,6 +8,7 @@
 #include "Encrypt.h"
 #include "Font.h"
 #include "Page.h"
+#include "SignatureField.h"
 
 #include <podofo/base/PdfEncodingFactory.h>
 

@@ -1,5 +1,9 @@
-import {__mod} from './document'
+import {__mod, Document} from './document'
 import {IPage} from './page'
+import {Obj} from "./object";
+import {Annotation} from "./annotation";
+import {Rect} from "./rect";
+import {Form} from "./form";
 
 
 export interface IFieldInfo {
@@ -121,5 +125,42 @@ export class ListField {
     }
     removeItem(index: number): void {
         this._instance.removeItem(index)
+    }
+}
+
+export class SignatureField {
+    private _instance:any
+    constructor(annot:Annotation|any, form?:Form, doc?:Document) {
+        if(form instanceof Form && doc instanceof Document) {
+            this._instance = new __mod.SignatureField((annot as any)._instance, form._instance, doc._instance)
+        }
+        else {
+            this._instance = new __mod.SignatureField(annot)
+        }
+    }
+
+    // setSignature(data:Buffer): void {
+    //     this._instance.setSignature(data)
+    // }
+
+    setReason(reason:string): void {
+        this._instance.setReason(reason)
+    }
+
+    setLocation(local:string): void {
+        this._instance.setLocation(local)
+    }
+
+    setCreator(creator:string): void {
+        this._instance.setCreator(creator)
+    }
+
+    setDate(): void {
+        this._instance.setDate()
+    }
+
+    getObject(): Obj {
+        const instance = this._instance.getObject()
+        return new Obj(instance)
     }
 }

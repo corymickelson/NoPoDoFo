@@ -17,6 +17,8 @@
 #include "doc/ListField.h"
 #include "doc/Painter.h"
 #include "doc/Rect.h"
+#include "doc/SignatureField.h"
+#include "doc/Signer.h"
 #include "doc/TextField.h"
 #include <napi.h>
 
@@ -44,6 +46,8 @@ init(Napi::Env env, Napi::Object exports)
   Font::Initialize(env, exports);
   Encoding::Initialize(env, exports);
   ExtGState::Initialize(env, exports);
+  Signer::Initialize(env, exports);
+  SignatureField::Initialize(env, exports);
   return exports;
 }
 

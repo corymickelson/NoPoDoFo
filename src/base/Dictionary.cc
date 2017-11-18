@@ -49,13 +49,27 @@ Dictionary::Initialize(Napi::Env& env, Napi::Object& target)
 void
 Dictionary::AddKey(const CallbackInfo& info)
 {
-  AssertFunctionArgs(
-    info, 2, { napi_valuetype::napi_string, napi_valuetype::napi_object });
+  if (info.Length() < 2) {
+    throw Napi::Error::New(
+      info.Env(),
+      "add key requires a key and value. Key and value args not found");
+  }
+  auto v = info[1];
+  PdfObject o;
+
+  if (v.IsBoolean()) {
+    o = PdfObject(v.As<Boolean>());
+  } else if (v.IsNumber()) {
+    o = PdfObject(v.As<Number>().DoubleValue());
+  } else if (v.IsString()) {
+    o = PdfObject(PdfString(v.As<String>().Utf8Value()));
+  } else if (v.IsObject()) {
+    auto objWrap = info[1].As<Object>();
+    Obj* obj = Obj::Unwrap(objWrap);
+    o = obj->GetObject();
+  }
   PdfName key(info[0].As<String>().Utf8Value());
-  auto objWrap = info[1].As<Object>();
-  Obj* o = Obj::Unwrap(objWrap);
-  auto obj = o->GetObject();
-  dict.AddKey(key, obj);
+  dict.AddKey(key, o);
 }
 
 Napi::Value

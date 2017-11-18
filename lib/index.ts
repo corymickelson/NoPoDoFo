@@ -18,7 +18,7 @@ import {
 import { Image as image } from './image'
 import { Painter as painter } from './painter'
 import { Rect as rect } from './rect'
-import { Signature as sign } from './signature'
+import { Signer as sign } from './signer'
 
 export const Document = doc,
     Page = page,
