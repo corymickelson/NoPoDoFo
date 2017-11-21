@@ -13,9 +13,13 @@ using namespace PoDoFo;
 
 namespace NoPoDoFo {
 
+FunctionReference Vector::constructor;
+
 Vector::Vector(const Napi::CallbackInfo& info)
   : ObjectWrap(info)
-{}
+{
+  vector = new PdfVecObjects();
+}
 
 Vector::~Vector()
 {

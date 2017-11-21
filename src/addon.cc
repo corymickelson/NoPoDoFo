@@ -20,6 +20,7 @@
 #include "doc/SignatureField.h"
 #include "doc/Signer.h"
 #include "doc/TextField.h"
+#include "base/Vector.h"
 #include <napi.h>
 
 Napi::Object
@@ -48,6 +49,7 @@ init(Napi::Env env, Napi::Object exports)
   NoPoDoFo::ExtGState::Initialize(env, exports);
   NoPoDoFo::Signer::Initialize(env, exports);
   NoPoDoFo::SignatureField::Initialize(env, exports);
+  NoPoDoFo::Vector::Initialize(env, exports);
   return exports;
 }
 
