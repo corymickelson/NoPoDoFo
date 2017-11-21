@@ -126,5 +126,12 @@ ExtGState::SetFrequency(const CallbackInfo& info)
   AssertFunctionArgs(info, 1, { napi_valuetype::napi_number });
   double v = info[0].As<Number>();
   self->SetFrequency(v);
+}
+ExtGState::~ExtGState() {
+  if(self != nullptr) {
+    HandleScope scope(Env());
+    self = nullptr;
+    doc = nullptr;
+  }
 };
 }

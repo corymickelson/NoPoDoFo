@@ -12,11 +12,8 @@ class SignatureField : public Napi::ObjectWrap<SignatureField>
 {
 public:
   explicit SignatureField(const Napi::CallbackInfo&);
-  ~SignatureField()
-  {
-    delete field;
-    delete signatureBuffer;
-  }
+  ~SignatureField();
+
   static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
   void SetAppearanceStream(const Napi::CallbackInfo&);

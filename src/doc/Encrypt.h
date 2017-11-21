@@ -13,11 +13,8 @@ class Encrypt : public Napi::ObjectWrap<Encrypt>
 {
 public:
   explicit Encrypt(const Napi::CallbackInfo&);
-  ~Encrypt()
-  {
-    delete encrypt;
-    delete document;
-  }
+  ~Encrypt();
+
   static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
 

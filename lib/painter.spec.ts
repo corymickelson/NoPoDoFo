@@ -70,9 +70,18 @@ function drawLine() {
     for (let s = 0; s < 5; s++) {
         x += 10000 * CONVERSION
         painter.setStrokeWidth((s*1000) * CONVERSION)
-        painter.setStrokingGrey(s * 10.0)
+        painter.setStrokingGrey(s / 10.0)
         painter.drawLine({x,y}, {x,y: y - lineLength})
     }
+
+    painter.finishPage()
+    test('write lines should not throw', t => {
+     doc.write((e, d) => {
+            if (e) t.fail(e.message)
+            else t.pass('How to test if a line exists on a pdf???')
+            t.end()
+        }, outFile)
+    })
 }
 
 function runTest(test: Function) {
@@ -85,5 +94,5 @@ function runTest(test: Function) {
 }
 
 export function runAll() {
-    [drawText].map(i => runTest(i))
+    [drawText, drawLine].map(i => runTest(i))
 }

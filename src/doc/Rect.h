@@ -14,7 +14,7 @@ class Rect : public Napi::ObjectWrap<Rect>
 {
 public:
   Rect(const Napi::CallbackInfo& callbackInfo);
-  ~Rect() {}
+  ~Rect() = default;
   static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
 

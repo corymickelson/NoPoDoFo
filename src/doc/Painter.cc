@@ -812,4 +812,10 @@ Painter::GetRGB(Napi::Value& value, int* rgb)
     rgb[i] = js.Get(i).As<Number>();
   }
 }
+Painter::~Painter()
+{
+  Napi::HandleScope scope(Env());
+  painter = nullptr;
+  document = nullptr;
+}
 }

@@ -17,7 +17,7 @@ class CheckBox : public ObjectWrap<CheckBox>
 {
 public:
   explicit CheckBox(const CallbackInfo& callbackInfo);
-  ~CheckBox() { delete box; }
+  ~CheckBox();
   static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target)
   {

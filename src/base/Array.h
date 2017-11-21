@@ -12,7 +12,7 @@ class Array : public Napi::ObjectWrap<Array>
 {
 public:
   explicit Array(const Napi::CallbackInfo&);
-  ~Array() { delete arr; }
+  ~Array();
   static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
 
@@ -27,7 +27,7 @@ public:
   void Push(const Napi::CallbackInfo&);
 
 private:
-  PoDoFo::PdfArray* arr;
+  PoDoFo::PdfArray* array;
 };
 }
 #endif

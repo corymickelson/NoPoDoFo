@@ -13,7 +13,7 @@ class Form : public Napi::ObjectWrap<Form>
 {
 public:
   explicit Form(const Napi::CallbackInfo&);
-  ~Form() { delete doc; }
+  ~Form();
   static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
   void SetNeedAppearances(const Napi::CallbackInfo&, const Napi::Value&);

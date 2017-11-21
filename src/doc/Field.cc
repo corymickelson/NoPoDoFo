@@ -147,4 +147,10 @@ Field::GetFieldIndex(const CallbackInfo& info)
 {
   return Napi::Number::New(info.Env(), fieldIndex);
 }
+Field::~Field() {
+  if(_page != nullptr) {
+    HandleScope scope(Env());
+    _page = nullptr;
+  }
+}
 }

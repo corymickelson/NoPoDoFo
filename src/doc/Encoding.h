@@ -12,10 +12,7 @@ namespace NoPoDoFo {
 class Encoding: public Napi::ObjectWrap<Encoding> {
 public:
   explicit Encoding(const Napi::CallbackInfo &callbackInfo);
-  ~Encoding() {
-    PoDoFo::podofo_free(encoding);
-    encoding = nullptr;
-  }
+  ~Encoding();
   static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env &, Napi::Object &target);
   Napi::Value AddToDictionary(const Napi::CallbackInfo &);

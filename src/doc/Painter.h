@@ -15,11 +15,8 @@ class Painter : public Napi::ObjectWrap<Painter>
 {
 public:
   Painter(const Napi::CallbackInfo& callbackInfo);
-  ~Painter()
-  {
-    delete painter;
-    delete document;
-  }
+  ~Painter();
+
   PoDoFo::PdfRect pageSize;
   static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);

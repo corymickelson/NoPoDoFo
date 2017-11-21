@@ -74,4 +74,10 @@ Encoding::GetData(const Napi::CallbackInfo& info)
 {
   return Value();
 }
+Encoding::~Encoding() {
+  if(encoding != nullptr) {
+    HandleScope scope(Env());
+    encoding = nullptr;
+  }
+}
 }

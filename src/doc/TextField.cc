@@ -50,4 +50,11 @@ TextField::GetText(const CallbackInfo& info)
   return Napi::String::New(info.Env(),
                            TextField::GetField().GetText().GetStringUtf8());
 }
+TextField::~TextField()
+{
+  if (field != nullptr) {
+    HandleScope scope(Env());
+    field = nullptr;
+  }
+}
 }

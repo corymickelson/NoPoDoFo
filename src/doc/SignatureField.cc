@@ -134,4 +134,12 @@ SignatureField::EnsureSignatureObject(const CallbackInfo& info)
     ErrorHandler(err, info);
   }
 }
+SignatureField::~SignatureField()
+{
+  if (field != nullptr || signatureBuffer != nullptr) {
+    HandleScope scope(Env());
+    field = nullptr;
+    signatureBuffer = nullptr;
+  }
+}
 }

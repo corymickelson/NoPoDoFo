@@ -12,7 +12,12 @@ Napi::FunctionReference Ref::constructor;
 Ref::Ref(const Napi::CallbackInfo& info)
   : ObjectWrap(info)
 {
-  ref = info[0].As<Napi::External<PdfReference>>().Data();
+  if (info.Length() == 1 && info[0].IsNumber()) {
+    const pdf_objnum i = info[0].As<Number>();
+    ref = new PdfReference(i, 0);
+  } else if (info.Length() == 1 && info[0].Type() == napi_external) {
+    ref = info[0].As<Napi::External<PdfReference>>().Data();
+  }
 }
 
 void
@@ -92,5 +97,11 @@ Ref::GetObj(const CallbackInfo& info)
   PdfObject obj(*ref);
   auto instancePtr = External<PdfObject>::New(info.Env(), &obj);
   return Obj::constructor.New({ instancePtr });
+}
+Ref::~Ref() {
+  if(ref != nullptr) {
+    HandleScope scope(Env());
+    ref = nullptr;
+  }
 }
 }

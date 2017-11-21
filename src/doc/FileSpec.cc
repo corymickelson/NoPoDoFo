@@ -32,4 +32,10 @@ FileSpec::FileSpec(const CallbackInfo& info)
   Document* doc = Document::Unwrap(docObj);
   spec = new PdfFileSpec(file.c_str(), true, doc->GetDocument(), true);
 }
+FileSpec::~FileSpec() {
+  if(spec != nullptr) {
+    HandleScope scope(Env());
+    spec = nullptr;
+  }
+}
 }

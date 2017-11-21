@@ -14,6 +14,9 @@ using namespace std;
 using namespace PoDoFo;
 
 namespace NoPoDoFo {
+
+FunctionReference Document::constructor;
+
 void
 Document::Initialize(Napi::Env& env, Napi::Object& target)
 {
@@ -21,7 +24,8 @@ Document::Initialize(Napi::Env& env, Napi::Object& target)
   Function ctor = DefineClass(
     env,
     "Document",
-    { InstanceAccessor("password", nullptr, &Document::SetPassword),
+    { //StaticMethod("gc", &Document::GC),
+      InstanceAccessor("password", nullptr, &Document::SetPassword),
       InstanceAccessor("encrypt", &Document::GetEncrypt, &Document::SetEncrypt),
       InstanceMethod("load", &Document::Load),
       InstanceMethod("getPageCount", &Document::GetPageCount),
@@ -36,29 +40,32 @@ Document::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceMethod("getObjects", &Document::GetObjects),
       InstanceMethod("getTrailer", &Document::GetTrailer),
       InstanceMethod("isAllowed", &Document::IsAllowed),
-    InstanceMethod("createFont", &Document::CreateFont)});
-
+      InstanceMethod("createFont", &Document::CreateFont) });
+  constructor = Persistent(ctor);
+  constructor.SuppressDestruct();
   target.Set("Document", ctor);
 }
 Document::Document(const CallbackInfo& info)
   : ObjectWrap(info)
 {
-  document = new PdfMemDocument();
-}
-
-Napi::Value
-Document::LoadBuffer(const CallbackInfo& info)
-{
-  auto resolver = Promise::Deferred::New(info.Env());
-  if (!info[0].IsBuffer()) {
-    throw Error::New(info.Env(), "Buffer required");
+  if(info.Length() == 1) {
+    AssertFunctionArgs(info, 1, {napi_external});
+    document = info[0].As<External<PdfMemDocument>>().Data();
+  } else {
+    document = new PdfMemDocument();
   }
-  auto buffer = info[0].As<Buffer<char>>();
-  document->LoadFromBuffer(buffer.Data(), buffer.Length());
-  resolver.Resolve(info.Env().Undefined());
-  return resolver.Promise();
+
+  if(!document) {
+    throw Error::New(info.Env(), "document has not been initialized properly");
+  }
 }
 
+Document::~Document() {
+  if(document != nullptr) {
+    HandleScope scope(Env());
+    document = nullptr;
+  }
+}
 Napi::Value
 Document::GetPageCount(const CallbackInfo& info)
 {
@@ -222,10 +229,8 @@ Document::SetEncrypt(const CallbackInfo& info, const Napi::Value& value)
     int nperm = 0;
     int algoParameter = 0;
     int key = 0;
-    if (!encryption.Has("ownerPassword") ||
-        !encryption.Has("keyLength") ||
-        !encryption.Has("protection") ||
-        !encryption.Has("algorithm")) {
+    if (!encryption.Has("ownerPassword") || !encryption.Has("keyLength") ||
+        !encryption.Has("protection") || !encryption.Has("algorithm")) {
       throw Error::New(info.Env(), "something is not right");
     }
     try {
@@ -632,8 +637,51 @@ Document::WriteBuffer(const CallbackInfo& info)
 {
   AssertFunctionArgs(info, 1, { napi_valuetype::napi_function });
   auto cb = info[0].As<Function>();
-  DocumentWriteBufferAsync* worker = new DocumentWriteBufferAsync(cb, this);
+  auto * worker = new DocumentWriteBufferAsync(cb, this);
   worker->Queue();
   return info.Env().Undefined();
+}
+
+class GCAsync: public AsyncWorker {
+public:
+  GCAsync(const Function &callback, Document *doc, string pwd)
+      : AsyncWorker(callback)
+  , doc(doc)
+  , pwd(std::move(pwd))
+  {}
+protected:
+  void Execute() override {
+    PdfVecObjects objs;
+    PdfParser parser(&objs);
+    objs.SetAutoDelete(true);
+    parser.ParseFile(doc->originPdf.c_str(),false);
+    PdfWriter writer(&parser);
+    writer.SetPdfVersion(parser.GetPdfVersion());
+    if(parser.GetEncrypted()) {
+      writer.SetEncrypted(*(parser.GetEncrypt()));
+    }
+    PdfRefCountedBuffer r;
+    PdfOutputDevice device(&r);
+    writer.Write(&device);
+    value = Buffer<char>::Copy(Env(), r.GetBuffer(), r.GetSize());
+  }
+  void OnOK() override {
+    HandleScope scope(Env());
+    Callback().Call({Env().Null(), value});
+  }
+private:
+  Document* doc = nullptr;
+  string pwd;
+  Napi::Buffer<char> value;
+};
+
+Napi::Value
+Document::GC(const Napi::CallbackInfo &info) {
+  AssertFunctionArgs(info, 1, {napi_string});
+  string source = info[0].As<String>().Utf8Value();
+  string dest;
+  if(info.Length() == 2 && info[1].IsString()) {
+    dest = info[1].As<String>().Utf8Value();
+  }
 }
 }

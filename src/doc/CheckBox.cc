@@ -35,4 +35,10 @@ CheckBox::SetChecked(const CallbackInfo& info, const Napi::Value& value)
   bool checked = value.As<Boolean>();
   box->SetChecked(checked);
 }
+CheckBox::~CheckBox() {
+  if(box != nullptr) {
+    HandleScope scope(Env());
+    box = nullptr;
+  }
+}
 }

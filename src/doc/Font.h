@@ -13,11 +13,8 @@ class Font : public Napi::ObjectWrap<Font>
 {
 public:
   explicit Font(const Napi::CallbackInfo& callbackInfo);
-  ~Font()
-  {
-    PoDoFo::podofo_free(font);
-    font = nullptr;
-  }
+  ~Font();
+
   static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
   Napi::Value GetFontSize(const Napi::CallbackInfo&);

@@ -13,7 +13,7 @@ class Ref : public Napi::ObjectWrap<Ref>
 {
 public:
   explicit Ref(const Napi::CallbackInfo&);
-  ~Ref() { delete ref; }
+  ~Ref();
   static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
 

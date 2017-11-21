@@ -331,4 +331,11 @@ Annotation::HasFileAttachment(const CallbackInfo& info)
 {
   return Napi::Boolean::New(info.Env(), annot->HasFileAttachement());
 }
+Annotation::~Annotation() {
+  if(annot != nullptr) {
+    HandleScope scope(Env());
+    annot = nullptr;
+    doc = nullptr;
+  }
+}
 }

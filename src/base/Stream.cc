@@ -100,4 +100,10 @@ Stream::Write(const CallbackInfo& info)
   worker->Queue();
   return info.Env().Undefined();
 }
+Stream::~Stream() {
+  if(stream != nullptr) {
+    HandleScope scope(Env());
+    stream = nullptr;
+  }
+}
 }

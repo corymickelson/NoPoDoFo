@@ -16,7 +16,7 @@ class Stream : public Napi::ObjectWrap<Stream>
 {
 public:
   explicit Stream(const Napi::CallbackInfo& callbackInfo);
-  ~Stream() = default;
+  ~Stream();
   static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
   Napi::Value Write(const Napi::CallbackInfo&);

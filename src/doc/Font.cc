@@ -213,4 +213,9 @@ Font::EmbedFont(const Napi::CallbackInfo& info)
     ErrorHandler(err, info);
   }
 }
+Font::~Font()
+{
+  Napi::HandleScope scope(Env());
+  font = nullptr;
+}
 }

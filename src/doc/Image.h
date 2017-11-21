@@ -13,11 +13,8 @@ class Image : public Napi::ObjectWrap<Image>
 {
 public:
   Image(const Napi::CallbackInfo&);
-  ~Image()
-  {
-    delete _doc;
-    delete img;
-  }
+  ~Image();
+
   static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
   Napi::Value GetWidth(const Napi::CallbackInfo&);

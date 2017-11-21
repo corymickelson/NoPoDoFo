@@ -321,4 +321,10 @@ Obj::Write(const CallbackInfo& info)
   worker->Queue();
   return info.Env().Undefined();
 }
+Obj::~Obj() {
+  if(obj != nullptr) {
+    HandleScope scope(Env());
+    obj = nullptr;
+  }
+}
 }

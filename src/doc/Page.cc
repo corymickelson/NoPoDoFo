@@ -351,4 +351,10 @@ Page::CreateAnnotation(const CallbackInfo& info)
     { External<PdfAnnotation>::New(info.Env(), annot) });
   return instance;
 }
+Page::~Page()
+{
+  Napi::HandleScope scope(Env());
+  page = nullptr;
+  parent = nullptr;
+}
 }

@@ -59,4 +59,10 @@ Form::GetObject(const CallbackInfo& info)
   auto objInstance = Obj::constructor.New({ nObj });
   return objInstance;
 }
+Form::~Form() {
+  if(doc != nullptr) {
+    HandleScope scope(Env());
+    doc = nullptr;
+  }
+}
 }

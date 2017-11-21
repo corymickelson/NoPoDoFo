@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>Ref | nopodofo</title>
+	<title>SignatureField | nopodofo</title>
 	<meta name="description" content="">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -56,13 +56,13 @@
 					<a href="../globals.html">Globals</a>
 				</li>
 				<li>
-					<a href="../modules/_reference_.html">&quot;reference&quot;</a>
+					<a href="../modules/_field_.html">&quot;field&quot;</a>
 				</li>
 				<li>
-					<a href="_reference_.ref.html">Ref</a>
+					<a href="_field_.signaturefield.html">SignatureField</a>
 				</li>
 			</ul>
-			<h1>Class Ref</h1>
+			<h1>Class SignatureField</h1>
 		</div>
 	</div>
 </header>
@@ -73,7 +73,7 @@
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
 					<li>
-						<span class="target">Ref</span>
+						<span class="target">SignatureField</span>
 					</li>
 				</ul>
 			</section>
@@ -84,30 +84,23 @@
 						<section class="tsd-index-section tsd-is-external">
 							<h3>Constructors</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-constructor tsd-parent-kind-class tsd-is-external"><a href="_reference_.ref.html#constructor" class="tsd-kind-icon">constructor</a></li>
+								<li class="tsd-kind-constructor tsd-parent-kind-class tsd-is-external"><a href="_field_.signaturefield.html#constructor" class="tsd-kind-icon">constructor</a></li>
 							</ul>
 						</section>
 						<section class="tsd-index-section tsd-is-private tsd-is-private-protected tsd-is-external">
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private tsd-is-external"><a href="_reference_.ref.html#_instance" class="tsd-kind-icon">_instance</a></li>
-							</ul>
-						</section>
-						<section class="tsd-index-section tsd-is-external">
-							<h3>Accessors</h3>
-							<ul class="tsd-index-list">
-								<li class="tsd-kind-get-signature tsd-parent-kind-class tsd-is-external"><a href="_reference_.ref.html#generation" class="tsd-kind-icon">generation</a></li>
-								<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-external"><a href="_reference_.ref.html#objectnumber" class="tsd-kind-icon">object<wbr>Number</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private tsd-is-external"><a href="_field_.signaturefield.html#_instance" class="tsd-kind-icon">_instance</a></li>
 							</ul>
 						</section>
 						<section class="tsd-index-section tsd-is-external">
 							<h3>Methods</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-external"><a href="_reference_.ref.html#deref" class="tsd-kind-icon">deref</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-external"><a href="_reference_.ref.html#isindirect" class="tsd-kind-icon">is<wbr>Indirect</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-external"><a href="_reference_.ref.html#set" class="tsd-kind-icon">set</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-external"><a href="_reference_.ref.html#tostring" class="tsd-kind-icon">to<wbr>String</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-external"><a href="_reference_.ref.html#write" class="tsd-kind-icon">write</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-external"><a href="_field_.signaturefield.html#getobject" class="tsd-kind-icon">get<wbr>Object</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-external"><a href="_field_.signaturefield.html#setcreator" class="tsd-kind-icon">set<wbr>Creator</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-external"><a href="_field_.signaturefield.html#setdate" class="tsd-kind-icon">set<wbr>Date</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-external"><a href="_field_.signaturefield.html#setlocation" class="tsd-kind-icon">set<wbr>Location</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-external"><a href="_field_.signaturefield.html#setreason" class="tsd-kind-icon">set<wbr>Reason</a></li>
 							</ul>
 						</section>
 					</div>
@@ -119,22 +112,28 @@
 					<a name="constructor" class="tsd-anchor"></a>
 					<h3>constructor</h3>
 					<ul class="tsd-signatures tsd-kind-constructor tsd-parent-kind-class tsd-is-external">
-						<li class="tsd-signature tsd-kind-icon">new <wbr>Ref<span class="tsd-signature-symbol">(</span>_instance<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_reference_.ref.html" class="tsd-signature-type">Ref</a></li>
+						<li class="tsd-signature tsd-kind-icon">new <wbr>Signature<wbr>Field<span class="tsd-signature-symbol">(</span>annot<span class="tsd-signature-symbol">: </span><a href="_annotation_.annotation.html" class="tsd-signature-type">Annotation</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">any</span>, form<span class="tsd-signature-symbol">?: </span><a href="_form_.form.html" class="tsd-signature-type">Form</a>, doc<span class="tsd-signature-symbol">?: </span><a href="_document_.document.html" class="tsd-signature-type">Document</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_field_.signaturefield.html" class="tsd-signature-type">SignatureField</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/corymickelson/npdf/blob/f92963e/lib/reference.ts#L20">reference.ts:20</a></li>
+									<li>Defined in <a href="https://github.com/corymickelson/npdf/blob/f92963e/lib/field.ts#L132">field.ts:132</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>_instance: <span class="tsd-signature-type">any</span></h5>
+									<h5>annot: <a href="_annotation_.annotation.html" class="tsd-signature-type">Annotation</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">any</span></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> form: <a href="_form_.form.html" class="tsd-signature-type">Form</a></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> doc: <a href="_document_.document.html" class="tsd-signature-type">Document</a></h5>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <a href="_reference_.ref.html" class="tsd-signature-type">Ref</a></h4>
+							<h4 class="tsd-returns-title">Returns <a href="_field_.signaturefield.html" class="tsd-signature-type">SignatureField</a></h4>
 						</li>
 					</ul>
 				</section>
@@ -147,126 +146,47 @@
 					<div class="tsd-signature tsd-kind-icon">_instance<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">any</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/corymickelson/npdf/blob/f92963e/lib/reference.ts#L22">reference.ts:22</a></li>
+							<li>Defined in <a href="https://github.com/corymickelson/npdf/blob/f92963e/lib/field.ts#L132">field.ts:132</a></li>
 						</ul>
 					</aside>
 				</section>
 			</section>
 			<section class="tsd-panel-group tsd-member-group tsd-is-external">
-				<h2>Accessors</h2>
-				<section class="tsd-panel tsd-member tsd-kind-get-signature tsd-parent-kind-class tsd-is-external">
-					<a name="generation" class="tsd-anchor"></a>
-					<h3>generation</h3>
-					<ul class="tsd-signatures tsd-kind-get-signature tsd-parent-kind-class tsd-is-external">
-						<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">get</span> generation<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span></li>
-					</ul>
-					<ul class="tsd-descriptions">
-						<li class="tsd-description">
-							<aside class="tsd-sources">
-								<ul>
-									<li>Defined in <a href="https://github.com/corymickelson/npdf/blob/f92963e/lib/reference.ts#L14">reference.ts:14</a></li>
-								</ul>
-							</aside>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">any</span></h4>
-						</li>
-					</ul>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-accessor tsd-parent-kind-class tsd-is-external">
-					<a name="objectnumber" class="tsd-anchor"></a>
-					<h3>object<wbr>Number</h3>
-					<ul class="tsd-signatures tsd-kind-accessor tsd-parent-kind-class tsd-is-external">
-						<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">get</span> objectNumber<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></li>
-						<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">set</span> objectNumber<span class="tsd-signature-symbol">(</span>value<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
-					</ul>
-					<ul class="tsd-descriptions">
-						<li class="tsd-description">
-							<aside class="tsd-sources">
-								<ul>
-									<li>Defined in <a href="https://github.com/corymickelson/npdf/blob/f92963e/lib/reference.ts#L6">reference.ts:6</a></li>
-								</ul>
-							</aside>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
-						</li>
-						<li class="tsd-description">
-							<aside class="tsd-sources">
-								<ul>
-									<li>Defined in <a href="https://github.com/corymickelson/npdf/blob/f92963e/lib/reference.ts#L10">reference.ts:10</a></li>
-								</ul>
-							</aside>
-							<h4 class="tsd-parameters-title">Parameters</h4>
-							<ul class="tsd-parameters">
-								<li>
-									<h5>value: <span class="tsd-signature-type">number</span></h5>
-								</li>
-							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
-						</li>
-					</ul>
-				</section>
-			</section>
-			<section class="tsd-panel-group tsd-member-group tsd-is-external">
 				<h2>Methods</h2>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-external">
-					<a name="deref" class="tsd-anchor"></a>
-					<h3>deref</h3>
+					<a name="getobject" class="tsd-anchor"></a>
+					<h3>get<wbr>Object</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-external">
-						<li class="tsd-signature tsd-kind-icon">deref<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_object_.obj.html" class="tsd-signature-type">Obj</a></li>
+						<li class="tsd-signature tsd-kind-icon">get<wbr>Object<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_object_.obj.html" class="tsd-signature-type">Obj</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/corymickelson/npdf/blob/f92963e/lib/reference.ts#L44">reference.ts:44</a></li>
+									<li>Defined in <a href="https://github.com/corymickelson/npdf/blob/f92963e/lib/field.ts#L162">field.ts:162</a></li>
 								</ul>
 							</aside>
-							<div class="tsd-comment tsd-typography">
-								<div class="lead">
-									<p>If ref is an indirect object, de-reference ref to PdfObject</p>
-								</div>
-							</div>
 							<h4 class="tsd-returns-title">Returns <a href="_object_.obj.html" class="tsd-signature-type">Obj</a></h4>
 						</li>
 					</ul>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-external">
-					<a name="isindirect" class="tsd-anchor"></a>
-					<h3>is<wbr>Indirect</h3>
+					<a name="setcreator" class="tsd-anchor"></a>
+					<h3>set<wbr>Creator</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-external">
-						<li class="tsd-signature tsd-kind-icon">is<wbr>Indirect<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></li>
+						<li class="tsd-signature tsd-kind-icon">set<wbr>Creator<span class="tsd-signature-symbol">(</span>creator<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/corymickelson/npdf/blob/f92963e/lib/reference.ts#L33">reference.ts:33</a></li>
-								</ul>
-							</aside>
-							<div class="tsd-comment tsd-typography">
-								<div class="lead">
-									<p>Check if ref points to an indirect object. Object is indirect if both object and generation numbers are not 0</p>
-								</div>
-							</div>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
-						</li>
-					</ul>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-external">
-					<a name="set" class="tsd-anchor"></a>
-					<h3>set</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-external">
-						<li class="tsd-signature tsd-kind-icon">set<span class="tsd-signature-symbol">(</span>value<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
-					</ul>
-					<ul class="tsd-descriptions">
-						<li class="tsd-description">
-							<aside class="tsd-sources">
-								<ul>
-									<li>Defined in <a href="https://github.com/corymickelson/npdf/blob/f92963e/lib/reference.ts#L18">reference.ts:18</a></li>
+									<li>Defined in <a href="https://github.com/corymickelson/npdf/blob/f92963e/lib/field.ts#L154">field.ts:154</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>value: <span class="tsd-signature-type">number</span></h5>
+									<h5>creator: <span class="tsd-signature-type">string</span></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -274,39 +194,62 @@
 					</ul>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-external">
-					<a name="tostring" class="tsd-anchor"></a>
-					<h3>to<wbr>String</h3>
+					<a name="setdate" class="tsd-anchor"></a>
+					<h3>set<wbr>Date</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-external">
-						<li class="tsd-signature tsd-kind-icon">to<wbr>String<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></li>
+						<li class="tsd-signature tsd-kind-icon">set<wbr>Date<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/corymickelson/npdf/blob/f92963e/lib/reference.ts#L37">reference.ts:37</a></li>
+									<li>Defined in <a href="https://github.com/corymickelson/npdf/blob/f92963e/lib/field.ts#L158">field.ts:158</a></li>
 								</ul>
 							</aside>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
 						</li>
 					</ul>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-external">
-					<a name="write" class="tsd-anchor"></a>
-					<h3>write</h3>
+					<a name="setlocation" class="tsd-anchor"></a>
+					<h3>set<wbr>Location</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-external">
-						<li class="tsd-signature tsd-kind-icon">write<span class="tsd-signature-symbol">(</span>output<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+						<li class="tsd-signature tsd-kind-icon">set<wbr>Location<span class="tsd-signature-symbol">(</span>local<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/corymickelson/npdf/blob/f92963e/lib/reference.ts#L25">reference.ts:25</a></li>
+									<li>Defined in <a href="https://github.com/corymickelson/npdf/blob/f92963e/lib/field.ts#L150">field.ts:150</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>output: <span class="tsd-signature-type">string</span></h5>
+									<h5>local: <span class="tsd-signature-type">string</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-external">
+					<a name="setreason" class="tsd-anchor"></a>
+					<h3>set<wbr>Reason</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-external">
+						<li class="tsd-signature tsd-kind-icon">set<wbr>Reason<span class="tsd-signature-symbol">(</span>reason<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/corymickelson/npdf/blob/f92963e/lib/field.ts#L146">field.ts:146</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>reason: <span class="tsd-signature-type">string</span></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -357,7 +300,7 @@
 					<li class=" tsd-kind-external-module tsd-is-external">
 						<a href="../modules/_encrypt_.html">"encrypt"</a>
 					</li>
-					<li class=" tsd-kind-external-module tsd-is-external">
+					<li class="current tsd-kind-external-module tsd-is-external">
 						<a href="../modules/_field_.html">"field"</a>
 					</li>
 					<li class=" tsd-kind-external-module tsd-is-external">
@@ -381,7 +324,7 @@
 					<li class=" tsd-kind-external-module tsd-is-external">
 						<a href="../modules/_rect_.html">"rect"</a>
 					</li>
-					<li class="current tsd-kind-external-module tsd-is-external">
+					<li class=" tsd-kind-external-module tsd-is-external">
 						<a href="../modules/_reference_.html">"reference"</a>
 					</li>
 					<li class=" tsd-kind-external-module tsd-is-external">
@@ -394,42 +337,57 @@
 			</nav>
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
+					<li class=" tsd-kind-class tsd-parent-kind-external-module tsd-is-external">
+						<a href="_field_.checkbox.html" class="tsd-kind-icon">Check<wbr>Box</a>
+					</li>
+					<li class=" tsd-kind-class tsd-parent-kind-external-module tsd-is-external">
+						<a href="_field_.field.html" class="tsd-kind-icon">Field</a>
+					</li>
+					<li class=" tsd-kind-class tsd-parent-kind-external-module tsd-is-external">
+						<a href="_field_.listfield.html" class="tsd-kind-icon">List<wbr>Field</a>
+					</li>
 				</ul>
 				<ul class="current">
 					<li class="current tsd-kind-class tsd-parent-kind-external-module tsd-is-external">
-						<a href="_reference_.ref.html" class="tsd-kind-icon">Ref</a>
+						<a href="_field_.signaturefield.html" class="tsd-kind-icon">Signature<wbr>Field</a>
 						<ul>
 							<li class=" tsd-kind-constructor tsd-parent-kind-class tsd-is-external">
-								<a href="_reference_.ref.html#constructor" class="tsd-kind-icon">constructor</a>
+								<a href="_field_.signaturefield.html#constructor" class="tsd-kind-icon">constructor</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private tsd-is-external">
-								<a href="_reference_.ref.html#_instance" class="tsd-kind-icon">_instance</a>
-							</li>
-							<li class=" tsd-kind-get-signature tsd-parent-kind-class tsd-is-external">
-								<a href="_reference_.ref.html#generation" class="tsd-kind-icon">generation</a>
-							</li>
-							<li class=" tsd-kind-accessor tsd-parent-kind-class tsd-is-external">
-								<a href="_reference_.ref.html#objectnumber" class="tsd-kind-icon">object<wbr>Number</a>
+								<a href="_field_.signaturefield.html#_instance" class="tsd-kind-icon">_instance</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-external">
-								<a href="_reference_.ref.html#deref" class="tsd-kind-icon">deref</a>
+								<a href="_field_.signaturefield.html#getobject" class="tsd-kind-icon">get<wbr>Object</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-external">
-								<a href="_reference_.ref.html#isindirect" class="tsd-kind-icon">is<wbr>Indirect</a>
+								<a href="_field_.signaturefield.html#setcreator" class="tsd-kind-icon">set<wbr>Creator</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-external">
-								<a href="_reference_.ref.html#set" class="tsd-kind-icon">set</a>
+								<a href="_field_.signaturefield.html#setdate" class="tsd-kind-icon">set<wbr>Date</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-external">
-								<a href="_reference_.ref.html#tostring" class="tsd-kind-icon">to<wbr>String</a>
+								<a href="_field_.signaturefield.html#setlocation" class="tsd-kind-icon">set<wbr>Location</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-external">
-								<a href="_reference_.ref.html#write" class="tsd-kind-icon">write</a>
+								<a href="_field_.signaturefield.html#setreason" class="tsd-kind-icon">set<wbr>Reason</a>
 							</li>
 						</ul>
 					</li>
 				</ul>
 				<ul class="after-current">
+					<li class=" tsd-kind-class tsd-parent-kind-external-module tsd-is-external">
+						<a href="_field_.textfield.html" class="tsd-kind-icon">Text<wbr>Field</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-external-module tsd-is-external">
+						<a href="../interfaces/_field_.ifieldinfo.html" class="tsd-kind-icon">IField<wbr>Info</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-parent-kind-external-module tsd-is-external">
+						<a href="../modules/_field_.html#fieldtype" class="tsd-kind-icon">Field<wbr>Type</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-parent-kind-external-module tsd-is-external">
+						<a href="../modules/_field_.html#ilistitem" class="tsd-kind-icon">IList<wbr>Item</a>
+					</li>
 				</ul>
 			</nav>
 		</div>

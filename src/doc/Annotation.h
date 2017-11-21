@@ -19,11 +19,8 @@ class Annotation : public ObjectWrap<Annotation>
 {
 public:
   explicit Annotation(const CallbackInfo& callbackInfo);
-  ~Annotation()
-  {
-    delete annot;
-    delete doc;
-  }
+  ~Annotation();
+
   static FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target)
   {

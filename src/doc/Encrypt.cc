@@ -134,4 +134,11 @@ Encrypt::GetKeyLength(const CallbackInfo& info)
 {
   return Number::New(info.Env(), encrypt->GetKeyLength());
 }
+Encrypt::~Encrypt() {
+  if(encrypt != nullptr) {
+    HandleScope scope(Env());
+    encrypt = nullptr;
+    document = nullptr;
+  }
+}
 }

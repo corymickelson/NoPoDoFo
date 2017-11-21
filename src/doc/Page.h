@@ -16,11 +16,8 @@ class Page : public Napi::ObjectWrap<Page>
 {
 public:
   explicit Page(const Napi::CallbackInfo& callbackInfo);
-  ~Page()
-  {
-    delete page;
-    delete parent;
-  }
+  ~Page();
+
   static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
   Napi::Value GetRotation(const Napi::CallbackInfo&);

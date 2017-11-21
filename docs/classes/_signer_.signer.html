@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>NPDFColorSpace | nopodofo</title>
+	<title>Signer | nopodofo</title>
 	<meta name="description" content="">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -56,98 +56,151 @@
 					<a href="../globals.html">Globals</a>
 				</li>
 				<li>
-					<a href="../modules/_painter_.html">&quot;painter&quot;</a>
+					<a href="../modules/_signer_.html">&quot;signer&quot;</a>
 				</li>
 				<li>
-					<a href="_painter_.npdfcolorspace.html">NPDFColorSpace</a>
+					<a href="_signer_.signer.html">Signer</a>
 				</li>
 			</ul>
-			<h1>Enumeration NPDFColorSpace</h1>
+			<h1>Class Signer</h1>
 		</div>
 	</div>
 </header>
 <div class="container container-main">
 	<div class="row">
 		<div class="col-8 col-content">
+			<section class="tsd-panel tsd-hierarchy">
+				<h3>Hierarchy</h3>
+				<ul class="tsd-hierarchy">
+					<li>
+						<span class="target">Signer</span>
+					</li>
+				</ul>
+			</section>
 			<section class="tsd-panel-group tsd-index-group">
 				<h2>Index</h2>
 				<section class="tsd-panel tsd-index-panel">
 					<div class="tsd-index-content">
 						<section class="tsd-index-section tsd-is-external">
-							<h3>Enumeration members</h3>
+							<h3>Constructors</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-enum-member tsd-parent-kind-enum tsd-is-external"><a href="_painter_.npdfcolorspace.html#cielab" class="tsd-kind-icon">Cie<wbr>Lab</a></li>
-								<li class="tsd-kind-enum-member tsd-parent-kind-enum tsd-is-external"><a href="_painter_.npdfcolorspace.html#devicecmyk" class="tsd-kind-icon">DeviceCMYK</a></li>
-								<li class="tsd-kind-enum-member tsd-parent-kind-enum tsd-is-external"><a href="_painter_.npdfcolorspace.html#devicegray" class="tsd-kind-icon">Device<wbr>Gray</a></li>
-								<li class="tsd-kind-enum-member tsd-parent-kind-enum tsd-is-external"><a href="_painter_.npdfcolorspace.html#devicergb" class="tsd-kind-icon">DeviceRGB</a></li>
-								<li class="tsd-kind-enum-member tsd-parent-kind-enum tsd-is-external"><a href="_painter_.npdfcolorspace.html#indexed" class="tsd-kind-icon">Indexed</a></li>
-								<li class="tsd-kind-enum-member tsd-parent-kind-enum tsd-is-external"><a href="_painter_.npdfcolorspace.html#separation" class="tsd-kind-icon">Separation</a></li>
+								<li class="tsd-kind-constructor tsd-parent-kind-class tsd-is-external"><a href="_signer_.signer.html#constructor" class="tsd-kind-icon">constructor</a></li>
+							</ul>
+						</section>
+						<section class="tsd-index-section tsd-is-private tsd-is-private-protected tsd-is-external">
+							<h3>Properties</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private tsd-is-external"><a href="_signer_.signer.html#_instance" class="tsd-kind-icon">_instance</a></li>
+							</ul>
+						</section>
+						<section class="tsd-index-section tsd-is-external">
+							<h3>Methods</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-external"><a href="_signer_.signer.html#sign" class="tsd-kind-icon">sign</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-external"><a href="_signer_.signer.html#signwithcertificateandkey" class="tsd-kind-icon">sign<wbr>With<wbr>Certificate<wbr>And<wbr>Key</a></li>
 							</ul>
 						</section>
 					</div>
 				</section>
 			</section>
 			<section class="tsd-panel-group tsd-member-group tsd-is-external">
-				<h2>Enumeration members</h2>
-				<section class="tsd-panel tsd-member tsd-kind-enum-member tsd-parent-kind-enum tsd-is-external">
-					<a name="cielab" class="tsd-anchor"></a>
-					<h3>Cie<wbr>Lab</h3>
-					<div class="tsd-signature tsd-kind-icon">Cie<wbr>Lab<span class="tsd-signature-symbol">:</span> </div>
+				<h2>Constructors</h2>
+				<section class="tsd-panel tsd-member tsd-kind-constructor tsd-parent-kind-class tsd-is-external">
+					<a name="constructor" class="tsd-anchor"></a>
+					<h3>constructor</h3>
+					<ul class="tsd-signatures tsd-kind-constructor tsd-parent-kind-class tsd-is-external">
+						<li class="tsd-signature tsd-kind-icon">new <wbr>Signer<span class="tsd-signature-symbol">(</span>doc<span class="tsd-signature-symbol">: </span><a href="_document_.document.html" class="tsd-signature-type">Document</a>, field<span class="tsd-signature-symbol">: </span><a href="_field_.signaturefield.html" class="tsd-signature-type">SignatureField</a>, output<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_signer_.signer.html" class="tsd-signature-type">Signer</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/corymickelson/npdf/blob/f92963e/lib/signer.ts#L6">signer.ts:6</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>doc: <a href="_document_.document.html" class="tsd-signature-type">Document</a></h5>
+								</li>
+								<li>
+									<h5>field: <a href="_field_.signaturefield.html" class="tsd-signature-type">SignatureField</a></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> output: <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="_signer_.signer.html" class="tsd-signature-type">Signer</a></h4>
+						</li>
+					</ul>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group tsd-is-private tsd-is-private-protected tsd-is-external">
+				<h2>Properties</h2>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private tsd-is-external">
+					<a name="_instance" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagPrivate">Private</span> _instance</h3>
+					<div class="tsd-signature tsd-kind-icon">_instance<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">any</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/corymickelson/npdf/blob/f92963e/lib/painter.ts#L34">painter.ts:34</a></li>
+							<li>Defined in <a href="https://github.com/corymickelson/npdf/blob/f92963e/lib/signer.ts#L6">signer.ts:6</a></li>
 						</ul>
 					</aside>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-enum-member tsd-parent-kind-enum tsd-is-external">
-					<a name="devicecmyk" class="tsd-anchor"></a>
-					<h3>DeviceCMYK</h3>
-					<div class="tsd-signature tsd-kind-icon">DeviceCMYK<span class="tsd-signature-symbol">:</span> </div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in <a href="https://github.com/corymickelson/npdf/blob/f92963e/lib/painter.ts#L32">painter.ts:32</a></li>
-						</ul>
-					</aside>
+			</section>
+			<section class="tsd-panel-group tsd-member-group tsd-is-external">
+				<h2>Methods</h2>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-external">
+					<a name="sign" class="tsd-anchor"></a>
+					<h3>sign</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-external">
+						<li class="tsd-signature tsd-kind-icon">sign<span class="tsd-signature-symbol">(</span>signature<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Buffer</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Buffer</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/corymickelson/npdf/blob/f92963e/lib/signer.ts#L23">signer.ts:23</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>signature: <span class="tsd-signature-type">Buffer</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Buffer</span></h4>
+						</li>
+					</ul>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-enum-member tsd-parent-kind-enum tsd-is-external">
-					<a name="devicegray" class="tsd-anchor"></a>
-					<h3>Device<wbr>Gray</h3>
-					<div class="tsd-signature tsd-kind-icon">Device<wbr>Gray<span class="tsd-signature-symbol">:</span> </div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in <a href="https://github.com/corymickelson/npdf/blob/f92963e/lib/painter.ts#L30">painter.ts:30</a></li>
-						</ul>
-					</aside>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-enum-member tsd-parent-kind-enum tsd-is-external">
-					<a name="devicergb" class="tsd-anchor"></a>
-					<h3>DeviceRGB</h3>
-					<div class="tsd-signature tsd-kind-icon">DeviceRGB<span class="tsd-signature-symbol">:</span> </div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in <a href="https://github.com/corymickelson/npdf/blob/f92963e/lib/painter.ts#L31">painter.ts:31</a></li>
-						</ul>
-					</aside>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-enum-member tsd-parent-kind-enum tsd-is-external">
-					<a name="indexed" class="tsd-anchor"></a>
-					<h3>Indexed</h3>
-					<div class="tsd-signature tsd-kind-icon">Indexed<span class="tsd-signature-symbol">:</span> </div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in <a href="https://github.com/corymickelson/npdf/blob/f92963e/lib/painter.ts#L35">painter.ts:35</a></li>
-						</ul>
-					</aside>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-enum-member tsd-parent-kind-enum tsd-is-external">
-					<a name="separation" class="tsd-anchor"></a>
-					<h3>Separation</h3>
-					<div class="tsd-signature tsd-kind-icon">Separation<span class="tsd-signature-symbol">:</span> </div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in <a href="https://github.com/corymickelson/npdf/blob/f92963e/lib/painter.ts#L33">painter.ts:33</a></li>
-						</ul>
-					</aside>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-external">
+					<a name="signwithcertificateandkey" class="tsd-anchor"></a>
+					<h3>sign<wbr>With<wbr>Certificate<wbr>And<wbr>Key</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-external">
+						<li class="tsd-signature tsd-kind-icon">sign<wbr>With<wbr>Certificate<wbr>And<wbr>Key<span class="tsd-signature-symbol">(</span>certfile<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, keyfile<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, password<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Buffer</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/corymickelson/npdf/blob/f92963e/lib/signer.ts#L19">signer.ts:19</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>certfile: <span class="tsd-signature-type">string</span></h5>
+								</li>
+								<li>
+									<h5>keyfile: <span class="tsd-signature-type">string</span></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> password: <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Buffer</span></h4>
+						</li>
+					</ul>
 				</section>
 			</section>
 		</div>
@@ -211,7 +264,7 @@
 					<li class=" tsd-kind-external-module tsd-is-external">
 						<a href="../modules/_page_.html">"page"</a>
 					</li>
-					<li class="current tsd-kind-external-module tsd-is-external">
+					<li class=" tsd-kind-external-module tsd-is-external">
 						<a href="../modules/_painter_.html">"painter"</a>
 					</li>
 					<li class=" tsd-kind-external-module tsd-is-external">
@@ -220,7 +273,7 @@
 					<li class=" tsd-kind-external-module tsd-is-external">
 						<a href="../modules/_reference_.html">"reference"</a>
 					</li>
-					<li class=" tsd-kind-external-module tsd-is-external">
+					<li class="current tsd-kind-external-module tsd-is-external">
 						<a href="../modules/_signer_.html">"signer"</a>
 					</li>
 					<li class=" tsd-kind-external-module tsd-is-external">
@@ -230,84 +283,27 @@
 			</nav>
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
-					<li class=" tsd-kind-enum tsd-parent-kind-external-module tsd-is-external">
-						<a href="_painter_.npdfalignment.html" class="tsd-kind-icon">NPDFAlignment</a>
-					</li>
-					<li class=" tsd-kind-enum tsd-parent-kind-external-module tsd-is-external">
-						<a href="_painter_.npdfblendmode.html" class="tsd-kind-icon">NPDFBlend<wbr>Mode</a>
-					</li>
 				</ul>
 				<ul class="current">
-					<li class="current tsd-kind-enum tsd-parent-kind-external-module tsd-is-external">
-						<a href="_painter_.npdfcolorspace.html" class="tsd-kind-icon">NPDFColor<wbr>Space</a>
+					<li class="current tsd-kind-class tsd-parent-kind-external-module tsd-is-external">
+						<a href="_signer_.signer.html" class="tsd-kind-icon">Signer</a>
 						<ul>
-							<li class=" tsd-kind-enum-member tsd-parent-kind-enum tsd-is-external">
-								<a href="_painter_.npdfcolorspace.html#cielab" class="tsd-kind-icon">Cie<wbr>Lab</a>
+							<li class=" tsd-kind-constructor tsd-parent-kind-class tsd-is-external">
+								<a href="_signer_.signer.html#constructor" class="tsd-kind-icon">constructor</a>
 							</li>
-							<li class=" tsd-kind-enum-member tsd-parent-kind-enum tsd-is-external">
-								<a href="_painter_.npdfcolorspace.html#devicecmyk" class="tsd-kind-icon">DeviceCMYK</a>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private tsd-is-external">
+								<a href="_signer_.signer.html#_instance" class="tsd-kind-icon">_instance</a>
 							</li>
-							<li class=" tsd-kind-enum-member tsd-parent-kind-enum tsd-is-external">
-								<a href="_painter_.npdfcolorspace.html#devicegray" class="tsd-kind-icon">Device<wbr>Gray</a>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-external">
+								<a href="_signer_.signer.html#sign" class="tsd-kind-icon">sign</a>
 							</li>
-							<li class=" tsd-kind-enum-member tsd-parent-kind-enum tsd-is-external">
-								<a href="_painter_.npdfcolorspace.html#devicergb" class="tsd-kind-icon">DeviceRGB</a>
-							</li>
-							<li class=" tsd-kind-enum-member tsd-parent-kind-enum tsd-is-external">
-								<a href="_painter_.npdfcolorspace.html#indexed" class="tsd-kind-icon">Indexed</a>
-							</li>
-							<li class=" tsd-kind-enum-member tsd-parent-kind-enum tsd-is-external">
-								<a href="_painter_.npdfcolorspace.html#separation" class="tsd-kind-icon">Separation</a>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-external">
+								<a href="_signer_.signer.html#signwithcertificateandkey" class="tsd-kind-icon">sign<wbr>With<wbr>Certificate<wbr>And<wbr>Key</a>
 							</li>
 						</ul>
 					</li>
 				</ul>
 				<ul class="after-current">
-					<li class=" tsd-kind-enum tsd-parent-kind-external-module tsd-is-external">
-						<a href="_painter_.npdffonttype.html" class="tsd-kind-icon">NPDFFont<wbr>Type</a>
-					</li>
-					<li class=" tsd-kind-enum tsd-parent-kind-external-module tsd-is-external">
-						<a href="_painter_.npdflinecapstyle.html" class="tsd-kind-icon">NPDFLine<wbr>Cap<wbr>Style</a>
-					</li>
-					<li class=" tsd-kind-enum tsd-parent-kind-external-module tsd-is-external">
-						<a href="_painter_.npdflinejoinstyle.html" class="tsd-kind-icon">NPDFLine<wbr>Join<wbr>Style</a>
-					</li>
-					<li class=" tsd-kind-enum tsd-parent-kind-external-module tsd-is-external">
-						<a href="_painter_.npdfrenderingintent.html" class="tsd-kind-icon">NPDFRendering<wbr>Intent</a>
-					</li>
-					<li class=" tsd-kind-enum tsd-parent-kind-external-module tsd-is-external">
-						<a href="_painter_.npdfstokestyle.html" class="tsd-kind-icon">NPDFStoke<wbr>Style</a>
-					</li>
-					<li class=" tsd-kind-enum tsd-parent-kind-external-module tsd-is-external">
-						<a href="_painter_.npdftextrenderingmode.html" class="tsd-kind-icon">NPDFText<wbr>Rendering<wbr>Mode</a>
-					</li>
-					<li class=" tsd-kind-enum tsd-parent-kind-external-module tsd-is-external">
-						<a href="_painter_.npdfverticalalignment.html" class="tsd-kind-icon">NPDFVertical<wbr>Alignment</a>
-					</li>
-					<li class=" tsd-kind-class tsd-parent-kind-external-module tsd-is-external">
-						<a href="../classes/_painter_.encoding.html" class="tsd-kind-icon">Encoding</a>
-					</li>
-					<li class=" tsd-kind-class tsd-parent-kind-external-module tsd-is-external">
-						<a href="../classes/_painter_.extgstate.html" class="tsd-kind-icon">ExtGState</a>
-					</li>
-					<li class=" tsd-kind-class tsd-parent-kind-external-module tsd-is-external">
-						<a href="../classes/_painter_.font.html" class="tsd-kind-icon">Font</a>
-					</li>
-					<li class=" tsd-kind-class tsd-parent-kind-external-module tsd-is-external">
-						<a href="../classes/_painter_.painter.html" class="tsd-kind-icon">Painter</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-parent-kind-external-module tsd-is-external">
-						<a href="../interfaces/_painter_.fontmetrics.html" class="tsd-kind-icon">Font<wbr>Metrics</a>
-					</li>
-					<li class=" tsd-kind-type-alias tsd-parent-kind-external-module tsd-is-external">
-						<a href="../modules/_painter_.html#npdfpoint" class="tsd-kind-icon">NPDFPoint</a>
-					</li>
-					<li class=" tsd-kind-type-alias tsd-parent-kind-external-module tsd-is-external">
-						<a href="../modules/_painter_.html#npdfcmyk" class="tsd-kind-icon">NPDFcmyk</a>
-					</li>
-					<li class=" tsd-kind-type-alias tsd-parent-kind-external-module tsd-is-external">
-						<a href="../modules/_painter_.html#npdfrgb" class="tsd-kind-icon">NPDFrgb</a>
-					</li>
 				</ul>
 			</nav>
 		</div>

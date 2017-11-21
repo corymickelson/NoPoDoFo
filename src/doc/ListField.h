@@ -14,11 +14,8 @@ class ListField : public Napi::ObjectWrap<ListField>
 {
 public:
   ListField(const CallbackInfo& info);
-  ~ListField()
-  {
-    delete field;
-    delete list;
-  }
+  ~ListField();
+
   static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
   void InsertItem(const Napi::CallbackInfo&);

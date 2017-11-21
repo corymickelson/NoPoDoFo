@@ -270,4 +270,10 @@ Dictionary::Write(const CallbackInfo& info)
     ErrorHandler(err, info);
   }
 }
+Dictionary::~Dictionary() {
+  if(_obj != nullptr) {
+    HandleScope scope(Env());
+    _obj = nullptr;
+  }
+}
 }
