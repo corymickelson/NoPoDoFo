@@ -1,3 +1,21 @@
-[submodule "boost-cmake"]
-	path = boost-cmake
-	url = https://github.com/Orphis/boost-cmake.git
+[submodule "depends/podofo"]
+	path = depends/podofo
+	url = https://github.com/svn2github/podofo
+[submodule "depends/freetype"]
+	path = depends/freetype
+	url = http://git.savannah.gnu.org/r/freetype/freetype2.git
+[submodule "depends/zlib"]
+	path = depends/zlib
+	url = https://github.com/madler/zlib.git
+[submodule "depends/fontconfig"]
+	path = depends/fontconfig
+	url = git://anongit.freedesktop.org/fontconfig
+[submodule "depends/libtiff"]
+	path = depends/libtiff
+	url = https://github.com/vadz/libtiff
+[submodule "depends/libpng"]
+	path = depends/libpng
+	url = https://github.com/glennrp/libpng.git
+[submodule "depends/openssl"]
+	path = depends/openssl
+	url = https://github.com/openssl/openssl

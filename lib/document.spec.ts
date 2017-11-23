@@ -3,13 +3,11 @@ import {join} from 'path'
 import * as test from 'tape'
 import {Document} from './document'
 import {EncryptInitOption, Encrypt} from './encrypt'
-import {Obj} from './object'
-import {Dictionary} from './dictionary'
 
-const filePath = join(__dirname, '../test.pdf'),
+const filePath = join(__dirname, '../test-documents/test.pdf'),
     outFile = './test.out.pdf',
     uPwd = 'secret',
-    pwdDoc = join(__dirname, '../pwd.pdf')
+    pwdDoc = join(__dirname, '../test-documents/pwd.pdf')
 
 test('can load pdf', t => {
     let doc = new Document(filePath)
@@ -47,7 +45,7 @@ test('encryption: user password', t => {
             protection: ['Edit', 'FillAndSign'],
             algorithm: 'aesv3'
         },
-        secureDoc = join(__dirname, '../secure.pdf')
+        secureDoc = join(__dirname, '../test-documents/secure.pdf')
     doc.on('ready', () => {
         doc.encrypt = new Encrypt(null, encryptionOption)
         doc.write(e => {

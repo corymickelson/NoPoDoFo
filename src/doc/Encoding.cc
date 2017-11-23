@@ -43,8 +43,6 @@ Encoding::AddToDictionary(const Napi::CallbackInfo& info)
   Dictionary* d = Dictionary::Unwrap(wrap);
   PdfDictionary* dict = d->GetDictionary();
   encoding->AddToDictionary(*dict);
-  delete d;
-  delete dict;
   return info.Env().Undefined();
 }
 Napi::Value
@@ -72,10 +70,11 @@ Encoding::ConvertToEncoding(const Napi::CallbackInfo& info)
 Napi::Value
 Encoding::GetData(const Napi::CallbackInfo& info)
 {
-  return Value();
+  return info.Env().Undefined();
 }
-Encoding::~Encoding() {
-  if(encoding != nullptr) {
+Encoding::~Encoding()
+{
+  if (encoding != nullptr) {
     HandleScope scope(Env());
     encoding = nullptr;
   }

@@ -13,7 +13,7 @@ Rect::Rect(const CallbackInfo& info)
   : ObjectWrap(info)
 {
   if (info.Length() == 0) {
-    rect = *new PoDoFo::PdfRect();
+    rect = new PoDoFo::PdfRect();
   }
   if (info.Length() == 1) {
     if (!info[0].IsObject()) {
@@ -21,13 +21,17 @@ Rect::Rect(const CallbackInfo& info)
                        "Rect requires Page as constructor parameter");
     }
     auto pageObj = info[0].As<Object>();
+    if(!pageObj.InstanceOf(Page::constructor.Value())) {
+      throw Error::New(info.Env(),
+                       "Rect requires Page as constructor parameter");
+    }
     Page* page = Page::Unwrap(pageObj);
-    rect = page->GetPage()->GetPageSize();
+    rect = new PdfRect(page->GetPage()->GetPageSize());
   }
   if (info.Length() == 4) {
     double left, bottom, width, height;
     for (uint8_t i = 0; i < info.Length(); i++) {
-      if (info[i].IsNumber() == false) {
+      if (!info[i].IsNumber()) {
         throw Napi::Error::New(info.Env(),
                                "Rect requires (number, number, number, number) "
                                "as constructor parameters.");
@@ -37,7 +41,15 @@ Rect::Rect(const CallbackInfo& info)
     bottom = info[1].As<Number>();
     width = info[2].As<Number>();
     height = info[3].As<Number>();
-    rect = *new PoDoFo::PdfRect(left, bottom, width, height);
+    rect = new PoDoFo::PdfRect(left, bottom, width, height);
+  }
+}
+
+Rect::~Rect()
+{
+  if (rect != nullptr) {
+    HandleScope scope(Env());
+    delete rect;
   }
 }
 void
@@ -65,30 +77,29 @@ Rect::Intersect(const CallbackInfo& info)
   }
   auto rectObj = info[0].As<Object>();
   Rect* rectIntersect = Rect::Unwrap(rectObj);
-  PdfRect _rect = rectIntersect->GetRect();
-  //  Rect::GetRect().Intersect(_rect);
-  rect.Intersect(_rect);
+  PdfRect* _rect = rectIntersect->GetRect();
+  rect->Intersect(*_rect);
 }
 Napi::Value
 Rect::GetWidth(const CallbackInfo& info)
 {
-  return Napi::Number::New(info.Env(), rect.GetWidth());
+  return Napi::Number::New(info.Env(), rect->GetWidth());
 }
 Napi::Value
 Rect::GetHeight(const CallbackInfo& info)
 {
 
-  return Napi::Number::New(info.Env(), rect.GetHeight());
+  return Napi::Number::New(info.Env(), rect->GetHeight());
 }
 Napi::Value
 Rect::GetLeft(const CallbackInfo& info)
 {
-  return Napi::Number::New(info.Env(), rect.GetLeft());
+  return Napi::Number::New(info.Env(), rect->GetLeft());
 }
 Napi::Value
 Rect::GetBottom(const CallbackInfo& info)
 {
-  return Napi::Number::New(info.Env(), rect.GetBottom());
+  return Napi::Number::New(info.Env(), rect->GetBottom());
 }
 void
 Rect::SetWidth(const CallbackInfo& info, const Napi::Value& value)
@@ -98,7 +109,7 @@ Rect::SetWidth(const CallbackInfo& info, const Napi::Value& value)
                            "SetWidth requies a single argument of type number");
   }
   double width = value.As<Number>();
-  rect.SetWidth(width);
+  rect->SetWidth(width);
 }
 void
 Rect::SetHeight(const CallbackInfo& info, const Napi::Value& value)
@@ -108,7 +119,7 @@ Rect::SetHeight(const CallbackInfo& info, const Napi::Value& value)
                            "SetWidth requies a single argument of type number");
   }
   double height = value.As<Number>();
-  rect.SetHeight(height);
+  rect->SetHeight(height);
 }
 void
 Rect::SetLeft(const CallbackInfo& info, const Napi::Value& value)
@@ -118,7 +129,7 @@ Rect::SetLeft(const CallbackInfo& info, const Napi::Value& value)
                            "SetWidth requies a single argument of type number");
   }
   double left = value.As<Number>();
-  rect.SetLeft(left);
+  rect->SetLeft(left);
 }
 void
 Rect::SetBottom(const CallbackInfo& info, const Napi::Value& value)
@@ -128,6 +139,6 @@ Rect::SetBottom(const CallbackInfo& info, const Napi::Value& value)
                            "SetWidth requies a single argument of type number");
   }
   double bottom = value.As<Number>();
-  rect.SetBottom(bottom);
+  rect->SetBottom(bottom);
 }
 }

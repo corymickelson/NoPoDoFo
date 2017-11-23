@@ -125,7 +125,7 @@ SignatureField::GetSignatureObject(const CallbackInfo& info)
   return External<PdfObject>::New(info.Env(), field->GetSignatureObject());
 }
 
-Value
+Napi::Value
 SignatureField::EnsureSignatureObject(const CallbackInfo& info)
 {
   try {
@@ -133,12 +133,13 @@ SignatureField::EnsureSignatureObject(const CallbackInfo& info)
   } catch (PdfError& err) {
     ErrorHandler(err, info);
   }
+  return info.Env().Undefined();
 }
 SignatureField::~SignatureField()
 {
   if (field != nullptr || signatureBuffer != nullptr) {
     HandleScope scope(Env());
-    field = nullptr;
+    delete field;
     signatureBuffer = nullptr;
   }
 }

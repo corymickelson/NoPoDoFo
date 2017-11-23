@@ -24,7 +24,7 @@ Document::Initialize(Napi::Env& env, Napi::Object& target)
   Function ctor = DefineClass(
     env,
     "Document",
-    { //StaticMethod("gc", &Document::GC),
+    { // StaticMethod("gc", &Document::GC),
       InstanceAccessor("password", nullptr, &Document::SetPassword),
       InstanceAccessor("encrypt", &Document::GetEncrypt, &Document::SetEncrypt),
       InstanceMethod("load", &Document::Load),
@@ -48,22 +48,23 @@ Document::Initialize(Napi::Env& env, Napi::Object& target)
 Document::Document(const CallbackInfo& info)
   : ObjectWrap(info)
 {
-  if(info.Length() == 1) {
-    AssertFunctionArgs(info, 1, {napi_external});
+  if (info.Length() == 1) {
+    AssertFunctionArgs(info, 1, { napi_external });
     document = info[0].As<External<PdfMemDocument>>().Data();
   } else {
     document = new PdfMemDocument();
   }
 
-  if(!document) {
+  if (!document) {
     throw Error::New(info.Env(), "document has not been initialized properly");
   }
 }
 
-Document::~Document() {
-  if(document != nullptr) {
+Document::~Document()
+{
+  if (document != nullptr) {
     HandleScope scope(Env());
-    document = nullptr;
+    delete document;
   }
 }
 Napi::Value
@@ -550,9 +551,16 @@ protected:
   void Execute() override
   {
     try {
+#if PODOFO_VERSION_PATCH < 6
+      if (loadBuffer) {
+        SetError("LoadFromBuffer is only available on PoDoFo version 0.9.6+");
+      }
+#else
       if (loadBuffer) {
         doc->GetDocument()->LoadFromBuffer(arg.c_str(), arg.length());
-      } else {
+      }
+#endif
+      else {
         doc->GetDocument()->Load(arg.c_str(), update);
       }
     } catch (PdfError& e) {
@@ -637,27 +645,30 @@ Document::WriteBuffer(const CallbackInfo& info)
 {
   AssertFunctionArgs(info, 1, { napi_valuetype::napi_function });
   auto cb = info[0].As<Function>();
-  auto * worker = new DocumentWriteBufferAsync(cb, this);
+  auto* worker = new DocumentWriteBufferAsync(cb, this);
   worker->Queue();
   return info.Env().Undefined();
 }
 
-class GCAsync: public AsyncWorker {
+class GCAsync : public AsyncWorker
+{
 public:
-  GCAsync(const Function &callback, Document *doc, string pwd)
-      : AsyncWorker(callback)
-  , doc(doc)
-  , pwd(std::move(pwd))
+  GCAsync(const Function& callback, Document* doc, string pwd)
+    : AsyncWorker(callback)
+    , doc(doc)
+    , pwd(std::move(pwd))
   {}
+
 protected:
-  void Execute() override {
+  void Execute() override
+  {
     PdfVecObjects objs;
     PdfParser parser(&objs);
     objs.SetAutoDelete(true);
-    parser.ParseFile(doc->originPdf.c_str(),false);
+    parser.ParseFile(doc->originPdf.c_str(), false);
     PdfWriter writer(&parser);
     writer.SetPdfVersion(parser.GetPdfVersion());
-    if(parser.GetEncrypted()) {
+    if (parser.GetEncrypted()) {
       writer.SetEncrypted(*(parser.GetEncrypt()));
     }
     PdfRefCountedBuffer r;
@@ -665,10 +676,12 @@ protected:
     writer.Write(&device);
     value = Buffer<char>::Copy(Env(), r.GetBuffer(), r.GetSize());
   }
-  void OnOK() override {
+  void OnOK() override
+  {
     HandleScope scope(Env());
-    Callback().Call({Env().Null(), value});
+    Callback().Call({ Env().Null(), value });
   }
+
 private:
   Document* doc = nullptr;
   string pwd;
@@ -676,12 +689,14 @@ private:
 };
 
 Napi::Value
-Document::GC(const Napi::CallbackInfo &info) {
-  AssertFunctionArgs(info, 1, {napi_string});
+Document::GC(const Napi::CallbackInfo& info)
+{
+  AssertFunctionArgs(info, 1, { napi_string });
   string source = info[0].As<String>().Utf8Value();
   string dest;
-  if(info.Length() == 2 && info[1].IsString()) {
+  if (info.Length() == 2 && info[1].IsString()) {
     dest = info[1].As<String>().Utf8Value();
   }
+  return info.Env().Undefined();
 }
 }

@@ -7,7 +7,7 @@ import {existsSync, unlinkSync} from "fs";
 import {Rect} from "./rect";
 
 
-const filePath = join(__dirname, '../test.pdf'),
+const filePath = join(__dirname, '../test-documents/test.pdf'),
     outFile = './test.out.pdf',
     doc = new Document(filePath)
 

@@ -117,7 +117,7 @@ function signatureBuffer(): any {
         const asn1Cert = (pki as any).certificateToAsn1(cert);
         const der = forge.asn1.toDer(asn1Cert)
 
-        const doc = new Document(join(__dirname, '../test.pdf'), true)
+        const doc = new Document(join(__dirname, '../test-documents/test.pdf'), true)
         doc.on('ready', async e => {
             if (e instanceof Error) throw e
             try {

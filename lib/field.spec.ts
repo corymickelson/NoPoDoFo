@@ -3,7 +3,7 @@ import * as test from 'tape'
 import {Document} from './document'
 import {CheckBox, Field, TextField} from './field'
 
-const filePath = join(__dirname, '../test.pdf'),
+const filePath = join(__dirname, '../test-documents/test.pdf'),
     outFile = './test.out.pdf'
 
 test('create field instance from existing pdf field', t => {

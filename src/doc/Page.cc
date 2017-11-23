@@ -256,7 +256,7 @@ Page::SetTrimBox(const CallbackInfo& info, const Napi::Value& value)
   try {
     Rect* rect = Rect::Unwrap(value.As<Object>());
     auto pdfRect = rect->GetRect();
-    page->SetTrimBox(pdfRect);
+    page->SetTrimBox(*pdfRect);
 
   } catch (PdfError& err) {
     ErrorHandler(err, info);
@@ -346,7 +346,7 @@ Page::CreateAnnotation(const CallbackInfo& info)
   auto type = static_cast<EPdfAnnotation>(flag);
   auto obj = info[1].As<Object>();
   Rect* rect = Rect::Unwrap(obj);
-  PdfAnnotation* annot = page->CreateAnnotation(type, rect->GetRect());
+  PdfAnnotation* annot = page->CreateAnnotation(type, *rect->GetRect());
   auto instance = Annotation::constructor.New(
     { External<PdfAnnotation>::New(info.Env(), annot) });
   return instance;

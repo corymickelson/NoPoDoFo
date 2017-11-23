@@ -46,11 +46,13 @@ string
 ErrorHandler::ParseMsgFromPdfError(PoDoFo::PdfError& err)
 {
   string text;
-  PoDoFo::EPdfError e = static_cast<PoDoFo::EPdfError>(err.GetError());
+	const auto e = static_cast<PoDoFo::EPdfError>(err.GetError());
   switch (e) {
+#if PODOFO_VERSION_PATCH >= 6
     case PoDoFo::ePdfError_BrokenFile:
       text = "BrokenFile";
       break;
+#endif
     case PoDoFo::ePdfError_ErrOk:
       text = "Ok";
       break;

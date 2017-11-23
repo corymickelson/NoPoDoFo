@@ -7,6 +7,7 @@
 #include "../ValidateArguments.h"
 #include "Obj.h"
 
+using namespace std;
 using namespace Napi;
 using namespace PoDoFo;
 
@@ -243,7 +244,8 @@ protected:
       SetError(err.Message());
     }
   }
-  void OnOK() override {
+  void OnOK() override
+  {
     HandleScope scope(Env());
     Callback().Call({ Env().Null(), Napi::String::New(Env(), arg) });
   }
@@ -270,8 +272,9 @@ Dictionary::Write(const CallbackInfo& info)
     ErrorHandler(err, info);
   }
 }
-Dictionary::~Dictionary() {
-  if(_obj != nullptr) {
+Dictionary::~Dictionary()
+{
+  if (_obj != nullptr) {
     HandleScope scope(Env());
     _obj = nullptr;
   }

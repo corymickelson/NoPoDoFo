@@ -19,7 +19,9 @@ namespace NoPoDoFo {
 FunctionReference Painter::constructor;
 Painter::Painter(const Napi::CallbackInfo& info)
   : ObjectWrap(info)
-{}
+{
+  painter = new PdfPainter();
+}
 
 void
 Painter::Initialize(Napi::Env& env, Napi::Object& target)
@@ -222,7 +224,7 @@ Painter::DrawMultiLineText(const CallbackInfo& info)
                        napi_valuetype::napi_number,
                        napi_valuetype::napi_boolean,
                        napi_valuetype::napi_boolean });
-  PdfRect rect = Rect::Unwrap(info[0].As<Object>())->GetRect();
+  PdfRect rect = *Rect::Unwrap(info[0].As<Object>())->GetRect();
   string text = info[1].As<String>().Utf8Value();
   EPdfAlignment alignment =
     static_cast<EPdfAlignment>(info[2].As<Number>().Int32Value());
@@ -231,12 +233,19 @@ Painter::DrawMultiLineText(const CallbackInfo& info)
   bool clip = info[4].As<Boolean>();
   bool skipSpaces = info[5].As<Boolean>();
   try {
-    painter->DrawMultiLineText(*const_cast<const PdfRect*>(&rect),
+    painter->DrawMultiLineText(rect.GetBottom(),
+                               rect.GetLeft(),
+                               rect.GetWidth(),
+                               rect.GetHeight(),
                                PdfString(text),
                                alignment,
-                               verticalAlignment,
-                               clip,
-                               skipSpaces);
+                               verticalAlignment);
+    // painter->DrawMultiLineText(*const_cast<const PdfRect*>(&rect),
+    //                           PdfString(text),
+    //                           alignment,
+    //                           verticalAlignment,
+    //                           clip,
+    //                           skipSpaces);
 
   } catch (PdfError& err) {
     ErrorHandler(err, info);
@@ -344,7 +353,7 @@ Painter::SetClipRect(const Napi::CallbackInfo& info)
 {
   AssertFunctionArgs(info, 1, { napi_valuetype::napi_object });
   Rect* r = Rect::Unwrap(info[0].As<Object>());
-  painter->SetClipRect(r->GetRect());
+  painter->SetClipRect(*r->GetRect());
 }
 
 void
@@ -361,7 +370,7 @@ Painter::Rectangle(const CallbackInfo& info)
   AssertFunctionArgs(info, 1, { napi_valuetype::napi_object });
   Rect* r = Rect::Unwrap(info[0].As<Object>());
   try {
-    painter->Rectangle(r->GetRect());
+    painter->Rectangle(*r->GetRect());
   } catch (PdfError& err) {
     ErrorHandler(err, info);
   }
@@ -717,7 +726,12 @@ Painter::GetMultiLineText(const CallbackInfo& info)
   string text = info[1].As<String>().Utf8Value();
   bool skipSpaces = info[2].As<Boolean>();
   vector<PdfString> lines =
+#if PODOFO_VERSION_PATCH >= 6
     painter->GetMultiLineTextAsLines(width, PdfString(text), skipSpaces);
+#else
+    painter->GetMultiLineTextAsLines(width, PdfString(text));
+#endif
+
   auto js = Array::New(info.Env());
   uint32_t count = 0;
   for (auto& i : lines) {
@@ -815,7 +829,7 @@ Painter::GetRGB(Napi::Value& value, int* rgb)
 Painter::~Painter()
 {
   Napi::HandleScope scope(Env());
-  painter = nullptr;
+  delete painter;
   document = nullptr;
 }
 }

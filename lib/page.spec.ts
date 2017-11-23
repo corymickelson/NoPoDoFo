@@ -9,7 +9,7 @@ import {Image} from "./image";
 import {Page} from "./page";
 
 
-const filePath = join(__dirname, '../test.pdf'),
+const filePath = join(__dirname, '../test-documents/test.pdf'),
     outFile = './test.out.pdf',
     doc = new Document(filePath)
 let page: Page;
@@ -34,10 +34,7 @@ function pageRotation() {
                 unlinkSync(outFile)
                 t.end()
             })
-
         }, outFile)
-
-
     })
 }
 
@@ -145,13 +142,11 @@ function pageResources() {
 function pageAddImg() {
     test('add image', t => {
         const painter = new Painter(),
-            img = new Image(doc, join(__dirname, '../test.jpg'))
+            img = new Image(doc, join(__dirname, '../test-documents/test.jpg'))
 
         painter.page = page
         painter.drawImage(img, 0, page.height - img.getHeight())
         painter.finishPage()
-        if (existsSync('./img.out.pdf'))
-            unlinkSync('./img.out.pdf')
 
         doc.write(e => {
 
@@ -199,6 +194,7 @@ function pageAddImg() {
                 if (err instanceof Error)
                     t.fail()
                 t.assert(existsSync(`/tmp/test.img.extract.${ext}`) === true)
+                if (existsSync('./img.out.pdf')) unlinkSync('./img.out.pdf')
                 t.end()
             })
         }

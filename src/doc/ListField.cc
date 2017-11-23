@@ -89,10 +89,11 @@ ListField::GetSelectedItem(const CallbackInfo& info)
   int index = list->GetSelectedItem();
   return Number::New(info.Env(), index);
 }
-ListField::~ListField() {
-  if(list != nullptr) {
+ListField::~ListField()
+{
+  if (list != nullptr) {
     HandleScope scope(Env());
-    list = nullptr;
+    delete list;
     field = nullptr;
   }
 }

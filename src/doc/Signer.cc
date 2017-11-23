@@ -36,10 +36,10 @@ Signer::~Signer()
 {
   HandleScope scope(Env());
   doc = nullptr;
-  signer = nullptr;
-  buffer = nullptr;
+  delete signer;
+  delete buffer;
   field = nullptr;
-  device = nullptr;
+  delete device;
 }
 
 void
