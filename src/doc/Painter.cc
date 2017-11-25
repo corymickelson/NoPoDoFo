@@ -233,13 +233,13 @@ Painter::DrawMultiLineText(const CallbackInfo& info)
   bool clip = info[4].As<Boolean>();
   bool skipSpaces = info[5].As<Boolean>();
   try {
-    painter->DrawMultiLineText(rect.GetBottom(),
+    /*painter->DrawMultiLineText(rect.GetBottom(),
                                rect.GetLeft(),
                                rect.GetWidth(),
                                rect.GetHeight(),
                                PdfString(text),
                                alignment,
-                               verticalAlignment);
+                               verticalAlignment);*/
     // painter->DrawMultiLineText(*const_cast<const PdfRect*>(&rect),
     //                           PdfString(text),
     //                           alignment,
@@ -717,7 +717,8 @@ Painter::DrawTextAligned(const CallbackInfo& info)
 Napi::Value
 Painter::GetMultiLineText(const CallbackInfo& info)
 {
-  AssertFunctionArgs(info,
+	return info.Env().Undefined();
+  /*AssertFunctionArgs(info,
                      3,
                      { napi_valuetype::napi_number,
                        napi_valuetype::napi_string,
@@ -738,7 +739,7 @@ Painter::GetMultiLineText(const CallbackInfo& info)
     js.Set(count, i.GetStringUtf8());
     count++;
   }
-  return js;
+  return js;*/
 }
 
 void

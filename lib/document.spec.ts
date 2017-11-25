@@ -1,8 +1,9 @@
-import {unlinkSync} from 'fs'
-import {join} from 'path'
+import { unlinkSync } from 'fs'
+import { join } from 'path'
 import * as test from 'tape'
-import {Document} from './document'
-import {EncryptInitOption, Encrypt} from './encrypt'
+import { Document } from './document'
+import { EncryptInitOption, Encrypt } from './encrypt'
+import { TestCase } from 'tape';
 
 const filePath = join(__dirname, '../test-documents/test.pdf'),
     outFile = './test.out.pdf',
@@ -16,7 +17,7 @@ test('can load pdf', t => {
         t.end()
     })
         .on('error', e => {
-            t.fail(e)
+            notCompiledErrorHandler(e, t)
         })
 })
 test('password protected, \'Password required\' error bubbles up', t => {
@@ -55,13 +56,13 @@ test('encryption: user password', t => {
                 t.fail("Password required error should have been thrown.")
             })
                 .on('error', e => {
-                    if(e instanceof Error) {
+                    if (e instanceof Error) {
                         t.end()
                     }
                 })
         }, secureDoc)
     })
-        .on('error', e => t.fail(e))
+    .on('error', e => notCompiledErrorHandler(e, t))
 })
 test('document get page count', t => {
     const doc = new Document(filePath)
@@ -72,7 +73,7 @@ test('document get page count', t => {
         t.end()
 
     })
-        .on('error', e => t.fail(e))
+    .on('error', e => notCompiledErrorHandler(e, t))
 })
 
 test('document delete page', t => {
@@ -90,10 +91,10 @@ test('document delete page', t => {
                 unlinkSync(outFile)
                 t.end()
             })
-                .on('error', () => t.fail())
+            .on('error', e => notCompiledErrorHandler(e, t))
         }, outFile)
     })
-        .on('error', e => t.fail(e))
+        .on('error', e => notCompiledErrorHandler(e, t))
 })
 
 test('document merger', t => {
@@ -110,10 +111,10 @@ test('document merger', t => {
                 unlinkSync(outFile)
                 t.end()
             })
-                .on('error', e => t.fail(e))
+                .on('error', e => notCompiledErrorHandler(e, t))
         }, outFile)
     })
-        .on('error', e => t.fail(e))
+        .on('error', e => notCompiledErrorHandler(e, t))
 })
 
 test('get page', t => {
@@ -123,12 +124,12 @@ test('get page', t => {
         t.ok(page)
         t.end()
     })
-        .on('error', e => t.fail(e))
+        .on('error', e => notCompiledErrorHandler(e, t))
 })
 
 test('write buffer', t => {
     const doc = new Document(filePath)
-    doc.on('ready', (pdf:Document) => {
+    doc.on('ready', (pdf: Document) => {
         pdf.write((e, d) => {
             if (e) t.fail(e.message)
             else {
@@ -139,8 +140,12 @@ test('write buffer', t => {
             }
         })
     })
-        .on('error', e => {
-            t.fail(e.message)
-        })
+        .on('error', e => notCompiledErrorHandler(e, t))
 })
-
+export function notCompiledErrorHandler(e: Error, t: any) {
+    if (e.message.includes('error: 49')) {
+        t.pass('YOUR CURRENT PODOFO BUILD WAS NOT COMPILED WITH ENCRYPT. To use pdf encrypt recompile with the correct options')
+    } else {
+        t.fail(e)
+    }
+}

@@ -5,7 +5,7 @@ import {Encrypt, EncryptInitOption, ProtectionOption} from './encrypt';
 import {EventEmitter} from 'events';
 import {Font} from "./painter";
 
-export const __mod = require('../build/Release/npdf.node')
+export const __mod = require('bindings')('npdf')
 export enum FontEncoding {
     GlobalWinAnsi = 1,
     GlobalStandard = 2,
