@@ -1,6 +1,6 @@
 {
   "name": "nopodofo",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Node.js native module bindings for PoDoFo",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -16,7 +16,8 @@
     "test:object": "node --expose-gc ./dist/object.spec.js",
     "test:painter": "node --expose-gc ./dist/painter.spec.js",
     "build:test": "npm run compile && npm run lib-build && npm run test",
-    "precommit": "node-gyp rebuild && npm run lib-build && npm test"
+    "precommit": "node-gyp rebuild && npm run lib-build && npm test",
+    "postinstall": "npm run lib-build && npm test"
   },
   "keywords": [
     "pdf"
