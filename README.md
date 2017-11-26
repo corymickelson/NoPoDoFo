@@ -53,3 +53,11 @@ The vcpkg of podofo provides a 32bit podofo binary, ensure that your node.js ins
 ### Usage
 
 TypeDocs available [here](https://corymickelson.github.io/NoPoDoFo/index)
+
+#### **Guides**
+ - [NoPoDoFo.Document](guides/document.md)
+ - [NoPoDoFo.StreamDocument](guids/stream_document.md)
+ - [NoPoDoFo.Primitives](guides/primitives.md)
+ - [NoPoDoFo.Painter](guides/painter.md)
+ - [NoPoDoFo.Page](guides/page.md)
+ - [NoPoDoFo.Object](guides/object.md)

@@ -1,7 +1,7 @@
 import {exists, existsSync} from 'fs'
 import {Obj} from './object';
 import {Page} from './page';
-import {Encrypt, EncryptInitOption, ProtectionOption} from './encrypt';
+import {Encrypt, EncryptOption, ProtectionOption} from './encrypt';
 import {EventEmitter} from 'events';
 import {Font} from "./painter";
 

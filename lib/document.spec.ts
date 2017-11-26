@@ -2,7 +2,7 @@ import { unlinkSync } from 'fs'
 import { join } from 'path'
 import * as test from 'tape'
 import { Document } from './document'
-import { EncryptInitOption, Encrypt } from './encrypt'
+import { EncryptOption, Encrypt } from './encrypt'
 import { TestCase } from 'tape';
 
 const filePath = join(__dirname, '../test-documents/test.pdf'),
@@ -39,7 +39,7 @@ test('throws JS error on file not found', t => {
 })
 test('encryption: user password', t => {
     const doc = new Document(filePath),
-        encryptionOption: EncryptInitOption = {
+        encryptionOption: EncryptOption = {
             ownerPassword: 'secret',
             userPassword: 'secret',
             keyLength: 40,

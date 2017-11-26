@@ -1,5 +1,5 @@
 export type ProtectionOption = 'Copy' | 'Print' | 'Edit' | 'EditNotes' | 'FillAndSign' | 'Accessible' | 'DocAssembly' | 'HighPrint'
-export type EncryptInitOption = {
+export type EncryptOption = {
     userPassword?: string
     ownerPassword?: string
     protection?: Array<ProtectionOption>
@@ -23,7 +23,7 @@ export class Encrypt {
     public get permission() {
         return this._instance.permission
     }
-    constructor(private _instance: any, public option?:EncryptInitOption) { 
+    constructor(private _instance: any, public option?:EncryptOption) { 
         if(_instance === null && option instanceof Object) {
             this._complete = false;
         }
