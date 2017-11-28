@@ -3,6 +3,9 @@
 This package provides native bindings to node.js for parsing and modifying pdf documents with [PoDoFo](http://podofo.sourceforge.net/index.html).
 NoPoDoFo is still in <mark>early development.</mark> 
 
+### __Current Version 0.1.1__
+[![NPM](https://nodei.co/npm/nopodofo.png?downloads=true&downloadRank=true)](http://nodei.co/npm/nopodofo)
+
 ## New Features
  - Digital Signing 
  - Access to Pdf data types (PdfObject, PdfArray, etc..., allows for things such as extracting images from a document [example](https://github.com/corymickelson/nopodofo/blob/master/lib/page.spec.ts#L145-L190))
