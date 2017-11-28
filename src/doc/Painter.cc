@@ -195,7 +195,11 @@ Painter::SetStrokeWidth(const Napi::CallbackInfo& info)
 void
 Painter::FinishPage(const CallbackInfo& info)
 {
-  painter->FinishPage();
+  try {
+    painter->FinishPage();
+  } catch (PdfError& err) {
+    ErrorHandler(err, info);
+  }
 }
 void
 Painter::DrawText(const CallbackInfo& info)
@@ -233,19 +237,19 @@ Painter::DrawMultiLineText(const CallbackInfo& info)
   bool clip = info[4].As<Boolean>();
   bool skipSpaces = info[5].As<Boolean>();
   try {
-    /*painter->DrawMultiLineText(rect.GetBottom(),
+    painter->DrawMultiLineText(rect.GetBottom(),
                                rect.GetLeft(),
                                rect.GetWidth(),
                                rect.GetHeight(),
                                PdfString(text),
                                alignment,
-                               verticalAlignment);*/
-    // painter->DrawMultiLineText(*const_cast<const PdfRect*>(&rect),
-    //                           PdfString(text),
-    //                           alignment,
-    //                           verticalAlignment,
-    //                           clip,
-    //                           skipSpaces);
+                               verticalAlignment);
+    //     painter->DrawMultiLineText(*const_cast<const PdfRect*>(&rect),
+    //                               PdfString(text),
+    //                               alignment,
+    //                               verticalAlignment,
+    //                               clip,
+    //                               skipSpaces);
 
   } catch (PdfError& err) {
     ErrorHandler(err, info);
@@ -340,7 +344,11 @@ void
 Painter::SetFont(const Napi::CallbackInfo& info, const Napi::Value& value)
 {
   Font* font = Font::Unwrap(value.As<Object>());
-  painter->SetFont(font->GetPoDoFoFont());
+  try {
+    painter->SetFont(font->GetPoDoFoFont());
+  } catch (PdfError& err) {
+    ErrorHandler(err, info);
+  }
 }
 Napi::Value
 Painter::GetFont(const Napi::CallbackInfo& info)
@@ -523,8 +531,8 @@ Painter::QuadCurveTo(const CallbackInfo& info)
   int d1x, d1y, d2x, d2y;
   d1x = d1.Get("x").As<Number>();
   d1y = d1.Get("y").As<Number>();
-  d2x = d1.Get("x").As<Number>();
-  d2y = d1.Get("y").As<Number>();
+  d2x = d2.Get("x").As<Number>();
+  d2y = d2.Get("y").As<Number>();
   try {
     painter->QuadCurveTo(d1x, d1y, d2x, d2y);
   } catch (PdfError& err) {
@@ -717,7 +725,7 @@ Painter::DrawTextAligned(const CallbackInfo& info)
 Napi::Value
 Painter::GetMultiLineText(const CallbackInfo& info)
 {
-	return info.Env().Undefined();
+  return info.Env().Undefined();
   /*AssertFunctionArgs(info,
                      3,
                      { napi_valuetype::napi_number,

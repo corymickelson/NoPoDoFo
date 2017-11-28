@@ -14,7 +14,6 @@ ErrorHandler::ErrorHandler(PoDoFo::PdfError& err, const CallbackInfo& info)
 {
   string msg = WriteMsg(err);
   stringstream eMsg;
-  streambuf* out = std::cout.rdbuf(eMsg.rdbuf());
   eMsg << "PoDoFo error: " << msg << endl;
   err.PrintErrorMsg();
   throw Napi::Error::New(info.Env(), eMsg.str());
@@ -35,7 +34,7 @@ ErrorHandler::WriteMsg(PoDoFo::PdfError& err)
 }
 
 string
-ErrorHandler::WriteMsg(Napi::Error &err)
+ErrorHandler::WriteMsg(Napi::Error& err)
 {
   stringstream msg;
   msg << "JS error: " << err.Message() << endl;
@@ -46,7 +45,7 @@ string
 ErrorHandler::ParseMsgFromPdfError(PoDoFo::PdfError& err)
 {
   string text;
-	const auto e = static_cast<PoDoFo::EPdfError>(err.GetError());
+  const auto e = static_cast<PoDoFo::EPdfError>(err.GetError());
   switch (e) {
 #if PODOFO_VERSION_PATCH >= 6
     case PoDoFo::ePdfError_BrokenFile:

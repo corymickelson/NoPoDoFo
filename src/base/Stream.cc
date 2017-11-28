@@ -37,7 +37,8 @@ Napi::Value
 Stream::GetBuffer(const CallbackInfo& info)
 {
   pdf_long bufferLength = stream->GetLength();
-  char* copy = static_cast<char*>(malloc(sizeof(char) * bufferLength));
+  char* copy = static_cast<char*>(
+    malloc(sizeof(char) * static_cast<unsigned long>(bufferLength)));
   stream->GetCopy(&copy, &bufferLength);
   auto value =
     Buffer<char>::Copy(info.Env(), copy, static_cast<size_t>(bufferLength));
@@ -49,7 +50,8 @@ Napi::Value
 Stream::GetFilteredBuffer(const CallbackInfo& info)
 {
   pdf_long bufferLength = stream->GetLength();
-  char* copy = static_cast<char*>(malloc(sizeof(char) * bufferLength));
+  char* copy = static_cast<char*>(
+    malloc(sizeof(char) * static_cast<unsigned long>(bufferLength)));
   stream->GetFilteredCopy(&copy, &bufferLength);
   auto value =
     Buffer<char>::Copy(info.Env(), copy, static_cast<size_t>(bufferLength));
@@ -100,8 +102,9 @@ Stream::Write(const CallbackInfo& info)
   worker->Queue();
   return info.Env().Undefined();
 }
-Stream::~Stream() {
-  if(stream != nullptr) {
+Stream::~Stream()
+{
+  if (stream != nullptr) {
     HandleScope scope(Env());
     stream = nullptr;
   }

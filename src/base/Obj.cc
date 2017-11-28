@@ -55,7 +55,8 @@ Obj::GetStream(const CallbackInfo& info)
     auto* pStream = dynamic_cast<PdfMemStream*>(obj->GetStream());
     auto stream = pStream->Get();
     auto length = pStream->GetLength();
-    auto value = Buffer<char>::Copy(info.Env(), stream, length);
+    auto value =
+      Buffer<char>::Copy(info.Env(), stream, static_cast<size_t>(length));
     return value;
   } catch (PdfError& err) {
     ErrorHandler(err, info);
@@ -321,8 +322,9 @@ Obj::Write(const CallbackInfo& info)
   worker->Queue();
   return info.Env().Undefined();
 }
-Obj::~Obj() {
-  if(obj != nullptr) {
+Obj::~Obj()
+{
+  if (obj != nullptr) {
     HandleScope scope(Env());
     obj = nullptr;
   }

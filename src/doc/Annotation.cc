@@ -3,6 +3,7 @@
 //
 
 #include "Annotation.h"
+#include "../ErrorHandler.h"
 
 namespace NoPoDoFo {
 
@@ -119,9 +120,13 @@ Annotation::SetAction(const CallbackInfo& info, const Napi::Value& value)
   int type = actionObj.Get("type").As<Number>();
   string uri = actionObj.Get("uri").As<String>().Utf8Value();
   auto flag = static_cast<PoDoFo::EPdfAction>(type);
-  PdfAction action(flag, doc);
-  action.SetURI(uri);
-  annot->SetAction(action);
+  try {
+    PdfAction action(flag, doc);
+    action.SetURI(uri);
+    annot->SetAction(action);
+  } catch (PdfError& err) {
+    ErrorHandler(err, info);
+  }
 }
 
 Napi::Value
@@ -314,25 +319,30 @@ Annotation::GetType(const CallbackInfo& info)
 
 void
 Annotation::SetQuadPoints(const CallbackInfo& info, const Napi::Value& value)
-{}
+{
+  throw Error::New(info.Env(), "unimplemented");
+}
 
 Napi::Value
 Annotation::GetQuadPoints(const CallbackInfo& info)
 {
-  return Value();
+  return info.Env().Undefined();
 }
 
 void
 Annotation::SetFileAttachment(const CallbackInfo& info)
-{}
+{
+  throw Error::New(info.Env(), "unimplemented");
+}
 
 Napi::Value
 Annotation::HasFileAttachment(const CallbackInfo& info)
 {
   return Napi::Boolean::New(info.Env(), annot->HasFileAttachement());
 }
-Annotation::~Annotation() {
-  if(annot != nullptr) {
+Annotation::~Annotation()
+{
+  if (annot != nullptr) {
     HandleScope scope(Env());
     annot = nullptr;
     doc = nullptr;

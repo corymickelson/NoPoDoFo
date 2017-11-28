@@ -47,7 +47,7 @@ ListField::RemoveItem(const CallbackInfo& info)
 {
   AssertFunctionArgs(info, 1, { napi_valuetype::napi_number });
   int index = info[0].As<Number>();
-  if (index > list->GetItemCount() || index < 0) {
+  if (static_cast<size_t>(index) > list->GetItemCount() || index < 0) {
     throw Napi::Error::New(info.Env(), "index out of range");
   }
   list->RemoveItem(index);

@@ -455,9 +455,8 @@ Document::CreateFont(const CallbackInfo& info)
     embed = info[4].As<Boolean>();
   if (info.Length() >= 6 && info[5].IsString())
     filename = info[5].As<String>().Utf8Value().c_str();
-  PdfFont* font;
   try {
-    font =
+    PdfFont* font =
       document->CreateFont(fontname.c_str(),
                            bold,
                            italic,
@@ -466,10 +465,10 @@ Document::CreateFont(const CallbackInfo& info)
                            PdfFontCache::eFontCreationFlags_AutoSelectBase14,
                            embed,
                            filename);
+    return Font::constructor.New({ External<PdfFont>::New(info.Env(), font) });
   } catch (PdfError& err) {
     ErrorHandler(err, info);
   }
-  return Font::constructor.New({ External<PdfFont>::New(info.Env(), font) });
 }
 
 class DocumentWriteAsync : public Napi::AsyncWorker
@@ -557,7 +556,8 @@ protected:
       }
 #else
       if (loadBuffer) {
-        doc->GetDocument()->LoadFromBuffer(arg.c_str(), arg.length());
+        doc->GetDocument()->LoadFromBuffer(arg.c_str(),
+                                           static_cast<long>(arg.length()));
       }
 #endif
       else {

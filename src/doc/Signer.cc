@@ -104,6 +104,12 @@ protected:
       Env(), self->buffer->GetBuffer(), self->buffer->GetSize());
     Callback().Call({ Env().Null(), value });
   }
+
+  void OnError(const Error& e) override
+  {
+    HandleScope scope(Env());
+    Callback().Call({ String::New(Env(), e.Message()) });
+  }
 };
 
 Napi::Value
@@ -130,7 +136,7 @@ Signer::Sign(const CallbackInfo& info)
     Buffer<char> sigBuffer;
     if (info[0].IsString()) {
       sigStr = info[0].As<String>().Utf8Value();
-      sigStrLength = sigStr.size();
+      sigStrLength = static_cast<pdf_long>(sigStr.size());
     } else if (info[0].IsBuffer()) {
       sigBuffer = info[0].As<Buffer<char>>();
     }

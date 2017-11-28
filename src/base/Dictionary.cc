@@ -118,7 +118,7 @@ Dictionary::GetKeys(const CallbackInfo& info)
 Napi::Value
 Dictionary::RemoveKey(const CallbackInfo& info)
 {
-  return Value();
+  throw Error::New(info.Env(), "unimplemented");
 }
 
 Napi::Value
@@ -131,7 +131,7 @@ Dictionary::HasKey(const CallbackInfo& info)
 Napi::Value
 Dictionary::Clear(const CallbackInfo& info)
 {
-  return Value();
+  throw Error::New(info.Env(), "unimplemented");
 }
 
 void

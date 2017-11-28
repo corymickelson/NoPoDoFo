@@ -49,7 +49,7 @@ Font::Initialize(Napi::Env& env, Napi::Object& target)
 Napi::Value
 Font::GetFontSize(const Napi::CallbackInfo& info)
 {
-  return Number::New(info.Env(), font->GetFontSize());
+  return Number::New(info.Env(), static_cast<double>(font->GetFontSize()));
 }
 void
 Font::SetFontSize(const Napi::CallbackInfo& info, const Napi::Value& value)
@@ -62,7 +62,7 @@ Font::SetFontSize(const Napi::CallbackInfo& info, const Napi::Value& value)
 Napi::Value
 Font::GetFontScale(const Napi::CallbackInfo& info)
 {
-  return Number::New(info.Env(), font->GetFontScale());
+  return Number::New(info.Env(), static_cast<double>(font->GetFontScale()));
 }
 void
 Font::SetFontScale(const Napi::CallbackInfo& info, const Napi::Value& value)
@@ -75,7 +75,7 @@ Font::SetFontScale(const Napi::CallbackInfo& info, const Napi::Value& value)
 Napi::Value
 Font::GetFontCharSpace(const Napi::CallbackInfo& info)
 {
-  return Number::New(info.Env(), font->GetFontCharSpace());
+  return Number::New(info.Env(), static_cast<double>(font->GetFontCharSpace()));
 }
 void
 Font::SetFontCharSpace(const Napi::CallbackInfo& info, const Napi::Value& value)
@@ -88,7 +88,7 @@ Font::SetFontCharSpace(const Napi::CallbackInfo& info, const Napi::Value& value)
 Napi::Value
 Font::GetWordSpace(const Napi::CallbackInfo& info)
 {
-  return Number::New(info.Env(), font->GetWordSpace());
+  return Number::New(info.Env(), static_cast<double>(font->GetWordSpace()));
 }
 void
 Font::SetWordSpace(const Napi::CallbackInfo& info, const Napi::Value& value)

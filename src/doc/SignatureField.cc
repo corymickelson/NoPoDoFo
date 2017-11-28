@@ -63,7 +63,9 @@ SignatureField::Initialize(Napi::Env& env, Napi::Object& target)
 
 void
 SignatureField::SetAppearanceStream(const CallbackInfo& info)
-{}
+{
+  throw Error::New(info.Env(), "unimplemented");
+}
 
 void
 SignatureField::SetSignature(const CallbackInfo& info)
@@ -117,7 +119,9 @@ SignatureField::SetFieldName(const CallbackInfo& info)
 
 void
 SignatureField::AddCertificateReference(const CallbackInfo& info)
-{}
+{
+  throw Error::New(info.Env(), "unimplemented");
+}
 
 Napi::Value
 SignatureField::GetSignatureObject(const CallbackInfo& info)
