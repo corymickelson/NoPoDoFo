@@ -5,12 +5,10 @@ cmake -DCMAKE_INSTALL_PREFIX=/usr $HOME/podofo/ \
 -DPODOFO_BUILD_SHARED=1 \
 -DPODOFO_HAVE_PNG_LIB=1 \
 -DPODOFO_HAVE_JPEG_LIB=1 \
--DPODOFO_HAVE_TIFF_LIB=1 \
--DLIBCRYPTO_LIBRARIES=/usr/lib/libcrypto.so \
--DLIBCRYPTO_INCLUDE_DIR=/usr/include/openssl && \
+-DPODOFO_HAVE_TIFF_LIB=1 && \
 make && \
 make install && \
-git clone https://github.com/corymickelson/NoPoDoFo $HOME/npdf && \
-cd $HOME/npdf && \
+# git clone https://github.com/corymickelson/NoPoDoFo $HOME/npdf && \
+cd /home/npdf && \
 npm i && \
-npm run compile && npm run lib-build && npm test
+npm run compile && npm run lib-build
