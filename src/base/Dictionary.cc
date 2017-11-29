@@ -6,6 +6,7 @@
 #include "../ErrorHandler.h"
 #include "../ValidateArguments.h"
 #include "Obj.h"
+#include <algorithm>
 
 using namespace std;
 using namespace Napi;

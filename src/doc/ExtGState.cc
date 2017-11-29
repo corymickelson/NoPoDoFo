@@ -1,6 +1,7 @@
 #include "ExtGState.h"
 #include "../ErrorHandler.h"
 #include "../ValidateArguments.h"
+#include <algorithm>
 
 using namespace Napi;
 using namespace PoDoFo;
@@ -127,8 +128,9 @@ ExtGState::SetFrequency(const CallbackInfo& info)
   double v = info[0].As<Number>();
   self->SetFrequency(v);
 }
-ExtGState::~ExtGState() {
-  if(self != nullptr) {
+ExtGState::~ExtGState()
+{
+  if (self != nullptr) {
     HandleScope scope(Env());
     self = nullptr;
     doc = nullptr;

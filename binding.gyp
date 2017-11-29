@@ -27,7 +27,7 @@
     ["OS=='linux'", {
       "variables": {
         "podofo_library%": "/usr/lib/libpodofo.so",
-        "podofo_include_dir%": "/usr/include/podofo",
+        "podofo_include_dir%": "/usr/include",
         'node_shared_openssl%': 'true'
       }
     }]
