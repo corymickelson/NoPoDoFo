@@ -237,19 +237,13 @@ Painter::DrawMultiLineText(const CallbackInfo& info)
   bool clip = info[4].As<Boolean>();
   bool skipSpaces = info[5].As<Boolean>();
   try {
-    painter->DrawMultiLineText(rect.GetBottom(),
-                               rect.GetLeft(),
-                               rect.GetWidth(),
-                               rect.GetHeight(),
-                               PdfString(text),
-                               alignment,
-                               verticalAlignment);
-    //     painter->DrawMultiLineText(*const_cast<const PdfRect*>(&rect),
-    //                               PdfString(text),
-    //                               alignment,
-    //                               verticalAlignment,
-    //                               clip,
-    //                               skipSpaces);
+     painter->DrawMultiLineText(rect.GetBottom(),
+                                rect.GetLeft(),
+                                rect.GetWidth(),
+                                rect.GetHeight(),
+                                PdfString(text),
+                                alignment,
+                                verticalAlignment);
 
   } catch (PdfError& err) {
     ErrorHandler(err, info);

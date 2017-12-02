@@ -14,8 +14,8 @@
       ],
       "variables": {
         "VCPKG_Path%": "C:/Srcs/vcpkg/installed/x86-windows/",
-    		"podofo_build_path%": "C:/Users/micke/CMakeBuilds/4c25184c-e5d2-673f-92ce-a630b81f074c/build/x86-Debug/src/Debug/",
-    		"podofo_include_path%": "S:/projects/cmakeProjects/podofo/"
+		"podofo_library%": "C:/Users/micke/CMakeBuilds/4c25184c-e5d2-673f-92ce-a630b81f074c/build/x86-Release/src/Release",
+   		"podofo_include_dir%": "S:/projects/cmakeProjects/podofo"
       },
       'libraries': [
         '-l<(openssl_root)/lib/libeay32.lib'
@@ -55,9 +55,9 @@
               "<(VCPKG_Path)/bin/tiff.dll",
               "<(VCPKG_Path)/bin/tiffxx.dll",
               "<(VCPKG_Path)/bin/turbojpeg.dll",
-              "<(VCPKG_Path)/bin/libidn.dll",
-              "<(VCPKG_Path)/bin/podofo.dll", #vcpkg installed podofo
-      			  #"<(podofo_build_path)/podofo.dll" #podofo built from source
+              "<(VCPKG_Path)/bin/libidn2.dll",
+              #"<(VCPKG_Path)/bin/podofo.dll", #vcpkg installed podofo
+   			  "<(podofo_library)/podofo.dll" #podofo built from source
             ]
           }]
         }]
@@ -124,9 +124,9 @@
             "-l<(VCPKG_Path)/lib/tiffxx.lib",
             "-l<(VCPKG_Path)/lib/turbojpeg.lib",
             "-l<(VCPKG_Path)/lib/zlib.lib",
-            "-l<(VCPKG_Path)/lib/libidn.lib",
-            "-l<(VCPKG_Path)/lib/podofo.lib", # vcpkg podofo installed
-      #			"-l<(podofo_build_path)/podofo.lib" # podofo built from source
+            "-l<(VCPKG_Path)/lib/libidn2.lib",
+            #"-l<(VCPKG_Path)/lib/podofo.lib", # vcpkg podofo installed
+      		"-l<(podofo_library)/podofo.lib" # podofo built from source
           ],
           "include_dirs": [
             "<(VCPKG_Path)/include",
@@ -135,8 +135,8 @@
             "<(VCPKG_Path)/libpng16", 
             "<(VCPKG_Path)/lzma", 
             "<(VCPKG_Path)/openssl", 
-            "<(VCPKG_Path)/podofo", # vcpkg podofo installed
-      #			"<(podofo_include_path)" # podofo built from source
+            # "<(VCPKG_Path)/podofo", # vcpkg podofo installed
+			"<(podofo_include_path)" # podofo built from source
           ],
           "defines": [
             "_USE_MATH_DEFINES"  # "for" "M_PI"

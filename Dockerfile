@@ -17,3 +17,8 @@ COPY test-documents/* /home/npdf/test-documents/
 ADD alpine-install-deps.sh /
 RUN /alpine-install-deps.sh
 
+VOLUME /home/src
+WORKDIR /home/src
+
+EXPOSE 22
+#CMD [ "/usr/sbin/sshd", "-D" ]
