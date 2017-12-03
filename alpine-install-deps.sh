@@ -7,8 +7,8 @@ cmake -DCMAKE_INSTALL_PREFIX=/usr $HOME/podofo/ \
 -DPODOFO_HAVE_JPEG_LIB=1 \
 -DPODOFO_HAVE_TIFF_LIB=1 && \
 make && \
-make install && \
+make install # && \
 # git clone https://github.com/corymickelson/NoPoDoFo $HOME/npdf && \
-cd /home/npdf && \
-npm i && \
-npm run compile && npm run lib-build
+# cd /home/npdf && \
+# npm i && \
+# npm run compile && npm run lib-build

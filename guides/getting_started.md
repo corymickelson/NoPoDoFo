@@ -3,7 +3,7 @@
 ## Windows
 
 Building podofo on windows is made much simpler with the help of vcpkg. Vcpkg does offer a podofo pacakage but for nopodofo we will want to build podofo from source with additional libraries that are not included in the vcpkg compiled podofo.
-
+This build does not support AES encryption option, to enable AES you will need libidn v1.
  - Install [vcpkg](https://github.com/Microsoft/vcpkg)
  - Install vcpkg's
    - tiff-dev
@@ -11,13 +11,11 @@ Building podofo on windows is made much simpler with the help of vcpkg. Vcpkg do
    - jpeg-dev 
    - fontconfig-dev
    - freetype-dev
-   - libidn-dev
    - openssl-dev
    - zlib-dev
 
-#### Building PoDoFo
 
-NoPoDoFo requires podofo compiled with all optional libraries. In the previous step we've included all required and optional libraries, in this step we will clone podofo and build.
+NoPoDoFo is developed with podofo compiled with all optional libraries (As noted above this build is missing libidn). In the previous step we've included most optional libraries, in this step we will clone podofo and build.
 
  - Clone [PoDoFo](https://github.com/svn2github/podofo)
  
@@ -39,13 +37,11 @@ Open with visual studio's open / project / cmake. If a default CMakeSettings.jso
 
 Now build podofo in visual studio, make sure you select a Release x86 build. The build output is defined in the CMakeSettings.json configuration.
 
-See Building NoPoDoFo for linking podofo.
-
 ## Linux
 
 There are many linux distro's, but for this guide I will only be covering arch linux. Other distro's will have similar
 installation instruction, if you are truely blocked on the installation of PoDoFo please create an issue.
-NoPoDoFo provides bindings for PoDoFo compiled with all optional dependencies. We will need the dev dependencies of the following:
+NoPoDoFo provides bindings for PoDoFo compiled with all optional dependencies. Please install the following:
 
  - openssl-dev
  - fontconfig-dev
@@ -79,3 +75,44 @@ cmake will output a bunch of stuff to the console, ensure that both openssl and 
 NoPoDoFo also provides a docker file for alpine linux with podofo built from source. To use this image for your project, in your dockerfile add the following
 
 `FROM corymickelson/nopodofo-alpine:latest`
+
+
+# Building NoPoDoFo
+
+With PoDoFo built it is time to compile and link NoPoDoFo. NoPoDoFo provides a CMakeLists file for building with CMake as well as a gyp file for building with node-gyp.
+
+<mark>CMake does not always work on windows, WIP</mark>
+
+## Windows
+Installing NoPoDoFo with node-gyp. 
+ - Clone NoPoDoFo from git or npm
+   -  `npm i -S nopodofo` 
+   - `git clone https://github.com/corymickelson/NoPoDoFo.git nopodofo`
+ - `cd nopodofo`
+ - `npm i --podofo_library="path to directory containing files:  podofo.lib and podofo.dll" --podofo_include_dir="path to podofo source directory"`
+
+## Linux
+Installing NoPoDoFo with CMake
+If you installed PoDoFo with the instructions provided above, PoDoFo will already be on your path in /usr. If you installed PoDoFo somewhere else you 
+may need to open CMakeLists.txt and add the path to 
+
+`
+find_path(PODOFO_INCLUDE_DIR podofo/podofo.h PATHS /usr/include /usr/local/include /* Here */)
+`
+
+`
+find_library(PODOFO_LIBRARY NAMES podofo PATHS /usr/lib64 /usr/lib /usr/local/lib /* Here */)
+`
+ - Clone NoPoDoFo from git or npm
+   -  `npm i -S nopodofo` 
+   - `git clone https://github.com/corymickelson/NoPoDoFo.git nopodofo`
+ - `cd nopodofo`
+ - `npm run compile`
+
+
+ ## Check Installation
+
+ It's a good idea to check that NoPoDoFo has been built and linked properly. Running this check will also inform you to whether or not any features available in NoPoDoFo are not available due to PoDoFo not being compiled with all optional dependencies.
+
+  - `npm run lib-build && npm test`
+
