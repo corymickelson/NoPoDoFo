@@ -20,7 +20,7 @@ export class Signer {
         return this._instance.signWithCertificateAndKey(certfile, keyfile, password || null)
     }
 
-    sign(signature:Buffer): Buffer {
+    sign(signature:string|Buffer): Buffer {
         return this._instance.sign(signature)
         // return new Promise((fulfill, reject) => {
             /*this._instance.sign((e:Error, d:Buffer|void) => {
@@ -30,7 +30,7 @@ export class Signer {
     }
 }
 
-export function signature(certfile:string, pkeyfile:string, password:string = ''):Buffer {
+export function signature(certfile:string, pkeyfile:string, password:string = ''): string {
     if(!existsSync(certfile) || !existsSync(pkeyfile)) {
         throw Error("One or both files not found")
     }

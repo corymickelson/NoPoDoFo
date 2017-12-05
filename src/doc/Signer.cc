@@ -134,11 +134,14 @@ Signer::Sign(const CallbackInfo& info)
     string sigStr;
     pdf_long sigStrLength = 0;
     Buffer<char> sigBuffer;
+    string data;
     if (info[0].IsString()) {
       sigStr = info[0].As<String>().Utf8Value();
       sigStrLength = static_cast<pdf_long>(sigStr.size());
-    } else if (info[0].IsBuffer()) {
-      sigBuffer = info[0].As<Buffer<char>>();
+    } else if (info[0].Type() == napi_external) {
+      char* ext = *info[0].As<External<char*>>().Data();
+      data = string(ext);
+      // sigBuffer = info[0].As<Buffer<char>>();
     }
     PdfSignatureField* pSignField = field->GetField();
     PdfPage* page = doc->GetDocument()->GetPage(0);
@@ -156,7 +159,7 @@ Signer::Sign(const CallbackInfo& info)
     PdfOutputDevice outputDevice("/tmp/test.pdf", true /*&r*/);
     PdfSignOutputDevice signer(&outputDevice);
     if (sigStrLength == 0) {
-      signer.SetSignatureSize(sigBuffer.Length());
+      signer.SetSignatureSize(data.size());
     } else {
       signer.SetSignatureSize(static_cast<size_t>(sigStrLength));
     }
@@ -174,7 +177,7 @@ Signer::Sign(const CallbackInfo& info)
 
     PdfData* signature;
     if (sigStrLength == 0) {
-      signature = new PdfData(sigBuffer.Data(), sigBuffer.Length());
+      signature = new PdfData(data.c_str(), data.size());
     } else {
       signature =
         new PdfData(sigStr.c_str(), static_cast<size_t>(sigStrLength));

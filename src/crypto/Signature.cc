@@ -131,10 +131,11 @@ NPDFSignatureData(const Napi::CallbackInfo& info)
 
   i2d_PKCS7_bio(out, p7);
   outLen = BIO_get_mem_data(out, &outBuffer);
-  Buffer<char> data;
+  Napi::Value data;
   if (outLen > 0 && outBuffer) {
-    data =
-      Buffer<char>::Copy(info.Env(), outBuffer, static_cast<size_t>(outLen));
+    data = String::New(info.Env(), outBuffer);
+    // data = Buffer<char>::Copy(info.Env(), outBuffer,
+    // static_cast<size_t>(outLen));
     PKCS7_free(p7);
     BIO_free(out);
     BIO_free(mem);
