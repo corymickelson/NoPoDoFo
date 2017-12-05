@@ -105,6 +105,7 @@
         "src/base/Ref.cc",
         "src/base/Stream.cc",
         "src/base/Vector.cc",
+        "src/crypto/Signature.cc"
       ],
       "conditions": [
         ["OS==\"win\"", {

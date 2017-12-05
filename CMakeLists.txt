@@ -24,15 +24,22 @@ file(GLOB SOURCE_FILES
         "src/base/*.cc"
         "src/base/*.h"
         "src/doc/*.h"
-        "src/doc/*.cc")
+        "src/doc/*.cc"
+        "src/crypto/*.h"
+        "src/crypto/*.cc")
 
 add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES})
 set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "" SUFFIX ".node")
+
+find_package(OpenSSL REQUIRED)
+
 target_include_directories(${PROJECT_NAME} PRIVATE
         ${CMAKE_SOURCE_DIR}/node_modules/node-addon-api
         ${CMAKE_SOURCE_DIR}/node_modules/node-addon-api/src
+        ${OPENSSL_INCLUDE_DIR}
         ${CMAKE_JS_INC})
-target_link_libraries(${PROJECT_NAME} PRIVATE ${CMAKE_JS_LIB})
+target_link_libraries(${PROJECT_NAME} PRIVATE ${CMAKE_JS_LIB} ${OPENSSL_LIBRARIES})
+
 if (MSVC)
     add_definitions(-DUSING_SHARED_PODOFO=1)
     target_include_directories(${PROJECT_NAME} PRIVATE ${PODOFO_INCLUDE_DIR})

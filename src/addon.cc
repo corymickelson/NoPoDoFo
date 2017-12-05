@@ -20,6 +20,7 @@
 #include "doc/SignatureField.h"
 #include "doc/Signer.h"
 #include "doc/TextField.h"
+#include "crypto/Signature.h"
 #include "base/Vector.h"
 #include <napi.h>
 
@@ -50,6 +51,9 @@ init(Napi::Env env, Napi::Object exports)
   NoPoDoFo::Signer::Initialize(env, exports);
   NoPoDoFo::SignatureField::Initialize(env, exports);
   NoPoDoFo::Vector::Initialize(env, exports);
+
+  exports["signature"] = Function::New(env, NPDFSignatureData);
+
   return exports;
 }
 

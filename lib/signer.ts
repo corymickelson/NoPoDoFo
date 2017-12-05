@@ -29,3 +29,10 @@ export class Signer {
         // })
     }
 }
+
+export function signature(certfile:string, pkeyfile:string, password:string = ''):Buffer {
+    if(!existsSync(certfile) || !existsSync(pkeyfile)) {
+        throw Error("One or both files not found")
+    }
+   return __mod.signature(certfile, pkeyfile, password)
+}

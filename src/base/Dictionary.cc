@@ -119,7 +119,12 @@ Dictionary::GetKeys(const CallbackInfo& info)
 Napi::Value
 Dictionary::RemoveKey(const CallbackInfo& info)
 {
-  throw Error::New(info.Env(), "unimplemented");
+  AssertFunctionArgs(info, 1, {napi_string});
+  try {
+    dict.RemoveKey(PdfName(info[0].As<String>().Utf8Value()));
+  } catch(PdfError &err) {
+    ErrorHandler(err, info);
+  }
 }
 
 Napi::Value

@@ -7,10 +7,19 @@ import {join} from 'path'
 import {Form} from "./form";
 
 import * as forge from 'node-forge'
-import {Signer} from "./signer";
+import {Signer, signature} from "./signer";
+import * as assert from "assert";
 
 
 signatureBuffer()
+
+function signatureTest() {
+    let b = signature(join(__dirname, '../test-documents/certificate.pem'), join(__dirname, '../test-documents/key.pem'))
+
+    assert(Buffer.isBuffer(b))
+}
+
+//signatureTest()
 
 function signatureBuffer(): any {
     const pki = forge.pki,
@@ -153,7 +162,9 @@ function signatureBuffer(): any {
                 field.setDate()
 
                 let signer = new Signer(doc, field)
-                let what = signer.sign(Buffer.from(der.data))
+                let b = signature(join(__dirname, '../test-documents/certificate.pem'), join(__dirname, '../test-documents/key.pem'))
+                //let what = signer.sign(Buffer.from(der.data))
+                let what = signer.sign(b)
                     // .then(what => {
                 console.log(what)
                         if (what) {
@@ -174,5 +185,9 @@ function signatureBuffer(): any {
 
         // console.log(asn1Cert)
     })
+
+}
+
+function signatureData() {
 
 }
