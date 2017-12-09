@@ -15,8 +15,7 @@ FunctionReference Field::constructor;
 Field::Field(const CallbackInfo& info)
   : ObjectWrap(info)
 {
-  AssertFunctionArgs(
-    info, 2, { napi_valuetype::napi_object, napi_valuetype::napi_number });
+  AssertFunctionArgs(info, 2, { napi_object, napi_number });
   auto pageObj = info[0].As<Object>();
   fieldIndex = info[1].As<Number>();
   Page* page = Page::Unwrap(pageObj);
@@ -147,8 +146,9 @@ Field::GetFieldIndex(const CallbackInfo& info)
 {
   return Napi::Number::New(info.Env(), fieldIndex);
 }
-Field::~Field() {
-  if(_page != nullptr) {
+Field::~Field()
+{
+  if (_page != nullptr) {
     HandleScope scope(Env());
     _page = nullptr;
   }

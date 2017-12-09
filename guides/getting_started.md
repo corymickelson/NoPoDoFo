@@ -84,6 +84,7 @@ With PoDoFo built it is time to compile and link NoPoDoFo. NoPoDoFo provides a C
 <mark>CMake does not always work on windows, WIP</mark>
 
 ## Windows
+Windows usage is still in testing, not all features may work.
 Installing NoPoDoFo with node-gyp. 
  - Clone NoPoDoFo from git or npm
    -  `npm i -S nopodofo` 

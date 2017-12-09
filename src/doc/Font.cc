@@ -134,8 +134,13 @@ Napi::Value
 Font::GetEncoding(const Napi::CallbackInfo& info)
 {
   const PdfEncoding* encoding = font->GetEncoding();
-  return Encoding::constructor.New({ External<PdfEncoding>::New(
-    info.Env(), const_cast<PdfEncoding*>(encoding)) });
+  return Encoding::constructor.New(
+    { External<PdfEncoding>::New(info.Env(),
+                                 const_cast<PdfEncoding*>(encoding),
+                                 [](Napi::Env env, PdfEncoding* value) {
+                                   HandleScope scope(env);
+                                   delete value;
+                                 }) });
 }
 Napi::Value
 Font::GetFontMetric(const Napi::CallbackInfo& info)

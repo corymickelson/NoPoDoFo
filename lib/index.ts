@@ -20,6 +20,7 @@ import { Painter as painter } from './painter'
 import { Rect as rect } from './rect'
 import { Signer as sign } from './signer'
 import {Stream as stream} from './stream'
+import {Form as form} from './form'
 
 export const Document = doc,
     Page = page,
@@ -31,6 +32,7 @@ export const Document = doc,
     NPdfAnnotationFlag = annotflags,
     NPdfAnnotationType = annottype,
     Field = field,
+    Form = form,
     CheckBox = checkbox,
     TextField = textfield,
     ListField = listfield,

@@ -89,7 +89,11 @@ Dictionary::GetKey(const CallbackInfo& info)
   }
   try {
     PdfObject* v = dict.GetKey(PdfName(k));
-    auto objPtr = Napi::External<PdfObject>::New(info.Env(), v);
+    auto objPtr = Napi::External<PdfObject>::New(
+      info.Env(), v, [](Napi::Env env, PdfObject* obj) {
+        HandleScope scope(env);
+        delete obj;
+      });
     auto instance = Obj::constructor.New({ objPtr });
     return instance;
   } catch (PdfError& err) {
@@ -111,7 +115,7 @@ Dictionary::GetKeys(const CallbackInfo& info)
     js.Set(Napi::Number::New(info.Env(), n),
            Napi::String::New(info.Env(), name));
     n++;
-    it++;
+    ++it;
   }
   return js;
 }
@@ -119,10 +123,10 @@ Dictionary::GetKeys(const CallbackInfo& info)
 Napi::Value
 Dictionary::RemoveKey(const CallbackInfo& info)
 {
-  AssertFunctionArgs(info, 1, {napi_string});
+  AssertFunctionArgs(info, 1, { napi_string });
   try {
     dict.RemoveKey(PdfName(info[0].As<String>().Utf8Value()));
-  } catch(PdfError &err) {
+  } catch (PdfError& err) {
     ErrorHandler(err, info);
   }
 }

@@ -276,7 +276,11 @@ Page::GetContents(const CallbackInfo& info)
   bool forAppending = info[0].As<Boolean>();
   PdfObject* contentsObj =
     forAppending ? page->GetContentsForAppending() : page->GetContents();
-  auto objPtr = Napi::External<PdfObject>::New(info.Env(), contentsObj);
+  auto objPtr = Napi::External<PdfObject>::New(
+    info.Env(), contentsObj, [](Napi::Env env, PdfObject* obj) {
+      HandleScope scope(env);
+      delete obj;
+    });
   auto instance = Obj::constructor.New({ objPtr });
   return instance;
 }
@@ -285,7 +289,11 @@ Napi::Value
 Page::GetResources(const CallbackInfo& info)
 {
   PdfObject* resources = page->GetResources();
-  auto objPtr = Napi::External<PdfObject>::New(info.Env(), resources);
+  auto objPtr = Napi::External<PdfObject>::New(
+    info.Env(), resources, [](Napi::Env env, PdfObject* obj) {
+      HandleScope scope(env);
+      delete obj;
+    });
   auto instance = Obj::constructor.New({ objPtr });
   return instance;
 }
@@ -334,7 +342,11 @@ Page::GetAnnotation(const CallbackInfo& info)
   AssertFunctionArgs(info, 1, { napi_valuetype::napi_number });
   int index = info[0].As<Number>();
   auto ptr = page->GetAnnotation(index);
-  auto instance = Napi::External<PdfAnnotation>::New(info.Env(), ptr);
+  auto instance = Napi::External<PdfAnnotation>::New(
+    info.Env(), ptr, [](Napi::Env env, PdfAnnotation* annot) {
+      HandleScope scope(env);
+      delete annot;
+    });
   return Annotation::constructor.New({ instance });
 }
 Napi::Value
@@ -347,8 +359,11 @@ Page::CreateAnnotation(const CallbackInfo& info)
   auto obj = info[1].As<Object>();
   Rect* rect = Rect::Unwrap(obj);
   PdfAnnotation* annot = page->CreateAnnotation(type, *rect->GetRect());
-  auto instance = Annotation::constructor.New(
-    { External<PdfAnnotation>::New(info.Env(), annot) });
+  auto instance = Annotation::constructor.New({ External<PdfAnnotation>::New(
+    info.Env(), annot, [](Napi::Env env, PdfAnnotation* value) {
+      HandleScope scope(env);
+      delete value;
+    }) });
   return instance;
 }
 Page::~Page()

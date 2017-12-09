@@ -82,7 +82,11 @@ Array::GetIndex(const CallbackInfo& info)
   AssertFunctionArgs(info, 1, { napi_valuetype::napi_number });
   size_t index = info[0].As<Number>().Uint32Value();
   PdfObject item = array[index];
-  auto initPtr = Napi::External<PdfObject>::New(info.Env(), &item);
+  auto initPtr = Napi::External<PdfObject>::New(
+    info.Env(), &item, [](Napi::Env env, PdfObject* obj) {
+      HandleScope scope(env);
+      delete obj;
+    });
   auto instance = Obj::constructor.New({ initPtr });
   return instance;
 }
@@ -122,7 +126,11 @@ Array::ToArray(const Napi::CallbackInfo& info)
   try {
     uint32_t counter = 0;
     for (auto& it : *array) {
-      const auto initPtr = External<PdfObject>::New(Env(), &it);
+      const auto initPtr =
+        External<PdfObject>::New(Env(), &it, [](Napi::Env env, PdfObject* obj) {
+          HandleScope scope(env);
+          delete obj;
+        });
       const auto instance = Obj::constructor.New({ initPtr });
       js.Set(counter, instance);
       counter++;
@@ -134,8 +142,9 @@ Array::ToArray(const Napi::CallbackInfo& info)
   }
   return js;
 }
-Array::~Array() {
-  if(array != nullptr) {
+Array::~Array()
+{
+  if (array != nullptr) {
     HandleScope scope(Env());
     array = nullptr;
   }

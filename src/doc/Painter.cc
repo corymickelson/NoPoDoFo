@@ -145,8 +145,11 @@ Painter::GetCanvas(const CallbackInfo& info)
   if (!instance) {
     return info.Env().Null();
   }
-  return Stream::constructor.New(
-    { External<PdfStream>::New(info.Env(), instance) });
+  return Stream::constructor.New({ External<PdfStream>::New(
+    info.Env(), instance, [](Napi::Env env, PdfStream* value) {
+      HandleScope scope(env);
+      delete value;
+    }) });
 }
 
 void
@@ -237,13 +240,13 @@ Painter::DrawMultiLineText(const CallbackInfo& info)
   bool clip = info[4].As<Boolean>();
   bool skipSpaces = info[5].As<Boolean>();
   try {
-     painter->DrawMultiLineText(rect.GetBottom(),
-                                rect.GetLeft(),
-                                rect.GetWidth(),
-                                rect.GetHeight(),
-                                PdfString(text),
-                                alignment,
-                                verticalAlignment);
+    painter->DrawMultiLineText(rect.GetBottom(),
+                               rect.GetLeft(),
+                               rect.GetWidth(),
+                               rect.GetHeight(),
+                               PdfString(text),
+                               alignment,
+                               verticalAlignment);
 
   } catch (PdfError& err) {
     ErrorHandler(err, info);
@@ -347,8 +350,11 @@ Painter::SetFont(const Napi::CallbackInfo& info, const Napi::Value& value)
 Napi::Value
 Painter::GetFont(const Napi::CallbackInfo& info)
 {
-  return Font::constructor.New(
-    { External<PdfFont>::New(info.Env(), painter->GetFont()) });
+  return Font::constructor.New({ External<PdfFont>::New(
+    info.Env(), painter->GetFont(), [](Napi::Env env, PdfFont* value) {
+      HandleScope scope(env);
+      delete value;
+    }) });
 }
 void
 Painter::SetClipRect(const Napi::CallbackInfo& info)

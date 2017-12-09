@@ -36,7 +36,7 @@ doc.on('ready', async e => {
         field.setCreator('me')
         field.setDate()
 
-        let signer = new Signer(doc, field)
+        let signer = new Signer(doc, "/tmp/signed.pdf")
         let signatureStr = signature(join(__dirname, '../test-documents/certificate.pem'), join(__dirname, '../test-documents/key.pem'))
         let signed = signer.sign(signatureStr)
         console.log(signed)

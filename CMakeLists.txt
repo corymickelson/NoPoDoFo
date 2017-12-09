@@ -40,6 +40,8 @@ target_include_directories(${PROJECT_NAME} PRIVATE
         ${CMAKE_JS_INC})
 target_link_libraries(${PROJECT_NAME} PRIVATE ${CMAKE_JS_LIB} ${OPENSSL_LIBRARIES})
 
+message(WARNING "Openssl version: ${OPENSSL_VERSION}")
+
 if (MSVC)
     add_definitions(-DUSING_SHARED_PODOFO=1)
     target_include_directories(${PROJECT_NAME} PRIVATE ${PODOFO_INCLUDE_DIR})
@@ -61,7 +63,3 @@ endif (MSVC)
 # else()
 #     message("cmake-js invalid")
 # endif(CMAKE_JS_VERSION)
-
-
-
-

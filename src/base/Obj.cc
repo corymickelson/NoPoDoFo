@@ -198,7 +198,11 @@ Obj::GetArray(const CallbackInfo& info)
     throw Napi::Error::New(info.Env(), "Obj only accessible as array");
   }
   auto init = obj->GetArray();
-  auto ptr = External<PdfArray>::New(info.Env(), &init);
+  auto ptr = External<PdfArray>::New(
+    info.Env(), &init, [](Napi::Env env, PdfArray* value) {
+      HandleScope scope(env);
+      delete value;
+    });
   auto instance = NoPoDoFo::Array::constructor.New({ ptr });
   return instance;
 }

@@ -55,12 +55,17 @@ Napi::Value
 Form::GetObject(const CallbackInfo& info)
 {
   auto obj = doc->GetAcroForm()->GetObject();
-  auto nObj = Napi::External<PdfObject>::New(info.Env(), obj);
+  auto nObj = Napi::External<PdfObject>::New(
+    info.Env(), obj, [](Napi::Env env, PdfObject* value) {
+      HandleScope scope(env);
+      delete value;
+    });
   auto objInstance = Obj::constructor.New({ nObj });
   return objInstance;
 }
-Form::~Form() {
-  if(doc != nullptr) {
+Form::~Form()
+{
+  if (doc != nullptr) {
     HandleScope scope(Env());
     doc = nullptr;
   }

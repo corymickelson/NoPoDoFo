@@ -17,6 +17,7 @@ Ref::Ref(const Napi::CallbackInfo& info)
     ref = new PdfReference(i, 0);
   } else if (info.Length() == 1 && info[0].Type() == napi_external) {
     ref = info[0].As<Napi::External<PdfReference>>().Data();
+    isExternalInstance = true;
   }
 }
 
@@ -95,13 +96,22 @@ Napi::Value
 Ref::GetObj(const CallbackInfo& info)
 {
   PdfObject obj(*ref);
-  auto instancePtr = External<PdfObject>::New(info.Env(), &obj);
+  auto instancePtr = External<PdfObject>::New(
+    info.Env(), &obj, [](Napi::Env env, PdfObject* value) {
+      HandleScope scope(env);
+      delete value;
+    });
   return Obj::constructor.New({ instancePtr });
 }
-Ref::~Ref() {
-  if(ref != nullptr) {
+Ref::~Ref()
+{
+  if (ref != nullptr) {
     HandleScope scope(Env());
-    ref = nullptr;
+    if (!isExternalInstance) {
+      delete ref;
+    } else {
+      ref = nullptr;
+    }
   }
 }
 }

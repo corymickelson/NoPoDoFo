@@ -44,6 +44,14 @@
         {
           "name": "CMAKE_JS_LIB",
           "value": "C:\\Users\\micke\\.cmake-js\\node-ia32\\v8.7.0\\win-x86\\node.lib"
+        },
+        {
+          "name": "LIBCRYPTO_LIBRARY_NAMES",
+          "value": "libeay32"
+        },
+        {
+          "name": "LIBSSL_LIBRARY_NAMES",
+          "value": "ssleay32" 
         }
       ]
     },

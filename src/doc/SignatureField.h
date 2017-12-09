@@ -33,6 +33,7 @@ public:
 private:
   PoDoFo::PdfSignatureField* field;
   PoDoFo::PdfData* signatureBuffer;
+  bool isExternalInstance = false;
 };
 }
 #endif

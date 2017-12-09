@@ -16,8 +16,7 @@
     "test:object": "node --expose-gc ./dist/object.spec.js",
     "test:painter": "node --expose-gc ./dist/painter.spec.js",
     "build:test": "npm run compile && npm run lib-build && npm run test",
-    "precommit": "node-gyp rebuild && npm run lib-build && npm test",
-    "postinstallx": "npm run lib-build && npm test"
+    "precommit": "node-gyp rebuild && npm run lib-build && npm test"
   },
   "keywords": [
     "pdf"

@@ -8,6 +8,7 @@
 #include "Encrypt.h"
 #include "Font.h"
 #include "Page.h"
+#include "Signer.h"
 
 using namespace Napi;
 using namespace std;
@@ -36,6 +37,7 @@ Document::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceMethod("isLinearized", &Document::IsLinearized),
       InstanceMethod("getWriteMode", &Document::GetWriteMode),
       InstanceMethod("write", &Document::Write),
+      InstanceMethod("writeUpdate", &Document::WriteUpdate),
       InstanceMethod("writeBuffer", &Document::WriteBuffer),
       InstanceMethod("getObjects", &Document::GetObjects),
       InstanceMethod("getTrailer", &Document::GetTrailer),
@@ -64,7 +66,10 @@ Document::~Document()
 {
   if (document != nullptr) {
     HandleScope scope(Env());
-    delete document;
+    if (isExternalInstance)
+      document = nullptr;
+    else
+      delete document;
   }
 }
 Napi::Value
@@ -350,7 +355,11 @@ Document::GetEncrypt(const CallbackInfo& info)
 {
   const PdfEncrypt* enc = document->GetEncrypt();
   auto ptr = const_cast<PdfEncrypt*>(enc);
-  auto encryptPtr = Napi::External<PdfEncrypt>::New(info.Env(), ptr);
+  auto encryptPtr = Napi::External<PdfEncrypt>::New(
+    info.Env(), ptr, [](Napi::Env env, PdfEncrypt* value) {
+      HandleScope scope(env);
+      delete value;
+    });
   auto instance = Encrypt::constructor.New({ encryptPtr });
   return instance;
 }
@@ -365,7 +374,11 @@ Document::GetObjects(const CallbackInfo& info)
     while (it != document->GetObjects().end()) {
       if (!(*it))
         break;
-      auto instance = External<PdfObject>::New(info.Env(), (*it));
+      auto instance = External<PdfObject>::New(
+        info.Env(), (*it), [](Napi::Env env, PdfObject* value) {
+          HandleScope scope(env);
+          delete value;
+        });
       js[count] = Obj::constructor.New({ instance });
       ++it;
       ++count;
@@ -383,7 +396,11 @@ Document::GetTrailer(const CallbackInfo& info)
 {
   const PdfObject* trailerPdObject = document->GetTrailer();
   auto* ptr = const_cast<PdfObject*>(trailerPdObject);
-  auto initPtr = Napi::External<PdfObject>::New(info.Env(), ptr);
+  auto initPtr = Napi::External<PdfObject>::New(
+    info.Env(), ptr, [](Napi::Env env, PdfObject* value) {
+      HandleScope scope(env);
+      delete value;
+    });
   auto instance = Obj::constructor.New({ initPtr });
   return instance;
 }
@@ -525,6 +542,34 @@ Document::Write(const CallbackInfo& info)
   }
 
   return Env().Undefined();
+}
+
+Value
+Document::WriteUpdate(const CallbackInfo& info)
+{
+  string output;
+  Signer* signer = nullptr;
+  if (!LoadedForIncrementalUpdates()) {
+    throw Error::New(info.Env(), "must be loaded for updates");
+  }
+  if (info.Length() < 1) {
+    throw Error::New(info.Env(), "requires Signer or string");
+  }
+  if (info[0].IsString()) {
+    output = info[0].As<String>().Utf8Value();
+  }
+  if (info[0].IsObject() &&
+      info[0].As<Object>().InstanceOf(Signer::constructor.Value())) {
+    signer = Signer::Unwrap(info[0].As<Object>());
+  }
+  try {
+    if (signer == nullptr)
+      document->WriteUpdate(output.c_str());
+    else if (signer != nullptr)
+      document->WriteUpdate(signer->signer, true);
+  } catch (PdfError& err) {
+    ErrorHandler(err, info);
+  }
 }
 
 class DocumentLoadAsync : public Napi::AsyncWorker

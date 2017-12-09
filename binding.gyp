@@ -1,37 +1,52 @@
 {
-  "conditions": [
+"conditions": [
     ["OS==\"win\"", {
-      'conditions': [
-        ['target_arch=="x64"', {
-          'variables': {
-            'openssl_root%': 'C:/OpenSSL-Win64'
-          }
-        }, {
-          'variables': {
-            'openssl_root%': 'C:/OpenSSL-Win32'
-          }
-        }]
-      ],
       "variables": {
         "VCPKG_Path%": "C:/Srcs/vcpkg/installed/x86-windows/",
-	    	"podofo_library%": "C:/Users/micke/CMakeBuilds/4c25184c-e5d2-673f-92ce-a630b81f074c/build/x86-Release/src/Release",
-   	  	"podofo_include_dir%": "S:/projects/cmakeProjects/podofo"
+   		"podofo_library%": "C:/Users/micke/CMakeBuilds/4c25184c-e5d2-673f-92ce-a630b81f074c/build/x86-Release/src/Release",
+   		"podofo_include_dir%": "S:/projects/cmakeProjects/podofo/"
       },
-      'libraries': [
-        '-l<(openssl_root)/lib/libeay32.lib'
-      ],
-      'include_dirs': [
-        '<(openssl_root)/include'
-      ]
     }],
     ["OS=='linux'", {
       "variables": {
         "podofo_library%": "/usr/lib/libpodofo.so",
-        "podofo_include_dir%": "/usr/include",
-        'node_shared_openssl%': 'true'
+        "podofo_include_dir%": "/usr/include/podofo"
       }
     }]
   ],
+#  "conditions": [
+#    ["OS==\"win\"", {
+#      'conditions': [
+#        ['target_arch=="x64"', {
+#          'variables': {
+#            'openssl_root%': 'C:/OpenSSL-Win64'
+#          }
+#        }, {
+#          'variables': {
+#            'openssl_root%': 'C:/OpenSSL-Win32'
+#          }
+#        }]
+#      ],
+#      "variables": {
+#        "VCPKG_Path%": "C:/Srcs/vcpkg/installed/x86-windows/",
+#	    	"podofo_library%": "C:/Users/micke/CMakeBuilds/4c25184c-e5d2-673f-92ce-a630b81f074c/build/x86-Release/src/Release",
+#   	  	"podofo_include_dir%": "S:/projects/cmakeProjects/podofo"
+#      },
+#      'libraries': [
+#        '-l<(openssl_root)/lib/libeay32.lib'
+#      ],
+#      'include_dirs': [
+#        '<(openssl_root)/include'
+#      ]
+#    }],
+#    ["OS=='linux'", {
+#      "variables": {
+#        "podofo_library%": "/usr/lib/libpodofo.so",
+#        "podofo_include_dir%": "/usr/include",
+#        'node_shared_openssl%': 'true'
+#      }
+#    }]
+#  ],
   "targets": [
     {
       "target_name": "npdf-postbuild",
@@ -55,7 +70,7 @@
               "<(VCPKG_Path)/bin/tiff.dll",
               "<(VCPKG_Path)/bin/tiffxx.dll",
               "<(VCPKG_Path)/bin/turbojpeg.dll",
-              "<(VCPKG_Path)/bin/libidn2.dll",
+              #"<(VCPKG_Path)/bin/libidn2.dll",
               #"<(VCPKG_Path)/bin/podofo.dll", #vcpkg installed podofo
    			  "<(podofo_library)/podofo.dll" #podofo built from source
             ]
@@ -105,7 +120,8 @@
         "src/base/Ref.cc",
         "src/base/Stream.cc",
         "src/base/Vector.cc",
-        "src/crypto/Signature.cc"
+        "src/crypto/Signature.cc",
+        "src/base/Data.cc"
       ],
       "conditions": [
         ["OS==\"win\"", {
@@ -125,7 +141,7 @@
             "-l<(VCPKG_Path)/lib/tiffxx.lib",
             "-l<(VCPKG_Path)/lib/turbojpeg.lib",
             "-l<(VCPKG_Path)/lib/zlib.lib",
-            "-l<(VCPKG_Path)/lib/libidn2.lib",
+            #"-l<(VCPKG_Path)/lib/libidn2.lib",
             #"-l<(VCPKG_Path)/lib/podofo.lib", # vcpkg podofo installed
       		"-l<(podofo_library)/podofo.lib" # podofo built from source
           ],
@@ -137,10 +153,9 @@
             "<(VCPKG_Path)/lzma", 
             "<(VCPKG_Path)/openssl", 
             # "<(VCPKG_Path)/podofo", # vcpkg podofo installed
-			"<(podofo_include_path)" # podofo built from source
+			"<(podofo_include_dir)" # podofo built from source
           ],
           "defines": [
-            "_USE_MATH_DEFINES"  # "for" "M_PI"
           ],
           "configurations": {
             "Debug": {

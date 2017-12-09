@@ -7,36 +7,36 @@
 
 using namespace PoDoFo;
 using namespace Napi;
+using namespace std;
 
 Napi::Value
 NPDFSignatureData(const Napi::CallbackInfo& info)
 {
   AssertFunctionArgs(info, 3, { napi_string, napi_string, napi_string });
 
-  string signerPEMPath = info[0].As<String>().Utf8Value();
-  string privateKeyPEMPath = info[1].As<String>().Utf8Value();
-  string pkeyPassword = info[2].As<String>().Utf8Value();
+  auto signerPEMPath = info[0].As<String>().Utf8Value();
+  auto privateKeyPemPath = info[1].As<String>().Utf8Value();
+  auto pkeyPassword = info[2].As<String>().Utf8Value();
 
   X509* cert = nullptr;
   EVP_PKEY* pkey = nullptr;
   long signatureSize = 0;
 
-  int flags = PKCS7_DETACHED | PKCS7_BINARY;
+  const auto flags = PKCS7_DETACHED | PKCS7_BINARY;
 
   OpenSSL_add_all_algorithms();
   ERR_load_crypto_strings();
 
   FILE* fp;
   fp = fopen(signerPEMPath.c_str(), "rb");
-
   if (!fp) {
     throw Error::New(info.Env(), "Failed to open certificate file");
   }
 
   cert = PEM_read_X509(fp, nullptr, nullptr, nullptr);
 
-  if (fseeko(fp, 0, SEEK_END) != -1) {
-    signatureSize += ftello(fp);
+  if (fseek(fp, 0, SEEK_END) != -1) {
+    signatureSize += ftell(fp);
   } else {
     signatureSize += 3072;
   }
@@ -46,7 +46,7 @@ NPDFSignatureData(const Napi::CallbackInfo& info)
   if (!cert) {
     throw Error::New(info.Env(), "Failed to decode certificate file");
   }
-  fp = fopen(privateKeyPEMPath.c_str(), "rb");
+  fp = fopen(privateKeyPemPath.c_str(), "rb");
   if (!fp) {
     X509_free(cert);
     throw Error::New(info.Env(), "Failed to open private key file");
@@ -68,8 +68,8 @@ NPDFSignatureData(const Napi::CallbackInfo& info)
     },
     const_cast<char*>(pkeyPassword.c_str()));
 
-  if (fseeko(fp, 0, SEEK_END) != -1) {
-    signatureSize += ftello(fp);
+  if (fseek(fp, 0, SEEK_END) != -1) {
+    signatureSize += ftell(fp);
   } else {
     signatureSize += 1024;
   }
@@ -118,7 +118,7 @@ NPDFSignatureData(const Napi::CallbackInfo& info)
     throw Error::New(info.Env(), "Failed PKCS7 final");
   }
 
-  BIO* out = BIO_new(BIO_s_mem());
+  auto out = BIO_new(BIO_s_mem());
   if (!out) {
     PKCS7_free(p7);
     X509_free(cert);
@@ -127,10 +127,9 @@ NPDFSignatureData(const Napi::CallbackInfo& info)
   }
 
   char* outBuffer = nullptr;
-  long outLen;
 
   i2d_PKCS7_bio(out, p7);
-  outLen = BIO_get_mem_data(out, &outBuffer);
+  const auto outLen = BIO_get_mem_data(out, &outBuffer);
   Napi::Value data;
   if (outLen > 0 && outBuffer) {
     data = String::New(info.Env(), outBuffer);
