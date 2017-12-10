@@ -1,11 +1,13 @@
-import {writeFileSync} from 'fs'
-import {Document} from './document'
-import {SignatureField} from './field'
-import {NPDFAnnotation, NPDFAnnotationFlag} from './annotation'
-import {Rect} from './rect'
-import {join} from 'path'
-import {Form} from "./form";
-import {Signer, signature} from "./signer";
+import * as test from 'tape'
+import { writeFileSync } from 'fs'
+import { Document } from './document'
+import { SignatureField } from './field'
+import { NPDFAnnotation, NPDFAnnotationFlag } from './annotation'
+import { Rect } from './rect'
+import { join } from 'path'
+import { Form } from "./form";
+import { Signer, signature } from "./signer";
+import { Data } from './data';
 
 
 const doc = new Document(join(__dirname, '../test-documents/test.pdf'), true)
@@ -25,25 +27,37 @@ doc.on('ready', async e => {
         if (form.needAppearances)
             form.needAppearances = false
 
-        // create signature field
         const rect = new Rect([0, 0, 10, 10]),
-            page = doc.getPage(doc.pageCount - 1),
+            page = doc.getPage(1),
             annot = page.createAnnotation(NPDFAnnotation.Widget, rect)
         annot.flag = NPDFAnnotationFlag.Hidden | NPDFAnnotationFlag.Invisible
-        const field = new SignatureField(annot, form, doc)
+        const field = new SignatureField(annot, form, doc),
+            signatureData = signature(join(__dirname, '../test-documents/certificate.pem'), join(__dirname, '../test-documents/key.pem'))
         field.setReason('test')
         field.setLocation('here')
         field.setCreator('me')
+        field.setFieldName('signer.sign')
         field.setDate()
 
-        let signer = new Signer(doc, "/tmp/signed.pdf")
-        let signatureStr = signature(join(__dirname, '../test-documents/certificate.pem'), join(__dirname, '../test-documents/key.pem'))
-        let signed = signer.sign(signatureStr)
-        console.log(signed)
-        if (signed) {
-            writeFileSync('/tmp/test.pdf', signed)
-            console.log('ok')
-        }
+        let signer = new Signer(doc)
+        signer.setField(field)
+        let signedPath = "/tmp/signed.pdf"
+        signer.signSync(signatureData, signedPath)
+        test('happy path digital signature', t => {
+            let signed = new Document(signedPath)
+            signed.on('ready', e => {
+                if (e instanceof Error) t.fail(e.message)
+                const signedPage = doc.getPage(1),
+                    fields = signedPage.getFieldsInfo()
+                let signatureFieldCandidates = fields.filter(i => i.name === 'signer.sign')
+                if(!signatureFieldCandidates || signatureFieldCandidates.length === 0) t.fail("signature field not found")
+                else if(signatureFieldCandidates.length === 1) {
+                    t.pass("signature found")
+                    t.end()
+                }
+                else t.fail("something went wrong")
+            })
+        })
     }
     catch
         (e) {

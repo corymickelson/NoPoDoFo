@@ -4,6 +4,7 @@ import {Page} from './page';
 import {Encrypt, EncryptOption, ProtectionOption} from './encrypt';
 import {EventEmitter} from 'events';
 import {Font} from "./painter";
+import { Signer } from './signer';
 
 export const __mod = require('bindings')('npdf')
 export enum FontEncoding {
@@ -38,7 +39,9 @@ export interface IDocument {
 
     isLinearized(): boolean
 
-    write(cb: (e: Error) => void, file?: string): void,
+    write(cb: (e: Error) => void, file?: string): void
+
+    writeUpdate(device:string|Signer): void  
 
     getTrailer(): Obj
 
@@ -215,5 +218,11 @@ export class Document extends EventEmitter implements IDocument {
             opts.hasOwnProperty('embed') ? opts.embed : false,
             opts.hasOwnProperty('fileName')? opts.fileName : null)
         return new Font(instance)
+    }
+
+    writeUpdate(device:string|Signer): void {
+        if(device instanceof Signer)
+            this._instance.writeUpdate((device as any)._instance)
+        else this._instance.writeUpdate(device)
     }
 }

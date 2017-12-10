@@ -5,9 +5,11 @@
 #include "SignatureField.h"
 #include "../ErrorHandler.h"
 #include "../ValidateArguments.h"
+#include "../base/Data.h"
 #include "../doc/Annotation.h"
 #include "../doc/Document.h"
 #include "../doc/Form.h"
+#include "Signer.h"
 
 using namespace Napi;
 using namespace PoDoFo;
@@ -49,13 +51,13 @@ SignatureField::Initialize(Napi::Env& env, Napi::Object& target)
     "SignatureField",
     { InstanceMethod("setAppearanceStream",
                      &SignatureField::SetAppearanceStream),
-      InstanceMethod("setSignature", &SignatureField::SetSignature),
       InstanceMethod("setReason", &SignatureField::SetReason),
       InstanceMethod("setLocation", &SignatureField::SetLocation),
       InstanceMethod("setCreator", &SignatureField::SetCreator),
       InstanceMethod("setDate", &SignatureField::SetDate),
       InstanceMethod("addCertificateReference",
                      &SignatureField::AddCertificateReference),
+      InstanceMethod("setFieldName", &SignatureField::SetFieldName),
       InstanceMethod("getObject", &SignatureField::GetSignatureObject),
       InstanceMethod("ensureSignatureObject",
                      &SignatureField::EnsureSignatureObject) });
@@ -66,19 +68,6 @@ void
 SignatureField::SetAppearanceStream(const CallbackInfo& info)
 {
   throw Error::New(info.Env(), "unimplemented");
-}
-
-void
-SignatureField::SetSignature(const CallbackInfo& info)
-{
-  AssertFunctionArgs(info, 1, { napi_valuetype::napi_string });
-  string data = info[0].As<String>().Utf8Value();
-  try {
-    signatureBuffer = new PdfData(data.c_str());
-    field->SetSignature(*signatureBuffer);
-  } catch (PdfError& err) {
-    ErrorHandler(err, info);
-  }
 }
 
 void

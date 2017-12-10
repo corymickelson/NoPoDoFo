@@ -37,7 +37,6 @@ Document::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceMethod("isLinearized", &Document::IsLinearized),
       InstanceMethod("getWriteMode", &Document::GetWriteMode),
       InstanceMethod("write", &Document::Write),
-      InstanceMethod("writeUpdate", &Document::WriteUpdate),
       InstanceMethod("writeBuffer", &Document::WriteBuffer),
       InstanceMethod("getObjects", &Document::GetObjects),
       InstanceMethod("getTrailer", &Document::GetTrailer),
@@ -542,34 +541,6 @@ Document::Write(const CallbackInfo& info)
   }
 
   return Env().Undefined();
-}
-
-Value
-Document::WriteUpdate(const CallbackInfo& info)
-{
-  string output;
-  Signer* signer = nullptr;
-  if (!LoadedForIncrementalUpdates()) {
-    throw Error::New(info.Env(), "must be loaded for updates");
-  }
-  if (info.Length() < 1) {
-    throw Error::New(info.Env(), "requires Signer or string");
-  }
-  if (info[0].IsString()) {
-    output = info[0].As<String>().Utf8Value();
-  }
-  if (info[0].IsObject() &&
-      info[0].As<Object>().InstanceOf(Signer::constructor.Value())) {
-    signer = Signer::Unwrap(info[0].As<Object>());
-  }
-  try {
-    if (signer == nullptr)
-      document->WriteUpdate(output.c_str());
-    else if (signer != nullptr)
-      document->WriteUpdate(signer->signer, true);
-  } catch (PdfError& err) {
-    ErrorHandler(err, info);
-  }
 }
 
 class DocumentLoadAsync : public Napi::AsyncWorker

@@ -17,7 +17,6 @@ public:
   static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
   void SetAppearanceStream(const Napi::CallbackInfo&);
-  void SetSignature(const Napi::CallbackInfo&);
   void SetReason(const Napi::CallbackInfo&);
   void SetLocation(const Napi::CallbackInfo&);
   void SetCreator(const Napi::CallbackInfo&);

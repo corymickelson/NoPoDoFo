@@ -65,40 +65,21 @@
 		<div class="col-8 col-content">
 			<div class="tsd-panel tsd-typography">
 				<h1 id="nopodofo">NoPoDoFo</h1>
-				<p>nopodofo, a native node module for reading, parsing, modifying, and creating pdf documents with <a href="http://podofo.sourceforge.net/index.html">PoDoFo</a>.</p>
-				<p><span style="background-color:#FFFF00">Still in early development.</span></p>
-				<h1 id="new-features-">New Features!</h1>
+				<p>This package provides native bindings to node.js for parsing and modifying pdf documents with <a href="http://podofo.sourceforge.net/index.html">PoDoFo</a>.
+				NoPoDoFo is still in <mark>early development.</mark> </p>
+				<h3 id="__current-version-0-1-1__"><strong>Current Version 0.1.1</strong></h3>
+				<p><a href="http://nodei.co/npm/nopodofo"><img src="https://nodei.co/npm/nopodofo.png?downloads=true&amp;downloadRank=true" alt="NPM"></a></p>
+				<h3 id="-documentation-https-corymickelson-github-io-nopodofo-index-"><a href="https://corymickelson.github.io/NoPoDoFo/index">Documentation</a></h3>
+				<h4 id="-guides-"><strong>Guides</strong></h4>
 				<ul>
-					<li>Get / Set Form Fields</li>
-					<li>Access to Pdf data types (PdfObject, PdfArray, etc..., allows for things such as extracting images from a document <a href="https://github.com/corymickelson/nopodofo/blob/master/lib/page.spec.ts#L145-L190">example</a>)</li>
+					<li><a href="guides/getting_started.md">NoPoDoFo Installation and Setup</a></li>
+					<li><a href="guides/document.md">NoPoDoFo.Document</a></li>
+					<li><a href="guids/stream_document.md">NoPoDoFo.StreamDocument</a></li>
+					<li><a href="guides/primitives.md">NoPoDoFo.Primitives</a></li>
+					<li><a href="guides/painter.md">NoPoDoFo.Painter</a></li>
+					<li><a href="guides/page.md">NoPoDoFo.Page</a></li>
+					<li><a href="guides/object.md">NoPoDoFo.Object</a></li>
 				</ul>
-				<h2 id="in-progress-">In Progress:</h2>
-				<ul>
-					<li>Add Images</li>
-					<li>Add Digital Signature</li>
-				</ul>
-				<h3 id="installation">Installation</h3>
-				<p>Currently tested on Mac and Linux</p>
-				<p>nopodofo has been developed against the PoDoFo trunk or github master( v0.9.6 ). It is recommended that when using nopodofo you compile PoDoFo from source. Thankfully this is incredibly simple on OSX and Linux, instructions are provided on the PoDoFo source README.html.  </p>
-				<p>nopodofo requires PoDoFo built with dependencies: zlib, openssl, libpng, libtiff, libjpeg, fontconfig, and freetype2</p>
-				<p>nopodofo requires:</p>
-				<ul>
-					<li><a href="http://podofo.sourceforge.net/index.html">PoDoFo</a></li>
-					<li><a href="https://www.npmjs.com/package/cmake-js">cmake-js</a></li>
-					<li><a href="https://nodejs.org/">Node.js</a> v8.6+ (nopodofo is built with <a href="https://nodejs.org/dist/latest-v8.x/docs/api/n-api.html">N-Api</a>)</li>
-				</ul>
-				<p>For usage in AWS Lambda, PoDoFo prebuilt binaries are available <a href="https://github.com/corymickelson/Commonopodofo_PoDoFo">here</a></p>
-				<p>To install nopodofo run
-				<code>npm i -S nopodofo</code></p>
-				<h3 id="todo">ToDo</h3>
-				<ul>
-					<li>Setup documentation</li>
-					<li>Add build dependencies to project repo</li>
-					<li>Add older Node.js version (v4.x, v6.x) support</li>
-					<li>Examples</li>
-				</ul>
-				<h3 id="usage">Usage</h3>
-				<p>TypeDocs available <a href="https://corymickelson.github.io/NoPoDoFo/index">here</a></p>
 			</div>
 		</div>
 		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
@@ -133,6 +114,9 @@
 					</li>
 					<li class=" tsd-kind-external-module tsd-is-external">
 						<a href="modules/_arr_.html">"arr"</a>
+					</li>
+					<li class=" tsd-kind-external-module tsd-is-external">
+						<a href="modules/_data_.html">"data"</a>
 					</li>
 					<li class=" tsd-kind-external-module tsd-is-external">
 						<a href="modules/_dictionary_.html">"dictionary"</a>
