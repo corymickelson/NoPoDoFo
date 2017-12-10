@@ -27,7 +27,7 @@ jobs:
           - v1-dependencies-
 
       - run: npm install
-
+      - run: apk add ttf-freefont
       - save_cache:
           paths:
             - node_modules

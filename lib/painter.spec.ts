@@ -18,7 +18,7 @@ doc.on('ready', e => {
 function drawText() {
     const page = doc.getPage(0),
         painter = new Painter(page),
-        font = doc.createFont({fontName: "Cantarell"})
+        font = doc.createFont({fontName: "monospace"})
     font.size = 24
 
     let metric = font.getMetrics()
@@ -50,7 +50,7 @@ function drawText() {
 function drawLine() {
     const page = doc.getPage(0),
         painter = new Painter(page),
-        font = doc.createFont({fontName: "Cantarell"}),
+        font = doc.createFont({fontName: "monospace"}),
         metric = font.getMetrics()
     font.size = 16
     painter.font = font
