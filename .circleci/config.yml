@@ -7,7 +7,7 @@ jobs:
   build:
     docker:
       # specify the version you desire here
-      - image: corymickelson/nopodofo-apline:latest
+      - image: corymickelson/nopodofo-alpine:latest
       
       # Specify service dependencies here if necessary
       # CircleCI maintains a library of pre-built images
