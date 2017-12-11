@@ -18,3 +18,4 @@ NoPoDoFo is still in <mark>early development.</mark>
  - [NoPoDoFo.Painter](guides/painter.md)
  - [NoPoDoFo.Page](guides/page.md)
  - [NoPoDoFo.Object](guides/object.md)
+ - [NoPoDoFo.Signer](guides/signer.md)
