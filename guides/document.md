@@ -2,7 +2,7 @@
 
 The NoPoDoFo Document class is a wrapper around PoDoFo::PdfMemDocument. This is the core class for reading and manipulating pdf documents.
 This class was designed to allow easy access to the pdf object structure and should be used whenever you want to change the structure of
-the pdf document. If you are only <i>creating</i> a pdf file use the [StreamDocument](stream_document.md) class.
+the pdf document. If you are only <i>creating</i> a pdf file use the [StreamDocument](https://github.com/corymickelson/NoPoDoFo/tree/master/guides/stream_document.md) class.
 
 ### Loading a document
 
@@ -68,7 +68,7 @@ doc.on('ready', () => {
 ### Pdf body (pdf object / pdf catalog)
 
 A PDF is comprised of an array of [NoPoDoFo.Obj](obj.md), each object contains a dictionary of key/value pairs. A PDF can be modified by adding, removing, or altering the contents of a PdfObject(s), an example of this can be seen [here](https://github.com/corymickelson/nopodofo/blob/master/lib/page.spec.ts#L145-L190).
-Document `.getObjects()` will return an array of [NoPoDoFo.Obj](../docs/classes/_object_.obj.html)
+Document `.getObjects()` will return an array of [NoPoDoFo.Obj](https://corymickelson.github.io/NoPoDoFo/modules/_object_.html)
 
 ``` typescript
 let doc = new NoPoDoFo.Document('/path/to/doc.pdf')
