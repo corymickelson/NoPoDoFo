@@ -6,18 +6,20 @@
   "types": "dist/index.d.ts",
   "repository": "git+https://github.com/corymickelson/NoPoDoFo.git",
   "scripts": {
-    "compile": "cmake-js compile --std c++17 --prefer-clang",
+    "compile": "cmake-js compile --prefer-make",
     "lib-build": "tsc -p tsconfig.json",
     "docs": "typedoc --mode modules --module commonjs --target es6 --exclude **/*.spec.* --out ./docs",
-    "test": "npm run test:document && npm run test:page && npm run test:field && npm run test:object && npm run test:painter && npm run test:signer",
+    "test": "npm run test:document && npm run test:page && npm run test:field && npm run test:object && npm run test:painter && npm run test:signer && npm run test:parser",
     "test:document": "node --expose-gc ./dist/document.spec.js",
     "test:page": "node --expose-gc ./dist/page.spec.js",
     "test:field": "node --expose-gc ./dist/field.spec.js",
     "test:object": "node --expose-gc ./dist/object.spec.js",
     "test:signer": "node --expose-gc ./dist/signer.spec.js",
     "test:painter": "node --expose-gc ./dist/painter.spec.js",
+    "test:parser": "node --expose-gc ./dist/parser.spec.js",
     "build:test": "npm run compile && npm run lib-build && npm run test",
-    "precommit": "node-gyp rebuild && npm run lib-build && npm test"
+    "precommit": "node-gyp rebuild && npm run lib-build && npm test",
+    "postinstall": "npm run lib-build"
   },
   "keywords": [
     "pdf"
@@ -33,8 +35,6 @@
     "@types/node-forge": "^0.6.10",
     "@types/tape": "^4.2.31",
     "husky": "^0.14.3",
-    "node-forge": "^0.7.1",
-    "tap-spec": "^4.1.1",
     "tape": "^4.8.0",
     "typescript": "~2.5.3"
   },

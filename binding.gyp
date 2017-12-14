@@ -121,7 +121,8 @@
         "src/base/Stream.cc",
         "src/base/Vector.cc",
         "src/crypto/Signature.cc",
-        "src/base/Data.cc"
+        "src/base/Data.cc",
+        "src/base/ContentsTokenizer.cc"
       ],
       "conditions": [
         ["OS==\"win\"", {

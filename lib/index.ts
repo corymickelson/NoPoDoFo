@@ -21,6 +21,7 @@ import { Rect as rect } from './rect'
 import { Signer as sign } from './signer'
 import {Stream as stream} from './stream'
 import {Form as form} from './form'
+import {ContentsTokenizer as ct} from './parser'
 
 export const Document = doc,
     Page = page,
@@ -41,5 +42,6 @@ export const Document = doc,
     Rect = rect,
     Signature = sign,
     Stream = stream,
+    ContentsTokenizer = ct,
     CONVERSION = 0.0028346456693
 

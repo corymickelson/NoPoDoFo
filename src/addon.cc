@@ -1,4 +1,5 @@
 #include "base/Array.h"
+#include "base/ContentsTokenizer.h"
 #include "base/Data.h"
 #include "base/Dictionary.h"
 #include "base/Obj.h"
@@ -53,6 +54,7 @@ init(Napi::Env env, Napi::Object exports)
   NoPoDoFo::SignatureField::Initialize(env, exports);
   NoPoDoFo::Vector::Initialize(env, exports);
   NoPoDoFo::Data::Initialize(env, exports);
+  NoPoDoFo::ContentsTokenizer::Initialize(env, exports);
 
   exports["signature"] = Function::New(env, NPDFSignatureData);
 
