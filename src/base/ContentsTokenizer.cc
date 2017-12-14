@@ -54,7 +54,7 @@ ContentsTokenizer::ReadAll(const CallbackInfo& info)
   PdfVariant var;
   EPdfContentsType type;
   std::stack<PdfVariant> stack;
-  double posX = 0.0, posY = 0.0;
+//  double posX = 0.0, posY = 0.0;
   bool blockText = false;
   PdfFont* font = nullptr;
   Napi::Array out = Array::New(info.Env());
@@ -63,9 +63,9 @@ ContentsTokenizer::ReadAll(const CallbackInfo& info)
     if (type == ePdfContentsType_Keyword) {
       if (strcmp(token, "l") == 0 || strcmp(token, "m") == 0) {
         if (stack.size() == 2) {
-          posX = stack.top().GetReal();
+//          posX = stack.top().GetReal();
           stack.pop();
-          posY = stack.top().GetReal();
+//          posY = stack.top().GetReal();
         } else {
           stringstream msg;
           msg << "WARNING: Token '" << token << "' expects two arguments, but %"
@@ -98,9 +98,9 @@ ContentsTokenizer::ReadAll(const CallbackInfo& info)
             throw Error::New(info.Env(), "Failed to create font");
           }
         } else if (strcmp(token, "Tj") == 0 || strcmp(token, "'") == 0) {
-          if (stack.size() < 1)
+          if (stack.empty())
             continue;
-          AddText(posX, posY, font, stack.top().GetString(), out);
+          AddText(font, stack.top().GetString(), out);
           stack.pop();
         } else if (strcmp(token, "\"") == 0) {
           if (stack.size() < 3) {
@@ -109,18 +109,18 @@ ContentsTokenizer::ReadAll(const CallbackInfo& info)
             }
             continue;
           }
-          AddText(posX, posY, font, stack.top().GetString(), out);
+          AddText(font, stack.top().GetString(), out);
           stack.pop();
           stack.pop(); // remove char spacing
           stack.pop(); // remove word spacing
         } else if (strcmp(token, "TJ") == 0) {
-          if (stack.size() < 1)
+          if (stack.empty())
             continue;
           PdfArray array = stack.top().GetArray();
           stack.pop();
-          for (size_t i = 0; i < array.size(); ++i) {
-            if (array[i].IsString() || array[i].IsHexString()) {
-              AddText(posX, posY, font, array[i].GetString(), out);
+          for (auto &i : array) {
+            if (i.IsString() || i.IsHexString()) {
+              AddText(font, i.GetString(), out);
             }
           }
         }
@@ -136,9 +136,7 @@ ContentsTokenizer::ReadAll(const CallbackInfo& info)
 }
 
 void
-ContentsTokenizer::AddText(double posX,
-                           double posY,
-                           PdfFont* font,
+ContentsTokenizer::AddText( PdfFont* font,
                            const PdfString& text,
                            Napi::Array& out)
 {
@@ -149,6 +147,6 @@ ContentsTokenizer::AddText(double posX,
   PdfString unicode = font->GetEncoding()->ConvertToUnicode(text, font);
   const char* chunk = unicode.GetStringUtf8().c_str();
   out.Set(out.Length(), chunk);
-  printf("(%.3f,%.3f) %s \n", posX, posY, unicode.GetStringUtf8().c_str());
+  printf("%s \n", unicode.GetStringUtf8().c_str());
 }
 }

@@ -13,7 +13,7 @@ test('get contents as string, contents tokenizer', t => {
         const page = doc.getPage(0),
             tokenizer = new ContentsTokenizer(page)
         
-        const pageContents = tokenizer.tokens()
+        const pageContents = tokenizer.readAllContent()
         t.assert(pageContents.length === 155) // fix this
         t.end()
     })

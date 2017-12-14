@@ -18,9 +18,7 @@ private:
   PoDoFo::PdfContentsTokenizer* self;
   PoDoFo::PdfPage* page;
   PoDoFo::PdfMemDocument* doc;
-  void AddText(double,
-               double,
-               PoDoFo::PdfFont*,
+  void AddText( PoDoFo::PdfFont*,
                const PoDoFo::PdfString&,
                Napi::Array& out);
 };
