@@ -50,6 +50,9 @@ Image::Initialize(Napi::Env& env, Napi::Object& target)
                   InstanceAccessor("isLoaded", &Image::IsLoaded, nullptr),
                   InstanceMethod("setInterpolate", &Image::SetInterpolate),
                   InstanceMethod("setData", &Image::LoadFromBuffer) });
+  constructor = Napi::Persistent(ctor);
+  constructor.SuppressDestruct();
+
   target.Set("Image", ctor);
 }
 void
@@ -79,8 +82,8 @@ Image::LoadFromFile(const CallbackInfo& info)
 
 void
 Image::LoadFromBuffer(const CallbackInfo& info)
-#ifdef PODOFO_HAVE_JPEG_LIB
 {
+#ifdef PODOFO_HAVE_JPEG_LIB
   try {
     if (info.Length() < 1 || !info[0].IsBuffer()) {
       throw Napi::Error::New(

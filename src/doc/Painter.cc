@@ -82,6 +82,8 @@ Painter::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceMethod("drawMultiLineText", &Painter::DrawMultiLineText),
       InstanceMethod("drawText", &Painter::DrawText),
       InstanceMethod("drawImage", &Painter::DrawImage) });
+  constructor = Napi::Persistent(ctor);
+  constructor.SuppressDestruct();
   target.Set("Painter", ctor);
 }
 void
@@ -223,14 +225,18 @@ Painter::DrawText(const CallbackInfo& info)
 void
 Painter::DrawMultiLineText(const CallbackInfo& info)
 {
+  // For some reason windows builds break with unresolved external symbol on
+  // podofo's DrawMultiLineText method
+#ifndef WIN32
+
   AssertFunctionArgs(info,
                      6,
-                     { napi_valuetype::napi_object,
-                       napi_valuetype::napi_string,
-                       napi_valuetype::napi_number,
-                       napi_valuetype::napi_number,
-                       napi_valuetype::napi_boolean,
-                       napi_valuetype::napi_boolean });
+                     { napi_object,
+                       napi_string,
+                       napi_number,
+                       napi_number,
+                       napi_boolean,
+                       napi_boolean });
   PdfRect rect = *Rect::Unwrap(info[0].As<Object>())->GetRect();
   string text = info[1].As<String>().Utf8Value();
   EPdfAlignment alignment =
@@ -251,6 +257,8 @@ Painter::DrawMultiLineText(const CallbackInfo& info)
   } catch (PdfError& err) {
     ErrorHandler(err, info);
   }
+
+#endif
 }
 void
 Painter::DrawImage(const CallbackInfo& info)

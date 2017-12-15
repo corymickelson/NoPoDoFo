@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 git clone https://github.com/svn2github/podofo $HOME/podofo && \
 cd $HOME/podofo && \
 mkdir $HOME/podofo/build && \

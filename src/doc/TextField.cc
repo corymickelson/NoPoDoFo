@@ -30,6 +30,9 @@ TextField::Initialize(Napi::Env& env, Napi::Object& target)
     env,
     "TextField",
     { InstanceAccessor("text", &TextField::GetText, &TextField::SetText) });
+  constructor = Napi::Persistent(ctor);
+  constructor.SuppressDestruct();
+
   target.Set("TextField", ctor);
 }
 void

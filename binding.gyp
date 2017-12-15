@@ -122,7 +122,8 @@
         "src/base/Vector.cc",
         "src/crypto/Signature.cc",
         "src/base/Data.cc",
-        "src/base/ContentsTokenizer.cc"
+        "src/base/ContentsTokenizer.cc",
+        "src/doc/SimpleTable.cc"
       ],
       "conditions": [
         ["OS==\"win\"", {

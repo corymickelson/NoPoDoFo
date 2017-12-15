@@ -61,6 +61,9 @@ SignatureField::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceMethod("getObject", &SignatureField::GetSignatureObject),
       InstanceMethod("ensureSignatureObject",
                      &SignatureField::EnsureSignatureObject) });
+  constructor = Napi::Persistent(ctor);
+  constructor.SuppressDestruct();
+
   target.Set("SignatureField", ctor);
 }
 

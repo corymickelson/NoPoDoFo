@@ -27,6 +27,8 @@ public:
                   "CheckBox",
                   { InstanceAccessor(
                     "checked", &CheckBox::IsChecked, &CheckBox::SetChecked) });
+    constructor = Napi::Persistent(ctor);
+    constructor.SuppressDestruct();
 
     target.Set("CheckBox", ctor);
   }

@@ -49,6 +49,9 @@ Dictionary::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceMethod("write", &Dictionary::Write),
       InstanceMethod("writeSync", &Dictionary::WriteSync),
       InstanceMethod("toObject", &Dictionary::ToObject) });
+  constructor = Napi::Persistent(ctor);
+  constructor.SuppressDestruct();
+
   target.Set("Dictionary", ctor);
 }
 void

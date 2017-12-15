@@ -29,6 +29,9 @@ ListField::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceMethod("insertItem", &ListField::InsertItem),
       InstanceMethod("removeItem", &ListField::RemoveItem),
       InstanceMethod("getItem", &ListField::GetItem) });
+  constructor = Napi::Persistent(ctor);
+  constructor.SuppressDestruct();
+
   target.Set("ListField", ctor);
 }
 
