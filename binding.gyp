@@ -243,7 +243,7 @@
         'conditions': [
           ['OS == "linux" or OS == "freebsd" or OS == "openbsd"', {
             'cflags_cc+': [
-              '-std=c++17',
+              '-std=c++14',
               '-Wno-missing-field-initializers'
             ]
           }]
