@@ -34,4 +34,9 @@ jobs:
           key: v1-dependencies-{{ checksum "package.json" }}
         
       # run tests!
-      - run: npm run lib-build && npm test
+      - run: npm i -g node-gyp
+      - run: node-gyp clean
+      - run: node-gyp configure
+      - run: node-gyp build
+      - run: npm run lib-build
+      - run: npm test
