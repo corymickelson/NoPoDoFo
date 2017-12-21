@@ -1,11 +1,11 @@
-import { __mod, Document } from './document'
-import { IPage } from './page'
-import { Obj } from "./object";
-import { Annotation } from "./annotation";
-import { Rect } from "./rect";
-import { Form } from "./form";
-import { Data } from './data';
-import { Signer } from './signer';
+import {__mod, Document} from './document'
+import {IPage} from './page'
+import {Obj} from "./object";
+import {Annotation} from "./annotation";
+import {Rect} from "./rect";
+import {Form} from "./form";
+import {Data} from './data';
+import {Signer} from './signer';
 
 
 export interface IFieldInfo {
@@ -22,17 +22,17 @@ export interface IFieldInfo {
     selected?: string
 }
 
-export type FieldType = 'TextField' | 'CheckBox' | 'RadioButton' | 'PushButton' | 'Signature' | 'ListField'
+export type FieldType = 'TextField' | 'CheckBox' | 'RadioButton' | 'PushButton' | 'Signature' | 'ListField' | 'ComboBox'
+
 export class Field {
     private _instance: any
+
     constructor(page: IPage, fieldIndex: number) {
         this._instance = new __mod.Field((page as any)._instance, fieldIndex)
     }
 
     getType(): FieldType {
-        const type = this._instance.getType()
-        return type === 'ComboBox' || type === 'ListBox' ? // Combobox and Listbox both implement ListField
-            'ListField' : type
+        return this._instance.getType()
     }
 
     getFieldName(): string {
@@ -66,15 +66,18 @@ export class Field {
 
 export class TextField {
     _instance: any
+
     constructor(field: Field) {
         if (field.getType() !== 'TextField') {
             throw Error('field parameter must be a field of type TextField')
         }
         this._instance = new __mod.TextField((field as any)._instance)
     }
+
     get text(): string {
         return this._instance.text
     }
+
     set text(value: string) {
         this._instance.text = value
     }
@@ -82,12 +85,15 @@ export class TextField {
 
 export class CheckBox {
     _instance: any
+
     get checked() {
         return this._instance.checked
     }
+
     set checked(value: boolean) {
         this._instance.checked = value
     }
+
     constructor(field: Field) {
         if (field.getType() !== 'CheckBox') {
             throw Error('must be of type CheckBox')
@@ -100,22 +106,25 @@ export type IListItem = {
     value: string,
     display: string
 }
-export class ListField {
+
+export class EnumerableField {
     private _instance: any
+
     get selected(): number {
         return this._instance.selected
     }
+
     set selected(index: number) {
         this._instance.selected = index
     }
+
     get length() {
         return this._instance.length
     }
+
     constructor(field: Field) {
-        if (field.getType() !== 'ListField') {
-            throw Error('must be of type ListField')
-        }
-        this._instance = new __mod.ListBox((field as any)._instance)
+        field.getType() === 'ListField' ? this._instance = new __mod.ListField((field as any)._instance) :
+            this._instance = new __mod.ComboBox((field as any)._instance)
     }
 
     getItem(index: number): IListItem {
@@ -125,13 +134,27 @@ export class ListField {
     setItem(item: IListItem): void {
         this._instance.insertItem(item.value, item.display)
     }
+
     removeItem(index: number): void {
         this._instance.removeItem(index)
     }
 }
 
+export class ListField extends EnumerableField {
+    constructor(field:Field) {
+        super(field)
+    }
+}
+
+export class ComboBox extends EnumerableField {
+    constructor(field:Field) {
+        super(field)
+    }
+}
+
 export class SignatureField {
     private _instance: any
+
     constructor(annot: Annotation | any, form?: Form, doc?: Document) {
         if (form instanceof Form && doc instanceof Document) {
             this._instance = new __mod.SignatureField((annot as any)._instance, (form as any)._instance, (doc as any)._instance)
@@ -160,6 +183,7 @@ export class SignatureField {
     setFieldName(n: string): void {
         this._instance.setFieldName(n)
     }
+
     getObject(): Obj {
         const instance = this._instance.getObject()
         return new Obj(instance)

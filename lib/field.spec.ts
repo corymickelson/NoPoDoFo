@@ -1,9 +1,10 @@
 import {join} from 'path'
 import * as test from 'tape'
 import {Document} from './document'
-import {CheckBox, Field, TextField} from './field'
+import {CheckBox, ComboBox, Field, ListField, TextField} from './field'
 
-const filePath = join(__dirname, '../test-documents/test.pdf'),
+//const filePath = join(__dirname, '../test-documents/test.pdf'),
+    const filePath = join(__dirname, '../test-documents/iss.16.checkbox-field-state-options.pdf'),
     outFile = './test.out.pdf'
 
 test('create field instance from existing pdf field', t => {
@@ -49,6 +50,47 @@ test('Can instantiate a Checkbox given a field of type CheckBox', t => {
         t.assert(checkbox.checked === false)
         t.end()
     })
-
 })
 
+test.skip('Can instantiate a ListBox from a ListField from a field of type ListField', t => {
+     const doc = new Document(filePath)
+    doc.on('ready', () => {
+        const page = doc.getPage(0)
+        const fields = page.getFieldsInfo()
+        let index = -1
+        for (let i = 0; i < fields.length; i++) {
+            let type = fields[i].type
+            if (type === 'ListField') {
+                index = i
+                break
+            }
+        }
+        const field = new Field(page, index)
+        t.assert(field.getType() === 'ListField')
+        const list= new ListField(field)
+        t.ok(list)
+        t.assert(list.selected === -1)
+        t.end()
+    })
+})
+test.only('Can instantiate a ListBox from a ComboBox from a field of type ComboBox', t => {
+        const doc = new Document(filePath)
+    doc.on('ready', () => {
+        const page = doc.getPage(0)
+        const fields = page.getFieldsInfo()
+        let index = -1
+        for (let i = 0; i < fields.length; i++) {
+            let type = fields[i].type
+            if (type === 'ComboBox') {
+                index = i
+                break
+            }
+        }
+        const field = new Field(page, index)
+        t.assert(field.getType() === 'ComboBox')
+        const combo = new ComboBox(field)
+        t.ok(combo)
+        t.assert(combo.selected=== -1)
+        t.end()
+    })
+})

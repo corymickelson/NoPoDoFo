@@ -48,7 +48,9 @@ public:
 private:
   PoDoFo::PdfPage* page;
   PoDoFo::PdfMemDocument* parent;
-  void GetFieldObject(Napi::Object&, PoDoFo::PdfField&);
+  void GetFieldObject(const Napi::CallbackInfo& info,
+                      Napi::Object&,
+                      PoDoFo::PdfField&);
   Napi::Object ExtractAndApplyRectValues(const Napi::CallbackInfo&,
                                          PoDoFo::PdfRect&);
 };
