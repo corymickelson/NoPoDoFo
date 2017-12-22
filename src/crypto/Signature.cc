@@ -133,8 +133,6 @@ NPDFSignatureData(const Napi::CallbackInfo& info)
   Napi::Value data;
   if (outLen > 0 && outBuffer) {
     data = String::New(info.Env(), outBuffer);
-    // data = Buffer<char>::Copy(info.Env(), outBuffer,
-    // static_cast<size_t>(outLen));
     PKCS7_free(p7);
     BIO_free(out);
     BIO_free(mem);
