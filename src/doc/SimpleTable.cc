@@ -21,8 +21,8 @@ SimpleTable::SimpleTable(const CallbackInfo& info)
 {
   AssertFunctionArgs(info, 3, { napi_object, napi_number, napi_number });
   doc = Document::Unwrap(info[0].As<Object>());
-  int cols = info[1].As<Number>();
-  int rows = info[2].As<Number>();
+  const int cols = info[1].As<Number>();
+  const int rows = info[2].As<Number>();
   model = new PdfSimpleTableModel(cols, rows);
   table = new PdfTable(cols, rows);
 }
@@ -41,27 +41,28 @@ void
 SimpleTable::Initialize(Napi::Env& env, Napi::Object& target)
 {
   HandleScope scope(env);
-  Function ctor = DefineClass(
+  const auto ctor = DefineClass(
     env,
     "SimpleTable",
-    { InstanceAccessor("font", &SimpleTable::GetFont, &SimpleTable::SetFont),
-      InstanceAccessor("text", &SimpleTable::GetText, &SimpleTable::SetText),
+    { InstanceAccessor("font", nullptr, &SimpleTable::SetFont),
+      InstanceAccessor("text", nullptr, &SimpleTable::SetText),
       InstanceAccessor("borderWidth",
                        &SimpleTable::GetBorderWidth,
                        &SimpleTable::SetBorderWidth),
-      InstanceAccessor("foregroundColor",
-                       &SimpleTable::GetForegroundColor,
-                       &SimpleTable::SetForegroundColor),
-      InstanceAccessor("backgroundColor",
-                       &SimpleTable::GetBackgroundColor,
-                       &SimpleTable::SetBackgroundColor),
       InstanceAccessor(
-        "alignment", &SimpleTable::GetAlignment, &SimpleTable::SetAlignment),
+        "foregroundColor", nullptr, &SimpleTable::SetForegroundColor),
       InstanceAccessor(
-        "verticalAlignment", &SimpleTable::GetVerticalAlignment, nullptr),
-      InstanceAccessor("wordWrap",
-                       &SimpleTable::HasWordWrap,
-                       &SimpleTable::SetWordWrapEnabled),
+        "backgroundColor", nullptr, &SimpleTable::SetBackgroundColor),
+      InstanceAccessor("alignment", nullptr, &SimpleTable::SetAlignment),
+      InstanceAccessor("wordWrap", nullptr, &SimpleTable::SetWordWrapEnabled),
+      InstanceMethod("getFont", &SimpleTable::GetFont),
+      InstanceMethod("getText", &SimpleTable::GetText),
+      InstanceMethod("getForegroundColor", &SimpleTable::GetForegroundColor),
+      InstanceMethod("getBackgroundColor", &SimpleTable::GetBackgroundColor),
+      InstanceMethod("getAlignment", &SimpleTable::GetAlignment),
+      InstanceMethod("getVerticalAlignment",
+                     &SimpleTable::GetVerticalAlignment),
+      InstanceMethod("getWordWrap", &SimpleTable::HasWordWrap),
       InstanceMethod("borderEnable", &SimpleTable::SetBorderEnabled),
       InstanceMethod("hasBorders", &SimpleTable::HasBorders),
       InstanceMethod("getImage", &SimpleTable::GetImage),
@@ -69,14 +70,14 @@ SimpleTable::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceMethod("hasBackgroundColor", &SimpleTable::HasBackgroundColor),
       InstanceMethod("enableBackground", &SimpleTable::SetBackgroundEnabled),
       InstanceMethod("getBorderColor", &SimpleTable::GetBorderColor),
-      InstanceAccessor(
-        "tableWidth", &SimpleTable::GetWidth, &SimpleTable::SetTableWidth),
-      InstanceAccessor(
-        "tableHeight", &SimpleTable::GetHeight, &SimpleTable::SetTableHeight),
+      InstanceAccessor("tableWidth", nullptr, &SimpleTable::SetTableWidth),
+      InstanceAccessor("tableHeight", nullptr, &SimpleTable::SetTableHeight),
       InstanceAccessor("autoPageBreak",
                        &SimpleTable::GetAutoPageBreak,
                        &SimpleTable::SetAutoPageBreak),
       InstanceMethod("draw", &SimpleTable::Draw),
+      InstanceMethod("getTableWidth", &SimpleTable::GetWidth),
+      InstanceMethod("getTableHeight", &SimpleTable::GetHeight),
       InstanceMethod("columnCount", &SimpleTable::GetCols),
       InstanceMethod("rowCount", &SimpleTable::GetRows),
       InstanceMethod("setColumnWidths", &SimpleTable::SetColumnWidths),
@@ -92,8 +93,8 @@ Value
 SimpleTable::GetFont(const CallbackInfo& info)
 {
   AssertFunctionArgs(info, 2, { napi_number, napi_number });
-  int col = info[0].As<Number>();
-  int row = info[1].As<Number>();
+  const int col = info[0].As<Number>();
+  const int row = info[1].As<Number>();
   return Font::constructor.New({ External<PdfFont>::New(
     info.Env(), model->GetFont(col, row), [](Napi::Env env, PdfFont* font) {
       HandleScope scope(env);
@@ -108,7 +109,7 @@ SimpleTable::SetFont(const CallbackInfo& info, const Napi::Value& value)
       !value.As<Object>().InstanceOf(Font::constructor.Value())) {
     throw Error::New(info.Env(), "value must be an instance of NoPoDoFo Font");
   }
-  PdfFont* pFont = Font::Unwrap(value.As<Object>())->GetPoDoFoFont();
+  const auto pFont = Font::Unwrap(value.As<Object>())->GetPoDoFoFont();
   model->SetFont(pFont);
 }
 
@@ -116,18 +117,18 @@ Value
 SimpleTable::GetText(const CallbackInfo& info)
 {
   AssertFunctionArgs(info, 2, { napi_number, napi_number });
-  int col = info[0].As<Number>();
-  int row = info[1].As<Number>();
+  const int col = info[0].As<Number>();
+  const int row = info[1].As<Number>();
   return String::New(info.Env(), model->GetText(col, row).GetStringUtf8());
 }
 
 void
 SimpleTable::SetText(const CallbackInfo& info, const Napi::Value& value)
 {
-  int col = value.As<Object>().Get("col").As<Number>();
-  int row = value.As<Object>().Get("row").As<Number>();
-  string text = value.As<Object>().Get("text").As<String>().Utf8Value();
-  model->SetText(col, row, PdfString(text));
+  const int col = value.As<Object>().Get("col").As<Number>();
+  const int row = value.As<Object>().Get("row").As<Number>();
+  const auto text = value.As<Object>().Get("text").As<String>().Utf8Value();
+  model->SetText(col, row, text);
 }
 
 Value
@@ -146,10 +147,10 @@ Value
 SimpleTable::GetBorderColor(const CallbackInfo& info)
 {
   AssertFunctionArgs(info, 2, { napi_number, napi_number });
-  int col = info[0].As<Number>();
-  int row = info[1].As<Number>();
-  PdfColor color = model->GetBorderColor(col, row);
-  PdfArray colorValues = color.ToArray();
+  const int col = info[0].As<Number>();
+  const int row = info[1].As<Number>();
+  auto color = model->GetBorderColor(col, row);
+  auto colorValues = color.ToArray();
   auto js = Array::New(info.Env());
   GetColor(color, js);
   return js;
@@ -171,31 +172,31 @@ Value
 SimpleTable::GetImage(const CallbackInfo& info)
 {
   AssertFunctionArgs(info, 2, { napi_number, napi_number });
-  int col = info[0].As<Number>();
-  int row = info[1].As<Number>();
+  const int col = info[0].As<Number>();
+  const int row = info[1].As<Number>();
   auto image = model->GetImage(col, row);
   auto* pStream = dynamic_cast<PdfMemStream*>(image->GetObject()->GetStream());
-  auto stream = pStream->Get();
-  auto length = pStream->GetLength();
-  auto value =
+  const auto stream = pStream->Get();
+  const auto length = pStream->GetLength();
+  const auto value =
     Buffer<char>::Copy(info.Env(), stream, static_cast<size_t>(length));
-  return value;
+  return static_cast<Napi::Value>(value);
 }
 Value
 SimpleTable::HasImage(const CallbackInfo& info)
 {
   AssertFunctionArgs(info, 2, { napi_number, napi_number });
-  int col = info[0].As<Number>();
-  int row = info[1].As<Number>();
+  const int col = info[0].As<Number>();
+  const int row = info[1].As<Number>();
   return Boolean::New(info.Env(), model->HasImage(col, row));
 }
 Value
 SimpleTable::GetForegroundColor(const CallbackInfo& info)
 {
   AssertFunctionArgs(info, 2, { napi_number, napi_number });
-  int col = info[0].As<Number>();
-  int row = info[1].As<Number>();
-  PdfColor color = model->GetForegroundColor(col, row);
+  const int col = info[0].As<Number>();
+  const int row = info[1].As<Number>();
+  auto color = model->GetForegroundColor(col, row);
   auto js = Array::New(info.Env());
   GetColor(color, js);
   return js;
@@ -217,9 +218,9 @@ Value
 SimpleTable::GetBackgroundColor(const CallbackInfo& info)
 {
   AssertFunctionArgs(info, 2, { napi_number, napi_number });
-  int col = info[0].As<Number>();
-  int row = info[1].As<Number>();
-  PdfArray color = model->GetForegroundColor(col, row).ToArray();
+  const int col = info[0].As<Number>();
+  const int row = info[1].As<Number>();
+  auto color = model->GetForegroundColor(col, row).ToArray();
   auto js = Array::New(info.Env());
   uint32_t n = 1;
   for (auto& i : color) {
@@ -234,7 +235,7 @@ SimpleTable::SetBackgroundColor(const CallbackInfo& info,
                                 const Napi::Value& value)
 {
   try {
-    Array a = value.As<Array>();
+    auto a = value.As<Array>();
     backgroundColor = SetColor(a);
     model->SetBackgroundColor(*backgroundColor);
   } catch (PdfError& err) {
@@ -246,8 +247,8 @@ Value
 SimpleTable::HasBackgroundColor(const CallbackInfo& info)
 {
   AssertFunctionArgs(info, 2, { napi_number, napi_number });
-  int col = info[0].As<Number>();
-  int row = info[1].As<Number>();
+  const int col = info[0].As<Number>();
+  const int row = info[1].As<Number>();
   return Boolean::New(info.Env(), model->HasBackgroundColor(col, row));
 }
 
@@ -261,9 +262,9 @@ Value
 SimpleTable::GetAlignment(const CallbackInfo& info)
 {
   AssertFunctionArgs(info, 2, { napi_number, napi_number });
-  int col = info[0].As<Number>();
-  int row = info[1].As<Number>();
-  auto alignment = model->GetAlignment(col, row);
+  const int col = info[0].As<Number>();
+  const int row = info[1].As<Number>();
+  const int alignment = model->GetAlignment(col, row);
   string alignmentResponse;
   switch (alignment) {
     case 0:
@@ -274,6 +275,8 @@ SimpleTable::GetAlignment(const CallbackInfo& info)
       break;
     case 2:
       alignmentResponse = "RIGHT";
+      break;
+    default:
       break;
   }
   return String::New(info.Env(), alignmentResponse);
@@ -292,7 +295,7 @@ SimpleTable::SetAlignment(const CallbackInfo& info, const Napi::Value& value)
     i = 2;
   else {
     throw Error::New(info.Env(),
-                     "value must be one of [\"LEFT\", \"CENTER\", \"RIGHT\"]");
+                     R"(value must be one of ["LEFT", "CENTER", "RIGHT"])");
   }
   model->SetAlignment(static_cast<EPdfAlignment>(i));
 }
@@ -301,8 +304,8 @@ Value
 SimpleTable::GetVerticalAlignment(const CallbackInfo& info)
 {
   AssertFunctionArgs(info, 2, { napi_number, napi_number });
-  int col = info[0].As<Number>();
-  int row = info[1].As<Number>();
+  const int col = info[0].As<Number>();
+  const int row = info[1].As<Number>();
   string i;
   switch (static_cast<int>(model->GetVerticalAlignment(col, row))) {
     case 0:
@@ -314,6 +317,8 @@ SimpleTable::GetVerticalAlignment(const CallbackInfo& info)
     case 2:
       i = "BOTTOM";
       break;
+    default:
+      throw Error::New(info.Env(), "Unknown identifier");
   }
   return String::New(info.Env(), i);
 }
@@ -322,8 +327,8 @@ Value
 SimpleTable::HasWordWrap(const CallbackInfo& info)
 {
   AssertFunctionArgs(info, 2, { napi_number, napi_number });
-  int col = info[0].As<Number>();
-  int row = info[1].As<Number>();
+  const int col = info[0].As<Number>();
+  const int row = info[1].As<Number>();
   return Boolean::New(info.Env(), model->HasWordWrap(col, row));
 }
 
@@ -337,11 +342,13 @@ SimpleTable::SetWordWrapEnabled(const CallbackInfo& info,
 void
 SimpleTable::Draw(const CallbackInfo& info)
 {
-  AssertFunctionArgs(info, 3, { napi_number, napi_number, napi_object });
-  double posX = info[0].As<Number>();
-  double posY = info[1].As<Number>();
-  Painter* painter = Painter::Unwrap(info[2].As<Object>());
+  AssertFunctionArgs(info, 2, { napi_object, napi_object });
+  const Object point = info[0].As<Object>();
+  const double posX = point.Get("x").As<Number>();
+  const double posY = point.Get("y").As<Number>();
+  auto painter = Painter::Unwrap(info[1].As<Object>());
   if (!table->GetModel()) {
+    cout << model->GetText(0, 0).GetStringUtf8() << endl;
     table->SetModel(model);
   }
   table->Draw(posX, posY, painter->GetPainter());
@@ -351,10 +358,10 @@ Value
 SimpleTable::GetWidth(const CallbackInfo& info)
 {
   AssertFunctionArgs(info, 3, { napi_number, napi_number, napi_object });
-  double posX = info[0].As<Number>();
-  double posY = info[1].As<Number>();
-  Page* page = Page::Unwrap(info[2].As<Object>());
-  double w = table->GetWidth(posX, posY, page->GetPage());
+  const double posX = info[0].As<Number>();
+  const double posY = info[1].As<Number>();
+  auto page = Page::Unwrap(info[2].As<Object>());
+  const auto w = table->GetWidth(posX, posY, page->GetPage());
   return Number::New(info.Env(), w);
 }
 
@@ -368,10 +375,10 @@ Value
 SimpleTable::GetHeight(const CallbackInfo& info)
 {
   AssertFunctionArgs(info, 3, { napi_number, napi_number, napi_object });
-  double posX = info[0].As<Number>();
-  double posY = info[1].As<Number>();
-  Page* page = Page::Unwrap(info[2].As<Object>());
-  double w = table->GetHeight(posX, posY, page->GetPage());
+  const double posX = info[0].As<Number>();
+  const double posY = info[1].As<Number>();
+  auto page = Page::Unwrap(info[2].As<Object>());
+  const auto w = table->GetHeight(posX, posY, page->GetPage());
   return Number::New(info.Env(), w);
 }
 
@@ -396,10 +403,11 @@ SimpleTable::GetRows(const CallbackInfo& info)
 void
 SimpleTable::SetColumnWidths(const CallbackInfo& info)
 {
-  double ws[info[0].As<Array>().Length()];
-  auto array = info[0].As<Array>();
+  const auto widths = info[0].As<Array>();
+  const auto ws = static_cast<double*>(calloc(sizeof(double), widths.Length()));
+  const auto array = info[0].As<Array>();
   for (uint32_t i = 0; i < array.Length(); i++) {
-    double index = array.Get(i).As<Number>();
+    const double index = array.Get(i).As<Number>();
     ws[i] = index;
   }
   table->SetColumnWidths(ws);
@@ -414,13 +422,15 @@ SimpleTable::SetColumnWidth(const CallbackInfo& info)
 void
 SimpleTable::SetRowHeights(const CallbackInfo& info)
 {
-  double ws[info[0].As<Array>().Length()];
+  auto heights = info[0].As<Array>();
+  const auto pdHeights =
+    static_cast<double*>(calloc(sizeof(double), heights.Length()));
   auto array = info[0].As<Array>();
   for (uint32_t i = 0; i < array.Length(); i++) {
-    double index = array.Get(i).As<Number>();
-    ws[i] = index;
+    const double index = array.Get(i).As<Number>();
+    pdHeights[i] = index;
   }
-  table->SetRowHeights(ws);
+  table->SetRowHeights(pdHeights);
 }
 
 void
@@ -433,7 +443,7 @@ void
 SimpleTable::SetAutoPageBreak(const CallbackInfo& info,
                               const Napi::Value& value)
 {
-  void* d = static_cast<void*>(doc->GetDocument());
+  auto* d = static_cast<void*>(doc->GetDocument());
   table->SetAutoPageBreak(
     value.As<Boolean>(),
     [](PdfRect& rect, void* data) -> PdfPage* {
@@ -455,24 +465,20 @@ SimpleTable::SetColor(Array& js)
   try {
     uint32_t i = 0;
     if (js.Length() == 3) {
-      // rgb color
-      double r, g, b;
-      r = js.Get(i).As<Number>();
-      g = js.Get(++i).As<Number>();
-      b = js.Get(++i).As<Number>();
+      const double r = js.Get(i).As<Number>();
+      const double g = js.Get(++i).As<Number>();
+      const double b = js.Get(++i).As<Number>();
       color = new PdfColor(r, g, b);
     } else if (js.Length() == 4) {
-      double c, m, y, k;
       // cmyk color
-      c = js.Get(i).As<Number>();
-      m = js.Get(++i).As<Number>();
-      y = js.Get(++i).As<Number>();
-      k = js.Get(++i).As<Number>();
+      const double c = js.Get(i).As<Number>();
+      const double m = js.Get(++i).As<Number>();
+      const double y = js.Get(++i).As<Number>();
+      const double k = js.Get(++i).As<Number>();
       color = new PdfColor(c, m, y, k);
     } else if (js.Length() == 1) {
-      double gs;
       // gray scale
-      gs = js.Get(i).As<Number>();
+      const double gs = js.Get(i).As<Number>();
       color = new PdfColor(gs);
     }
   } catch (PdfError& err) {
@@ -483,7 +489,7 @@ SimpleTable::SetColor(Array& js)
 void
 SimpleTable::GetColor(PdfColor& color, Array& js)
 {
-  uint32_t n = 1;
+  uint32_t n = 0;
   for (auto& i : color.ToArray()) {
     js.Set(n, i.GetNumber());
     ++n;

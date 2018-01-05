@@ -10,6 +10,8 @@ import { Signer, signature } from "./signer";
 import { Data } from './data';
 
 
+const start:Date = new Date()
+const hrstart = process.hrtime()
 const doc = new Document(join(__dirname, '../test-documents/test.pdf'), true)
 doc.on('ready', async e => {
     if (e instanceof Error) throw e
@@ -43,6 +45,10 @@ doc.on('ready', async e => {
         signer.setField(field)
         let signedPath = "/tmp/signed.pdf"
         signer.signSync(signatureData, signedPath)
+        const end = (new Date() as any) - (start as any),
+            hrend = process.hrtime(hrstart)
+        console.info(`Execution time: %dms`, end)
+        console.info(`Execution time (hr): %ds %dms`, hrend[0], hrend[1]/1000000)
         test('happy path digital signature', t => {
             let signed = new Document(signedPath)
             signed.on('ready', e => {

@@ -8,6 +8,8 @@ import {NPDFPoint} from "./painter";
 
 export type NPDFcmyk = [number, number, number, number]
 export type NPDFrgb = [number, number, number]
+export type NPDFGrayScale = number
+export type NPDFColor = NPDFrgb | NPDFcmyk | NPDFGrayScale
 export type NPDFPoint = {x:number, y:number}
 
 export enum NPDFStokeStyle {

@@ -243,7 +243,8 @@ public:
     : Napi::AsyncWorker(cb)
     , dict(dict)
     , arg(std::move(dest))
-  {}
+  {
+  }
 
 protected:
   void Execute() override

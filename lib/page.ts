@@ -108,12 +108,12 @@ export class Page implements IPage {
     }
     getFields(): Array<Field> {
         const fields = []
-        let count = this.getNumFields(),
-            i = 0;
+        const count = this.getNumFields();
+        let i = 0;
         for (; i < count; i++) {
-            fields[i] = new Field(this, i)
+            fields[i] = ((new Field(this, i)) as any)
         }
-        return fields
+        return fields as Array<Field>
     }
     createAnnotation(type: NPDFAnnotation, rect: Rect):Annotation {
         const instance = this._instance.createAnnotation((type as number), (rect as any)._instance)
@@ -129,10 +129,10 @@ export class Page implements IPage {
 
     getAnnotations(): Array<Annotation> {
         const count = this.getNumAnnots()
-        const output = []
+        const output: Array<Annotation> = []
         for (let i = 0; i < count; i++) {
             try {
-                let item = this.getAnnotation(i)
+                const item = this.getAnnotation(i);
                 output.push(item)
             } catch (e) {
                 throw e

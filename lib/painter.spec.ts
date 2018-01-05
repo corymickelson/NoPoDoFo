@@ -1,51 +1,46 @@
 import { Painter } from './painter'
 import * as test from 'tape'
 import { join } from 'path';
-import { Document } from './document';
+import { Document, FontEncoding } from './document';
 import { CONVERSION } from "./index";
 import { existsSync, unlinkSync } from "fs";
 import { Rect } from "./rect";
+import { Cell, Table } from "./table";
 
 
 const filePath = join(__dirname, '../test-documents/test.pdf'),
-    outFile = './test.out.pdf',
+    outFile = '/tmp/painter.out.pdf',
     doc = new Document(filePath)
 
 doc.on('ready', e => {
-    runAll()
-})
-
-function drawText() {
-    const page = doc.getPage(0),
-        painter = new Painter(page),
-        font = doc.createFont({ fontName: "monospace" })
-    font.size = 24
-
-    let metric = font.getMetrics()
-    test('font size persists', t => {
-        t.assert(metric.fontSize === 24, 'font size persists')
-        t.end()
-    })
-
-    painter.setColor([0.0, 0.0, 0.0])
-    painter.font = font
-
-
     test('draw text', t => {
-        let x, y
-        x = CONVERSION * 10000
-        y = page.height - 10000 * CONVERSION
-        y -= metric.lineSpacing
+        const page = doc.getPage(0),
+            painter = new Painter(page),
+            font = doc.createFont({ fontName: "monospace", encoding: FontEncoding.Identity })
+        font.size = 24
+        const metric = font.getMetrics()
 
-        painter.drawText({ x, y }, "Test")
-        painter.finishPage()
-        doc.write((e, d) => {
-            if (e) t.fail(e.message)
-            else t.pass('need to add text extract to check, but if it did not throw that will have to work for now :)')
-            t.end()
-        }, outFile)
+        t.test('font size persists', fontSizeTest => {
+            fontSizeTest.assert(metric.fontSize === 24, 'font size persists')
+            fontSizeTest.end()
+        })
+        t.test('single line text test', singleLineTextTest => {
+            let x, y
+            x = CONVERSION * 10000
+            y = page.height - 10000 * CONVERSION
+            y -= metric.lineSpacing
+
+            painter.drawText({ x, y }, "Test")
+            painter.finishPage()
+            doc.write((e, d) => {
+                if (e) singleLineTextTest.fail(e.message)
+                else singleLineTextTest.pass('need to add text extract to check, but if it did not throw that will have to work for now :)')
+                singleLineTextTest.end()
+            }, outFile)
+        })
     })
-}
+
+})
 
 function drawLine() {
     const page = doc.getPage(0),
@@ -114,11 +109,44 @@ function drawMultiLine() {
     painter.finishPage()
     test('write lines should not throw', t => {
         doc.write((e, d) => {
-            if (e) t.fail(e.message)
+            if (e instanceof Error) t.fail(e.message)
             else t.pass('How to test if a line exists on a pdf???')
             t.end()
         }, outFile)
     })
+}
+
+function drawSimpleTable() {
+    const page = doc.getPage(0),
+        painter = new Painter(page),
+        font = doc.createFont({ fontName: "monospace", encoding: FontEncoding.Identity }),
+        table = new Table(doc, 5, 5)
+    painter.setColor([0.0, 0.0, 0.0])
+    font.size = 16
+    painter.font = font
+    table.font = font
+    table.foregroundColor = [0.0, 0.0, 0.0]
+    // table.enableBackground(true)
+    for (let c = 0; c < 5; c++) {
+        for (let r = 0; r < 5; r++) {
+            const cell = new Cell(table, c, r)
+            // cell.text = `Column ${c}, row ${r}`
+            cell.text = 'A'
+        }
+    }
+    table.tableWidth = 200
+    table.tableHeight = 200
+    table.draw({ x: 300, y: 300 }, painter)
+    // table.enableBackground(true)
+    painter.finishPage()
+    test('test table painter', t => {
+        doc.write((e, d) => {
+            if (e instanceof Error) t.fail(e.message)
+            t.pass()
+            t.end()
+        }, '/tmp/table.pdf')
+    })
+
 }
 
 function runTest(test: Function) {
@@ -128,8 +156,4 @@ function runTest(test: Function) {
         if (existsSync(outFile))
             unlinkSync(outFile)
     })
-}
-
-export function runAll() {
-    [drawText, drawLine].map(i => runTest(i))
 }
