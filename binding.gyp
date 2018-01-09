@@ -80,7 +80,7 @@
     },
     {
       "target_name": "npdf",
-      'include_dirs': ["<!@(node -p \"require('node-addon-api').include\")"],
+      'include_dirs': ["<!@(node -p \"require('node-addon-api').include\")", "include/"],
       'dependencies': ["<!(node -p \"require('node-addon-api').gyp\")"],
       "defines": ["USING_SHARED_PODOFO=1"],
       'cflags!': [ '-fno-exceptions' ],
@@ -122,7 +122,8 @@
         "src/base/Vector.cc",
         "src/crypto/Signature.cc",
         "src/base/Data.cc",
-        "src/base/ContentsTokenizer.cc"
+        "src/base/ContentsTokenizer.cc",
+        "src/doc/SimpleTable.cc"
       ],
       "conditions": [
         ["OS==\"win\"", {

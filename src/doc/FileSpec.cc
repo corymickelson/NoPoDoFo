@@ -18,6 +18,9 @@ FileSpec::Initialize(Napi::Env& env, Napi::Object& target)
 {
   HandleScope scope(env);
   Function ctor = DefineClass(env, "FileSpec", {});
+  constructor = Napi::Persistent(ctor);
+  constructor.SuppressDestruct();
+
   target.Set("FileSpec", ctor);
 }
 FileSpec::FileSpec(const CallbackInfo& info)

@@ -111,7 +111,10 @@ find_library(PODOFO_LIBRARY NAMES podofo PATHS /usr/lib64 /usr/lib /usr/local/li
  - `npm run compile`
 
 
- ## Check Installation
+## Compile for JS
+NoPoDoFo's interface is written in [Typescript](https://www.typescriptlang.org/). For typescript projects, you should import the class directly from the lib 
+directory. For JS projects you can run `npm run lib-build` and `require('nopodofo')`
+## Check Installation
 
  It's a good idea to check that NoPoDoFo has been built and linked properly. Running this check will also inform you to whether or not any features available in NoPoDoFo are not available due to PoDoFo not being compiled with all optional dependencies.
 

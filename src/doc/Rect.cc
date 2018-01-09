@@ -21,7 +21,7 @@ Rect::Rect(const CallbackInfo& info)
                        "Rect requires Page as constructor parameter");
     }
     auto pageObj = info[0].As<Object>();
-    if(!pageObj.InstanceOf(Page::constructor.Value())) {
+    if (!pageObj.InstanceOf(Page::constructor.Value())) {
       throw Error::New(info.Env(),
                        "Rect requires Page as constructor parameter");
     }
@@ -66,6 +66,9 @@ Rect::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceMethod("intersect", &Rect::Intersect)
 
     });
+  constructor = Napi::Persistent(ctor);
+  constructor.SuppressDestruct();
+
   target.Set("Rect", ctor);
 }
 void

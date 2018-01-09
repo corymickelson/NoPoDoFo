@@ -24,6 +24,7 @@
 #include "doc/SignatureField.h"
 #include "doc/Signer.h"
 #include "doc/TextField.h"
+#include "doc/SimpleTable.h"
 #include <napi.h>
 
 Napi::Object
@@ -55,6 +56,7 @@ init(Napi::Env env, Napi::Object exports)
   NoPoDoFo::Vector::Initialize(env, exports);
   NoPoDoFo::Data::Initialize(env, exports);
   NoPoDoFo::ContentsTokenizer::Initialize(env, exports);
+  NoPoDoFo::SimpleTable::Initialize(env, exports);
 
   exports["signature"] = Function::New(env, NPDFSignatureData);
 

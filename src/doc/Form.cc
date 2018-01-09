@@ -31,6 +31,9 @@ Form::Initialize(Napi::Env& env, Napi::Object& target)
                                 InstanceAccessor("needAppearances",
                                                  &Form::GetNeedAppearances,
                                                  &Form::SetNeedAppearances) });
+  constructor = Napi::Persistent(ctor);
+  constructor.SuppressDestruct();
+
   target.Set("Form", ctor);
 }
 void

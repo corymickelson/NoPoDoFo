@@ -450,21 +450,36 @@ Document::CreateFont(const CallbackInfo& info)
     italic = info[2].As<Boolean>();
   if (info.Length() >= 4 && info[3].IsNumber()) {
     int n = info[3].As<Number>();
-    if (n < 1 || n > 3) {
-      throw Error::New(info.Env(), "encoding out of range");
-    }
     switch (n) {
       case 1:
-        encoding = PdfEncodingFactory::GlobalWinAnsiEncodingInstance();
+        encoding = new PdfWinAnsiEncoding();
         break;
       case 2:
-        encoding = PdfEncodingFactory::GlobalStandardEncodingInstance();
+        encoding = new PdfStandardEncoding();
         break;
       case 3:
-        encoding = PdfEncodingFactory::GlobalPdfDocEncodingInstance();
+        encoding = new PdfDocEncoding();
+        break;
+      case 4:
+        encoding = new PdfMacRomanEncoding();
+        break;
+      case 5:
+        encoding = new PdfMacExpertEncoding();
+        break;
+      case 6:
+        encoding = new PdfSymbolEncoding();
+        break;
+      case 7:
+        encoding = new PdfZapfDingbatsEncoding();
+        break;
+      case 8:
+        encoding = new PdfWin1250Encoding();
+        break;
+      case 9:
+        encoding = new PdfIso88592Encoding();
         break;
       default:
-        encoding = PdfEncodingFactory::GlobalWinAnsiEncodingInstance();
+        encoding = new PdfIdentityEncoding(0, 0xffff, true);
     }
   }
   if (info.Length() >= 5 && info[4].IsBoolean())
@@ -481,7 +496,11 @@ Document::CreateFont(const CallbackInfo& info)
                            PdfFontCache::eFontCreationFlags_AutoSelectBase14,
                            embed,
                            filename);
-    return Font::constructor.New({ External<PdfFont>::New(info.Env(), font) });
+    return Font::constructor.New(
+      { External<PdfFont>::New(info.Env(), font, [](Napi::Env env, PdfFont* f) {
+        HandleScope scope(env);
+        delete f;
+      }) });
   } catch (PdfError& err) {
     ErrorHandler(err, info);
   }
@@ -494,7 +513,8 @@ public:
     : Napi::AsyncWorker(cb)
     , doc(doc)
     , arg(std::move(arg))
-  {}
+  {
+  }
 
 private:
   Document* doc;
@@ -550,7 +570,8 @@ public:
     : AsyncWorker(cb)
     , doc(doc)
     , arg(std::move(arg))
-  {}
+  {
+  }
 
   void ForUpdate(bool v) { update = v; }
   void LoadFromBuffer(bool v) { loadBuffer = v; }
@@ -630,7 +651,8 @@ public:
   DocumentWriteBufferAsync(Function& cb, Document* doc)
     : AsyncWorker(cb)
     , doc(doc)
-  {}
+  {
+  }
 
 private:
   Document* doc;
@@ -674,7 +696,8 @@ public:
     : AsyncWorker(callback)
     , doc(doc)
     , pwd(std::move(pwd))
-  {}
+  {
+  }
 
 protected:
   void Execute() override

@@ -26,6 +26,9 @@ NPDFSignatureData(const Napi::CallbackInfo& info)
 
   OpenSSL_add_all_algorithms();
   ERR_load_crypto_strings();
+  ERR_load_PEM_strings();
+  ERR_load_ASN1_strings();
+  ERR_load_EVP_strings();
 
   FILE* fp;
   fp = fopen(signerPEMPath.c_str(), "rb");

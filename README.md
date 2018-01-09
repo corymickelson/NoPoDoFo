@@ -2,7 +2,7 @@
 
 [![CircleCI](https://circleci.com/gh/corymickelson/NoPoDoFo.svg?style=svg)](https://circleci.com/gh/corymickelson/NoPoDoFo)
 
-This package provides native bindings to node.js for parsing and modifying pdf documents with [PoDoFo](http://podofo.sourceforge.net/index.html).
+This package provides (almost) complete nodejs pdf functionality via native bindings to [PoDoFo](http://podofo.sourceforge.net/index.html).
 NoPoDoFo is still in <mark>early development.</mark> 
 
 ### __Current Version 0.2.1__

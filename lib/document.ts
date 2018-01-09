@@ -8,9 +8,16 @@ import { Signer } from './signer';
 
 export const __mod = require('bindings')('npdf')
 export enum FontEncoding {
-    GlobalWinAnsi = 1,
-    GlobalStandard = 2,
-    GlobalPdfDoc = 3
+    WinAnsi = 1,
+    Standard = 2,
+    PdfDoc = 3,
+    MacRoman= 4,
+    MacExpert = 5,
+    Symbol = 6,
+    ZapfDingbats = 7,
+    Win1250 = 8,
+    Iso88592 = 9,
+    Identity = 0
 }
 export interface CreateFontOpts {
     fontName:string,

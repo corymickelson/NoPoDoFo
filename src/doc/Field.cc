@@ -41,6 +41,9 @@ Field::Initialize(Napi::Env& env, Napi::Object& target)
                   InstanceMethod("getFieldIndex", &Field::GetFieldIndex),
                   //        InstanceMethod("textField", &Field::TextField),
                   InstanceMethod("isRequired", &Field::IsRequired) });
+  constructor = Napi::Persistent(ctor);
+  constructor.SuppressDestruct();
+
   target.Set("Field", ctor);
 }
 

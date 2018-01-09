@@ -1,7 +1,7 @@
 import { unlinkSync } from 'fs'
 import { join } from 'path'
 import * as test from 'tape'
-import { Document } from './document'
+import { Document, FontEncoding } from './document'
 import { EncryptOption, Encrypt } from './encrypt'
 import { TestCase } from 'tape';
 
@@ -142,6 +142,18 @@ test('write buffer', t => {
     })
         .on('error', e => notCompiledErrorHandler(e, t))
 })
+
+test('create font', t => {
+    const doc = new Document(filePath)
+    doc.on('ready', (pdf: Document) => {
+        let font = pdf.createFont({encoding:FontEncoding.Identity,bold:false, fontName: 'monospace'})
+        const m = font.getMetrics()
+        t.ok(m)
+        t.end()
+    })
+        .on('error', e => notCompiledErrorHandler(e, t))
+})
+
 export function notCompiledErrorHandler(e: Error, t: any) {
     if (e.message.includes('error: 49')) {
         t.pass('YOUR CURRENT PODOFO BUILD WAS NOT COMPILED WITH ENCRYPT. To use pdf encrypt recompile with the correct options')

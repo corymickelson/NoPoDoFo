@@ -23,6 +23,12 @@ Painter::Painter(const Napi::CallbackInfo& info)
   painter = new PdfPainter();
 }
 
+Painter::~Painter()
+{
+  Napi::HandleScope scope(Env());
+  delete painter;
+  document = nullptr;
+}
 void
 Painter::Initialize(Napi::Env& env, Napi::Object& target)
 {
@@ -82,6 +88,8 @@ Painter::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceMethod("drawMultiLineText", &Painter::DrawMultiLineText),
       InstanceMethod("drawText", &Painter::DrawText),
       InstanceMethod("drawImage", &Painter::DrawImage) });
+  constructor = Napi::Persistent(ctor);
+  constructor.SuppressDestruct();
   target.Set("Painter", ctor);
 }
 void
@@ -97,7 +105,6 @@ Painter::SetPage(const Napi::CallbackInfo& info, const Napi::Value& value)
   }
   PoDoFo::PdfPage* page = pagePtr->GetPage();
   document = pagePtr->GetDocument();
-  painter = new PoDoFo::PdfPainter();
   painter->SetPage(page);
   pageSize = page->GetPageSize();
 }
@@ -223,14 +230,18 @@ Painter::DrawText(const CallbackInfo& info)
 void
 Painter::DrawMultiLineText(const CallbackInfo& info)
 {
+// For some reason windows builds break with unresolved external symbol on
+// podofo's DrawMultiLineText method
+#ifndef WIN32
+
   AssertFunctionArgs(info,
                      6,
-                     { napi_valuetype::napi_object,
-                       napi_valuetype::napi_string,
-                       napi_valuetype::napi_number,
-                       napi_valuetype::napi_number,
-                       napi_valuetype::napi_boolean,
-                       napi_valuetype::napi_boolean });
+                     { napi_object,
+                       napi_string,
+                       napi_number,
+                       napi_number,
+                       napi_boolean,
+                       napi_boolean });
   PdfRect rect = *Rect::Unwrap(info[0].As<Object>())->GetRect();
   string text = info[1].As<String>().Utf8Value();
   EPdfAlignment alignment =
@@ -251,6 +262,8 @@ Painter::DrawMultiLineText(const CallbackInfo& info)
   } catch (PdfError& err) {
     ErrorHandler(err, info);
   }
+
+#endif
 }
 void
 Painter::DrawImage(const CallbackInfo& info)
@@ -834,11 +847,5 @@ Painter::GetRGB(Napi::Value& value, int* rgb)
   for (uint8_t i = 0; i < js.Length(); i++) {
     rgb[i] = js.Get(i).As<Number>();
   }
-}
-Painter::~Painter()
-{
-  Napi::HandleScope scope(Env());
-  delete painter;
-  document = nullptr;
 }
 }
