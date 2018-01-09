@@ -23,6 +23,12 @@ Painter::Painter(const Napi::CallbackInfo& info)
   painter = new PdfPainter();
 }
 
+Painter::~Painter()
+{
+  Napi::HandleScope scope(Env());
+  delete painter;
+  document = nullptr;
+}
 void
 Painter::Initialize(Napi::Env& env, Napi::Object& target)
 {
@@ -99,7 +105,6 @@ Painter::SetPage(const Napi::CallbackInfo& info, const Napi::Value& value)
   }
   PoDoFo::PdfPage* page = pagePtr->GetPage();
   document = pagePtr->GetDocument();
-  painter = new PoDoFo::PdfPainter();
   painter->SetPage(page);
   pageSize = page->GetPageSize();
 }
@@ -225,8 +230,8 @@ Painter::DrawText(const CallbackInfo& info)
 void
 Painter::DrawMultiLineText(const CallbackInfo& info)
 {
-  // For some reason windows builds break with unresolved external symbol on
-  // podofo's DrawMultiLineText method
+// For some reason windows builds break with unresolved external symbol on
+// podofo's DrawMultiLineText method
 #ifndef WIN32
 
   AssertFunctionArgs(info,
@@ -842,11 +847,5 @@ Painter::GetRGB(Napi::Value& value, int* rgb)
   for (uint8_t i = 0; i < js.Length(); i++) {
     rgb[i] = js.Get(i).As<Number>();
   }
-}
-Painter::~Painter()
-{
-  Napi::HandleScope scope(Env());
-  delete painter;
-  document = nullptr;
 }
 }

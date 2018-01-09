@@ -14,7 +14,7 @@ namespace NoPoDoFo {
 class Painter : public Napi::ObjectWrap<Painter>
 {
 public:
-    explicit Painter(const Napi::CallbackInfo& callbackInfo);
+  explicit Painter(const Napi::CallbackInfo& callbackInfo);
   ~Painter();
 
   PoDoFo::PdfRect pageSize;
