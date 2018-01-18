@@ -17,7 +17,7 @@ doc.on('ready', pdf => {
     if (pdf instanceof Error) throw Error("doc ready error")
     test('painter', t => {
         const page = pdf.getPage(0),
-            painter = new Painter(page),
+            painter = new Painter(doc, page),
             font = pdf.createFont({ fontName: 'monospace', encoding: FontEncoding.Identity })
         font.size = 16
         painter.font = font

@@ -48,6 +48,13 @@ Obj::Obj(const Napi::CallbackInfo& info)
   obj = info[0].As<Napi::External<PdfObject>>().Data();
 }
 
+Obj::~Obj()
+{
+  if (obj != nullptr) {
+    HandleScope scope(Env());
+    delete obj;
+  }
+}
 Napi::Value
 Obj::GetStream(const CallbackInfo& info)
 {
@@ -198,11 +205,7 @@ Obj::GetArray(const CallbackInfo& info)
     throw Napi::Error::New(info.Env(), "Obj only accessible as array");
   }
   auto init = obj->GetArray();
-  auto ptr = External<PdfArray>::New(
-    info.Env(), &init, [](Napi::Env env, PdfArray* value) {
-      HandleScope scope(env);
-      delete value;
-    });
+  auto ptr = External<PdfArray>::New(info.Env(), &init);
   auto instance = NoPoDoFo::Array::constructor.New({ ptr });
   return instance;
 }
@@ -245,7 +248,8 @@ public:
     : Napi::AsyncWorker(cb)
     , obj(obj)
     , arg(std::move(arg))
-  {}
+  {
+  }
 
 protected:
   void Execute() override
@@ -290,7 +294,8 @@ public:
     : AsyncWorker(cb)
     , obj(obj)
     , arg(std::move(dest))
-  {}
+  {
+  }
 
 protected:
   void Execute() override
@@ -325,12 +330,5 @@ Obj::Write(const CallbackInfo& info)
     new ObjWriteAsync(cb, this, info[0].As<String>().Utf8Value());
   worker->Queue();
   return info.Env().Undefined();
-}
-Obj::~Obj()
-{
-  if (obj != nullptr) {
-    HandleScope scope(Env());
-    obj = nullptr;
-  }
 }
 }

@@ -12,8 +12,9 @@ Napi::FunctionReference Encrypt::constructor;
 Encrypt::Encrypt(const Napi::CallbackInfo& info)
   : ObjectWrap(info)
 {
-  AssertFunctionArgs(info, 1, { napi_valuetype::napi_external });
+  AssertFunctionArgs(info, 2, { napi_external, napi_external });
   encrypt = info[0].As<External<PdfEncrypt>>().Data();
+  document = info[1].As<External<Document>>().Data();
 }
 
 void
@@ -91,10 +92,12 @@ Encrypt::Authenticate(const CallbackInfo& info)
     throw Napi::Error::New(
       info.Env(), "must contain property userPassword OR ownerPassword");
   }
-  if (!document->GetTrailer()->GetDictionary().HasKey(PdfName("ID"))) {
+  if (!document->GetDocument()->GetTrailer()->GetDictionary().HasKey(
+        PdfName("ID"))) {
     throw Napi::Error::New(info.Env(), "No document ID found in trailer");
   }
-  string id = document->GetTrailer()
+  string id = document->GetDocument()
+                ->GetTrailer()
                 ->GetDictionary()
                 .GetKey(PdfName("ID"))
                 ->GetArray()[0]
@@ -139,7 +142,7 @@ Encrypt::~Encrypt()
 {
   if (encrypt != nullptr) {
     HandleScope scope(Env());
-    encrypt = nullptr;
+    delete encrypt;
     document = nullptr;
   }
 }

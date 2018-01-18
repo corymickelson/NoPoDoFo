@@ -141,7 +141,7 @@ function pageResources() {
 
 function pageAddImg() {
     test('add image', t => {
-        const painter = new Painter(),
+        const painter = new Painter(doc),
             img = new Image(doc, join(__dirname, '../test-documents/test.jpg'))
 
         painter.page = page
@@ -165,9 +165,12 @@ function pageAddImg() {
                             let imgObj = o.asDictionary().hasKey('Filter') ? o.asDictionary().getKey('Filter') : null
 
                             if (imgObj && imgObj.type === 'Array') {
-                                if (imgObj.asArray().length === 1) {
-                                    if (imgObj.asArray().at(0).type === 'Name') {
-                                        if (imgObj.asArray().at(0).asName() === 'DCTDecode') {
+                                const imgObjArr = imgObj.asArray()
+                                if (imgObjArr.length === 1) {
+                                    if (imgObjArr[0].type === 'Name') {
+                                    // if (imgObj.asArray().at(0).type === 'Name') {
+                                        // if (imgObj.asArray().at(0).asName() === 'DCTDecode') {
+                                        if (imgObjArr[0].asName() === 'DCTDecode') {
                                             extractImg(o, true)
                                             return
                                         }

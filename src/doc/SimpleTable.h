@@ -58,9 +58,9 @@ public:
   Napi::Value GetAutoPageBreak(const Napi::CallbackInfo&);
 
 private:
-  PoDoFo::PdfSimpleTableModel* model;
-  PoDoFo::PdfTable* table;
-  Document* doc;
+  PoDoFo::PdfSimpleTableModel* model = nullptr;
+  PoDoFo::PdfTable* table = nullptr;
+  Document* doc = nullptr;
   PoDoFo::PdfColor* backgroundColor = nullptr;
   PoDoFo::PdfColor* foregroundColor = nullptr;
 

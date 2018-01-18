@@ -157,7 +157,7 @@ Image::~Image()
   if (img != nullptr) {
     HandleScope scope(Env());
     delete img;
-    _doc = nullptr;
   }
+  _doc = nullptr;
 }
 }

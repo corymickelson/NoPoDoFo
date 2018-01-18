@@ -14,13 +14,17 @@ FunctionReference ContentsTokenizer::constructor;
 ContentsTokenizer::ContentsTokenizer(const Napi::CallbackInfo& info)
   : ObjectWrap(info)
 {
-  AssertFunctionArgs(info, 1, { napi_object });
+  AssertFunctionArgs(info, 2, { napi_object, napi_object });
   auto wrap = info[0].As<Object>();
   if (!wrap.InstanceOf(Page::constructor.Value())) {
     throw Error::New(info.Env(), "must be an instance of Page");
   }
-  doc = Page::Unwrap(wrap)->GetDocument();
-  page = Page::Unwrap(wrap)->GetPage();
+  auto dWrap = info[1].As<Object>();
+  if (!dWrap.InstanceOf(Document::constructor.Value())) {
+    throw Error::New(info.Env(), "must be an instance of Document");
+  }
+  doc = Document::Unwrap(dWrap);
+  page = Page::Unwrap(wrap);
   self = new PdfContentsTokenizer(Page::Unwrap(wrap)->GetPage());
 }
 
@@ -54,7 +58,7 @@ ContentsTokenizer::ReadAll(const CallbackInfo& info)
   PdfVariant var;
   EPdfContentsType type;
   std::stack<PdfVariant> stack;
-//  double posX = 0.0, posY = 0.0;
+  //  double posX = 0.0, posY = 0.0;
   bool blockText = false;
   PdfFont* font = nullptr;
   Napi::Array out = Array::New(info.Env());
@@ -63,9 +67,9 @@ ContentsTokenizer::ReadAll(const CallbackInfo& info)
     if (type == ePdfContentsType_Keyword) {
       if (strcmp(token, "l") == 0 || strcmp(token, "m") == 0) {
         if (stack.size() == 2) {
-//          posX = stack.top().GetReal();
+          //          posX = stack.top().GetReal();
           stack.pop();
-//          posY = stack.top().GetReal();
+          //          posY = stack.top().GetReal();
         } else {
           stringstream msg;
           msg << "WARNING: Token '" << token << "' expects two arguments, but %"
@@ -89,11 +93,12 @@ ContentsTokenizer::ReadAll(const CallbackInfo& info)
           }
           stack.pop();
           PdfName fontName = stack.top().GetName();
-          PdfObject* pFont = page->GetFromResources(PdfName("Font"), fontName);
+          PdfObject* pFont =
+            page->GetPage()->GetFromResources(PdfName("Font"), fontName);
           if (!pFont) {
             throw Error::New(info.Env(), "Failed to create font");
           }
-          font = doc->GetFont(pFont);
+          font = doc->GetDocument()->GetFont(pFont);
           if (!font) {
             throw Error::New(info.Env(), "Failed to create font");
           }
@@ -118,7 +123,7 @@ ContentsTokenizer::ReadAll(const CallbackInfo& info)
             continue;
           PdfArray array = stack.top().GetArray();
           stack.pop();
-          for (auto &i : array) {
+          for (auto& i : array) {
             if (i.IsString() || i.IsHexString()) {
               AddText(font, i.GetString(), out);
             }
@@ -136,7 +141,7 @@ ContentsTokenizer::ReadAll(const CallbackInfo& info)
 }
 
 void
-ContentsTokenizer::AddText( PdfFont* font,
+ContentsTokenizer::AddText(PdfFont* font,
                            const PdfString& text,
                            Napi::Array& out)
 {

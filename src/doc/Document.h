@@ -45,7 +45,6 @@ public:
 private:
   bool loadForIncrementalUpdates = false;
   PoDoFo::PdfMemDocument* document;
-  bool isExternalInstance = false;
 };
 }
 #endif // NPDF_PDFMEMDOCUMENT_H

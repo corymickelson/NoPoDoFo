@@ -6,6 +6,7 @@
 #define NPDF_PDFFIELD_H
 
 #include "../ValidateArguments.h"
+#include "Page.h"
 #include <napi.h>
 #include <podofo/podofo.h>
 #include <string>
@@ -29,11 +30,11 @@ public:
   Napi::Value IsRequired(const CallbackInfo&);
   void SetFieldIndex(const CallbackInfo&);
   Napi::Value GetFieldIndex(const CallbackInfo&);
-  PoDoFo::PdfField GetField() { return _page->GetField(fieldIndex); }
+  PoDoFo::PdfField GetField() { return _page->GetPage()->GetField(fieldIndex); }
 
 private:
   int fieldIndex;
-  PoDoFo::PdfPage* _page;
+  Page* _page;
 };
 }
 #endif // NPDF_PDFFIELD_H

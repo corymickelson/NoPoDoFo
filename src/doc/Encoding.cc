@@ -76,7 +76,7 @@ Encoding::~Encoding()
 {
   if (encoding != nullptr) {
     HandleScope scope(Env());
-    encoding = nullptr;
+    delete encoding;
   }
 }
 }

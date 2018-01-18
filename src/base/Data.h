@@ -19,7 +19,6 @@ public:
 
 private:
   PoDoFo::PdfData* self;
-  bool isExternalInstance = false;
 };
 }
 #endif

@@ -1,6 +1,8 @@
 #ifndef NPDF_CONTENTSTOKENIZER_H
 #define NPDF_CONTENTSTOKENIZER_H
 
+#include "../doc/Document.h"
+#include "../doc/Page.h"
 #include <napi.h>
 #include <podofo/podofo.h>
 
@@ -16,11 +18,9 @@ public:
 
 private:
   PoDoFo::PdfContentsTokenizer* self;
-  PoDoFo::PdfPage* page;
-  PoDoFo::PdfMemDocument* doc;
-  void AddText( PoDoFo::PdfFont*,
-               const PoDoFo::PdfString&,
-               Napi::Array& out);
+  Page* page;
+  Document* doc;
+  void AddText(PoDoFo::PdfFont*, const PoDoFo::PdfString&, Napi::Array& out);
 };
 }
 

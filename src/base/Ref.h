@@ -31,7 +31,6 @@ public:
 
 private:
   PoDoFo::PdfReference* ref;
-  bool isExternalInstance = false;
 };
 }
 #endif

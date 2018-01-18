@@ -35,7 +35,6 @@ SignatureField::SignatureField(const CallbackInfo& info)
     } else if (info.Length() == 1) {
       AssertFunctionArgs(info, 1, { napi_valuetype::napi_external });
       field = info[0].As<External<PdfSignatureField>>().Data();
-      isExternalInstance = true;
     }
   } catch (PdfError& err) {
     ErrorHandler(err, info);
@@ -134,13 +133,8 @@ SignatureField::EnsureSignatureObject(const CallbackInfo& info)
 }
 SignatureField::~SignatureField()
 {
-  if (field != nullptr || signatureBuffer != nullptr) {
-    HandleScope scope(Env());
-    if (isExternalInstance)
-      field = nullptr;
-    else
-      delete field;
-    delete signatureBuffer;
-  }
+  HandleScope scope(Env());
+  delete field;
+  delete signatureBuffer;
 }
 }

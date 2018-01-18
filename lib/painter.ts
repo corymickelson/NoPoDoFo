@@ -1,7 +1,7 @@
 import {IPage} from './page'
 import {Image} from './image'
 import {Stream} from './stream'
-import {__mod} from './document'
+import {__mod, Document} from './document'
 import {Dictionary} from "./dictionary";
 import {Rect} from "./rect";
 import {NPDFPoint} from "./painter";
@@ -109,8 +109,8 @@ export class Painter {
         this._instance.precision = value
     }
 
-    constructor(page?: IPage) {
-        this._instance = new __mod.Painter()
+    constructor(doc:Document, page?: IPage) {
+        this._instance = new __mod.Painter((doc as any)._instance)
         if (page)
             this._instance.page = (page as any)._instance
     }

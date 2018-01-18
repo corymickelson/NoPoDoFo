@@ -7,6 +7,8 @@
 
 #define CONVERSION_CONSTANT 0.002834645669291339
 
+#include "Document.h"
+
 #include <napi.h>
 #include <podofo/podofo.h>
 
@@ -76,12 +78,13 @@ public:
   Napi::Value GetPrecision(const Napi::CallbackInfo&);
   void SetPrecision(const Napi::CallbackInfo&, const Napi::Value&);
 
-  PoDoFo::PdfMemDocument* GetDocument() { return document; }
+  PoDoFo::PdfMemDocument* GetDocument() { return document->GetDocument(); }
   PoDoFo::PdfPainter* GetPainter() { return painter; }
 
 private:
   PoDoFo::PdfPainter* painter;
-  PoDoFo::PdfMemDocument* document;
+  //  PoDoFo::PdfMemDocument* document;
+  Document* document;
   void GetCMYK(Napi::Value&, int* cmyk);
   void GetRGB(Napi::Value&, int* rgb);
 };

@@ -111,11 +111,8 @@ Vector::GetObject(const Napi::CallbackInfo& info)
   const pdf_gennum g = static_cast<const pdf_gennum>(
     info.Length() == 2 && info[1].IsNumber() ? info[1].As<Number>() : 0);
   PdfReference ref(i, g);
-  return Obj::constructor.New({ External<PdfObject>::New(
-    info.Env(), vector->GetObject(ref), [](Napi::Env env, PdfObject* value) {
-      HandleScope scope(env);
-      delete value;
-    }) });
+  return Obj::constructor.New(
+    { External<PdfObject>::New(info.Env(), vector->GetObject(ref)) });
 }
 Napi::Value
 Vector::GetIndex(const Napi::CallbackInfo& info)

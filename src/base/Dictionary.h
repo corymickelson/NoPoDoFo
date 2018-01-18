@@ -34,11 +34,11 @@ public:
   void WriteSync(const Napi::CallbackInfo&);
   Napi::Value ToObject(const Napi::CallbackInfo&);
 
-  PoDoFo::PdfDictionary* GetDictionary() { return &dict; }
+  PoDoFo::PdfDictionary* GetDictionary() { return dict; }
 
 private:
-  PoDoFo::PdfObject* _obj;
-  PoDoFo::PdfDictionary dict = PoDoFo::PdfDictionary();
+  //  PoDoFo::PdfObject* _obj;
+  PoDoFo::PdfDictionary* dict = new PoDoFo::PdfDictionary();
 };
 }
 #endif

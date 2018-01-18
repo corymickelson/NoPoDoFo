@@ -27,7 +27,7 @@ public:
   void Push(const Napi::CallbackInfo&);
 
 private:
-  PoDoFo::PdfArray* array;
+  PoDoFo::PdfArray* array = new PoDoFo::PdfArray();
 };
 }
 #endif

@@ -19,9 +19,9 @@ Page::Page(const CallbackInfo& info)
 {
   PoDoFo::PdfPage* pagePtr =
     info[0].As<Napi::External<PoDoFo::PdfPage>>().Data();
-  PoDoFo::PdfMemDocument* parentPtr =
-    info[1].As<Napi::External<PoDoFo::PdfMemDocument>>().Data();
-  parent = parentPtr;
+  //  PoDoFo::PdfMemDocument* parentPtr =
+  //    info[1].As<Napi::External<PoDoFo::PdfMemDocument>>().Data();
+  //  parent = parentPtr;
   page = pagePtr;
 }
 void
@@ -276,11 +276,7 @@ Page::GetContents(const CallbackInfo& info)
   bool forAppending = info[0].As<Boolean>();
   PdfObject* contentsObj =
     forAppending ? page->GetContentsForAppending() : page->GetContents();
-  auto objPtr = Napi::External<PdfObject>::New(
-    info.Env(), contentsObj, [](Napi::Env env, PdfObject* obj) {
-      HandleScope scope(env);
-      delete obj;
-    });
+  auto objPtr = Napi::External<PdfObject>::New(info.Env(), contentsObj);
   auto instance = Obj::constructor.New({ objPtr });
   return instance;
 }
@@ -289,11 +285,7 @@ Napi::Value
 Page::GetResources(const CallbackInfo& info)
 {
   PdfObject* resources = page->GetResources();
-  auto objPtr = Napi::External<PdfObject>::New(
-    info.Env(), resources, [](Napi::Env env, PdfObject* obj) {
-      HandleScope scope(env);
-      delete obj;
-    });
+  auto objPtr = Napi::External<PdfObject>::New(info.Env(), resources);
   auto instance = Obj::constructor.New({ objPtr });
   return instance;
 }
@@ -342,11 +334,7 @@ Page::GetAnnotation(const CallbackInfo& info)
   AssertFunctionArgs(info, 1, { napi_valuetype::napi_number });
   int index = info[0].As<Number>();
   auto ptr = page->GetAnnotation(index);
-  auto instance = Napi::External<PdfAnnotation>::New(
-    info.Env(), ptr, [](Napi::Env env, PdfAnnotation* annot) {
-      HandleScope scope(env);
-      delete annot;
-    });
+  auto instance = Napi::External<PdfAnnotation>::New(info.Env(), ptr);
   return Annotation::constructor.New({ instance });
 }
 Napi::Value
@@ -359,17 +347,14 @@ Page::CreateAnnotation(const CallbackInfo& info)
   auto obj = info[1].As<Object>();
   Rect* rect = Rect::Unwrap(obj);
   PdfAnnotation* annot = page->CreateAnnotation(type, *rect->GetRect());
-  auto instance = Annotation::constructor.New({ External<PdfAnnotation>::New(
-    info.Env(), annot, [](Napi::Env env, PdfAnnotation* value) {
-      HandleScope scope(env);
-      delete value;
-    }) });
+  auto instance = Annotation::constructor.New(
+    { External<PdfAnnotation>::New(info.Env(), annot) });
   return instance;
 }
 Page::~Page()
 {
   Napi::HandleScope scope(Env());
-  page = nullptr;
-  parent = nullptr;
+  delete page;
+  //  parent = nullptr;
 }
 }

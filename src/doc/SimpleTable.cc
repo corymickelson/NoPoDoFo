@@ -95,11 +95,8 @@ SimpleTable::GetFont(const CallbackInfo& info)
   AssertFunctionArgs(info, 2, { napi_number, napi_number });
   const int col = info[0].As<Number>();
   const int row = info[1].As<Number>();
-  return Font::constructor.New({ External<PdfFont>::New(
-    info.Env(), model->GetFont(col, row), [](Napi::Env env, PdfFont* font) {
-      HandleScope scope(env);
-      delete font;
-    }) });
+  return Font::constructor.New(
+    { External<PdfFont>::New(info.Env(), model->GetFont(col, row)) });
 }
 
 void

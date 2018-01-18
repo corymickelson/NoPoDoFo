@@ -1,6 +1,8 @@
 #ifndef EXTGSTATE_H
 #define EXTGSTATE_H
 
+#include "Document.h"
+
 #include <napi.h>
 #include <podofo/podofo.h>
 
@@ -27,7 +29,7 @@ public:
 
 private:
   PoDoFo::PdfExtGState* self;
-  PoDoFo::PdfMemDocument* doc;
+  //  Document* doc;
 };
 }
 #endif

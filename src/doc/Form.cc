@@ -15,9 +15,8 @@ Form::Form(const Napi::CallbackInfo& info)
     throw Napi::Error::New(info.Env(), "Form requires document parameter");
   }
   Object docObj = info[0].As<Object>();
-  Document* document = Document::Unwrap(docObj);
-  doc = document->GetDocument();
-  if (!doc->GetAcroForm()) {
+  doc = Document::Unwrap(docObj);
+  if (!doc->GetDocument()->GetAcroForm()) {
     throw Napi::Error::New(info.Env(), "Null Form");
   }
 }
@@ -57,12 +56,8 @@ Form::GetNeedAppearances(const CallbackInfo& info)
 Napi::Value
 Form::GetObject(const CallbackInfo& info)
 {
-  auto obj = doc->GetAcroForm()->GetObject();
-  auto nObj = Napi::External<PdfObject>::New(
-    info.Env(), obj, [](Napi::Env env, PdfObject* value) {
-      HandleScope scope(env);
-      delete value;
-    });
+  auto obj = GetForm()->GetObject();
+  auto nObj = Napi::External<PdfObject>::New(info.Env(), obj);
   auto objInstance = Obj::constructor.New({ nObj });
   return objInstance;
 }

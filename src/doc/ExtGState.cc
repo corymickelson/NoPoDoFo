@@ -12,10 +12,14 @@ FunctionReference ExtGState::constructor;
 ExtGState::ExtGState(const Napi::CallbackInfo& info)
   : ObjectWrap(info)
 {
-  AssertFunctionArgs(
-    info, 2, { napi_valuetype::napi_external, napi_valuetype::napi_external });
-  self = info[0].As<External<PdfExtGState>>().Data();
-  doc = info[0].As<External<PdfMemDocument>>().Data();
+  AssertFunctionArgs(info, 1, { napi_object });
+  auto o = info[0].As<Object>();
+  if (!o.InstanceOf(Document::constructor.Value())) {
+    throw Error::New(info.Env(),
+                     "Requires an instance of Document for construction");
+  }
+  auto d = Document::Unwrap(o);
+  self = new PdfExtGState(d->GetDocument());
 }
 
 void
@@ -132,8 +136,7 @@ ExtGState::~ExtGState()
 {
   if (self != nullptr) {
     HandleScope scope(Env());
-    self = nullptr;
-    doc = nullptr;
+    delete self;
   }
 };
 }

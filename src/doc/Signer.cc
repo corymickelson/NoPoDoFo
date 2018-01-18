@@ -61,11 +61,8 @@ Signer::SetField(const CallbackInfo& info)
 Value
 Signer::GetField(const CallbackInfo& info)
 {
-  return SignatureField::constructor.New({ External<PdfSignatureField>::New(
-    info.Env(), field->GetField(), [](Napi::Env env, PdfSignatureField* value) {
-      HandleScope scope(env);
-      delete value;
-    }) });
+  return SignatureField::constructor.New(
+    { External<PdfSignatureField>::New(info.Env(), field->GetField()) });
 }
 
 Napi::Value
@@ -124,7 +121,8 @@ public:
     , self(self)
     , signature(std::move(data))
     , output(std::move(output))
-  {}
+  {
+  }
   ~SignAsync()
   {
     HandleScope scope(Env());

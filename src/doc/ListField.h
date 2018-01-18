@@ -6,6 +6,7 @@
 #define NPDF_LISTFIELD_H
 
 #include "../ValidateArguments.h"
+#include "Field.h"
 #include <napi.h>
 #include <podofo/podofo.h>
 #include <string>
@@ -26,7 +27,7 @@ public:
   Napi::Value GetSelectedItem(const Napi::CallbackInfo&);
 
 private:
-  PoDoFo::PdfField* field;
+  Field* field;
   PoDoFo::PdfListField* list;
 };
 }

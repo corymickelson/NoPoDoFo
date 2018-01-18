@@ -114,9 +114,14 @@ Annotation::HasDestination(const CallbackInfo& info)
 }
 
 void
-Annotation::SetAction(const CallbackInfo& info, const Napi::Value& value)
+Annotation::SetAction(const CallbackInfo& info)
 {
-  auto actionObj = value.As<Object>();
+  auto actionObj = info[0].As<Object>();
+  auto o = info[1].As<Object>();
+  if (!o.InstanceOf(Document::constructor.Value())) {
+    throw Error::New(info.Env(), "Requires instance of Document");
+  }
+  auto doc = Document::Unwrap(o)->GetDocument();
   int type = actionObj.Get("type").As<Number>();
   string uri = actionObj.Get("uri").As<String>().Utf8Value();
   auto flag = static_cast<PoDoFo::EPdfAction>(type);
@@ -344,8 +349,7 @@ Annotation::~Annotation()
 {
   if (annot != nullptr) {
     HandleScope scope(Env());
-    annot = nullptr;
-    doc = nullptr;
+    delete annot;
   }
 }
 }

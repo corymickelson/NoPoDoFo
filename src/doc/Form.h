@@ -5,6 +5,8 @@
 #ifndef NPDF_FORM_H
 #define NPDF_FORM_H
 
+#include "Document.h"
+
 #include <napi.h>
 #include <podofo/podofo.h>
 
@@ -19,10 +21,10 @@ public:
   void SetNeedAppearances(const Napi::CallbackInfo&, const Napi::Value&);
   Napi::Value GetNeedAppearances(const Napi::CallbackInfo&);
   Napi::Value GetObject(const Napi::CallbackInfo&);
-  PoDoFo::PdfAcroForm* GetForm() { return doc->GetAcroForm(); }
+  PoDoFo::PdfAcroForm* GetForm() { return doc->GetDocument()->GetAcroForm(); }
 
 private:
-  PoDoFo::PdfMemDocument* doc;
+  Document* doc;
 };
 }
 #endif

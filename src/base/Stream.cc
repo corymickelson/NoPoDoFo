@@ -66,7 +66,8 @@ public:
     : AsyncWorker(cb)
     , stream(stream)
     , arg(std::move(arg))
-  {}
+  {
+  }
   ~StreamWriteAsync() {}
 
 private:
@@ -106,7 +107,7 @@ Stream::~Stream()
 {
   if (stream != nullptr) {
     HandleScope scope(Env());
-    stream = nullptr;
+    delete stream;
   }
 }
 }

@@ -18,9 +18,7 @@ Field::Field(const CallbackInfo& info)
   AssertFunctionArgs(info, 2, { napi_object, napi_number });
   auto pageObj = info[0].As<Object>();
   fieldIndex = info[1].As<Number>();
-  Page* page = Page::Unwrap(pageObj);
-  _page = page->GetPage();
-  //  PdfField pdfField = _page->GetField(fieldIndex);
+  _page = Page::Unwrap(pageObj);
 }
 
 void

@@ -43,11 +43,11 @@ public:
   void DeleteAnnotation(const Napi::CallbackInfo&);
 
   PoDoFo::PdfPage* GetPage() { return page; }
-  PoDoFo::PdfMemDocument* GetDocument() { return parent; }
+  //  PoDoFo::PdfMemDocument* GetDocument() { return parent; }
 
 private:
   PoDoFo::PdfPage* page;
-  PoDoFo::PdfMemDocument* parent;
+  //  PoDoFo::PdfMemDocument* parent;
   void GetFieldObject(Napi::Object&, PoDoFo::PdfField&);
   Napi::Object ExtractAndApplyRectValues(const Napi::CallbackInfo&,
                                          PoDoFo::PdfRect&);

@@ -1,5 +1,5 @@
 import { Page } from "./page";
-import { __mod } from "./document";
+import { __mod, Document } from "./document";
 
 /**
  * This class is a parser for content streams in PDF documents.
@@ -7,8 +7,8 @@ import { __mod } from "./document";
  */
 export class ContentsTokenizer {
     private _instance:any
-    constructor(page:Page) {
-        this._instance = new __mod.ContentsTokenizer((page as any)._instance)
+    constructor(page:Page, doc:Document) {
+        this._instance = new __mod.ContentsTokenizer((page as any)._instance, (doc as any)._instance)
     }
 
     /**

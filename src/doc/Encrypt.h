@@ -5,6 +5,8 @@
 #ifndef NPDF_ENCRYPT_H
 #define NPDF_ENCRYPT_H
 
+#include "Document.h"
+
 #include <napi.h>
 #include <podofo/podofo.h>
 
@@ -28,7 +30,7 @@ public:
 
 private:
   PoDoFo::PdfEncrypt* encrypt;
-  PoDoFo::PdfMemDocument* document;
+  Document* document;
 };
 }
 #endif

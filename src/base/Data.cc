@@ -13,7 +13,6 @@ Data::Data(const Napi::CallbackInfo& info)
 {
   if (info.Length() == 1 && info[0].Type() == napi_external) {
     self = info[0].As<External<PdfData>>().Data();
-    isExternalInstance = true;
   } else if (info.Length() == 1 && info[0].IsString()) {
     string strData = info[0].As<String>().Utf8Value();
     self = new PdfData(strData.c_str());
@@ -27,11 +26,7 @@ Data::~Data()
 {
   if (self != nullptr) {
     HandleScope scope(Env());
-    if (isExternalInstance) // delete will happen in external finalize callback
-      self = nullptr;
-    else {
-      delete self;
-    }
+    delete self;
   }
 }
 

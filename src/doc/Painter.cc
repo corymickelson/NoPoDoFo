@@ -20,6 +20,13 @@ FunctionReference Painter::constructor;
 Painter::Painter(const Napi::CallbackInfo& info)
   : ObjectWrap(info)
 {
+  AssertFunctionArgs(info, 1, { napi_object });
+  auto o = info[0].As<Object>();
+  if (!o.InstanceOf(Document::constructor.Value())) {
+    throw Error::New(
+      info.Env(), "Painter requires an instance of Document for construction");
+  }
+  document = Document::Unwrap(o);
   painter = new PdfPainter();
 }
 
@@ -104,7 +111,7 @@ Painter::SetPage(const Napi::CallbackInfo& info, const Napi::Value& value)
     throw Napi::Error::New(info.Env(), "Page must be an instance of Page.");
   }
   PoDoFo::PdfPage* page = pagePtr->GetPage();
-  document = pagePtr->GetDocument();
+  //  document = pagePtr->GetDocument();
   painter->SetPage(page);
   pageSize = page->GetPageSize();
 }
@@ -113,7 +120,8 @@ Painter::GetPage(const CallbackInfo& info)
 {
   auto* page = dynamic_cast<PdfPage*>(painter->GetPage());
   auto pagePtr = Napi::External<PdfPage>::New(info.Env(), page);
-  auto docPtr = Napi::External<PdfMemDocument>::New(info.Env(), document);
+  auto docPtr =
+    Napi::External<PdfMemDocument>::New(info.Env(), document->GetDocument());
   auto instance = Page::constructor.New({ pagePtr, docPtr });
   return instance;
 }
@@ -152,11 +160,8 @@ Painter::GetCanvas(const CallbackInfo& info)
   if (!instance) {
     return info.Env().Null();
   }
-  return Stream::constructor.New({ External<PdfStream>::New(
-    info.Env(), instance, [](Napi::Env env, PdfStream* value) {
-      HandleScope scope(env);
-      delete value;
-    }) });
+  return Stream::constructor.New(
+    { External<PdfStream>::New(info.Env(), instance) });
 }
 
 void
@@ -363,11 +368,8 @@ Painter::SetFont(const Napi::CallbackInfo& info, const Napi::Value& value)
 Napi::Value
 Painter::GetFont(const Napi::CallbackInfo& info)
 {
-  return Font::constructor.New({ External<PdfFont>::New(
-    info.Env(), painter->GetFont(), [](Napi::Env env, PdfFont* value) {
-      HandleScope scope(env);
-      delete value;
-    }) });
+  return Font::constructor.New(
+    { External<PdfFont>::New(info.Env(), painter->GetFont()) });
 }
 void
 Painter::SetClipRect(const Napi::CallbackInfo& info)
@@ -825,7 +827,7 @@ Painter::DrawGlyph(const CallbackInfo& info)
   x = point.Get("x").As<Number>();
   y = point.Get("y").As<Number>();
   try {
-    painter->DrawGlyph(document, x, y, glyph.c_str());
+    painter->DrawGlyph(document->GetDocument(), x, y, glyph.c_str());
   } catch (PdfError& err) {
     ErrorHandler(err, info);
   }

@@ -11,9 +11,8 @@ ListField::ListField(const CallbackInfo& info)
 {
   AssertFunctionArgs(info, 1, { napi_valuetype::napi_object });
   auto wrap = info[0].As<Object>();
-  auto fieldObj = Field::Unwrap(wrap)->GetField();
-  field = &fieldObj;
-  list = new PdfListField(*field);
+  field = Field::Unwrap(wrap);
+  list = new PdfListField(field->GetField());
 }
 
 void
@@ -97,7 +96,7 @@ ListField::~ListField()
   if (list != nullptr) {
     HandleScope scope(Env());
     delete list;
-    field = nullptr;
   }
+  field = nullptr;
 }
 }

@@ -55,7 +55,6 @@ Document::Document(const CallbackInfo& info)
   } else {
     document = new PdfMemDocument();
   }
-
   if (!document) {
     throw Error::New(info.Env(), "document has not been initialized properly");
   }
@@ -65,10 +64,7 @@ Document::~Document()
 {
   if (document != nullptr) {
     HandleScope scope(Env());
-    if (isExternalInstance)
-      document = nullptr;
-    else
-      delete document;
+    delete document;
   }
 }
 Napi::Value
@@ -354,12 +350,9 @@ Document::GetEncrypt(const CallbackInfo& info)
 {
   const PdfEncrypt* enc = document->GetEncrypt();
   auto ptr = const_cast<PdfEncrypt*>(enc);
-  auto encryptPtr = Napi::External<PdfEncrypt>::New(
-    info.Env(), ptr, [](Napi::Env env, PdfEncrypt* value) {
-      HandleScope scope(env);
-      delete value;
-    });
-  auto instance = Encrypt::constructor.New({ encryptPtr });
+  auto encryptPtr = Napi::External<PdfEncrypt>::New(info.Env(), ptr);
+  auto instance = Encrypt::constructor.New(
+    { encryptPtr, External<Document>::New(info.Env(), this) });
   return instance;
 }
 
@@ -373,11 +366,7 @@ Document::GetObjects(const CallbackInfo& info)
     while (it != document->GetObjects().end()) {
       if (!(*it))
         break;
-      auto instance = External<PdfObject>::New(
-        info.Env(), (*it), [](Napi::Env env, PdfObject* value) {
-          HandleScope scope(env);
-          delete value;
-        });
+      auto instance = External<PdfObject>::New(info.Env(), (*it));
       js[count] = Obj::constructor.New({ instance });
       ++it;
       ++count;
@@ -395,11 +384,7 @@ Document::GetTrailer(const CallbackInfo& info)
 {
   const PdfObject* trailerPdObject = document->GetTrailer();
   auto* ptr = const_cast<PdfObject*>(trailerPdObject);
-  auto initPtr = Napi::External<PdfObject>::New(
-    info.Env(), ptr, [](Napi::Env env, PdfObject* value) {
-      HandleScope scope(env);
-      delete value;
-    });
+  auto initPtr = Napi::External<PdfObject>::New(info.Env(), ptr);
   auto instance = Obj::constructor.New({ initPtr });
   return instance;
 }
@@ -496,11 +481,7 @@ Document::CreateFont(const CallbackInfo& info)
                            PdfFontCache::eFontCreationFlags_AutoSelectBase14,
                            embed,
                            filename);
-    return Font::constructor.New(
-      { External<PdfFont>::New(info.Env(), font, [](Napi::Env env, PdfFont* f) {
-        HandleScope scope(env);
-        delete f;
-      }) });
+    return Font::constructor.New({ External<PdfFont>::New(info.Env(), font) });
   } catch (PdfError& err) {
     ErrorHandler(err, info);
   }

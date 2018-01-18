@@ -5,6 +5,7 @@
 #ifndef NPDF_ANNOTATION_H
 #define NPDF_ANNOTATION_H
 
+#include "Document.h"
 #include "Page.h"
 #include "Rect.h"
 #include <napi.h>
@@ -39,8 +40,8 @@ public:
                          &Annotation::SetDestination),
         InstanceMethod("hasDestination", &Annotation::HasDestination),
         InstanceMethod("hasAction", &Annotation::HasAction),
-        InstanceAccessor(
-          "action", &Annotation::GetAction, &Annotation::SetAction),
+        InstanceMethod("setAction", &Annotation::SetAction),
+        InstanceMethod("getAction", &Annotation::GetAction),
         InstanceAccessor("open", &Annotation::GetOpen, &Annotation::SetOpen),
         InstanceMethod("getType", &Annotation::GetType),
         InstanceAccessor("color", &Annotation::GetColor, &Annotation::SetColor),
@@ -64,7 +65,7 @@ public:
   void SetDestination(const CallbackInfo&, const Napi::Value&);
   Napi::Value GetDestination(const CallbackInfo&);
   Napi::Value HasDestination(const CallbackInfo&);
-  void SetAction(const CallbackInfo&, const Napi::Value&);
+  void SetAction(const CallbackInfo&);
   Napi::Value GetAction(const CallbackInfo&);
   Napi::Value HasAction(const CallbackInfo&);
   void SetOpen(const CallbackInfo&, const Napi::Value&);
@@ -81,7 +82,7 @@ public:
 
 private:
   PdfAnnotation* annot;
-  PdfMemDocument* doc;
+  //  Document* doc;
 };
 }
 #endif // NPDF_ANNOTATION_H
