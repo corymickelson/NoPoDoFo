@@ -51,7 +51,7 @@ test('document objects instance of nopodofo.Obj', t => {
         t.throws(() => arr.pop())
         let arrObj = arr[0]
         t.assert(arrObj instanceof Obj, "Should return an Obj")
-        t.assert(arr instanceof Proxy, "Can get object as array where type === Arr")
+        //t.assert(arr instanceof Proxy, "Can get object as array where type === Arr")
 
         let keys = dict.getKeys()
         t.assert(keys instanceof Array, 'keys instance of array')

@@ -146,7 +146,7 @@ test('write buffer', t => {
 test('create font', t => {
     const doc = new Document(filePath)
     doc.on('ready', (pdf: Document) => {
-        let font = pdf.createFont({encoding:FontEncoding.Identity,bold:false, fontName: 'monospace'})
+        let font = pdf.createFont({fontName: 'monospace'})
         const m = font.getMetrics()
         t.ok(m)
         t.end()
