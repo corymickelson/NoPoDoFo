@@ -38,7 +38,7 @@ public:
 
 private:
   //  PoDoFo::PdfObject* _obj;
-  PoDoFo::PdfDictionary* dict = new PoDoFo::PdfDictionary();
+  PoDoFo::PdfDictionary* dict = nullptr;
 };
 }
 #endif

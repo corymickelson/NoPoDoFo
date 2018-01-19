@@ -1,7 +1,7 @@
-import { Ref } from "./reference";
-import { Dictionary } from "./dictionary";
-import { Arr } from "./arr";
+import {Ref} from "./reference";
+import {Dictionary} from "./dictionary";
 
+export type PDInternal = any
 export type PDType =
     'Boolean'
     | 'Number'
@@ -120,17 +120,16 @@ export class Obj {
     // }
 
     asArray(): Array<Obj> {
-        const i = this._instance.getArray(),
-            array = i.toArray(),
-            length = array.length,
+        const i: PDInternal = this._instance.getArray(),
             mutableCheck = () => {
                 if (!i.mutable) {
                     throw Error('Array is not mutable. To make changes to the underlying PoDoFo::PdfArray you must first set the mutable property to true.')
                 }
             }
-        let dirty: boolean = i.dirty
-        //array:Array<Obj> = i.getArray().map((j: any) => new Obj(j)),
-        const ap = new Proxy(i, {
+        let dirty: boolean = false,
+            array: Array<Obj> = i.toArray(),
+            length: number = array.length
+        return new Proxy(i, {
             get(target, prop) {
                 let int = parseInt((prop as string))
                 if (!Number.isNaN(int)) prop = int
@@ -141,11 +140,10 @@ export class Obj {
                             return () => {
                                 const i = length - 1,
                                     item = (dirty ? (i as any).toArray() : array || (i as any).toArray())[i]
-                                        (i as any).remove(i)
+                                    (i as any).remove(i)
                                 dirty = true
                                 return item
                             }
-                        // return () => target.remove(target.length)
                         case 'unshift':
                             mutableCheck()
                             return () => {
@@ -168,15 +166,18 @@ export class Obj {
                             }
                         case 'length':
                             return (dirty ? (i as any).toArray() : array || (i as any).toArray()).length
-                        default: // catch all, and apply to native js array
-                            // const array = target.dirty ? target.asArray() : ac || target.asArray()
+                        default:
                             return (...args: any[]) => {
                                 dirty = true
                                 return dirty ? (i as any).toArray() : array || (i as any).toArray()[prop].call(args)
                             }
                     }
-                } else if (typeof prop === 'number' && prop > -1 && prop < target.length) {
-                    const arr = i.dirty ? (i as any).toArray() : array || (i as any).toArray()
+                } else if (typeof prop === 'number' && prop > -1 && prop < length) {
+                    if(prop < 0 || prop > length) {
+                        throw new RangeError()
+                    }
+                    const arr = dirty ? (i as any).toArray() : array || (i as any).toArray()
+                    array = arr
                     return new Obj(arr[prop])
                 } else {
 
@@ -190,8 +191,6 @@ export class Obj {
                 return false
             }
         })
-
-        return ap
     }
 
     asDictionary(): Dictionary {

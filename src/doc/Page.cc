@@ -22,7 +22,7 @@ Page::Page(const CallbackInfo& info)
   //  PoDoFo::PdfMemDocument* parentPtr =
   //    info[1].As<Napi::External<PoDoFo::PdfMemDocument>>().Data();
   //  parent = parentPtr;
-  page = pagePtr;
+  page = new PdfPage(*pagePtr);
 }
 void
 Page::Initialize(Napi::Env& env, Napi::Object& target)

@@ -22,12 +22,14 @@ public:
   Napi::Value ContainsString(const Napi::CallbackInfo&);
   Napi::Value GetStringIndex(const Napi::CallbackInfo&);
   Napi::Value IsDirty(const Napi::CallbackInfo&);
-  Napi::Value GetIndex(const Napi::CallbackInfo&);
+  Napi::Value At(const Napi::CallbackInfo&);
   void SetDirty(const Napi::CallbackInfo&, const Napi::Value&);
   void Push(const Napi::CallbackInfo&);
+  Napi::Value Pop(const Napi::CallbackInfo&);
 
 private:
-  PoDoFo::PdfArray* array = new PoDoFo::PdfArray();
+  PoDoFo::PdfArray* array = nullptr;
+  Napi::Value GetObjAtIndex(const Napi::CallbackInfo&);
 };
 }
 #endif

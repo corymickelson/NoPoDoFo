@@ -3,7 +3,6 @@ import {Document} from './document'
 import * as test from 'tape'
 import {join} from 'path';
 import {Dictionary} from './dictionary';
-import {Arr} from "./arr";
 
 test('document objects instance of nopodofo.Obj', t => {
     const filePath = join(__dirname, '../test-documents/test.pdf'),
@@ -40,7 +39,7 @@ test('document objects instance of nopodofo.Obj', t => {
                 }
             }
         }
-        // if (!found) t.fail("references not found") // this is causing gitkraken to fail, need to research cause
+        t.assert(found === true, "If streams are not found there is a problem")
 
         let dicts = objs.filter((i: any) => i.type === 'Dictionary'),
             dict = dicts[0].asDictionary()

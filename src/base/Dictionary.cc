@@ -27,7 +27,6 @@ Dictionary::Dictionary(const CallbackInfo& info)
   if (!obj.IsDictionary()) {
     throw Error::New(info.Env(), "PdfObject must be of type 'Dictionary'");
   }
-  //  dict = &obj.GetDictionary();
   dict = new PdfDictionary(obj.GetDictionary());
 }
 void
@@ -287,6 +286,7 @@ Dictionary::~Dictionary()
 {
   if (dict != nullptr) {
     HandleScope scope(Env());
+    delete dict;
   }
 }
 }

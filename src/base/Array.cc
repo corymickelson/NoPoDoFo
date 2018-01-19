@@ -18,7 +18,6 @@ Array::Array(const CallbackInfo& info)
   : ObjectWrap<Array>(info)
 {
   AssertFunctionArgs(info, 1, { napi_valuetype::napi_external });
-  //  PdfArray* pArray = info[0].As<External<PdfArray>>().Data();
   array = new PdfArray(*info[0].As<External<PdfArray>>().Data());
 }
 
@@ -31,11 +30,12 @@ Array::Initialize(Napi::Env& env, Napi::Object& target)
                 { InstanceAccessor("dirty", &Array::IsDirty, &Array::SetDirty),
                   InstanceAccessor("length", &Array::Length, nullptr),
                   InstanceMethod("toArray", &Array::ToArray),
-                  InstanceMethod("getIndex", &Array::GetIndex),
+                  InstanceMethod("at", &Array::At),
                   InstanceMethod("contains", &Array::ContainsString),
                   InstanceMethod("indexOf", &Array::GetStringIndex),
                   InstanceMethod("write", &Array::Write),
-                  InstanceMethod("push", &Array::Push) });
+                  InstanceMethod("push", &Array::Push),
+                  InstanceMethod("pop", &Array::Pop) });
   constructor = Persistent(ctor);
   constructor.SuppressDestruct();
   target.Set("Array", ctor);
@@ -53,7 +53,6 @@ Array::Write(const CallbackInfo& info)
   PdfOutputDevice device(output.c_str());
   array->Write(&device, ePdfWriteMode_Default);
 }
-
 Napi::Value
 Array::ContainsString(const CallbackInfo& info)
 {
@@ -62,7 +61,6 @@ Array::ContainsString(const CallbackInfo& info)
   bool match = array->ContainsString(searchString);
   return Napi::Boolean::New(info.Env(), match);
 }
-
 Napi::Value
 Array::GetStringIndex(const CallbackInfo& info)
 {
@@ -78,14 +76,15 @@ Array::IsDirty(const CallbackInfo& info)
 }
 
 Napi::Value
-Array::GetIndex(const CallbackInfo& info)
+Array::At(const CallbackInfo& info)
 {
   AssertFunctionArgs(info, 1, { napi_valuetype::napi_number });
-  size_t index = info[0].As<Number>().Uint32Value();
-  PdfObject item = array[index];
-  auto initPtr = Napi::External<PdfObject>::New(info.Env(), &item);
-  auto instance = Obj::constructor.New({ initPtr });
-  return instance;
+  return GetObjAtIndex(info);
+  //  size_t index = info[0].As<Number>().Uint32Value();
+  //  PdfObject item = array[index];
+  //  auto initPtr = Napi::External<PdfObject>::New(info.Env(), &item);
+  //  auto instance = Obj::constructor.New({ initPtr });
+  //  return instance;
 }
 
 void
@@ -114,6 +113,22 @@ Array::Push(const CallbackInfo& info)
   } catch (Napi::Error& err) {
     ErrorHandler(err, info);
   }
+}
+
+Value
+Array::Pop(const CallbackInfo& info)
+{
+  return GetObjAtIndex(info);
+}
+
+Value
+Array::GetObjAtIndex(const CallbackInfo& info)
+{
+  size_t index = info[0].As<Number>().Uint32Value();
+  PdfObject item = array[index];
+  auto initPtr = Napi::External<PdfObject>::New(info.Env(), &item);
+  auto instance = Obj::constructor.New({ initPtr });
+  return instance;
 }
 
 Napi::Value

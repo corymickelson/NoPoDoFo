@@ -51,7 +51,8 @@ Document::Document(const CallbackInfo& info)
 {
   if (info.Length() == 1) {
     AssertFunctionArgs(info, 1, { napi_external });
-    document = info[0].As<External<PdfMemDocument>>().Data();
+    auto d = info[0].As<External<PdfMemDocument>>().Data();
+    document = new PdfMemDocument(d);
   } else {
     document = new PdfMemDocument();
   }
@@ -89,8 +90,7 @@ Document::GetPage(const CallbackInfo& info)
     }
     PdfPage* page = document->GetPage(n);
     auto pagePtr = Napi::External<PdfPage>::New(info.Env(), page);
-    auto docPtr = Napi::External<PdfMemDocument>::New(info.Env(), document);
-    auto instance = Page::constructor.New({ pagePtr, docPtr });
+    auto instance = Page::constructor.New({ pagePtr });
     return instance;
   } catch (PdfError& err) {
     ErrorHandler(err, info);
