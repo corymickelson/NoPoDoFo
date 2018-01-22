@@ -21,6 +21,7 @@ Obj::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceAccessor("type", &Obj::GetDataType, nullptr),
       InstanceAccessor("length", &Obj::GetObjectLength, nullptr),
       InstanceAccessor("reference", &Obj::Reference, nullptr),
+      InstanceAccessor("immutable", &Obj::GetImmutable, &Obj::SetImmutable),
       InstanceMethod("hasStream", &Obj::HasStream),
       InstanceMethod("getOffset", &Obj::GetByteOffset),
       InstanceMethod("write", &Obj::Write),
@@ -33,7 +34,9 @@ Obj::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceMethod("getName", &Obj::GetName),
       InstanceMethod("getArray", &Obj::GetArray),
       InstanceMethod("getReference", &Obj::GetReference),
-      InstanceMethod("getRawData", &Obj::GetRawData) });
+      InstanceMethod("getRawData", &Obj::GetRawData),
+      InstanceMethod("clear", &Obj::Clear),
+      InstanceMethod("eq", &Obj::Eq) });
   constructor = Napi::Persistent(ctor);
   constructor.SuppressDestruct();
   target.Set("Obj", ctor);
@@ -53,6 +56,16 @@ Obj::~Obj()
   if (obj != nullptr) {
     HandleScope scope(Env());
     delete obj;
+  }
+}
+
+void
+Obj::Clear(const Napi::CallbackInfo& info)
+{
+  try {
+    obj->Clear();
+  } catch (PdfError& err) {
+    ErrorHandler(err, info);
   }
 }
 Napi::Value
@@ -83,6 +96,19 @@ Obj::GetObjectLength(const CallbackInfo& info)
 {
   return Napi::Number::New(info.Env(),
                            obj->GetObjectLength(ePdfWriteMode_Default));
+}
+
+Napi::Value
+Obj::GetImmutable(const CallbackInfo& info)
+{
+  return Boolean::New(info.Env(), obj->GetImmutable());
+}
+void
+Obj::SetImmutable(const CallbackInfo& info, const Napi::Value& value)
+{
+  if (value.IsBoolean()) {
+    obj->SetImmutable(value.As<Boolean>());
+  }
 }
 
 Napi::Value
@@ -117,6 +143,18 @@ Obj::GetDataType(const CallbackInfo& info)
     js = "Unknown";
   }
   return Napi::String::New(info.Env(), js);
+}
+
+Napi::Value
+Obj::Eq(const CallbackInfo& info)
+{
+  AssertFunctionArgs(info, 1, {napi_object});
+  auto wrap = info[0].As<Object>();
+  if(!wrap.InstanceOf(Obj::constructor.Value())) {
+    throw Error::New(info.Env(), "Must be an instance of NoPoDoFo Obj");
+  }
+  auto value = Obj::Unwrap(wrap);
+  return Boolean::New(info.Env(), value->GetObject() == this->GetObject());
 }
 
 Napi::Value
@@ -248,8 +286,7 @@ public:
     : Napi::AsyncWorker(cb)
     , obj(obj)
     , arg(std::move(arg))
-  {
-  }
+  {}
 
 protected:
   void Execute() override
@@ -294,8 +331,7 @@ public:
     : AsyncWorker(cb)
     , obj(obj)
     , arg(std::move(dest))
-  {
-  }
+  {}
 
 protected:
   void Execute() override

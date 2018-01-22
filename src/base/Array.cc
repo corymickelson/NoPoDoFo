@@ -20,25 +20,57 @@ Array::Array(const CallbackInfo& info)
   AssertFunctionArgs(info, 1, { napi_valuetype::napi_external });
   array = new PdfArray(*info[0].As<External<PdfArray>>().Data());
 }
+Array::~Array()
+{
+  if (array != nullptr) {
+    HandleScope scope(Env());
+    delete array;
+  }
+}
 
 void
 Array::Initialize(Napi::Env& env, Napi::Object& target)
 {
-  Function ctor =
-    DefineClass(env,
-                "Array",
-                { InstanceAccessor("dirty", &Array::IsDirty, &Array::SetDirty),
-                  InstanceAccessor("length", &Array::Length, nullptr),
-                  InstanceMethod("toArray", &Array::ToArray),
-                  InstanceMethod("at", &Array::At),
-                  InstanceMethod("contains", &Array::ContainsString),
-                  InstanceMethod("indexOf", &Array::GetStringIndex),
-                  InstanceMethod("write", &Array::Write),
-                  InstanceMethod("push", &Array::Push),
-                  InstanceMethod("pop", &Array::Pop) });
+  Function ctor = DefineClass(
+    env,
+    "Array",
+    { InstanceAccessor("dirty", &Array::IsDirty, &Array::SetDirty),
+      InstanceAccessor("length", &Array::Length, nullptr),
+      InstanceAccessor("immutable", &Array::GetImmutable, &Array::SetImmutable),
+      InstanceMethod("toArray", &Array::ToArray),
+      InstanceMethod("at", &Array::At),
+      InstanceMethod("contains", &Array::ContainsString),
+      InstanceMethod("indexOf", &Array::GetStringIndex),
+      InstanceMethod("write", &Array::Write),
+      InstanceMethod("push", &Array::Push),
+      InstanceMethod("pop", &Array::Pop),
+      InstanceMethod("clear", &Array::Clear),
+      InstanceMethod("eq", &Array::Eq)});
   constructor = Persistent(ctor);
   constructor.SuppressDestruct();
   target.Set("Array", ctor);
+}
+Napi::Value
+Array::Eq(const CallbackInfo& info)
+{
+  AssertFunctionArgs(info, 1, { napi_object });
+  auto wrap = info[0].As<Object>();
+  if (!wrap.InstanceOf(Array::constructor.Value())) {
+    throw Error::New(info.Env(), "Must be an instance of NoPoDoFo Obj");
+  }
+  auto value = Array::Unwrap(wrap);
+  return Boolean::New(info.Env(), value->GetArray() == array);
+}
+Napi::Value
+Array::GetImmutable(const CallbackInfo& info)
+{
+  return Boolean::New(info.Env(), array->GetImmutable());
+}
+
+void
+Array::SetImmutable(const CallbackInfo& info, const Napi::Value& value)
+{
+  array->SetImmutable(value.As<Boolean>());
 }
 Napi::Value
 Array::Length(const Napi::CallbackInfo& info)
@@ -80,11 +112,6 @@ Array::At(const CallbackInfo& info)
 {
   AssertFunctionArgs(info, 1, { napi_valuetype::napi_number });
   return GetObjAtIndex(info);
-  //  size_t index = info[0].As<Number>().Uint32Value();
-  //  PdfObject item = array[index];
-  //  auto initPtr = Napi::External<PdfObject>::New(info.Env(), &item);
-  //  auto instance = Obj::constructor.New({ initPtr });
-  //  return instance;
 }
 
 void
@@ -150,11 +177,14 @@ Array::ToArray(const Napi::CallbackInfo& info)
   }
   return js;
 }
-Array::~Array()
+
+void
+Array::Clear(const CallbackInfo& info)
 {
-  if (array != nullptr) {
-    HandleScope scope(Env());
-    delete array;
+  try {
+    array->Clear();
+  } catch (PdfError& err) {
+    ErrorHandler(err, info);
   }
 }
 }

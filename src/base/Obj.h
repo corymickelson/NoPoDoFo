@@ -38,6 +38,10 @@ public:
   Napi::Value GetBool(const Napi::CallbackInfo&);
   Napi::Value GetReference(const Napi::CallbackInfo&);
   Napi::Value GetRawData(const Napi::CallbackInfo&);
+  Napi::Value GetImmutable(const Napi::CallbackInfo&);
+  void SetImmutable(const Napi::CallbackInfo &, const Napi::Value &);
+  void Clear(const Napi::CallbackInfo&);
+  Napi::Value Eq(const Napi::CallbackInfo&);
 
   const PoDoFo::PdfObject GetObject() { return *obj; }
 

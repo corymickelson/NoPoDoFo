@@ -48,11 +48,23 @@ Dictionary::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceMethod("clear", &Dictionary::Clear),
       InstanceMethod("write", &Dictionary::Write),
       InstanceMethod("writeSync", &Dictionary::WriteSync),
-      InstanceMethod("toObject", &Dictionary::ToObject) });
+      InstanceMethod("toObject", &Dictionary::ToObject),
+      InstanceMethod("eq", &Dictionary::Eq) });
   constructor = Napi::Persistent(ctor);
   constructor.SuppressDestruct();
 
   target.Set("Dictionary", ctor);
+}
+Napi::Value
+Dictionary::Eq(const CallbackInfo& info)
+{
+  AssertFunctionArgs(info, 1, { napi_object });
+  auto wrap = info[0].As<Object>();
+  if (!wrap.InstanceOf(Dictionary::constructor.Value())) {
+    throw Error::New(info.Env(), "Must be an instance of NoPoDoFo Obj");
+  }
+  auto value = Dictionary::Unwrap(wrap);
+  return Boolean::New(info.Env(), value->GetDictionary() == dict);
 }
 void
 Dictionary::AddKey(const CallbackInfo& info)
@@ -239,8 +251,7 @@ public:
     : Napi::AsyncWorker(cb)
     , dict(dict)
     , arg(std::move(dest))
-  {
-  }
+  {}
 
 protected:
   void Execute() override

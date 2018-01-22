@@ -21,7 +21,6 @@ test('document objects instance of nopodofo.Obj', t => {
         let streams = objs.filter((i: any) => i.hasStream())
         t.assert(streams.length > 0, 'objects streams available')
         t.assert(streams[0].stream instanceof Buffer, 'stream as Buffer')
-
         t.assert(objs[0] instanceof Obj, 'Objects array, instance of nopodofo.Obj')
 
         let found = false;
@@ -47,10 +46,9 @@ test('document objects instance of nopodofo.Obj', t => {
 
         let arrs = objs.filter((i: any) => i.type === 'Array'),
             arr = arrs[0].asArray()
-        t.throws(() => arr.pop())
+        t.throws(() => arr.pop(), "This operation should fail since the underlying PdfArray is immutable")
         let arrObj = arr[0]
-        t.assert(arrObj instanceof Obj, "Should return an Obj")
-        //t.assert(arr instanceof Proxy, "Can get object as array where type === Arr")
+        t.assert(arrObj instanceof Obj, "Should return an Obj via array bracket getter notation")
 
         let keys = dict.getKeys()
         t.assert(keys instanceof Array, 'keys instance of array')

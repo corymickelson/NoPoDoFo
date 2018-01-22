@@ -24,8 +24,13 @@ public:
   Napi::Value IsDirty(const Napi::CallbackInfo&);
   Napi::Value At(const Napi::CallbackInfo&);
   void SetDirty(const Napi::CallbackInfo&, const Napi::Value&);
+  Napi::Value GetImmutable(const Napi::CallbackInfo&);
+  void SetImmutable(const Napi::CallbackInfo&, const Napi::Value&);
   void Push(const Napi::CallbackInfo&);
   Napi::Value Pop(const Napi::CallbackInfo&);
+  void Clear(const Napi::CallbackInfo&);
+  Napi::Value Eq(const Napi::CallbackInfo&);
+  PoDoFo::PdfArray* GetArray() { return array; }
 
 private:
   PoDoFo::PdfArray* array = nullptr;
