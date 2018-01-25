@@ -18,7 +18,7 @@
     "test:painter": "node --expose-gc ./dist/painter.spec.js",
     "test:parser": "node --expose-gc ./dist/parser.spec.js",
     "build:test": "npm run compile && npm run lib-build && npm run test",
-    "precommit": "node-gyp rebuild && npm run lib-build && npm test",
+    "precommitx": "node-gyp rebuild && npm run lib-build && npm test",
     "postinstall": "npm run lib-build"
   },
   "keywords": [

@@ -18,16 +18,22 @@ FunctionReference Dictionary::constructor;
 Dictionary::Dictionary(const CallbackInfo& info)
   : ObjectWrap<Dictionary>(info)
 {
-  auto objWrap = info[0].As<Object>();
-  if (!objWrap.InstanceOf(Obj::constructor.Value())) {
-    throw Error::New(
-      info.Env(), "Dictionary constructor requires an instance of PdfObject");
+  if (info[0].IsObject()) {
+    auto objWrap = info[0].As<Object>();
+    if (!objWrap.InstanceOf(Obj::constructor.Value())) {
+      throw Error::New(
+        info.Env(), "Dictionary constructor requires an instance of PdfObject");
+    }
+    auto obj = Obj::Unwrap(objWrap)->GetObject();
+    if (!obj.IsDictionary()) {
+      throw Error::New(info.Env(), "PdfObject must be of type 'Dictionary'");
+    }
+    dict = new PdfDictionary(obj.GetDictionary());
+  } else if (info[0].Type() == napi_external) {
+    dict = std::move(info[0].As<External<PdfDictionary>>().Data());
+  } else {
+    dict = new PdfDictionary();
   }
-  auto obj = Obj::Unwrap(objWrap)->GetObject();
-  if (!obj.IsDictionary()) {
-    throw Error::New(info.Env(), "PdfObject must be of type 'Dictionary'");
-  }
-  dict = new PdfDictionary(obj.GetDictionary());
 }
 void
 Dictionary::Initialize(Napi::Env& env, Napi::Object& target)

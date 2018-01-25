@@ -18,7 +18,9 @@ Array::Array(const CallbackInfo& info)
   : ObjectWrap<Array>(info)
 {
   AssertFunctionArgs(info, 1, { napi_valuetype::napi_external });
-  array = new PdfArray(*info[0].As<External<PdfArray>>().Data());
+  //  PdfArray* a = info[0].As<External<PdfArray>>().Data();
+  array = std::move(info[0].As<External<PdfArray>>().Data());
+  //  array = new PdfArray(*info[0].As<External<PdfArray>>().Data());
 }
 Array::~Array()
 {

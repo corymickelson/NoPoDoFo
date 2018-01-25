@@ -28,6 +28,7 @@ Obj::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceMethod("flateCompressStream", &Obj::FlateCompressStream),
       InstanceMethod("delayedStreamLoad", &Obj::DelayedStreamLoad),
       InstanceMethod("getBool", &Obj::GetBool),
+      InstanceMethod("getDictionary", &Obj::GetDictionary),
       InstanceMethod("getNumber", &Obj::GetNumber),
       InstanceMethod("getReal", &Obj::GetReal),
       InstanceMethod("getString", &Obj::GetString),
@@ -266,6 +267,18 @@ Obj::GetReference(const CallbackInfo& info)
   auto init = obj->GetReference();
   auto ptr = External<PdfReference>::New(info.Env(), &init);
   auto instance = Ref::constructor.New({ ptr });
+  return instance;
+}
+
+Napi::Value
+Obj::GetDictionary(const CallbackInfo& info)
+{
+  if (!obj->IsDictionary()) {
+    throw Napi::Error::New(info.Env(), "Obj only accessible as Ref");
+  }
+  auto init = obj->GetDictionary();
+  auto ptr = External<PdfDictionary>::New(info.Env(), &init);
+  auto instance = Dictionary::constructor.New({ ptr });
   return instance;
 }
 

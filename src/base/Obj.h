@@ -37,6 +37,7 @@ public:
   Napi::Value GetArray(const Napi::CallbackInfo&);
   Napi::Value GetBool(const Napi::CallbackInfo&);
   Napi::Value GetReference(const Napi::CallbackInfo&);
+  Napi::Value GetDictionary(const Napi::CallbackInfo&);
   Napi::Value GetRawData(const Napi::CallbackInfo&);
   Napi::Value GetImmutable(const Napi::CallbackInfo&);
   void SetImmutable(const Napi::CallbackInfo &, const Napi::Value &);
