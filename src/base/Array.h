@@ -33,7 +33,8 @@ public:
   PoDoFo::PdfArray* GetArray() { return array; }
 
 private:
-  PoDoFo::PdfArray* array = nullptr;
+  PoDoFo::PdfArray* array;
+  //  PoDoFo::PdfObject* obj = nullptr;
   Napi::Value GetObjAtIndex(const Napi::CallbackInfo&);
 };
 }

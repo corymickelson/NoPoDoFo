@@ -18,13 +18,16 @@ doc.on('ready', async e => {
     try {
         // check for form
         let form = new Form(doc),
-            formDict = form.getObject().asDictionary()
-        if (!formDict.hasKey('SigFlags') ||
-            formDict.getKey('SigFlags').type !== 'Number' ||
-            formDict.getKey('SigFlags').asNumber() !== 3) {
-            if (formDict.hasKey('SigFlags'))
-                formDict.removeKey('SigFlags')
-            formDict.addKey('SigFlags', 3)
+            formDict = form.getObject().asObject()
+        if (!formDict['SigFlags'] ||
+            formDict['SigFlags'].type !== 'Number' ||
+            formDict['SigFlags'].asNumber() !== 3) {
+            if (formDict['SigFlags']) {
+                delete formDict['SigFlags']
+                //formDict.removeKey('SigFlags')
+            }
+            (formDict as any).SigFlags = 3
+            // formDict.addKey('SigFlags', 3)
         }
         if (form.needAppearances)
             form.needAppearances = false

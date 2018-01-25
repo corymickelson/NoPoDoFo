@@ -34,6 +34,7 @@ Obj::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceMethod("getString", &Obj::GetString),
       InstanceMethod("getName", &Obj::GetName),
       InstanceMethod("getArray", &Obj::GetArray),
+      InstanceMethod("getDictionary", &Obj::GetDictionary),
       InstanceMethod("getReference", &Obj::GetReference),
       InstanceMethod("getRawData", &Obj::GetRawData),
       InstanceMethod("clear", &Obj::Clear),
@@ -45,12 +46,8 @@ Obj::Initialize(Napi::Env& env, Napi::Object& target)
 
 Obj::Obj(const Napi::CallbackInfo& info)
   : ObjectWrap<Obj>(info)
-{
-  if (info.Length() < 1) {
-    throw Error::New(info.Env(), "requires PdfObject external pointer");
-  }
-  obj = info[0].As<Napi::External<PdfObject>>().Data();
-}
+  , obj(info[0].As<Napi::External<PdfObject>>().Data())
+{}
 
 Obj::~Obj()
 {
@@ -149,9 +146,9 @@ Obj::GetDataType(const CallbackInfo& info)
 Napi::Value
 Obj::Eq(const CallbackInfo& info)
 {
-  AssertFunctionArgs(info, 1, {napi_object});
+  AssertFunctionArgs(info, 1, { napi_object });
   auto wrap = info[0].As<Object>();
-  if(!wrap.InstanceOf(Obj::constructor.Value())) {
+  if (!wrap.InstanceOf(Obj::constructor.Value())) {
     throw Error::New(info.Env(), "Must be an instance of NoPoDoFo Obj");
   }
   auto value = Obj::Unwrap(wrap);
@@ -243,8 +240,7 @@ Obj::GetArray(const CallbackInfo& info)
   if (!obj->IsArray()) {
     throw Napi::Error::New(info.Env(), "Obj only accessible as array");
   }
-  auto init = obj->GetArray();
-  auto ptr = External<PdfArray>::New(info.Env(), &init);
+  auto ptr = External<PdfArray>::New(info.Env(), &obj->GetArray());
   auto instance = NoPoDoFo::Array::constructor.New({ ptr });
   return instance;
 }
@@ -299,14 +295,15 @@ public:
     : Napi::AsyncWorker(cb)
     , obj(obj)
     , arg(std::move(arg))
-  {}
+  {
+  }
 
 protected:
   void Execute() override
   {
     try {
-      PdfObject o = obj->GetObject();
-      value = o.GetByteOffset(arg.c_str(), ePdfWriteMode_Default);
+      auto o = const_cast<PdfObject*>(obj->GetObject());
+      value = o->GetByteOffset(arg.c_str(), ePdfWriteMode_Default);
     } catch (PdfError& err) {
       SetError(ErrorHandler::WriteMsg(err));
     } catch (Napi::Error& err) {
@@ -344,14 +341,15 @@ public:
     : AsyncWorker(cb)
     , obj(obj)
     , arg(std::move(dest))
-  {}
+  {
+  }
 
 protected:
   void Execute() override
   {
     try {
       PdfOutputDevice device(arg.c_str());
-      obj->GetObject().WriteObject(&device, ePdfWriteMode_Default, nullptr);
+      obj->GetObject()->WriteObject(&device, ePdfWriteMode_Default, nullptr);
     } catch (PdfError& err) {
       SetError(ErrorHandler::WriteMsg(err));
     } catch (Napi::Error& err) {

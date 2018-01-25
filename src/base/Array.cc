@@ -16,12 +16,9 @@ Napi::FunctionReference Array::constructor;
 
 Array::Array(const CallbackInfo& info)
   : ObjectWrap<Array>(info)
-{
-  AssertFunctionArgs(info, 1, { napi_valuetype::napi_external });
-  //  PdfArray* a = info[0].As<External<PdfArray>>().Data();
-  array = std::move(info[0].As<External<PdfArray>>().Data());
-  //  array = new PdfArray(*info[0].As<External<PdfArray>>().Data());
-}
+  , array(new PdfArray(*info[0].As<External<PdfArray>>().Data()))
+{}
+
 Array::~Array()
 {
   if (array != nullptr) {
@@ -47,7 +44,7 @@ Array::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceMethod("push", &Array::Push),
       InstanceMethod("pop", &Array::Pop),
       InstanceMethod("clear", &Array::Clear),
-      InstanceMethod("eq", &Array::Eq)});
+      InstanceMethod("eq", &Array::Eq) });
   constructor = Persistent(ctor);
   constructor.SuppressDestruct();
   target.Set("Array", ctor);
@@ -61,23 +58,23 @@ Array::Eq(const CallbackInfo& info)
     throw Error::New(info.Env(), "Must be an instance of NoPoDoFo Obj");
   }
   auto value = Array::Unwrap(wrap);
-  return Boolean::New(info.Env(), value->GetArray() == array);
+  return Boolean::New(info.Env(), value->GetArray() == GetArray());
 }
 Napi::Value
 Array::GetImmutable(const CallbackInfo& info)
 {
-  return Boolean::New(info.Env(), array->GetImmutable());
+  return Boolean::New(info.Env(), GetArray()->GetImmutable());
 }
 
 void
 Array::SetImmutable(const CallbackInfo& info, const Napi::Value& value)
 {
-  array->SetImmutable(value.As<Boolean>());
+  GetArray()->SetImmutable(value.As<Boolean>());
 }
 Napi::Value
 Array::Length(const Napi::CallbackInfo& info)
 {
-  return Number::New(info.Env(), array->size());
+  return Number::New(info.Env(), GetArray()->size());
 }
 void
 Array::Write(const CallbackInfo& info)
@@ -85,14 +82,14 @@ Array::Write(const CallbackInfo& info)
   AssertFunctionArgs(info, 1, { napi_valuetype::napi_string });
   string output = info[0].As<String>().Utf8Value();
   PdfOutputDevice device(output.c_str());
-  array->Write(&device, ePdfWriteMode_Default);
+  GetArray()->Write(&device, ePdfWriteMode_Default);
 }
 Napi::Value
 Array::ContainsString(const CallbackInfo& info)
 {
   AssertFunctionArgs(info, 1, { napi_valuetype::napi_string });
   string searchString = info[0].As<String>().Utf8Value();
-  bool match = array->ContainsString(searchString);
+  bool match = GetArray()->ContainsString(searchString);
   return Napi::Boolean::New(info.Env(), match);
 }
 Napi::Value
@@ -100,19 +97,21 @@ Array::GetStringIndex(const CallbackInfo& info)
 {
   AssertFunctionArgs(info, 1, { napi_valuetype::napi_string });
   string str = info[0].As<String>().Utf8Value();
-  return Napi::Number::New(info.Env(), array->GetStringIndex(str));
+  return Napi::Number::New(info.Env(), GetArray()->GetStringIndex(str));
 }
 
 Napi::Value
 Array::IsDirty(const CallbackInfo& info)
 {
-  return Napi::Boolean::New(info.Env(), array->IsDirty());
+  return Napi::Boolean::New(info.Env(), GetArray()->IsDirty());
 }
 
 Napi::Value
 Array::At(const CallbackInfo& info)
 {
   AssertFunctionArgs(info, 1, { napi_valuetype::napi_number });
+  PdfOutputDevice what("/tmp/array.out.txt");
+  GetArray()->Write(&what, ePdfWriteMode_Default);
   return GetObjAtIndex(info);
 }
 
@@ -122,7 +121,7 @@ Array::SetDirty(const CallbackInfo& info, const Napi::Value& value)
   if (!value.IsBoolean()) {
     throw Napi::Error::New(info.Env(), "dirty must be of type boolean");
   }
-  array->SetDirty(value.As<Boolean>());
+  GetArray()->SetDirty(value.As<Boolean>());
 }
 
 void
@@ -135,7 +134,7 @@ Array::Push(const CallbackInfo& info)
   }
   try {
     auto item = Obj::Unwrap(wrapper);
-    array->push_back(item->GetObject());
+    GetArray()->push_back(*item->GetObject());
 
   } catch (PdfError& err) {
     ErrorHandler(err, info);
@@ -154,7 +153,10 @@ Value
 Array::GetObjAtIndex(const CallbackInfo& info)
 {
   size_t index = info[0].As<Number>().Uint32Value();
-  PdfObject item = array[index];
+  if (index > GetArray()->size()) {
+    throw Napi::RangeError();
+  }
+  PdfObject item = GetArray()[index];
   auto initPtr = Napi::External<PdfObject>::New(info.Env(), &item);
   auto instance = Obj::constructor.New({ initPtr });
   return instance;
@@ -166,7 +168,7 @@ Array::ToArray(const Napi::CallbackInfo& info)
   auto js = Napi::Array::New(info.Env());
   try {
     uint32_t counter = 0;
-    for (auto& it : *array) {
+    for (auto& it : *GetArray()) {
       const auto initPtr = External<PdfObject>::New(Env(), &it);
       const auto instance = Obj::constructor.New({ initPtr });
       js.Set(counter, instance);
@@ -184,7 +186,7 @@ void
 Array::Clear(const CallbackInfo& info)
 {
   try {
-    array->Clear();
+    GetArray()->Clear();
   } catch (PdfError& err) {
     ErrorHandler(err, info);
   }

@@ -154,15 +154,15 @@ function pageAddImg() {
             for (let i = 0; i < objs.length; i++) {
                 let o = objs[i]
                 if (o.type === 'Dictionary') {
-                    let objDict = o.asDictionary(),
-                        objType = objDict.hasKey('Type') ? objDict.getKey('Type') : null,
-                        objSubType = objDict.hasKey('SubType') ? objDict.getKey('SubType') : null
+                    let objDict = o.asObject(),
+                        objType = objDict['Type'],
+                        objSubType = objDict['SubType']
 
                     if ((objType && objType.type === 'Name') ||
                         (objSubType && objSubType.type === 'Name')) {
 
-                        if ((objType && (objType as Obj).asName() === 'XObject') || (objSubType && (objSubType as Obj).asName() === 'Image')) {
-                            let imgObj = o.asDictionary().hasKey('Filter') ? o.asDictionary().getKey('Filter') : null
+                        if ((objType && objType.asName() === 'XObject') || (objSubType && objSubType.asName() === 'Image')) {
+                            let imgObj = o.asObject()['Filter']
 
                             if (imgObj && imgObj.type === 'Array') {
                                 const imgObjArr = imgObj.asArray()

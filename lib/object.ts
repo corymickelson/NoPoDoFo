@@ -116,7 +116,8 @@ export class Obj {
      */
     asArray(): Array<Obj> {
         const internal: NPDFInternal = this._instance.getArray()
-        let mutableCheck =
+        let data: Array<Obj> = internal.toArray(),
+            mutableCheck =
                 () => {
                     if (internal.immutable) {
                         throw Error(
@@ -125,7 +126,7 @@ export class Obj {
                 },
             propIndex = (v: any): number | null => {
                 const index = parseInt((v as string));
-                if (!Number.isNaN(index)) {
+                if (Number.isNaN(index)) {
                     return null
                 }
                 return index
@@ -134,14 +135,14 @@ export class Obj {
         return new Proxy(internal, {
             get(target: NPDFInternal, prop: any) {
                 const int = propIndex(prop)
-                if (int) prop = int
+                if (typeof(int) === 'number') prop = int
                 if (typeof prop === 'string') {
                     switch (prop) {
                         case 'pop':
                             mutableCheck()
                             return () => {
-                                const item = target.at(target.length - 1)
-                                target.remove(target.length - 1)
+                                const item = data.pop()//internal.at(internal.length - 1)
+                                internal.remove(internal.length - 1)
                                 return new Obj(item)
                             }
                         case 'unshift':
@@ -150,13 +151,17 @@ export class Obj {
                                 if (v.every(i => i instanceof Obj)) {
                                     v.forEach((item, index, array) => {
                                         try {
-                                            target.add(item._instance, 0)
+                                            internal.add(item._instance, 0)
                                         } catch (e) {
                                             console.error(e)
                                             throw e
                                         }
                                     })
-                                    return target.length
+                                    data.unshift(...v)
+                                    if (data.length != internal.length) {
+                                        throw Error('Internal array out of sync')
+                                    }
+                                    return data.length
                                 } else {
                                     throw TypeError()
                                 }
@@ -167,13 +172,17 @@ export class Obj {
                                 if (v.every(i => i instanceof Obj)) {
                                     v.forEach((item, index, array) => {
                                         try {
-                                            target.add(item._instance, target.length - 1)
+                                            internal.add(item._instance, internal.length - 1)
                                         } catch (e) {
                                             console.error(e)
                                             throw e
                                         }
                                     })
-                                    return target.length
+                                    data.push(...v)
+                                    if (data.length !== internal.length) {
+                                        throw Error("Internal array out of sync")
+                                    }
+                                    return data.length
                                 } else {
                                     throw TypeError()
                                 }
@@ -181,12 +190,15 @@ export class Obj {
                         case 'shift':
                             mutableCheck()
                             return () => {
-                                const item = target.at(0)
-                                target.remove(0)
+                                const item = data.shift()//internal.at(0)
+                                internal.remove(0)
                                 return new Obj(item)
                             }
                         case 'length':
-                            return target.length
+                            if (data.length !== internal.length) {
+                                throw Error("Internal array out of sync")
+                            }
+                            return data.length
                         case 'concat':
                         case 'copyWithin':
                             console.warn(`NoPoDoFo does not yet support the creation of new PdfArray types.`)
@@ -199,11 +211,11 @@ export class Obj {
                             return false
                     }
                 }
-                else if (typeof prop === 'number' && prop > -1 && prop < target.length) {
-                    if (prop < 0 || prop > target.length) {
+                else if (typeof prop === 'number' && prop > -1 && prop < data.length) {
+                    if (prop < 0 || prop > data.length) {
                         throw new RangeError()
                     }
-                    return new Obj(target.at(prop))
+                    return new Obj(data[prop])
                 } else {
                     throw EvalError()
                 }
@@ -215,61 +227,86 @@ export class Obj {
                     throw RangeError()
                 }
                 if (value instanceof Obj && typeof prop === 'number') {
-                    target.add(value, prop)
+                    internal.add(value, prop)
+                    data[prop] = value
                     return true
                 }
                 return false
             },
+            defineProperty(target: NPDFInternal, prop: any, descriptor: any): boolean {
+                if (prop === 'immutable') {
+                    if (typeof(descriptor) === 'boolean') {
+                        internal.immutable = descriptor
+                    } else {
+                        return false
+                    }
+                }
+                return true
+            },
             deleteProperty(target: NPDFInternal, prop: any): boolean {
                 mutableCheck()
                 const index = propIndex(prop)
+                if (!index) {
+                    throw TypeError()
+                }
                 if (!prop) {
                     console.warn(`When prop is null the entire array is cleared`)
-                    target.clear()
+                    internal.clear()
+                    data = []
+                } else {
+                    internal.remove(index)
+                    data.splice(index, 1)
                 }
-                target.remove(index)
                 return true
             }
         })
     }
 
-    asObject(): Object {
-        const internal: NPDFInternal = new __mod.Dictionary(this._instance)
-        return new Proxy<Object>(internal, {
+    asObject(): {[key:string]: Obj} {
+        // const internal: NPDFInternal = new __mod.Dictionary(this._instance)
+        const internal: NPDFInternal = this._instance.getDictionary()
+        let data = internal.toObject()
+        return new Proxy<{[key:string]: Obj}>(internal, {
             get(target: NPDFInternal, prop: any) {
-                if (target.immutable) {
+                if (internal.immutable) {
                     throw EvalError('Object is immutable')
-                } else if (target.hasKey(prop)) {
-                    return new Obj(target.getKey(prop))
+                }
+                else if (data.hasOwnProperty(prop)) {
+                    return new Obj(data[prop])
+                }
+                else if (internal.hasKey(prop)) {
+                    return new Obj(internal.getKey(prop))
                 } else {
-                    throw EvalError(`Property ${prop} does not exist on object.`)
+                    return null
                 }
             },
             set(target: NPDFInternal, prop: any, value: Obj): boolean {
-                if (target.immutable) {
+                if (internal.immutable) {
                     throw EvalError()
                 } else {
-                    target.addKey(prop, value.hasOwnProperty('_instance') ? value._instance : value)
+                    internal.addKey(prop, value.hasOwnProperty('_instance') ? value._instance : value)
+                    data = internal.toObject()
                 }
                 return true
             },
             deleteProperty(target: NPDFInternal, prop: any): boolean {
-                if (target.immutable) {
+                if (internal.immutable) {
                     throw EvalError()
-                } else if(target.hasKey(prop)){
+                } else if (internal.hasKey(prop)) {
                     console.info(`Clearing property ${prop}`)
-                    target.removeKey(prop)
-                } else if(!prop) {
-                    target.clear()
+                    internal.removeKey(prop)
+                } else if (!prop) {
+                    internal.clear()
                     console.warn('When prop is null the entire object is cleared')
                 }
+                data = internal.toObject()
                 return true
             },
             has(target: NPDFInternal, prop: any): boolean {
-                return target.hasKey(prop)
+                return data.hasOwnProperty(prop)
             },
             defineProperty(target: NPDFInternal, prop: any, descriptor: any): boolean {
-                if (target.immutable) {
+                if (internal.immutable) {
                     throw EvalError()
                 }
                 const properties = ['enumerable', 'configurable', 'writable', 'value', 'get', 'set']
@@ -279,7 +316,7 @@ export class Obj {
                     console.info('NoPoDoFo primitive array uses a JS Proxy and exposes definable properties: writable, value')
                     if (prop === 'writable') {
                         console.warn('Setting the immutable property will define the writable value for the entire object.')
-                        if (typeof descriptor === 'boolean') target.immutable = descriptor
+                        if (typeof descriptor === 'boolean') internal.immutable = descriptor
                         else throw TypeError('The immutable flag requires a boolean value')
                     }
                 } else {
@@ -288,31 +325,33 @@ export class Obj {
                 return true
             },
             getOwnPropertyDescriptor(target: NPDFInternal, prop: any): PropertyDescriptor {
-                if (!target.hasKey(prop)) {
-                    throw EvalError(`${prop} does not exist.`)
+                if (!data.hasOwnProperty(prop) || !internal.hasKey(prop)) {
+                    return {}
                 }
+                const immutable = internal.immutable
                 return {
-                    writable: !target.immutable,
-                    value: target.getKey(prop),
-                    configurable: !target.immutable,
+                    writable: !immutable,
+                    value: data[prop], //internal.getKey(prop),
+                    configurable: !immutable,
                     enumerable: true
                 }
             },
             ownKeys(target: NPDFInternal): Array<string> {
-                return ['stream', 'type', 'length', 'reference', 'immutable', 'hasStream', 'getOffset', 'write',
-                    'flateCompressStream', 'delayedStreamLoad', 'getBool', 'getNumber', 'getRea', 'getString',
-                    'getName', 'getArray', 'getReference', 'getRawData']
+                // return ['stream', 'type', 'length', 'reference', 'immutable', 'hasStream', 'getOffset', 'write',
+                //     'flateCompressStream', 'delayedStreamLoad', 'getBool', 'getNumber', 'getRea', 'getString',
+                //     'getName', 'getArray', 'getReference', 'getRawData']
+                return Object.keys(data)
             },
-            isExtensible(target: NPDFInternal): boolean {
-                return !target.immutable
-            },
-            preventExtensions(target: NPDFInternal): boolean {
-                return !target.immutable
-            },
-            setPrototypeOf(target: NPDFInternal, value: any): boolean {
-                console.warn('The prototype of this object can not be set')
-                return false
-            }
+            // isExtensible(target: NPDFInternal): boolean {
+            //     return !internal.immutable
+            // },
+            // preventExtensions(target: NPDFInternal): boolean {
+            //     return !internal.immutable
+            // },
+            // setPrototypeOf(target: NPDFInternal, value: any): boolean {
+            //     console.warn('The prototype of this object can not be set')
+            //     return false
+            // }
         })
     }
 

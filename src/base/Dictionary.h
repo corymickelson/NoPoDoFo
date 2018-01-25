@@ -33,13 +33,12 @@ public:
   Napi::Value Write(const Napi::CallbackInfo&);
   void WriteSync(const Napi::CallbackInfo&);
   Napi::Value ToObject(const Napi::CallbackInfo&);
-  Napi::Value Eq(const Napi::CallbackInfo &);
+  Napi::Value Eq(const Napi::CallbackInfo&);
 
   PoDoFo::PdfDictionary* GetDictionary() { return dict; }
 
 private:
-  //  PoDoFo::PdfObject* _obj;
-  PoDoFo::PdfDictionary* dict = nullptr;
+  PoDoFo::PdfDictionary* dict;
 };
 }
 #endif

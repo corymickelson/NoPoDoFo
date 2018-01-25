@@ -40,11 +40,11 @@ public:
   Napi::Value GetDictionary(const Napi::CallbackInfo&);
   Napi::Value GetRawData(const Napi::CallbackInfo&);
   Napi::Value GetImmutable(const Napi::CallbackInfo&);
-  void SetImmutable(const Napi::CallbackInfo &, const Napi::Value &);
+  void SetImmutable(const Napi::CallbackInfo&, const Napi::Value&);
   void Clear(const Napi::CallbackInfo&);
   Napi::Value Eq(const Napi::CallbackInfo&);
 
-  const PoDoFo::PdfObject GetObject() { return *obj; }
+  PoDoFo::PdfObject* GetObject() { return obj; }
 
 private:
   PoDoFo::PdfObject* obj;
