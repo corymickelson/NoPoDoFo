@@ -20,4 +20,4 @@ NoPoDoFo is still in <mark>early development.</mark>
  - [NoPoDoFo.Signer](https://github.com/corymickelson/NoPoDoFo/blob/master/guides/signer.md)
  - [NoPoDoFo.Parsers](https://github.com/corymickelson/NoPoDoFo/blob/master/guides/parsers.md)
 
-Setting up a development environment for native addons can be found [here](https://github.com/corymickelson/NoPoDoFo/blob/master/guides/native_addon_dev_env.md)
+Setting up a development environment for native addons can be found [here](https://corymickelson.github.io)

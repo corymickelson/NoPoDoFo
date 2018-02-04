@@ -3,7 +3,6 @@ import { join } from 'path'
 import * as test from 'tape'
 import { Document, FontEncoding } from './document'
 import { EncryptOption, Encrypt } from './encrypt'
-import { TestCase } from 'tape';
 
 const filePath = join(__dirname, '../test-documents/test.pdf'),
     outFile = './test.out.pdf',

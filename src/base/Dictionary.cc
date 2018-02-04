@@ -18,7 +18,8 @@ FunctionReference Dictionary::constructor;
 Dictionary::Dictionary(const CallbackInfo& info)
   : ObjectWrap<Dictionary>(info)
   , dict(new PdfDictionary(*info[0].As<External<PdfDictionary>>().Data()))
-{}
+{
+}
 void
 Dictionary::Initialize(Napi::Env& env, Napi::Object& target)
 {
@@ -102,6 +103,7 @@ Dictionary::GetKey(const CallbackInfo& info)
   } catch (Napi::Error& err) {
     ErrorHandler(err, info);
   }
+  return info.Env().Undefined();
 }
 
 Napi::Value
@@ -130,6 +132,7 @@ Dictionary::RemoveKey(const CallbackInfo& info)
   } catch (PdfError& err) {
     ErrorHandler(err, info);
   }
+  return info.Env().Undefined();
 }
 
 Napi::Value
@@ -196,6 +199,7 @@ Dictionary::GetKeyAs(const CallbackInfo& info)
                              "Type must be one of: boolean, long, real, name.");
     }
   }
+  return info.Env().Undefined();
 }
 
 void
@@ -217,7 +221,7 @@ Napi::Value
 Dictionary::ToObject(const CallbackInfo& info)
 {
   try {
-    Object js = Object::New(info.Env());
+    auto js = Object::New(info.Env());
     auto keys = GetDictionary()->GetKeys();
     map<PoDoFo::PdfName, PoDoFo::PdfObject*>::const_iterator it;
     for (it = keys.begin(); it != keys.end(); it++) {
@@ -243,6 +247,11 @@ public:
     , dict(dict)
     , arg(std::move(dest))
   {
+  }
+  ~DictWriteAsync()
+  {
+    HandleScope scope(Env());
+    dict = nullptr;
   }
 
 protected:
@@ -284,6 +293,7 @@ Dictionary::Write(const CallbackInfo& info)
   } catch (Napi::Error& err) {
     ErrorHandler(err, info);
   }
+  return info.Env().Undefined();
 }
 Dictionary::~Dictionary()
 {

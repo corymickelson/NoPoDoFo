@@ -17,7 +17,8 @@ Napi::FunctionReference Array::constructor;
 Array::Array(const CallbackInfo& info)
   : ObjectWrap<Array>(info)
   , array(new PdfArray(*info[0].As<External<PdfArray>>().Data()))
-{}
+{
+}
 
 Array::~Array()
 {
@@ -69,7 +70,11 @@ Array::GetImmutable(const CallbackInfo& info)
 void
 Array::SetImmutable(const CallbackInfo& info, const Napi::Value& value)
 {
-  GetArray()->SetImmutable(value.As<Boolean>());
+  try {
+    GetArray()->SetImmutable(value.As<Boolean>());
+  } catch (PdfError& err) {
+    ErrorHandler(err, info);
+  }
 }
 Napi::Value
 Array::Length(const Napi::CallbackInfo& info)

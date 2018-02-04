@@ -1,5 +1,5 @@
-import {__mod} from "./document";
-import {Ref} from "./reference";
+import { __mod } from "./document";
+import { Ref } from "./reference";
 
 export type NPDFInternal = any
 
@@ -7,6 +7,16 @@ export type CoerceKeyType = 'boolean' | 'long' | 'name' | 'real'
 
 export type PDType = 'Boolean' | 'Number' | 'Name' | 'Real' | 'String' | 'Array' |
     'Dictionary' | 'Reference' | 'RawData'
+
+export interface NArray {
+    [key: number]: Obj
+    immutable: boolean
+    length: number
+    unshift: (...v:Array<Obj>) => number
+    push: (...v:Array<Obj>) => number
+    pop: () => Obj
+    shift: () => Obj
+}
 
 /**
  * @desc This class represents a PDF indirect Object in memory
@@ -111,19 +121,19 @@ export class Obj {
      * The asArray method returns an Array Proxy (or an Object that is wrapped in a proxy that exposes methods similar to
      * an array, which modifies the underlying PdfArray Object). This is NOT an array, but provides a data structure
      * as close to an array as possible to help user's view/modify the data. If a method or property is not supported
-     * a console message will be provided. For more information on NoPoDoFo Array see the guides.
+     * a console message will be provided.  
      * @returns {Array<Obj>}
      */
-    asArray(): Array<Obj> {
+    asArray(): NArray {
         const internal: NPDFInternal = this._instance.getArray()
-        let data: Array<Obj> = internal.toArray(),
-            mutableCheck =
-                () => {
-                    if (internal.immutable) {
-                        throw Error(
-                            'Array is not mutable. To make changes to the underlying PoDoFo::PdfArray you must first set the mutable property to true.')
-                    }
-                },
+        let data: Array<Obj> = internal.toArray()
+        const mutableCheck =
+            () => {
+                if (internal.immutable) {
+                    throw Error(
+                        'Array is not mutable. To make changes to the underlying PoDoFo::PdfArray you must first set the mutable property to true.')
+                }
+            },
             propIndex = (v: any): number | null => {
                 const index = parseInt((v as string));
                 if (Number.isNaN(index)) {
@@ -135,13 +145,15 @@ export class Obj {
         return new Proxy(internal, {
             get(target: NPDFInternal, prop: any) {
                 const int = propIndex(prop)
-                if (typeof(int) === 'number') prop = int
+                if (typeof (int) === 'number') prop = int
                 if (typeof prop === 'string') {
                     switch (prop) {
+                        case 'immutable':
+                            return internal.immutable
                         case 'pop':
                             mutableCheck()
                             return () => {
-                                const item = data.pop()//internal.at(internal.length - 1)
+                                const item = data.pop()
                                 internal.remove(internal.length - 1)
                                 return new Obj(item)
                             }
@@ -158,7 +170,7 @@ export class Obj {
                                         }
                                     })
                                     data.unshift(...v)
-                                    if (data.length != internal.length) {
+                                    if (data.length !== internal.length) {
                                         throw Error('Internal array out of sync')
                                     }
                                     return data.length
@@ -190,7 +202,7 @@ export class Obj {
                         case 'shift':
                             mutableCheck()
                             return () => {
-                                const item = data.shift()//internal.at(0)
+                                const item = data.shift()
                                 internal.remove(0)
                                 return new Obj(item)
                             }
@@ -199,16 +211,13 @@ export class Obj {
                                 throw Error("Internal array out of sync")
                             }
                             return data.length
-                        case 'concat':
-                        case 'copyWithin':
-                            console.warn(`NoPoDoFo does not yet support the creation of new PdfArray types.`)
-                            break
-                        case 'entries':
-                            console.warn(`NoPoDoFo does not yet support this method on PdfArray types.`)
-                            break
+                        // case 'concat':
+                        // case 'copyWithin':
+                        //     throw TypeError(`NoPoDoFo does not yet support the creation of new PdfArray types.`)
+                        // case 'entries':
+                        //     throw TypeError(`NoPoDoFo does not yet support this method on PdfArray types.`)
                         default:
-                            console.warn(`${prop} is not supported`)
-                            return false
+                            throw TypeError(`${prop} is not supported`)
                     }
                 }
                 else if (typeof prop === 'number' && prop > -1 && prop < data.length) {
@@ -217,25 +226,31 @@ export class Obj {
                     }
                     return new Obj(data[prop])
                 } else {
-                    throw EvalError()
+                    throw EvalError(`NoPoDoFo array does not support ${prop}`)
                 }
             },
             set(target, prop, value): boolean {
-                mutableCheck()
-                const index = propIndex(prop);
-                if (!index) {
-                    throw RangeError()
-                }
-                if (value instanceof Obj && typeof prop === 'number') {
-                    internal.add(value, prop)
-                    data[prop] = value
+                if (prop === 'immutable' && typeof (value) === 'boolean') {
+                    internal.immutable = value
                     return true
+                } else {
+                    mutableCheck()
+                    const index = propIndex(prop);
+                    if (!index) {
+                        throw RangeError()
+                    }
+                    if (value instanceof Obj && typeof prop === 'number') {
+                        internal.add(value, prop)
+                        data[prop] = value
+                        return true
+                    }
+                    return false
                 }
-                return false
+
             },
             defineProperty(target: NPDFInternal, prop: any, descriptor: any): boolean {
                 if (prop === 'immutable') {
-                    if (typeof(descriptor) === 'boolean') {
+                    if (typeof (descriptor) === 'boolean') {
                         internal.immutable = descriptor
                     } else {
                         return false
@@ -262,11 +277,10 @@ export class Obj {
         })
     }
 
-    asObject(): {[key:string]: Obj} {
-        // const internal: NPDFInternal = new __mod.Dictionary(this._instance)
+    asObject(): { [key: string]: Obj } {
         const internal: NPDFInternal = this._instance.getDictionary()
         let data = internal.toObject()
-        return new Proxy<{[key:string]: Obj}>(internal, {
+        return new Proxy<{ [key: string]: Obj }>(internal, {
             get(target: NPDFInternal, prop: any) {
                 if (internal.immutable) {
                     throw EvalError('Object is immutable')
@@ -326,32 +340,28 @@ export class Obj {
             },
             getOwnPropertyDescriptor(target: NPDFInternal, prop: any): PropertyDescriptor {
                 if (!data.hasOwnProperty(prop) || !internal.hasKey(prop)) {
-                    return {}
+                    throw TypeError(`This dictionary object does not contain property: ${prop}`)
                 }
                 const immutable = internal.immutable
                 return {
                     writable: !immutable,
-                    value: data[prop], //internal.getKey(prop),
+                    value: data[prop],
                     configurable: !immutable,
                     enumerable: true
                 }
             },
             ownKeys(target: NPDFInternal): Array<string> {
-                // return ['stream', 'type', 'length', 'reference', 'immutable', 'hasStream', 'getOffset', 'write',
-                //     'flateCompressStream', 'delayedStreamLoad', 'getBool', 'getNumber', 'getRea', 'getString',
-                //     'getName', 'getArray', 'getReference', 'getRawData']
                 return Object.keys(data)
             },
-            // isExtensible(target: NPDFInternal): boolean {
-            //     return !internal.immutable
-            // },
-            // preventExtensions(target: NPDFInternal): boolean {
-            //     return !internal.immutable
-            // },
-            // setPrototypeOf(target: NPDFInternal, value: any): boolean {
-            //     console.warn('The prototype of this object can not be set')
-            //     return false
-            // }
+            isExtensible(target: NPDFInternal): boolean {
+                return false
+            },
+            preventExtensions(target: NPDFInternal): boolean {
+                return false
+            },
+            setPrototypeOf(target: NPDFInternal, value: any): boolean {
+                return false
+            }
         })
     }
 

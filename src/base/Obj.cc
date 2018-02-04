@@ -34,7 +34,6 @@ Obj::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceMethod("getString", &Obj::GetString),
       InstanceMethod("getName", &Obj::GetName),
       InstanceMethod("getArray", &Obj::GetArray),
-      InstanceMethod("getDictionary", &Obj::GetDictionary),
       InstanceMethod("getReference", &Obj::GetReference),
       InstanceMethod("getRawData", &Obj::GetRawData),
       InstanceMethod("clear", &Obj::Clear),
@@ -47,7 +46,8 @@ Obj::Initialize(Napi::Env& env, Napi::Object& target)
 Obj::Obj(const Napi::CallbackInfo& info)
   : ObjectWrap<Obj>(info)
   , obj(info[0].As<Napi::External<PdfObject>>().Data())
-{}
+{
+}
 
 Obj::~Obj()
 {
@@ -70,7 +70,7 @@ Napi::Value
 Obj::GetStream(const CallbackInfo& info)
 {
   try {
-    auto* pStream = dynamic_cast<PdfMemStream*>(obj->GetStream());
+    auto pStream = dynamic_cast<PdfMemStream*>(obj->GetStream());
     auto stream = pStream->Get();
     auto length = pStream->GetLength();
     auto value =
@@ -81,6 +81,7 @@ Obj::GetStream(const CallbackInfo& info)
   } catch (Napi::Error& err) {
     ErrorHandler(err, info);
   }
+  return info.Env().Undefined();
 }
 
 Napi::Value
@@ -105,7 +106,11 @@ void
 Obj::SetImmutable(const CallbackInfo& info, const Napi::Value& value)
 {
   if (value.IsBoolean()) {
-    obj->SetImmutable(value.As<Boolean>());
+    try {
+      obj->SetImmutable(value.As<Boolean>());
+    } catch (PdfError& err) {
+      ErrorHandler(err, info);
+    }
   }
 }
 
@@ -167,6 +172,7 @@ Obj::Reference(const CallbackInfo& info)
   } catch (Napi::Error& err) {
     ErrorHandler(err, info);
   }
+  return info.Env().Undefined();
 }
 
 void
@@ -232,6 +238,7 @@ Obj::GetName(const CallbackInfo& info)
   } catch (Napi::Error& err) {
     ErrorHandler(err, info);
   }
+  return info.Env().Undefined();
 }
 
 Napi::Value

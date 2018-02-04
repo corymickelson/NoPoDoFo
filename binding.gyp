@@ -5,7 +5,7 @@
         "VCPKG_Path%": "C:/Srcs/vcpkg/installed/x86-windows/",
    		"podofo_library%": "C:/Users/micke/CMakeBuilds/4c25184c-e5d2-673f-92ce-a630b81f074c/build/x86-Release/src/Release",
    		"podofo_include_dir%": "S:/projects/cmakeProjects/podofo/"
-      },
+      }
     }],
     ["OS=='linux'", {
       "variables": {
