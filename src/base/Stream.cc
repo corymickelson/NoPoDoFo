@@ -22,6 +22,7 @@ Stream::Stream(const CallbackInfo& info)
 void
 Stream::Initialize(Napi::Env& env, Napi::Object& target)
 {
+  HandleScope scope(env);
   Function ctor = DefineClass(
     env,
     "Stream",

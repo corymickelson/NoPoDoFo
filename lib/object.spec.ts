@@ -2,7 +2,6 @@ import {Obj} from './object'
 import {Document} from './document'
 import * as test from 'tape'
 import {join} from 'path';
-import {Dictionary} from './dictionary';
 
 test('document objects instance of nopodofo.Obj', t => {
     const filePath = join(__dirname, '../test-documents/test.pdf'),

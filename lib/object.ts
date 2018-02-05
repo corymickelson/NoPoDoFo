@@ -1,5 +1,6 @@
 import { __mod } from "./document";
 import { Ref } from "./reference";
+import { Stream } from "stream";
 
 export type NPDFInternal = any
 
@@ -17,7 +18,26 @@ export interface NArray {
     pop: () => Obj
     shift: () => Obj
 }
-
+export interface NObj {
+    reference: number
+    length: number
+    stream: Stream
+    type: PDType
+    hasStream():boolean
+    getOffset(key: string): Promise<number>
+    write(output: string, cb: Function): void
+    flateCompressStream(): void
+    delayedStreamLoad(): void
+    asBool(): boolean
+    asString(): string
+    asName(): string
+    asReal(): number
+    asNumber(): number
+    asArray(): NArray
+    asObject(): { [key: string]: Obj }
+    asReference(): Ref
+    asBuffer(): Buffer
+}
 /**
  * @desc This class represents a PDF indirect Object in memory
  *      It is possible to manipulate the stream which can be appended to the
@@ -28,19 +48,12 @@ export interface NArray {
  * @todo New instance object not yet supported. Objects can only be instantiated
  * from an existing object
  */
-export class Obj {
+
+export class Obj implements NObj {
     private _instance: any
 
     get reference() {
         return this._instance.reference
-    }
-
-    get owner() {
-        return this._instance.owner
-    }
-
-    set owner(value: Array<Obj>) {
-        this._instance.owner = value
     }
 
     get length() {

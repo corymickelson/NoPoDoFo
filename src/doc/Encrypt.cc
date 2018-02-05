@@ -20,6 +20,7 @@ Encrypt::Encrypt(const Napi::CallbackInfo& info)
 void
 Encrypt::Initialize(Napi::Env& env, Napi::Object& target)
 {
+  HandleScope scope(env);
   Function ctor = DefineClass(
     env,
     "Encrypt",

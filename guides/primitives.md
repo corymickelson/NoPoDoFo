@@ -7,12 +7,10 @@ Please familiarize yourself with the [PDF specification](http://wwwimages.adobe.
 
 NoPoDoFo provides handles to the following PDF data types:
  - PdfObject as [Obj](#NoPoDoFo.Obj)
- - PdfArray as [Array](#NoPoDoFo.Array)
- - PdfDictionary as [Dictionary](#NoPoDoFo.Dictionary)
  - PdfIndirectObject as [Ref](#NoPoDoFo.Ref)
  - PdfStream as [Stream](#NoPoDoFo.Stream)
  
-PdfString, PdfNull, PdfNumber, PdfName, and PdfBool are all returned as their native Javascript counterpart.
+PdfArray, PdfString, PdfNull, PdfNumber, PdfName, PdfDictionary and PdfBool are all returned as their native Javascript counterpart and are variants of NoPoDoFo.Obj.
 
 ### NoPoDoFo.Obj
 The Body of a PDF is composed of collection of PdfObjects, these may be in the format of an inline object or an indirect object, NoPoDoFo exposes indirect objects as [Ref](#NoPoDoFo.Ref). 
@@ -21,44 +19,32 @@ Objects typically contain a dictionary, but any Pdf data type is possible.
 The type of the Object is exposed via `Obj.type`.
 
 ``` typescript
-// ... assuming the document has already been loaded
-let body = doc.getObjects()
-let objArrays = body.filter(i => i.type === 'Array')
-let objDicts = body.filter(i => i.type === 'Dictionary')
+interface NObj {
+    reference: number
+    owner: number
+    length: number
+    stream: Stream
+    type: PDType
+    hasStream():boolean
+    getOffset(key: string): Promise<number>
+    write(output: string, cb: Function): void
+    flateCompressStream(): void
+    delayedStreamLoad(): void
+    asBool(): boolean
+    asString(): string
+    asName(): string
+    asReal(): number
+    asNumber(): number
+    asArray(): NArray
+    asObject(): { [key: string]: Obj }
+    asReference(): Ref
+    asBuffer(): Buffer
+}
 ```
 For more on NoPoDoFo.Obj see [here](../docs/classes/_object_.obj.html)
 
-### NoPoDoFo.Array
-An array object is a one-dimensional collection of objects arranged sequentially. Unlike arrays in many other computer languages, PDF arrays may be heterogeneous; that is, an array’s elements may be any combination of numbers, strings, dictionaries, or any other objects, including other arrays. The number of elements in an array is subject to an implementation limit.
-For more on NoPoDoFo.Arr see [arr](../docs/classes/_arr_.arr.html)
-
-``` typescript
-// ... assuming the document has already been loaded
-
-// First get a handle to an object of type Array
-let obj = doc.getObjects().filter(i => i.type === 'Array')[0]
-let pdfArr = obj.asArray() // this is a PdfArray NOT a Javascript array
-assert(pdfArr.contiains('Type')) // this is using PoDoFo to query the array
-let jsArr = pdfArr.toArray() // the resulting array will NOT persist any changes back to the underlying pdf array
-```
-
-### NoPoDoFo.Dictionary
-A dictionary object is an associative table containing pairs of objects, known as the dictionary’s entries. The first element of each entry is the key and the second element is the value. The key must be a name (unlike dictionary keys in PostScript, which may be objects of any type). The value can be any kind of object, including another dictionary.
-NoPoDoFo Dictionary manipulations should be made using methods defined on the NoPoDoFo.Dictionary class. Calling NoPoDoFo.Dictionary.toObject will cast the Obj to a native Javascript object. Any changes made to the native Javascript object will NOT be persisted back to the underlying PdfObject.
-
-``` typescript
-// ... assuming the document has already been loaded
-// First get a handle to an object of type Dictionary
-let obj = doc.getObjects().filter(i => i.type === 'Dictionary')[0]
-let pdfDict = obj.asDictionary()
-// Getting and setting key/value
-let subType:NoPoDoFo.Obj = obj.hasKey('SubType') ? obj.getKey('SubType'): undefined
-obj.addKey('Type', 3) // change persists
-obj.removeKey('SubType') // change persists
-let jsObj:Object = obj.toObject() // any changes made to jsObj will not persist
-```
 ### NoPoDoFo.Ref
-The NoPoDoF.Ref type is a type of pointer to an NoPoDoFo.Obj. 
+The NoPoDoF.Ref type is loosely a type of pointer to an NoPoDoFo.Obj. 
 ``` typescript
 // ... assuming the document has already been loaded
 let body = doc.getObjects()
@@ -80,8 +66,7 @@ if(o.type === 'Dictionary' && o.hasStream()) {
 }
 ```
 
-### String
-
-### Number
-
-### Null
+### NoPoDoFo.Obj.asArray
+See [proxied](https://github.com/corymickelson/NoPoDoFo/tree/master/guides/proxied.md)
+### NoPoDoFo.Obj.asObject
+See [proxied](https://github.com/corymickelson/NoPoDoFo/tree/master/guides/proxied.md)

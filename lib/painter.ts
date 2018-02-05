@@ -2,9 +2,9 @@ import {IPage} from './page'
 import {Image} from './image'
 import {Stream} from './stream'
 import {__mod, Document} from './document'
-import {Dictionary} from "./dictionary";
 import {Rect} from "./rect";
 import {NPDFPoint} from "./painter";
+import { Obj } from './object';
 
 export type NPDFcmyk = [number, number, number, number]
 export type NPDFrgb = [number, number, number]
@@ -419,7 +419,7 @@ export class Encoding {
     constructor(private _instance: any) {
     }
 
-    addToDictionary(target: Dictionary): void {
+    addToDictionary(target: {[key:string]: Obj}): void {
         this._instance.addToDictionary(target)
     }
 

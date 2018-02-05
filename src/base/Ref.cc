@@ -23,6 +23,7 @@ Ref::Ref(const Napi::CallbackInfo& info)
 void
 Ref::Initialize(Napi::Env& env, Napi::Object& target)
 {
+  HandleScope scope(env);
   Napi::Function ctor = DefineClass(
     env,
     "Ref",

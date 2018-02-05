@@ -1,5 +1,4 @@
 import { Document as doc } from './document'
-import { Dictionary as dict } from './dictionary'
 import { Obj as obj } from './object'
 import { Page as page } from './page'
 import {
@@ -25,7 +24,6 @@ import {ContentsTokenizer as ct} from './parser'
 
 export const Document = doc,
     Page = page,
-    Dictionary = dict,
     Obj = obj,
     Annotation = annot,
     NPdfAction = action,
