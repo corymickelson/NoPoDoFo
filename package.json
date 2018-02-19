@@ -7,6 +7,7 @@
   "repository": "git+https://github.com/corymickelson/NoPoDoFo.git",
   "scripts": {
     "compile": "cmake-js compile -s=c++14 --prefer-clang",
+    "compile:debug": "cmake-js compile -D -s=c++14 --prefer-clang",
     "lib-build": "npm run compile && tsc -p tsconfig.json",
     "docs": "typedoc --mode modules --module commonjs --target es6 --exclude **/*.spec.* --out ./docs",
     "test": "npm run test:document && npm run test:page && npm run test:field && npm run test:object && npm run test:painter && npm run test:signer && npm run test:parser",

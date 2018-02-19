@@ -9,22 +9,21 @@
 #include "crypto/Signature.h"
 #include "doc/Annotation.h"
 #include "doc/CheckBox.h"
-#include "doc/Document.h"
+#include "doc/ComboBox.h"
 #include "doc/Encoding.h"
 #include "doc/Encrypt.h"
 #include "doc/ExtGState.h"
-#include "doc/Field.h"
 #include "doc/FileSpec.h"
 #include "doc/Font.h"
 #include "doc/Form.h"
 #include "doc/Image.h"
 #include "doc/ListField.h"
 #include "doc/Painter.h"
-#include "doc/Rect.h"
 #include "doc/SignatureField.h"
 #include "doc/Signer.h"
 #include "doc/TextField.h"
 #include "doc/SimpleTable.h"
+#include "doc/ListBox.h"
 #include <napi.h>
 
 Napi::Object
@@ -39,6 +38,8 @@ init(Napi::Env env, Napi::Object exports)
   NoPoDoFo::Rect::Initialize(env, exports);
   NoPoDoFo::Painter::Initialize(env, exports);
   NoPoDoFo::CheckBox::Initialize(env, exports);
+  NoPoDoFo::ComboBox::Initialize(env, exports);
+  NoPoDoFo::ListBox::Initialize(env, exports);
   NoPoDoFo::Form::Initialize(env, exports);
   NoPoDoFo::Dictionary::Initialize(env, exports);
   NoPoDoFo::FileSpec::Initialize(env, exports);

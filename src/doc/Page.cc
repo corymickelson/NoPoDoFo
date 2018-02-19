@@ -84,7 +84,7 @@ Page::GetFields(const CallbackInfo& info)
       auto obj = Napi::Object::New(info.Env());
       auto field = page->GetField(static_cast<int>(i));
       obj.Set("index", Napi::Number::New(info.Env(), i));
-      Page::GetFieldObject(obj, field);
+      Page::GetFieldObject(info, obj, field);
       fields.Set(static_cast<uint32_t>(i), obj);
     }
     return fields;
@@ -96,7 +96,9 @@ Page::GetFields(const CallbackInfo& info)
 }
 
 void
-Page::GetFieldObject(Napi::Object& obj, PoDoFo::PdfField& field)
+Page::GetFieldObject(const CallbackInfo& info,
+                     Napi::Object& obj,
+                     PoDoFo::PdfField& field)
 {
   string name = field.GetFieldName().GetStringUtf8();
   string alternateName = field.GetAlternateName().GetStringUtf8();
@@ -131,18 +133,38 @@ Page::GetFieldObject(Napi::Object& obj, PoDoFo::PdfField& field)
     }
     case ePdfField_ComboBox: {
       PdfComboBox comboBox(field);
+      int displayIndex = comboBox.GetSelectedItem();
       string comboValue =
-        comboBox.GetItem(comboBox.GetSelectedItem()).GetStringUtf8();
+        displayIndex > -1
+          ? comboBox.GetItem(comboBox.GetSelectedItem()).GetStringUtf8()
+          : "";
       obj.Set("type", "ComboBox");
       obj.Set("selected", comboValue);
+      auto items = Array::New(info.Env());
+      for (size_t i = 0; i < comboBox.GetItemCount(); i++) {
+        items.Set(
+          static_cast<uint32_t>(i),
+          comboBox.GetItemDisplayText(static_cast<int>(i)).GetStringUtf8());
+      }
+      obj.Set("items", items);
       break;
     }
     case ePdfField_ListBox: {
       PdfListBox listBox(field);
+      int selected = listBox.GetSelectedItem();
       string listValue =
-        listBox.GetItem(listBox.GetSelectedItem()).GetStringUtf8();
+        selected > -1
+          ? listBox.GetItem(listBox.GetSelectedItem()).GetStringUtf8()
+          : "";
       obj.Set("type", "ListBox");
       obj.Set("value", listValue);
+      auto items = Array::New(info.Env());
+      for (size_t i = 0; i < listBox.GetItemCount(); i++) {
+        items.Set(
+          static_cast<uint32_t>(i),
+          listBox.GetItemDisplayText(static_cast<int>(i)).GetStringUtf8());
+      }
+      obj.Set("items", items);
       break;
     }
     case ePdfField_PushButton: {

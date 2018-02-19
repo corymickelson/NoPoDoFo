@@ -1,7 +1,7 @@
-import { __mod, Document } from './document'
+import {__mod, Document} from './document'
 import {NPDFInternal, Obj} from "./object";
-import { Annotation } from "./annotation";
-import { Form } from "./form";
+import {Annotation} from "./annotation";
+import {Form} from "./form";
 
 
 export interface IFieldInfo {
@@ -18,15 +18,23 @@ export interface IFieldInfo {
     selected?: string
 }
 
-export type FieldType = 'TextField' | 'CheckBox' | 'RadioButton' | 'PushButton' | 'Signature' | 'ListField'
+export type FieldType =
+    'TextField'
+    | 'CheckBox'
+    | 'RadioButton'
+    | 'PushButton'
+    | 'Signature'
+    | 'ListField'
+    | 'ComboBox'
+    | 'ListBox'
+
 export class Field {
 
-    constructor(private _instance:NPDFInternal) { }
+    constructor(private _instance: NPDFInternal) {
+    }
 
     getType(): FieldType {
-        const type = this._instance.getType()
-        return type === 'ComboBox' || type === 'ListBox' ? // Combobox and Listbox both implement ListField
-            'ListField' : type
+        return this._instance.getType()
     }
 
     getFieldName(): string {
@@ -60,6 +68,7 @@ export class Field {
 
 export class TextField extends Field {
     private _textFieldInstance: any
+
     constructor(field: Field) {
         super((field as any)._instance)
         if (field.getType() !== 'TextField') {
@@ -67,22 +76,27 @@ export class TextField extends Field {
         }
         this._textFieldInstance = new __mod.TextField((field as any)._instance)
     }
+
     get text(): string {
         return this._textFieldInstance.text
     }
+
     set text(value: string) {
         this._textFieldInstance.text = value
     }
 }
 
-export class CheckBox extends Field{
+export class CheckBox extends Field {
     private _checkboxInstance: any
+
     get checked() {
         return this._checkboxInstance.checked
     }
+
     set checked(value: boolean) {
         this._checkboxInstance.checked = value
     }
+
     constructor(field: Field) {
         super((field as any)._instance)
         if (field.getType() !== 'CheckBox') {
@@ -96,39 +110,72 @@ export type IListItem = {
     value: string,
     display: string
 }
-export class ListField extends Field {
-    private _listFieldInstance: any
+
+export class EnumerableField extends Field {
+    private _enumerableFieldInstance: any
+
     get selected(): number {
-        return this._listFieldInstance.selected
+        return this._enumerableFieldInstance.selected
     }
+
     set selected(index: number) {
-        this._listFieldInstance.selected = index
+        this._enumerableFieldInstance.selected = index
     }
+
     get length() {
-        return this._listFieldInstance.length
+        return this._enumerableFieldInstance.length
     }
+
     constructor(field: Field) {
         super((field as any)._instance)
-        if (field.getType() !== 'ListField') {
-            throw Error('must be of type ListField')
+        const t = field.getType()
+        if (t === 'ListBox' || t === 'ComboBox') {
+            this._enumerableFieldInstance = new __mod.ListField((field as any)._instance)
+        } else {
+            throw TypeError("EnumerableField must be a field type ListBox or ComboBox")
         }
-        this._listFieldInstance = new __mod.ListBox((field as any)._instance)
     }
 
     getItem(index: number): IListItem {
-        return this._listFieldInstance.getItem(index)
+        return this._enumerableFieldInstance.getItem(index)
     }
 
     setItem(item: IListItem): void {
-        this._listFieldInstance.insertItem(item.value, item.display)
+        this._enumerableFieldInstance.insertItem(item.value, item.display)
     }
+
     removeItem(index: number): void {
-        this._listFieldInstance.removeItem(index)
+        this._enumerableFieldInstance.removeItem(index)
+    }
+}
+
+export class ListBox extends EnumerableField {
+    private _listBoxInstance: NPDFInternal
+
+    constructor(field: Field) {
+        super(field)
+        if (field.getType() !== 'ListBox') {
+            throw TypeError('Must be field type ListBox')
+        }
+        this._listBoxInstance = new __mod.ListBox((field as any)._instance)
+    }
+}
+
+export class ComboBox extends EnumerableField {
+    private _comboBoxInstance: NPDFInternal
+
+    constructor(field: Field) {
+        super(field)
+        if (field.getType() !== 'ComboBox') {
+            throw TypeError('Must be field type ComboBox')
+        }
+        this._comboBoxInstance = new __mod.ComboBox((field as any)._instance)
     }
 }
 
 export class SignatureField {
     private _instance: any
+
     constructor(annot: Annotation | any, form?: Form, doc?: Document) {
         if (form instanceof Form && doc instanceof Document) {
             this._instance = new __mod.SignatureField((annot as any)._instance, (form as any)._instance, (doc as any)._instance)
@@ -157,6 +204,7 @@ export class SignatureField {
     setFieldName(n: string): void {
         this._instance.setFieldName(n)
     }
+
     getObject(): Obj {
         const instance = this._instance.getObject()
         return new Obj(instance)

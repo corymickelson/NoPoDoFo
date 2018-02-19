@@ -1,9 +1,10 @@
 import {join} from 'path'
 import * as test from 'tape'
 import {Document} from './document'
-import {CheckBox, Field, TextField} from './field'
+import {CheckBox, ComboBox, Field, ListBox, TextField} from './field'
 
-const filePath = join(__dirname, '../test-documents/test.pdf'),
+//const filePath = join(__dirname, '../test-documents/test.pdf'),
+    const filePath = join(__dirname, '../test-documents/iss.16.checkbox-field-state-options.pdf'),
     outFile = './test.out.pdf'
 
 test('create field instance from existing pdf field', t => {
@@ -49,6 +50,47 @@ test('Can instantiate a Checkbox given a field of type CheckBox', t => {
         t.assert(checkbox.checked === false)
         t.end()
     })
-
 })
 
+test('Can instantiate a ListBox', t => {
+     const doc = new Document(filePath)
+    doc.on('ready', () => {
+        const page = doc.getPage(0)
+        const fields = page.getFieldsInfo()
+        let index = -1
+        for (let i = 0; i < fields.length; i++) {
+            let type = fields[i].type
+            if (type === 'ListBox') {
+                index = i
+                break
+            }
+        }
+        const field = page.getField(index)
+        t.assert(field.getType() === 'ListField')
+        const list= new ListBox(field)
+        t.ok(list)
+        t.assert(list.selected === -1)
+        t.end()
+    })
+})
+test('Can instantiate a ComboBox', t => {
+        const doc = new Document(filePath)
+    doc.on('ready', () => {
+        const page = doc.getPage(0)
+        const fields = page.getFieldsInfo()
+        let index = -1
+        for (let i = 0; i < fields.length; i++) {
+            let type = fields[i].type
+            if (type === 'ComboBox') {
+                index = i
+                break
+            }
+        }
+        const field = page.getField(index)
+        t.assert(field.getType() === 'ComboBox')
+        const combo = new ComboBox(field)
+        t.ok(combo)
+        t.assert(combo.selected=== -1)
+        t.end()
+    })
+})

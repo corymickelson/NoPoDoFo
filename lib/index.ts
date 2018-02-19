@@ -12,7 +12,8 @@ import {
     CheckBox as checkbox,
     Field as field,
     TextField as textfield,
-    ListField as listfield
+    ListBox as listbox,
+    ComboBox as combobox
 } from './field'
 import { Image as image } from './image'
 import { Painter as painter } from './painter'
@@ -34,7 +35,8 @@ export const Document = doc,
     Form = form,
     CheckBox = checkbox,
     TextField = textfield,
-    ListField = listfield,
+    ListBox = listbox,
+    ComboBox = combobox,
     Image = image,
     Painter = painter,
     Rect = rect,

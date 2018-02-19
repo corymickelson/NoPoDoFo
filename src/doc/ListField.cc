@@ -91,7 +91,6 @@ ListField::SetSelectedItem(const CallbackInfo& info, const Napi::Value& value)
 Napi::Value
 ListField::GetSelectedItem(const CallbackInfo& info)
 {
-  AssertFunctionArgs(info, 1, { napi_valuetype::napi_number });
   int index = list->GetSelectedItem();
   return Number::New(info.Env(), index);
 }

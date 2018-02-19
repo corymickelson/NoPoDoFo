@@ -1,9 +1,6 @@
 #include "Signer.h"
 #include "../ErrorHandler.h"
 #include "../ValidateArguments.h"
-#include "../base/Data.h"
-#include "Annotation.h"
-#include "Rect.h"
 
 using namespace Napi;
 using namespace PoDoFo;
