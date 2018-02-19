@@ -15,8 +15,8 @@ ListField::ListField(const CallbackInfo& info)
   AssertFunctionArgs(info, 1, { napi_valuetype::napi_object });
   auto wrap = info[0].As<Object>();
   auto field = Field::Unwrap(wrap);
-  auto listField = new PdfListField(*field->GetField());
-  list = make_unique<PdfListField>(*listField);
+//  auto listField = new PdfListField(field->GetField());
+  list = make_unique<PdfListField>(*new PdfListField(field->GetField()));
 }
 
 void

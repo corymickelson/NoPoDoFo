@@ -18,7 +18,7 @@ TextField::TextField(const CallbackInfo& info)
   try {
     auto fieldObj = info[0].As<Object>();
     auto field = Field::Unwrap(fieldObj);
-    PdfTextField v(*field->GetField().get());
+    PdfTextField v(field->GetField());
     text = make_unique<PdfTextField>(v);
   } catch (PdfError& err) {
     stringstream msg;

@@ -18,7 +18,7 @@ ComboBox::ComboBox(const Napi::CallbackInfo& info)
 {
   AssertFunctionArgs(info, 1, { napi_object });
   Field* nField = Field::Unwrap(info[0].As<Object>());
-  PdfComboBox v(*nField->GetField());
+  PdfComboBox v(nField->GetField());
   self = make_unique<PdfComboBox>(v);
 }
 

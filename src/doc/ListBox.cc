@@ -17,8 +17,8 @@ ListBox::ListBox(const Napi::CallbackInfo& info)
 {
   AssertFunctionArgs(info, 1, { napi_object });
   Field* nField = Field::Unwrap(info[0].As<Object>());
-  PdfListBox v(*nField->GetField());
-  self = make_unique<PdfListBox>(v);
+//  PdfListBox v(nField->GetField());
+  self = make_unique<PdfListBox>(*new PdfListBox(nField->GetField()));
 }
 void
 ListBox::Initialize(Napi::Env& env, Napi::Object& target)

@@ -79,6 +79,7 @@ Napi::Value
 Page::GetFields(const CallbackInfo& info)
 {
   try {
+    EscapableHandleScope scope(info.Env());
     auto fields = Napi::Array::New(info.Env());
     for (size_t i = 0; i < static_cast<size_t>(page->GetNumFields()); ++i) {
       auto obj = Napi::Object::New(info.Env());
@@ -87,7 +88,7 @@ Page::GetFields(const CallbackInfo& info)
       Page::GetFieldObject(info, obj, field);
       fields.Set(static_cast<uint32_t>(i), obj);
     }
-    return fields;
+    return scope.Escape(fields);
   } catch (PdfError& err) {
     stringstream errMsg;
     errMsg << "An error occured in PoDoFo: " << err.GetError() << endl;

@@ -27,10 +27,10 @@ public:
   void SetMappingName(const CallbackInfo&);
   void SetRequired(const CallbackInfo&);
   Napi::Value IsRequired(const CallbackInfo&);
-  std::shared_ptr<PoDoFo::PdfField> GetField() { return field; }
+  PoDoFo::PdfField& GetField() { return *field; }
 
 private:
-  std::shared_ptr<PoDoFo::PdfField> field;
+  std::unique_ptr<PoDoFo::PdfField> field;
 };
 }
 #endif // NPDF_PDFFIELD_H

@@ -16,7 +16,8 @@ CheckBox::CheckBox(const CallbackInfo& info)
   }
   auto fieldObj = info[0].As<Object>();
   Field* field = Field::Unwrap(fieldObj);
-  box = make_unique<PdfCheckBox>(*new PdfCheckBox(*field->GetField()));
+  PdfCheckBox v(field->GetField());
+  box = make_unique<PdfCheckBox>(v);
 }
 
 void CheckBox::Initialize(Napi::Env &env, Napi::Object &target) {
