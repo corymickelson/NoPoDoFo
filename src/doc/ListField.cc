@@ -1,9 +1,12 @@
 #include "ListField.h"
 #include "Field.h"
 
+
+namespace NoPoDoFo {
+
 using namespace PoDoFo;
 using namespace Napi;
-namespace NoPoDoFo {
+
 FunctionReference ListField::constructor;
 
 ListField::ListField(const CallbackInfo& info)
@@ -11,8 +14,9 @@ ListField::ListField(const CallbackInfo& info)
 {
   AssertFunctionArgs(info, 1, { napi_valuetype::napi_object });
   auto wrap = info[0].As<Object>();
-  field = Field::Unwrap(wrap);
-  list = new PdfListField(field->GetField());
+  auto field = Field::Unwrap(wrap);
+  auto listField = new PdfListField(*field->GetField());
+  list = make_unique<PdfListField>(*listField);
 }
 
 void
@@ -91,12 +95,5 @@ ListField::GetSelectedItem(const CallbackInfo& info)
   int index = list->GetSelectedItem();
   return Number::New(info.Env(), index);
 }
-ListField::~ListField()
-{
-  if (list != nullptr) {
-    HandleScope scope(Env());
-    delete list;
-  }
-  field = nullptr;
-}
+
 }

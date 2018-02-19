@@ -10,8 +10,10 @@
 #include <napi.h>
 #include <podofo/podofo.h>
 
-using namespace std;
 namespace NoPoDoFo {
+
+using namespace std;
+
 class Page : public Napi::ObjectWrap<Page>
 {
 public:
@@ -23,6 +25,7 @@ public:
   Napi::Value GetRotation(const Napi::CallbackInfo&);
   Napi::Value GetNumFields(const Napi::CallbackInfo&);
   void SetRotation(const Napi::CallbackInfo&, const Napi::Value&);
+  Napi::Value GetField(const Napi::CallbackInfo&);
   Napi::Value GetFields(const Napi::CallbackInfo&);
   Napi::Value GetFieldIndex(const Napi::CallbackInfo&);
   void SetPageWidth(const Napi::CallbackInfo&, const Napi::Value&);
@@ -43,11 +46,9 @@ public:
   void DeleteAnnotation(const Napi::CallbackInfo&);
 
   PoDoFo::PdfPage* GetPage() { return page; }
-  //  PoDoFo::PdfMemDocument* GetDocument() { return parent; }
 
 private:
   PoDoFo::PdfPage* page;
-  //  PoDoFo::PdfMemDocument* parent;
   void GetFieldObject(Napi::Object&, PoDoFo::PdfField&);
   Napi::Object ExtractAndApplyRectValues(const Napi::CallbackInfo&,
                                          PoDoFo::PdfRect&);

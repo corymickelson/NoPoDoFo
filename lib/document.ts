@@ -1,17 +1,18 @@
-import {existsSync} from 'fs'
+import {access, constants} from 'fs'
 import {Obj} from './object';
 import {Page} from './page';
 import {Encrypt, ProtectionOption} from './encrypt';
 import {EventEmitter} from 'events';
 import {Font} from "./painter";
-import { Signer } from './signer';
+import {Signer} from './signer';
 
 export const __mod = require('bindings')('npdf')
+
 export enum FontEncoding {
     WinAnsi = 1,
     Standard = 2,
     PdfDoc = 3,
-    MacRoman= 4,
+    MacRoman = 4,
     MacExpert = 5,
     Symbol = 6,
     ZapfDingbats = 7,
@@ -19,18 +20,18 @@ export enum FontEncoding {
     Iso88592 = 9,
     Identity = 0
 }
+
 export interface CreateFontOpts {
-    fontName:string,
-    bold?:boolean,
-    italic?:boolean,
+    fontName: string,
+    bold?: boolean,
+    italic?: boolean,
     encoding?: FontEncoding,
-    embed?:boolean,
-    fileName?:string
+    embed?: boolean,
+    fileName?: string
 }
+
 export interface IDocument {
     encrypt: Encrypt
-
-    load(file: string, update?: boolean): void
 
     getPageCount(): number
 
@@ -48,13 +49,13 @@ export interface IDocument {
 
     write(cb: (e: Error) => void, file?: string): void
 
-    writeUpdate(device:string|Signer): void  
+    writeUpdate(device: string | Signer): void
 
     getTrailer(): Obj
 
     isAllowed(protection: ProtectionOption): boolean
 
-    createFont(opts:CreateFontOpts): Font
+    createFont(opts: CreateFontOpts): Font
 }
 
 
@@ -69,15 +70,10 @@ export class Document extends EventEmitter implements IDocument {
 
     private _instance: any
     private _loaded: boolean = false;
-    private _pageCount: number
-    private _password: string
+    private _password: string | undefined = undefined
 
     get loaded() {
         return this._loaded
-    }
-
-    get pageCount() {
-        return this._pageCount
     }
 
     set password(value: string) {
@@ -103,12 +99,18 @@ export class Document extends EventEmitter implements IDocument {
      * @param update
      * @returns void
      */
-    constructor(file: string, update: boolean = false) {
+    constructor(file: string|Buffer, update: boolean = false) {
         super()
         this._instance = new __mod.Document()
-        if (file) {
-            if (!existsSync(file))
-                throw new Error('file not found')
+        if (typeof(file) === 'string') {
+            access(file, constants.F_OK | constants.R_OK, err => {
+                if (err){
+                    this.emit('error', Error('file not found'))
+                } else {
+                    this.load(file, update)
+                }
+            })
+        } else if(Buffer.isBuffer(file)) {
             this.load(file, update)
         }
     }
@@ -118,7 +120,7 @@ export class Document extends EventEmitter implements IDocument {
      * @param file - file path
      * @param update - load document for incremental updates
      */
-    load(file: string | Buffer, update: boolean = false): void {
+    private load(file: string | Buffer, update: boolean = false): void {
         this._instance.load(file, (e: Error) => {
             if (e) {
                 this.emit('error', e)
@@ -137,7 +139,7 @@ export class Document extends EventEmitter implements IDocument {
     }
 
     getPage(pageN: number): Page {
-        if (pageN > this.pageCount || pageN < 0) {
+        if (pageN > this.getPageCount() || pageN < 0) {
             throw new RangeError("pageN out of range")
         }
         if (!this._loaded) {
@@ -170,7 +172,7 @@ export class Document extends EventEmitter implements IDocument {
         if (!this._loaded) {
             throw new Error('load a pdf file before calling this method')
         }
-        if (this.pageCount < pageIndex || pageIndex < 0) {
+        if (this.getPageCount() < pageIndex || pageIndex < 0) {
             throw new RangeError('page index out of range')
         }
         this._instance.deletePage(pageIndex)
@@ -216,19 +218,27 @@ export class Document extends EventEmitter implements IDocument {
         return this._instance.isAllowed(protection)
     }
 
-    createFont(opts:CreateFontOpts & Object): Font {
+    /**
+     * @desc Creates a PdfFont instance for use in NoPoDoFo generated Pdf Document. Note
+     *      it is up to the user to check that the specified font family exists on the system.
+     *      For font management use font-manager
+     * @see https://github.com/corymickelson/font-manager
+     * @param {CreateFontOpts & Object} opts
+     * @returns {Font}
+     */
+    createFont(opts: CreateFontOpts & Object): Font {
         const instance = this._instance.createFont(
             opts.fontName,
             opts.hasOwnProperty('bold') ? opts.bold : false,
             opts.hasOwnProperty('italic') ? opts.italic : false,
             opts.hasOwnProperty('encoding') ? opts.encoding : 1,
             opts.hasOwnProperty('embed') ? opts.embed : false,
-            opts.hasOwnProperty('fileName')? opts.fileName : null)
+            opts.hasOwnProperty('fileName') ? opts.fileName : null)
         return new Font(instance)
     }
 
-    writeUpdate(device:string|Signer): void {
-        if(device instanceof Signer)
+    writeUpdate(device: string | Signer): void {
+        if (device instanceof Signer)
             this._instance.writeUpdate((device as any)._instance)
         else this._instance.writeUpdate(device)
     }

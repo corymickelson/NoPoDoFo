@@ -11,8 +11,8 @@ FunctionReference Annotation::constructor;
 
 Annotation::Annotation(const CallbackInfo& info)
   : ObjectWrap(info)
+  , annot(info[0].As<External<PdfAnnotation>>().Data())
 {
-  annot = info[0].As<External<PdfAnnotation>>().Data();
 }
 
 void

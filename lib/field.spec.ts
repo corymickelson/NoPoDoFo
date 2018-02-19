@@ -42,7 +42,7 @@ test('Can instantiate a Checkbox given a field of type CheckBox', t => {
                 break
             }
         }
-        const field = new Field(page, index)
+        const field = page.getField(index)
         t.assert(field.getType() === 'CheckBox')
         const checkbox = new CheckBox(field)
         t.ok(checkbox)

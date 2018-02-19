@@ -14,9 +14,7 @@ namespace NoPoDoFo {
 class ListField : public Napi::ObjectWrap<ListField>
 {
 public:
-  ListField(const CallbackInfo& info);
-  ~ListField();
-
+  explicit ListField(const CallbackInfo& info);
   static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
   void InsertItem(const Napi::CallbackInfo&);
@@ -27,8 +25,7 @@ public:
   Napi::Value GetSelectedItem(const Napi::CallbackInfo&);
 
 private:
-  Field* field;
-  PoDoFo::PdfListField* list;
+  std::unique_ptr<PoDoFo::PdfListField> list;
 };
 }
 #endif

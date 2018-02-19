@@ -15,8 +15,7 @@ namespace NoPoDoFo {
 class Field : public Napi::ObjectWrap<Field>
 {
 public:
-  Field(const CallbackInfo& info);
-  ~Field();
+  explicit Field(const CallbackInfo& info);
   static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
 
@@ -28,13 +27,10 @@ public:
   void SetMappingName(const CallbackInfo&);
   void SetRequired(const CallbackInfo&);
   Napi::Value IsRequired(const CallbackInfo&);
-  void SetFieldIndex(const CallbackInfo&);
-  Napi::Value GetFieldIndex(const CallbackInfo&);
-  PoDoFo::PdfField GetField() { return _page->GetPage()->GetField(fieldIndex); }
+  std::shared_ptr<PoDoFo::PdfField> GetField() { return field; }
 
 private:
-  int fieldIndex;
-  Page* _page;
+  std::shared_ptr<PoDoFo::PdfField> field;
 };
 }
 #endif // NPDF_PDFFIELD_H

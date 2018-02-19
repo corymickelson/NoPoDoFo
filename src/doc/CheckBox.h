@@ -17,26 +17,13 @@ class CheckBox : public ObjectWrap<CheckBox>
 {
 public:
   explicit CheckBox(const CallbackInfo& callbackInfo);
-  ~CheckBox();
   static Napi::FunctionReference constructor;
-  static void Initialize(Napi::Env& env, Napi::Object& target)
-  {
-    HandleScope scope(env);
-    Function ctor =
-      DefineClass(env,
-                  "CheckBox",
-                  { InstanceAccessor(
-                    "checked", &CheckBox::IsChecked, &CheckBox::SetChecked) });
-    constructor = Napi::Persistent(ctor);
-    constructor.SuppressDestruct();
-
-    target.Set("CheckBox", ctor);
-  }
+  static void Initialize(Napi::Env& env, Napi::Object& target);
   Napi::Value IsChecked(const CallbackInfo&);
   void SetChecked(const CallbackInfo&, const Napi::Value&);
 
 private:
-  PdfCheckBox* box;
+  std::unique_ptr<PdfCheckBox> box;
 };
 }
 #endif // NPDF_CHECKBOX_H

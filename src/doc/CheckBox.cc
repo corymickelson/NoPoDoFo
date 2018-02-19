@@ -16,9 +16,21 @@ CheckBox::CheckBox(const CallbackInfo& info)
   }
   auto fieldObj = info[0].As<Object>();
   Field* field = Field::Unwrap(fieldObj);
-  box = new PdfCheckBox(field->GetField());
+  box = make_unique<PdfCheckBox>(*new PdfCheckBox(*field->GetField()));
 }
 
+void CheckBox::Initialize(Napi::Env &env, Napi::Object &target) {
+    HandleScope scope(env);
+    Function ctor =
+      DefineClass(env,
+                  "CheckBox",
+                  { InstanceAccessor(
+                    "checked", &CheckBox::IsChecked, &CheckBox::SetChecked) });
+    constructor = Napi::Persistent(ctor);
+    constructor.SuppressDestruct();
+
+    target.Set("CheckBox", ctor);
+  }
 Napi::Value
 CheckBox::IsChecked(const CallbackInfo& info)
 {
@@ -35,11 +47,5 @@ CheckBox::SetChecked(const CallbackInfo& info, const Napi::Value& value)
   bool checked = value.As<Boolean>();
   box->SetChecked(checked);
 }
-CheckBox::~CheckBox()
-{
-  if (box != nullptr) {
-    HandleScope scope(Env());
-    delete box;
-  }
-}
+
 }

@@ -11,25 +11,20 @@
 #include <podofo/podofo.h>
 #include <string>
 
-using namespace std;
 namespace NoPoDoFo {
+using namespace std;
 class TextField : public Napi::ObjectWrap<TextField>
 {
 public:
   static Napi::FunctionReference constructor;
   explicit TextField(const Napi::CallbackInfo&);
-  ~TextField();
   static void Initialize(Napi::Env& env, Napi::Object& target);
-
   void SetText(const Napi::CallbackInfo&, const Napi::Value&);
   Napi::Value GetText(const Napi::CallbackInfo&);
 
 private:
-  Field* field;
-  PoDoFo::PdfTextField GetField()
-  {
-    return PoDoFo::PdfTextField(field->GetField());
-  }
+  unique_ptr<PoDoFo::PdfTextField> text;
+
 };
 }
 #endif // NPDF_TEXTFIELD_H

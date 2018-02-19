@@ -6,8 +6,8 @@
   "types": "dist/index.d.ts",
   "repository": "git+https://github.com/corymickelson/NoPoDoFo.git",
   "scripts": {
-    "compile": "cmake-js compile --prefer-make",
-    "lib-build": "tsc -p tsconfig.json",
+    "compile": "cmake-js compile -s=c++14 --prefer-clang",
+    "lib-build": "npm run compile && tsc -p tsconfig.json",
     "docs": "typedoc --mode modules --module commonjs --target es6 --exclude **/*.spec.* --out ./docs",
     "test": "npm run test:document && npm run test:page && npm run test:field && npm run test:object && npm run test:painter && npm run test:signer && npm run test:parser",
     "test:document": "node --expose-gc ./dist/document.spec.js",
@@ -18,7 +18,7 @@
     "test:painter": "node --expose-gc ./dist/painter.spec.js",
     "test:parser": "node --expose-gc ./dist/parser.spec.js",
     "build:test": "npm run compile && npm run lib-build && npm run test",
-    "precommit": "node-gyp rebuild && npm run lib-build && npm test",
+    "precommit": "npm run compile && npm run lib-build && npm test",
     "postinstall": "npm run lib-build"
   },
   "keywords": [

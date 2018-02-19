@@ -59,8 +59,8 @@ export class Cell {
 
 export class Table {
     private _instance: any
-    private _position: NPDFPoint
-    private _page: Page
+    private _position: NPDFPoint = {x:0, y:0}
+    private _page: Page|null = null
 
     // model accessors
     /**
@@ -72,6 +72,14 @@ export class Table {
             throw Error("must be instance of Font")
         }
         this._instance.font = (v as any)._instance
+    }
+
+    get page():Page|null {
+        return this._page
+    }
+
+    set page(value:Page|null) {
+        this._page = value
     }
 
     get borderWidth(): number {

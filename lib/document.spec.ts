@@ -1,8 +1,8 @@
-import { unlinkSync } from 'fs'
-import { join } from 'path'
+import {unlinkSync} from 'fs'
+import {join} from 'path'
 import * as test from 'tape'
-import { Document, FontEncoding } from './document'
-import { EncryptOption, Encrypt } from './encrypt'
+import {Document, FontEncoding} from './document'
+import {EncryptOption, Encrypt} from './encrypt'
 
 const filePath = join(__dirname, '../test-documents/test.pdf'),
     outFile = './test.out.pdf',
@@ -31,10 +31,14 @@ test('password protected, \'Password required\' error bubbles up', t => {
         })
 })
 test('throws JS error on file not found', t => {
-    t.throws(() => {
-        let doc = new Document('/bad/path')
+    let doc = new Document('/bad/path')
+    doc.on('ready', e => {
+        t.fail('should have thrown "file not found" error.')
     })
-    t.end()
+        .on('error', (e:Error) => {
+            t.assert(e.message === 'file not found')
+            t.end()
+        })
 })
 test('encryption: user password', t => {
     const doc = new Document(filePath),
@@ -51,17 +55,12 @@ test('encryption: user password', t => {
         doc.write(e => {
             if (e) t.fail(e.message)
             let sDoc: Document = new Document(secureDoc)
-            sDoc.on('ready', () => {
-                t.fail("Password required error should have been thrown.")
-            })
-                .on('error', e => {
-                    if (e instanceof Error) {
-                        t.end()
-                    }
-                })
+            sDoc
+                .on('ready', () => {
+                    t.fail("Password required error should have been thrown.")
+                }).on('error', e => { t.end() })
         }, secureDoc)
     })
-    .on('error', e => notCompiledErrorHandler(e, t))
 })
 test('document get page count', t => {
     const doc = new Document(filePath)
@@ -72,7 +71,7 @@ test('document get page count', t => {
         t.end()
 
     })
-    .on('error', e => notCompiledErrorHandler(e, t))
+        .on('error', e => notCompiledErrorHandler(e, t))
 })
 
 test('document delete page', t => {
@@ -90,7 +89,7 @@ test('document delete page', t => {
                 unlinkSync(outFile)
                 t.end()
             })
-            .on('error', e => notCompiledErrorHandler(e, t))
+                .on('error', e => notCompiledErrorHandler(e, t))
         }, outFile)
     })
         .on('error', e => notCompiledErrorHandler(e, t))

@@ -8,7 +8,6 @@
 #include "Encrypt.h"
 #include "Font.h"
 #include "Page.h"
-#include "Signer.h"
 
 using namespace Napi;
 using namespace std;
@@ -79,6 +78,7 @@ Napi::Value
 Document::GetPage(const CallbackInfo& info)
 {
   try {
+    EscapableHandleScope scope(info.Env());
     if (info.Length() != 1 || !info[0].IsNumber()) {
       throw Napi::Error::New(info.Env(),
                              "getPage takes an argument of 1, of type number.");
@@ -91,7 +91,7 @@ Document::GetPage(const CallbackInfo& info)
     PdfPage* page = document->GetPage(n);
     auto pagePtr = Napi::External<PdfPage>::New(info.Env(), page);
     auto instance = Page::constructor.New({ pagePtr });
-    return instance;
+    return scope.Escape(instance);
   } catch (PdfError& err) {
     ErrorHandler(err, info);
   }

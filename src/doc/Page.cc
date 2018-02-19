@@ -7,11 +7,12 @@
 #include "../base/Obj.h"
 #include "Annotation.h"
 #include "Field.h"
-#include "Rect.h"
+
+namespace NoPoDoFo {
 
 using namespace Napi;
 using namespace PoDoFo;
-namespace NoPoDoFo {
+
 Napi::FunctionReference Page::constructor;
 
 Page::Page(const CallbackInfo& info)
@@ -19,9 +20,6 @@ Page::Page(const CallbackInfo& info)
 {
   PoDoFo::PdfPage* pagePtr =
     info[0].As<Napi::External<PoDoFo::PdfPage>>().Data();
-  //  PoDoFo::PdfMemDocument* parentPtr =
-  //    info[1].As<Napi::External<PoDoFo::PdfMemDocument>>().Data();
-  //  parent = parentPtr;
   page = new PdfPage(*pagePtr);
 }
 void
@@ -36,7 +34,7 @@ Page::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceAccessor("number", &Page::GetPageNumber, nullptr),
       InstanceAccessor("width", &Page::GetPageWidth, &Page::SetPageWidth),
       InstanceAccessor("height", &Page::GetPageHeight, &Page::SetPageHeight),
-
+      InstanceMethod("getField", &Page::GetField),
       InstanceMethod("getNumFields", &Page::GetNumFields),
       InstanceMethod("getFieldsInfo", &Page::GetFields),
       InstanceMethod("getFieldIndex", &Page::GetFieldIndex),
@@ -62,6 +60,19 @@ Napi::Value
 Page::GetNumFields(const CallbackInfo& info)
 {
   return Napi::Number::New(info.Env(), page->GetNumFields());
+}
+
+Napi::Value
+Page::GetField(const CallbackInfo& info)
+{
+  EscapableHandleScope scope(info.Env());
+  int index = info[0].As<Number>();
+  if (index < 0 || index > page->GetNumFields()) {
+    throw RangeError();
+  }
+  auto instance = Field::constructor.New({ External<PdfField>::New(
+    info.Env(), new PdfField(page->GetField(index))) });
+  return scope.Escape(instance);
 }
 
 Napi::Value

@@ -4,16 +4,22 @@
 
 #include "TextField.h"
 
+
+namespace NoPoDoFo {
+
 using namespace Napi;
 using namespace PoDoFo;
-namespace NoPoDoFo {
+
 FunctionReference TextField::constructor;
+
 TextField::TextField(const CallbackInfo& info)
   : ObjectWrap(info)
 {
   try {
     auto fieldObj = info[0].As<Object>();
-    field = Field::Unwrap(fieldObj);
+    auto field = Field::Unwrap(fieldObj);
+    PdfTextField v(*field->GetField().get());
+    text = make_unique<PdfTextField>(v);
   } catch (PdfError& err) {
     stringstream msg;
     msg << "Failed to instantiate TextField. PoDoFo Error: " << err.GetError()
@@ -43,21 +49,15 @@ TextField::SetText(const CallbackInfo& info, const Napi::Value& value)
                            "TextField value must be of type string");
   }
   string input = value.As<String>().Utf8Value();
-  PoDoFo::PdfString text(input);
-  TextField::GetField().SetText(text);
+  PoDoFo::PdfString v(input);
+  (*text).SetText(v);
 }
 
 Napi::Value
 TextField::GetText(const CallbackInfo& info)
 {
   return Napi::String::New(info.Env(),
-                           TextField::GetField().GetText().GetStringUtf8());
+      (*text).GetText().GetStringUtf8());
 }
-TextField::~TextField()
-{
-  if (field != nullptr) {
-    HandleScope scope(Env());
-    field = nullptr;
-  }
-}
+
 }
