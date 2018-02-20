@@ -32,14 +32,4 @@ jobs:
           paths:
             - node_modules
           key: v1-dependencies-{{ checksum "package.json" }}
-        
-      # run tests!
-#      - run: npm i -g node-gyp
-#      - run: node-gyp clean
-#      - run: node-gyp configure
-#      - run: node-gyp build
-#      - run: npm run lib-build
-      # - run: npm i -g cmake-js
-      # - run: cmake-js build
-      # - run: npm run lib-build
       - run: npm run build:test

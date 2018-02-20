@@ -118,7 +118,6 @@
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private tsd-is-external"><a href="_document_.document.html#_instance" class="tsd-kind-icon">_instance</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private tsd-is-external"><a href="_document_.document.html#_loaded" class="tsd-kind-icon">_loaded</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private tsd-is-external"><a href="_document_.document.html#_pagecount" class="tsd-kind-icon">_page<wbr>Count</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private tsd-is-external"><a href="_document_.document.html#_password" class="tsd-kind-icon">_password</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited tsd-is-static tsd-is-external"><a href="_document_.document.html#defaultmaxlisteners" class="tsd-kind-icon">default<wbr>Max<wbr>Listeners</a></li>
 							</ul>
@@ -128,7 +127,6 @@
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-external"><a href="_document_.document.html#encrypt" class="tsd-kind-icon">encrypt</a></li>
 								<li class="tsd-kind-get-signature tsd-parent-kind-class tsd-is-external"><a href="_document_.document.html#loaded" class="tsd-kind-icon">loaded</a></li>
-								<li class="tsd-kind-get-signature tsd-parent-kind-class tsd-is-external"><a href="_document_.document.html#pagecount" class="tsd-kind-icon">page<wbr>Count</a></li>
 								<li class="tsd-kind-set-signature tsd-parent-kind-class tsd-is-external"><a href="_document_.document.html#password" class="tsd-kind-icon">password</a></li>
 							</ul>
 						</section>
@@ -150,7 +148,7 @@
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-external"><a href="_document_.document.html#islinearized" class="tsd-kind-icon">is<wbr>Linearized</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-overwrite tsd-is-inherited tsd-is-external"><a href="_document_.document.html#listenercount" class="tsd-kind-icon">listener<wbr>Count</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-overwrite tsd-is-inherited tsd-is-external"><a href="_document_.document.html#listeners" class="tsd-kind-icon">listeners</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-external"><a href="_document_.document.html#load" class="tsd-kind-icon">load</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private tsd-is-external"><a href="_document_.document.html#load" class="tsd-kind-icon">load</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-external"><a href="_document_.document.html#mergedocument" class="tsd-kind-icon">merge<wbr>Document</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-overwrite tsd-is-inherited tsd-is-external"><a href="_document_.document.html#on" class="tsd-kind-icon">on</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-overwrite tsd-is-inherited tsd-is-external"><a href="_document_.document.html#once" class="tsd-kind-icon">once</a></li>
@@ -173,13 +171,13 @@
 					<a name="constructor" class="tsd-anchor"></a>
 					<h3>constructor</h3>
 					<ul class="tsd-signatures tsd-kind-constructor tsd-parent-kind-class tsd-is-external">
-						<li class="tsd-signature tsd-kind-icon">new <wbr>Document<span class="tsd-signature-symbol">(</span>file<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, update<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_document_.document.html" class="tsd-signature-type">Document</a></li>
+						<li class="tsd-signature tsd-kind-icon">new <wbr>Document<span class="tsd-signature-symbol">(</span>file<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Buffer</span>, update<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_document_.document.html" class="tsd-signature-type">Document</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/c1f237f/lib/document.ts#L97">document.ts:97</a></li>
+									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/f3d4968/lib/document.ts#L93">document.ts:93</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -194,7 +192,7 @@
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>file: <span class="tsd-signature-type">string</span></h5>
+									<h5>file: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Buffer</span></h5>
 								</li>
 								<li>
 									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> update: <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> =&nbsp;false</span></h5>
@@ -214,7 +212,7 @@
 					<div class="tsd-signature tsd-kind-icon">_instance<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">any</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/c1f237f/lib/document.ts#L70">document.ts:70</a></li>
+							<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/f3d4968/lib/document.ts#L71">document.ts:71</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -224,27 +222,17 @@
 					<div class="tsd-signature tsd-kind-icon">_loaded<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> =&nbsp;false</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/c1f237f/lib/document.ts#L71">document.ts:71</a></li>
-						</ul>
-					</aside>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private tsd-is-external">
-					<a name="_pagecount" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagPrivate">Private</span> _page<wbr>Count</h3>
-					<div class="tsd-signature tsd-kind-icon">_page<wbr>Count<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/c1f237f/lib/document.ts#L72">document.ts:72</a></li>
+							<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/f3d4968/lib/document.ts#L72">document.ts:72</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private tsd-is-external">
 					<a name="_password" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagPrivate">Private</span> _password</h3>
-					<div class="tsd-signature tsd-kind-icon">_password<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
+					<div class="tsd-signature tsd-kind-icon">_password<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> =&nbsp;undefined</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/c1f237f/lib/document.ts#L73">document.ts:73</a></li>
+							<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/f3d4968/lib/document.ts#L73">document.ts:73</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -273,7 +261,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/c1f237f/lib/document.ts#L94">document.ts:94</a></li>
+									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/f3d4968/lib/document.ts#L90">document.ts:90</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <a href="_encrypt_.encrypt.html" class="tsd-signature-type">Encrypt</a></h4>
@@ -281,7 +269,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/c1f237f/lib/document.ts#L87">document.ts:87</a></li>
+									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/f3d4968/lib/document.ts#L83">document.ts:83</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -304,27 +292,10 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/c1f237f/lib/document.ts#L75">document.ts:75</a></li>
+									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/f3d4968/lib/document.ts#L75">document.ts:75</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
-						</li>
-					</ul>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-get-signature tsd-parent-kind-class tsd-is-external">
-					<a name="pagecount" class="tsd-anchor"></a>
-					<h3>page<wbr>Count</h3>
-					<ul class="tsd-signatures tsd-kind-get-signature tsd-parent-kind-class tsd-is-external">
-						<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">get</span> pageCount<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></li>
-					</ul>
-					<ul class="tsd-descriptions">
-						<li class="tsd-description">
-							<aside class="tsd-sources">
-								<ul>
-									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/c1f237f/lib/document.ts#L79">document.ts:79</a></li>
-								</ul>
-							</aside>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -338,7 +309,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/c1f237f/lib/document.ts#L83">document.ts:83</a></li>
+									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/f3d4968/lib/document.ts#L79">document.ts:79</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -410,9 +381,21 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/c1f237f/lib/document.ts#L219">document.ts:219</a></li>
+									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/f3d4968/lib/document.ts#L229">document.ts:229</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<dl class="tsd-comment-tags">
+									<dt>desc</dt>
+									<dd><p>Creates a PdfFont instance for use in NoPoDoFo generated Pdf Document. Note
+											it is up to the user to check that the specified font family exists on the system.
+										For font management use font-manager</p>
+									</dd>
+									<dt>see</dt>
+									<dd><p><a href="https://github.com/corymickelson/font-manager">https://github.com/corymickelson/font-manager</a></p>
+									</dd>
+								</dl>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
@@ -434,7 +417,7 @@
 							<aside class="tsd-sources">
 								<p>Implementation of <a href="../interfaces/_document_.idocument.html">IDocument</a>.<a href="../interfaces/_document_.idocument.html#deletepage">deletePage</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/c1f237f/lib/document.ts#L169">document.ts:169</a></li>
+									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/f3d4968/lib/document.ts#L171">document.ts:171</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -524,7 +507,7 @@
 							<aside class="tsd-sources">
 								<p>Implementation of <a href="../interfaces/_document_.idocument.html">IDocument</a>.<a href="../interfaces/_document_.idocument.html#getobjects">getObjects</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/c1f237f/lib/document.ts#L150">document.ts:150</a></li>
+									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/f3d4968/lib/document.ts#L152">document.ts:152</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Array</span><span class="tsd-signature-symbol">&lt;</span><a href="_object_.obj.html" class="tsd-signature-type">Obj</a><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -542,7 +525,7 @@
 							<aside class="tsd-sources">
 								<p>Implementation of <a href="../interfaces/_document_.idocument.html">IDocument</a>.<a href="../interfaces/_document_.idocument.html#getpage">getPage</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/c1f237f/lib/document.ts#L139">document.ts:139</a></li>
+									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/f3d4968/lib/document.ts#L141">document.ts:141</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -566,7 +549,7 @@
 							<aside class="tsd-sources">
 								<p>Implementation of <a href="../interfaces/_document_.idocument.html">IDocument</a>.<a href="../interfaces/_document_.idocument.html#getpagecount">getPageCount</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/c1f237f/lib/document.ts#L132">document.ts:132</a></li>
+									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/f3d4968/lib/document.ts#L134">document.ts:134</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
@@ -584,7 +567,7 @@
 							<aside class="tsd-sources">
 								<p>Implementation of <a href="../interfaces/_document_.idocument.html">IDocument</a>.<a href="../interfaces/_document_.idocument.html#gettrailer">getTrailer</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/c1f237f/lib/document.ts#L210">document.ts:210</a></li>
+									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/f3d4968/lib/document.ts#L212">document.ts:212</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <a href="_object_.obj.html" class="tsd-signature-type">Obj</a></h4>
@@ -602,7 +585,7 @@
 							<aside class="tsd-sources">
 								<p>Implementation of <a href="../interfaces/_document_.idocument.html">IDocument</a>.<a href="../interfaces/_document_.idocument.html#getversion">getVersion</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/c1f237f/lib/document.ts#L179">document.ts:179</a></li>
+									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/f3d4968/lib/document.ts#L181">document.ts:181</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
@@ -620,7 +603,7 @@
 							<aside class="tsd-sources">
 								<p>Implementation of <a href="../interfaces/_document_.idocument.html">IDocument</a>.<a href="../interfaces/_document_.idocument.html#isallowed">isAllowed</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/c1f237f/lib/document.ts#L215">document.ts:215</a></li>
+									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/f3d4968/lib/document.ts#L217">document.ts:217</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -644,7 +627,7 @@
 							<aside class="tsd-sources">
 								<p>Implementation of <a href="../interfaces/_document_.idocument.html">IDocument</a>.<a href="../interfaces/_document_.idocument.html#islinearized">isLinearized</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/c1f237f/lib/document.ts#L186">document.ts:186</a></li>
+									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/f3d4968/lib/document.ts#L188">document.ts:188</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
@@ -701,17 +684,17 @@
 						</li>
 					</ul>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-external">
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-private tsd-is-external">
 					<a name="load" class="tsd-anchor"></a>
-					<h3>load</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-external">
+					<h3><span class="tsd-flag ts-flagPrivate">Private</span> load</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-private tsd-is-external">
 						<li class="tsd-signature tsd-kind-icon">load<span class="tsd-signature-symbol">(</span>file<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Buffer</span>, update<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/c1f237f/lib/document.ts#L121">document.ts:121</a></li>
+									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/f3d4968/lib/document.ts#L123">document.ts:123</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -748,7 +731,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/c1f237f/lib/document.ts#L162">document.ts:162</a></li>
+									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/f3d4968/lib/document.ts#L164">document.ts:164</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1066,7 +1049,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/c1f237f/lib/document.ts#L199">document.ts:199</a></li>
+									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/f3d4968/lib/document.ts#L201">document.ts:201</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1122,7 +1105,7 @@
 							<aside class="tsd-sources">
 								<p>Implementation of <a href="../interfaces/_document_.idocument.html">IDocument</a>.<a href="../interfaces/_document_.idocument.html#writeupdate">writeUpdate</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/c1f237f/lib/document.ts#L230">document.ts:230</a></li>
+									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/f3d4968/lib/document.ts#L240">document.ts:240</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1267,9 +1250,6 @@
 								<a href="_document_.document.html#_loaded" class="tsd-kind-icon">_loaded</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private tsd-is-external">
-								<a href="_document_.document.html#_pagecount" class="tsd-kind-icon">_page<wbr>Count</a>
-							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private tsd-is-external">
 								<a href="_document_.document.html#_password" class="tsd-kind-icon">_password</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-inherited tsd-is-static tsd-is-external">
@@ -1280,9 +1260,6 @@
 							</li>
 							<li class=" tsd-kind-get-signature tsd-parent-kind-class tsd-is-external">
 								<a href="_document_.document.html#loaded" class="tsd-kind-icon">loaded</a>
-							</li>
-							<li class=" tsd-kind-get-signature tsd-parent-kind-class tsd-is-external">
-								<a href="_document_.document.html#pagecount" class="tsd-kind-icon">page<wbr>Count</a>
 							</li>
 							<li class=" tsd-kind-set-signature tsd-parent-kind-class tsd-is-external">
 								<a href="_document_.document.html#password" class="tsd-kind-icon">password</a>
@@ -1332,7 +1309,7 @@
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-overwrite tsd-is-inherited tsd-is-external">
 								<a href="_document_.document.html#listeners" class="tsd-kind-icon">listeners</a>
 							</li>
-							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-external">
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-private tsd-is-external">
 								<a href="_document_.document.html#load" class="tsd-kind-icon">load</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-external">
@@ -1379,7 +1356,7 @@
 						<a href="../interfaces/_document_.idocument.html" class="tsd-kind-icon">IDocument</a>
 					</li>
 					<li class=" tsd-kind-variable tsd-parent-kind-external-module tsd-is-external">
-						<a href="../modules/_document_.html#___mod" class="tsd-kind-icon">___mod</a>
+						<a href="../modules/_document_.html#__mod" class="tsd-kind-icon">__mod</a>
 					</li>
 				</ul>
 			</nav>
