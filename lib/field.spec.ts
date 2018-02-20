@@ -26,7 +26,6 @@ test('Can instantiate a TextField given a field of type TextField', t => {
             field = page.getField(0)
         const text = new TextField(field)
         t.ok(text)
-        t.ok(text.text)
         t.end()
     })
 })
