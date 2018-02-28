@@ -32,11 +32,23 @@ Napi::FunctionReference Encrypt::constructor;
 Encrypt::Encrypt(const Napi::CallbackInfo& info)
   : ObjectWrap(info)
 {
-  AssertFunctionArgs(info, 2, { napi_external, napi_external });
-  encrypt = info[0].As<External<PdfEncrypt>>().Data();
-  document = info[1].As<External<Document>>().Data();
+  AssertFunctionArgs(info, 1, { napi_object });
+  document = Document::Unwrap(info[0].As<Object>());
+  if(info.Length() == 2 && info[1].Type() == napi_external) {
+    encrypt = info[1].As<External<PdfEncrypt>>().Data();
+  } else {
+    encrypt = const_cast<PdfEncrypt*>(document->GetDocument()->GetEncrypt());
+  }
 }
-
+Encrypt::~Encrypt()
+{
+  HandleScope scope(Env());
+  if (encrypt != nullptr) {
+    delete encrypt;
+    encrypt = nullptr;
+  }
+  document = nullptr;
+}
 void
 Encrypt::Initialize(Napi::Env& env, Napi::Object& target)
 {
@@ -159,12 +171,5 @@ Encrypt::GetKeyLength(const CallbackInfo& info)
 {
   return Number::New(info.Env(), encrypt->GetKeyLength());
 }
-Encrypt::~Encrypt()
-{
-  if (encrypt != nullptr) {
-    HandleScope scope(Env());
-    delete encrypt;
-    document = nullptr;
-  }
-}
+
 }

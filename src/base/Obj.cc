@@ -26,6 +26,7 @@
 
 using namespace Napi;
 using namespace PoDoFo;
+
 namespace NoPoDoFo {
 FunctionReference Obj::constructor;
 
@@ -57,14 +58,14 @@ Obj::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceMethod("getRawData", &Obj::GetRawData),
       InstanceMethod("clear", &Obj::Clear),
       InstanceMethod("eq", &Obj::Eq) });
-  constructor = Napi::Persistent(ctor);
+  constructor = Persistent(ctor);
   constructor.SuppressDestruct();
   target.Set("Obj", ctor);
 }
 
 Obj::Obj(const Napi::CallbackInfo& info)
   : ObjectWrap<Obj>(info)
-  , obj(info[0].As<Napi::External<PdfObject>>().Data())
+  , obj(info[0].As<External<PdfObject>>().Data())
 {
 }
 
@@ -183,9 +184,10 @@ Napi::Value
 Obj::Reference(const CallbackInfo& info)
 {
   try {
+    EscapableHandleScope scope(info.Env());
     PdfReference init = obj->Reference();
     auto initPtr = Napi::External<PdfReference>::New(info.Env(), &init);
-    return Ref::constructor.New({ initPtr });
+    return scope.Escape(Ref::constructor.New({ initPtr }));
   } catch (PdfError& err) {
     ErrorHandler(err, info);
   } catch (Napi::Error& err) {
@@ -263,12 +265,13 @@ Obj::GetName(const CallbackInfo& info)
 Napi::Value
 Obj::GetArray(const CallbackInfo& info)
 {
+  EscapableHandleScope scope(info.Env());
   if (!obj->IsArray()) {
     throw Napi::Error::New(info.Env(), "Obj only accessible as array");
   }
   auto ptr = External<PdfArray>::New(info.Env(), &obj->GetArray());
   auto instance = NoPoDoFo::Array::constructor.New({ ptr });
-  return instance;
+  return scope.Escape(instance);
 }
 
 Napi::Value
@@ -286,22 +289,24 @@ Obj::GetReference(const CallbackInfo& info)
   if (!obj->IsReference()) {
     throw Napi::Error::New(info.Env(), "Obj only accessible as Ref");
   }
+  EscapableHandleScope scope(info.Env());
   auto init = obj->GetReference();
   auto ptr = External<PdfReference>::New(info.Env(), &init);
   auto instance = Ref::constructor.New({ ptr });
-  return instance;
+  return scope.Escape(instance);
 }
 
 Napi::Value
 Obj::GetDictionary(const CallbackInfo& info)
 {
   if (!obj->IsDictionary()) {
-    throw Napi::Error::New(info.Env(), "Obj only accessible as Ref");
+    throw Napi::Error::New(info.Env(), "Obj only accessible as Dictionary");
   }
+  EscapableHandleScope scope(info.Env());
   auto init = obj->GetDictionary();
   auto ptr = External<PdfDictionary>::New(info.Env(), &init);
   auto instance = Dictionary::constructor.New({ ptr });
-  return instance;
+  return scope.Escape(instance);
 }
 
 Napi::Value
@@ -328,7 +333,7 @@ protected:
   void Execute() override
   {
     try {
-      auto o = const_cast<PdfObject*>(obj->GetObject());
+      auto o = obj->GetObject();
       value = o->GetByteOffset(arg.c_str(), ePdfWriteMode_Default);
     } catch (PdfError& err) {
       SetError(ErrorHandler::WriteMsg(err));
@@ -339,7 +344,7 @@ protected:
   void OnOK() override
   {
     HandleScope scope(Env());
-    Callback().Call({ Env().Null(), Napi::Number::New(Env(), value) });
+    Callback().Call({ Env().Null(), Number::New(Env(), value) });
   }
 
 private:

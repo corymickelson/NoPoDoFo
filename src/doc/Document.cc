@@ -2,7 +2,7 @@
  * This file is part of the NoPoDoFo (R) project.
  * Copyright (c) 2017-2018
  * Authors: Cory Mickelson, et al.
- * 
+ *
  * NoPoDoFo is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -16,7 +16,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 
 #include "Document.h"
 #include "../ErrorHandler.h"
@@ -41,7 +40,7 @@ Document::Initialize(Napi::Env& env, Napi::Object& target)
   Function ctor = DefineClass(
     env,
     "Document",
-    { // StaticMethod("gc", &Document::GC),
+    { StaticMethod("gc", &Document::GC),
       InstanceAccessor("password", nullptr, &Document::SetPassword),
       InstanceAccessor("encrypt", &Document::GetEncrypt, &Document::SetEncrypt),
       InstanceMethod("load", &Document::Load),
@@ -55,6 +54,7 @@ Document::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceMethod("write", &Document::Write),
       InstanceMethod("writeBuffer", &Document::WriteBuffer),
       InstanceMethod("getObjects", &Document::GetObjects),
+      InstanceMethod("hasEncrypt", &Document::HasEncrypt),
       InstanceMethod("getTrailer", &Document::GetTrailer),
       InstanceMethod("isAllowed", &Document::IsAllowed),
       InstanceMethod("createFont", &Document::CreateFont) });
@@ -64,51 +64,40 @@ Document::Initialize(Napi::Env& env, Napi::Object& target)
 }
 Document::Document(const CallbackInfo& info)
   : ObjectWrap(info)
+  , document(new PdfMemDocument())
 {
-  if (info.Length() == 1) {
-    AssertFunctionArgs(info, 1, { napi_external });
-    auto d = info[0].As<External<PdfMemDocument>>().Data();
-    document = new PdfMemDocument(d);
-  } else {
-    document = new PdfMemDocument();
-  }
-  if (!document) {
-    throw Error::New(info.Env(), "document has not been initialized properly");
-  }
 }
 
 Document::~Document()
 {
-  if (document != nullptr) {
-    HandleScope scope(Env());
-    delete document;
-  }
+  HandleScope scope(Env());
+  delete document;
+  document = nullptr;
 }
 Napi::Value
 Document::GetPageCount(const CallbackInfo& info)
 {
   int pages = document->GetPageCount();
-  return Napi::Number::New(info.Env(), pages);
+  return Number::New(info.Env(), pages);
 }
 
 Napi::Value
 Document::GetPage(const CallbackInfo& info)
 {
   try {
-    EscapableHandleScope scope(info.Env());
-    if (info.Length() != 1 || !info[0].IsNumber()) {
-      throw Napi::Error::New(info.Env(),
+    if (info.Length() < 1 || !info[0].IsNumber()) {
+      throw Error::New(info.Env(),
                              "getPage takes an argument of 1, of type number.");
     }
     int n = info[0].As<Number>();
     int pl = document->GetPageCount();
     if (n > pl) {
-      throw Napi::RangeError::New(info.Env(), "Index out of page count range");
+      throw RangeError::New(info.Env(), "Index out of page count range");
     }
     PdfPage* page = document->GetPage(n);
-    auto pagePtr = Napi::External<PdfPage>::New(info.Env(), page);
-    auto instance = Page::constructor.New({ pagePtr });
-    return scope.Escape(instance);
+    auto pagePtr = External<PdfPage>::New(info.Env(), page);
+    auto instance = Page::constructor.New({ this->Value(), pagePtr });
+    return instance;
   } catch (PdfError& err) {
     ErrorHandler(err, info);
   }
@@ -162,16 +151,16 @@ Document::GetVersion(const CallbackInfo& info)
       break;
   }
   if (v == 0.0) {
-    throw Napi::Error::New(info.Env(),
+    throw Error::New(info.Env(),
                            "Failed to parse document. Pdf version unknown.");
   }
-  return Napi::Number::New(info.Env(), v);
+  return Number::New(info.Env(), v);
 }
 
 Napi::Value
 Document::IsLinearized(const CallbackInfo& info)
 {
-  return Napi::Boolean::New(info.Env(), document->IsLinearized());
+  return Boolean::New(info.Env(), document->IsLinearized());
 }
 
 void
@@ -180,7 +169,7 @@ Document::DeletePage(const CallbackInfo& info)
   AssertFunctionArgs(info, 1, { napi_valuetype::napi_number });
   int pageIndex = info[0].As<Number>();
   if (pageIndex < 0 || pageIndex > document->GetPageCount()) {
-    throw Napi::Error::New(info.Env(), "Page index out of range");
+    throw Error::New(info.Env(), "Page index out of range");
   }
   try {
     document->GetPagesTree()->DeletePage(pageIndex);
@@ -199,7 +188,7 @@ Document::MergeDocument(const CallbackInfo& info)
     mergedDoc.Load(docPath.c_str());
   } catch (PdfError& err) {
     if (err.GetError() == ePdfError_InvalidPassword && info.Length() != 2) {
-      throw Napi::Error::New(info.Env(),
+      throw Error::New(info.Env(),
                              "Password required to modify this document. Call "
                              "MergeDocument(filePath, password)");
     } else if (err.GetError() == ePdfError_InvalidPassword &&
@@ -228,14 +217,18 @@ Document::GetWriteMode(const CallbackInfo& info)
   }
   return Napi::String::New(info.Env(), writeMode);
 }
-
+Napi::Value
+Document::HasEncrypt(const CallbackInfo& info)
+{
+  return Boolean::New(info.Env(), document->GetEncrypt() != nullptr);
+}
 void
 Document::SetEncrypt(const CallbackInfo& info, const Napi::Value& value)
 {
   try {
     AssertFunctionArgs(info, 1, { napi_valuetype::napi_object });
     if (!value.IsObject()) {
-      throw Napi::Error::New(info.Env(),
+      throw Error::New(info.Env(),
                              "Set encrypt requires a single argument of"
                              " type Object<{userPassword:string,"
                              " ownerPassword:string, protection:Array<string>,"
@@ -288,7 +281,7 @@ Document::SetEncrypt(const CallbackInfo& info, const Napi::Value& value)
                       << "[Copy, Print, Edit, EditNotes, FillAndSign, "
                          "Accessible, DocAssembly, HighPrint]"
                       << endl;
-                  throw Napi::Error::New(info.Env(), msg.str());
+                  throw Error::New(info.Env(), msg.str());
                 }
               }
             }
@@ -317,7 +310,7 @@ Document::SetEncrypt(const CallbackInfo& info, const Napi::Value& value)
                 << ". Permission must be one or more of: [rc4v1, rc4v2, aesv2, "
                    "aesv3]"
                 << endl;
-            throw Napi::Error::New(info.Env(), msg.str());
+            throw Error::New(info.Env(), msg.str());
           }
         }
       }
@@ -337,7 +330,7 @@ Document::SetEncrypt(const CallbackInfo& info, const Napi::Value& value)
                 << ". Permission must be one or more of: [40, 56, 80, 96, 128, "
                    "256]"
                 << endl;
-              throw Napi::Error::New(info.Env(), msg.str());
+              throw Error::New(info.Env(), msg.str());
             }
           }
         }
@@ -346,7 +339,7 @@ Document::SetEncrypt(const CallbackInfo& info, const Napi::Value& value)
       stringstream msg;
       msg << "Parse Encrypt Object failed with error: " << err.GetError()
           << endl;
-      throw Napi::Error::New(info.Env(), msg.str());
+      throw Error::New(info.Env(), msg.str());
     }
     document->SetEncrypted(
       userPwd,
@@ -358,7 +351,7 @@ Document::SetEncrypt(const CallbackInfo& info, const Napi::Value& value)
     stringstream msg;
     msg << "PdfMemDocument::SetEncrypt failed with error: " << err.GetError()
         << endl;
-    throw Napi::Error::New(info.Env(), msg.str());
+    throw Error::New(info.Env(), msg.str());
   }
 }
 
@@ -367,25 +360,24 @@ Document::GetEncrypt(const CallbackInfo& info)
 {
   const PdfEncrypt* enc = document->GetEncrypt();
   auto ptr = const_cast<PdfEncrypt*>(enc);
-  auto encryptPtr = Napi::External<PdfEncrypt>::New(info.Env(), ptr);
+  auto encryptPtr = External<PdfEncrypt>::New(info.Env(), ptr);
   auto instance = Encrypt::constructor.New(
-    { encryptPtr, External<Document>::New(info.Env(), this) });
+    { this->Value(), encryptPtr });
   return instance;
 }
 
 Napi::Value
 Document::GetObjects(const CallbackInfo& info)
 {
-  EscapableHandleScope scope(info.Env());
   try {
-    auto js = Napi::Array::New(info.Env());
+    auto js = Array::New(info.Env());
     uint32_t count = 0;
     for (auto& item : document->GetObjects()) {
       auto instance = External<PdfObject>::New(info.Env(), item);
       js[count] = Obj::constructor.New({ instance });
       ++count;
     }
-    return scope.Escape(js);
+    return js;
   } catch (PdfError& err) {
     ErrorHandler(err, info);
   } catch (Error& err) {
@@ -438,7 +430,7 @@ Value
 Document::CreateFont(const CallbackInfo& info)
 {
   AssertFunctionArgs(info, 1, { napi_valuetype::napi_string });
-  auto fontname = info[0].As<String>().Utf8Value();
+  auto fontName = info[0].As<String>().Utf8Value();
   bool bold = false;
   bool italic = false;
   const PdfEncoding* encoding = nullptr;
@@ -488,7 +480,7 @@ Document::CreateFont(const CallbackInfo& info)
     filename = info[5].As<String>().Utf8Value().c_str();
   try {
     PdfFont* font =
-      document->CreateFont(fontname.c_str(),
+      document->CreateFont(fontName.c_str(),
                            bold,
                            italic,
                            false,
@@ -502,10 +494,10 @@ Document::CreateFont(const CallbackInfo& info)
   }
 }
 
-class DocumentWriteAsync : public Napi::AsyncWorker
+class DocumentWriteAsync : public AsyncWorker
 {
 public:
-  DocumentWriteAsync(Napi::Function& cb, Document* doc, string arg)
+  DocumentWriteAsync(Napi::Function& cb, Document& doc, string arg)
     : Napi::AsyncWorker(cb)
     , doc(doc)
     , arg(std::move(arg))
@@ -513,7 +505,7 @@ public:
   }
 
 private:
-  Document* doc;
+  Document& doc;
   string arg = "";
 
   // AsyncWorker interface
@@ -522,7 +514,7 @@ protected:
   {
     try {
       PdfOutputDevice device(arg.c_str());
-      doc->GetDocument()->Write(&device);
+      doc.GetDocument()->Write(&device);
     } catch (PdfError& err) {
       SetError(String::New(Env(), ErrorHandler::WriteMsg(err)));
     } catch (Napi::Error& err) {
@@ -543,7 +535,7 @@ Document::Write(const CallbackInfo& info)
     if (info.Length() == 2 && info[0].IsString() && info[1].IsFunction()) {
       string arg = info[0].As<String>();
       auto cb = info[1].As<Function>();
-      DocumentWriteAsync* worker = new DocumentWriteAsync(cb, this, arg);
+      DocumentWriteAsync* worker = new DocumentWriteAsync(cb, *this, arg);
       worker->Queue();
     } else {
       throw Error::New(
@@ -559,10 +551,10 @@ Document::Write(const CallbackInfo& info)
   return Env().Undefined();
 }
 
-class DocumentLoadAsync : public Napi::AsyncWorker
+class DocumentLoadAsync : public AsyncWorker
 {
 public:
-  DocumentLoadAsync(Napi::Function& cb, Document* doc, string arg)
+  DocumentLoadAsync(Function& cb, Document& doc, string arg)
     : AsyncWorker(cb)
     , doc(doc)
     , arg(std::move(arg))
@@ -573,7 +565,7 @@ public:
   void LoadFromBuffer(bool v) { loadBuffer = v; }
 
 private:
-  Document* doc;
+  Document& doc;
   string arg;
   bool update = false;
   bool loadBuffer = false;
@@ -589,12 +581,12 @@ protected:
       }
 #else
       if (loadBuffer) {
-        doc->GetDocument()->LoadFromBuffer(arg.c_str(),
+        doc.GetDocument()->LoadFromBuffer(arg.c_str(),
                                            static_cast<long>(arg.length()));
       }
 #endif
       else {
-        doc->GetDocument()->Load(arg.c_str(), update);
+        doc.GetDocument()->Load(arg.c_str(), update);
       }
     } catch (PdfError& e) {
       if (e.GetError() == ePdfError_InvalidPassword) {
@@ -634,7 +626,7 @@ Document::Load(const CallbackInfo& info)
     loadForIncrementalUpdates = forUpdate;
   }
   originPdf = source;
-  DocumentLoadAsync* worker = new DocumentLoadAsync(cb, this, source);
+  DocumentLoadAsync* worker = new DocumentLoadAsync(cb, *this, source);
   worker->ForUpdate(forUpdate);
   worker->LoadFromBuffer(loadBuffer);
   worker->Queue();
@@ -644,14 +636,14 @@ Document::Load(const CallbackInfo& info)
 class DocumentWriteBufferAsync : public AsyncWorker
 {
 public:
-  DocumentWriteBufferAsync(Function& cb, Document* doc)
+  DocumentWriteBufferAsync(Function& cb, Document& doc)
     : AsyncWorker(cb)
     , doc(doc)
   {
   }
 
 private:
-  Document* doc;
+  Document& doc;
   string value = "";
   size_t size = 0;
 
@@ -660,7 +652,7 @@ protected:
   {
     PdfRefCountedBuffer docBuffer;
     PdfOutputDevice device(&docBuffer);
-    doc->GetDocument()->Write(&device);
+    doc.GetDocument()->Write(&device);
     value = string(docBuffer.GetBuffer());
     size = docBuffer.GetSize();
   }
@@ -680,7 +672,7 @@ Document::WriteBuffer(const CallbackInfo& info)
 {
   AssertFunctionArgs(info, 1, { napi_valuetype::napi_function });
   auto cb = info[0].As<Function>();
-  auto* worker = new DocumentWriteBufferAsync(cb, this);
+  auto* worker = new DocumentWriteBufferAsync(cb, *this);
   worker->Queue();
   return info.Env().Undefined();
 }
@@ -688,9 +680,9 @@ Document::WriteBuffer(const CallbackInfo& info)
 class GCAsync : public AsyncWorker
 {
 public:
-  GCAsync(const Function& callback, Document* doc, string pwd)
+  GCAsync(const Function& callback, string doc, string pwd)
     : AsyncWorker(callback)
-    , doc(doc)
+    , doc(std::move(doc))
     , pwd(std::move(pwd))
   {
   }
@@ -698,10 +690,10 @@ public:
 protected:
   void Execute() override
   {
-    PdfVecObjects objs;
-    PdfParser parser(&objs);
-    objs.SetAutoDelete(true);
-    parser.ParseFile(doc->originPdf.c_str(), false);
+    PdfVecObjects vecObjects;
+    PdfParser parser(&vecObjects);
+    vecObjects.SetAutoDelete(true);
+    parser.ParseFile(doc.c_str(), false);
     PdfWriter writer(&parser);
     writer.SetPdfVersion(parser.GetPdfVersion());
     if (parser.GetEncrypted()) {
@@ -719,7 +711,7 @@ protected:
   }
 
 private:
-  Document* doc = nullptr;
+  string doc;
   string pwd;
   Napi::Buffer<char> value;
 };
@@ -727,12 +719,12 @@ private:
 Napi::Value
 Document::GC(const Napi::CallbackInfo& info)
 {
-  AssertFunctionArgs(info, 1, { napi_string });
+  AssertFunctionArgs(info, 2, { napi_function, napi_string, napi_string });
   string source = info[0].As<String>().Utf8Value();
-  string dest;
-  if (info.Length() == 2 && info[1].IsString()) {
-    dest = info[1].As<String>().Utf8Value();
-  }
+  string pwd = info[1].As<String>().Utf8Value();
+  auto cb = info[2].As<Function>();
+  auto worker = new GCAsync(cb, source, pwd);
+  worker->Queue();
   return info.Env().Undefined();
 }
 }

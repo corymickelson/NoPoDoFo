@@ -7,19 +7,21 @@
   "repository": "git+https://github.com/corymickelson/NoPoDoFo.git",
   "scripts": {
     "compile": "cmake-js compile -s=c++14 --prefer-clang",
-    "compile:debug": "cmake-js compile -D -s=c++14 --prefer-clang",
+    "compile:debug": "cmake-js build -D -s=c++14 --prefer-clang",
     "lib-build": "npm run compile && tsc -p tsconfig.json",
     "docs": "typedoc --mode modules --module commonjs --target es6 --exclude **/*.spec.* --out ./docs",
     "test": "npm run test:document && npm run test:page && npm run test:field && npm run test:object && npm run test:painter && npm run test:signer && npm run test:parser",
-    "test:document": "node --expose-gc ./dist/document.spec.js",
-    "test:page": "node --expose-gc ./dist/page.spec.js",
-    "test:field": "node --expose-gc ./dist/field.spec.js",
-    "test:object": "node --expose-gc ./dist/object.spec.js",
-    "test:signer": "node --expose-gc ./dist/signer.spec.js",
-    "test:painter": "node --expose-gc ./dist/painter.spec.js",
-    "test:parser": "node --expose-gc ./dist/parser.spec.js",
-    "build:test": "npm run compile && npm run lib-build && npm run test",
-    "precommit": "npm run lib-build && npm test",
+    "test:document": "node --expose-gc ./dist/document.spec.js | tap-summary",
+    "test:page": "node --expose-gc ./dist/page.spec.js | tap-summary",
+    "test:field": "node --expose-gc ./dist/field.spec.js | tap-summary",
+    "test:object": "node --expose-gc ./dist/object.spec.js | tap-summary",
+    "test:signer": "node --expose-gc ./dist/signer.spec.js | tap-summary",
+    "test:painter": "node --expose-gc ./dist/painter.spec.js | tap-summary",
+    "test:parser": "node --expose-gc ./dist/parser.spec.js | tap-summary",
+    "test:all": "node --expose-gc ./dist/_all.spec.js",
+    "build:test": "npm run  lib-build && npm run test:all",
+    "build:test:coverage": " npm run compile && nyc node --expose-gc ./dist/_all.spec.js && nyc report --reporter=text-lcov | coveralls",
+    "precommit": "npm run lib-build && npm run test:all",
     "postinstall": "npm run lib-build"
   },
   "keywords": [
@@ -34,9 +36,14 @@
   "devDependencies": {
     "@types/node": "^8.0.47",
     "@types/tape": "^4.2.31",
+    "@types/uuid": "^3.4.3",
+    "coveralls": "^3.0.0",
     "husky": "^0.14.3",
+    "nyc": "^11.4.1",
+    "tap-summary": "^4.0.0",
     "tape": "^4.8.0",
-    "typescript": "~2.5.3"
+    "typescript": "~2.5.3",
+    "uuid": "^3.2.1"
   },
   "dependencies": {
     "bindings": "^1.3.0",

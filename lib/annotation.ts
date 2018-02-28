@@ -16,22 +16,10 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import { Page } from './page'
-import { Rect } from './rect'
 import { NPDFrgb } from './painter';
+import {access} from "fs";
+import {F_OK, R_OK} from "constants";
 
-export interface IAnnotation {
-    title: string
-    flag: number
-    color: NPDFrgb
-    hasAppearanceStream(): boolean
-    setBorderStyle(horizontalRadius: number, verticalRadius: number, width: number): void
-    hasDestination(): boolean
-    hasAction(): boolean
-    getType(): NPDFAnnotationType
-    setFileAttachment(): void
-    hasFileAttachment(): boolean
-}
 export enum NPDFAnnotationType {
     Text = 'Text',
     Link = 'Link',
@@ -129,11 +117,11 @@ export enum NPDFAction {
  * @desc Red, Green, Blue
  */
 export class Annotation {
-    get quadPoints() {
-        throw Error("unimplemented")
+    get quadPoints(): Array<number> {
+        return this._instance.quadPoints
     }
     set quadPoints(value:Array<number>) {
-        throw Error("unimplemented")
+        this._instance.quadPoints = value
     }
     get title() {
         return this._instance.title
@@ -183,8 +171,11 @@ export class Annotation {
     getType(): NPDFAnnotationType {
         return this._instance.getType()
     }
-    setFileAttachment(): void {
-        throw new Error("Method not implemented.");
+    setFileAttachment(filename:string, embed:boolean = true): void {
+        access(filename, F_OK | R_OK, err => {
+            if(err) throw Error("File not found")
+            this._instance.setFileAttachment(filename, embed)
+        })
     }
     hasFileAttachment(): boolean {
         return this._instance.hasFileAttachment()

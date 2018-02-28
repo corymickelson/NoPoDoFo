@@ -2,7 +2,7 @@
  * This file is part of the NoPoDoFo (R) project.
  * Copyright (c) 2017-2018
  * Authors: Cory Mickelson, et al.
- * 
+ *
  * NoPoDoFo is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -91,6 +91,7 @@ Signer::Sign(const CallbackInfo& info)
     pdf_long sigStrLength = static_cast<pdf_long>(sigStr.size());
 
     PdfSignatureField* pSignField = field->GetField();
+
     if (pSignField->GetFieldName().GetStringUtf8().empty()) {
       pSignField->SetFieldName("NoPoDoFo::SignatureField");
     }

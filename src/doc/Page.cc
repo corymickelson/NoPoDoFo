@@ -2,7 +2,7 @@
  * This file is part of the NoPoDoFo (R) project.
  * Copyright (c) 2017-2018
  * Authors: Cory Mickelson, et al.
- * 
+ *
  * NoPoDoFo is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -28,21 +28,36 @@ namespace NoPoDoFo {
 using namespace Napi;
 using namespace PoDoFo;
 
-Napi::FunctionReference Page::constructor;
+FunctionReference Page::constructor;
 
 Page::Page(const CallbackInfo& info)
   : ObjectWrap(info)
+  , doc(Document::Unwrap(info[0].As<Object>()))
 {
-  PoDoFo::PdfPage* pagePtr =
-    info[0].As<Napi::External<PoDoFo::PdfPage>>().Data();
-  page = new PdfPage(*pagePtr);
+  if (info[1].Type() == napi_external) {
+    page = new PdfPage(*info[1].As<External<PdfPage>>().Data());
+  } else if (info[1].IsNumber()) {
+    if (info[1].As<Number>().Int32Value() >= 0 &&
+        doc->GetDocument()->GetPageCount() <
+          info[1].As<Number>().Int32Value()) {
+      int index = info[1].As<Number>();
+      page = new PdfPage(*doc->GetDocument()->GetPage(index));
+    }
+  }
+}
+Page::~Page()
+{
+  HandleScope scope(Env());
+  delete page;
+  page = nullptr;
 }
 void
 Page::Initialize(Napi::Env& env, Napi::Object& target)
 {
-  Napi::HandleScope scope(env);
-  Napi::Function ctor = DefineClass(
-    env,
+  //  EscapableHandleScope scope(env);
+  HandleScope scope(env);
+  Function ctor = DefineClass(
+    scope.Env(),
     "Page",
     { InstanceAccessor("rotation", &Page::GetRotation, &Page::SetRotation),
       InstanceAccessor("trimBox", &Page::GetTrimBox, &Page::SetTrimBox),
@@ -51,7 +66,7 @@ Page::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceAccessor("height", &Page::GetPageHeight, &Page::SetPageHeight),
       InstanceMethod("getField", &Page::GetField),
       InstanceMethod("getNumFields", &Page::GetNumFields),
-      InstanceMethod("getFieldsInfo", &Page::GetFields),
+      InstanceMethod("getFieldsInfo", &Page::GetFieldsSummary),
       InstanceMethod("getFieldIndex", &Page::GetFieldIndex),
       InstanceMethod("getContents", &Page::GetContents),
       InstanceMethod("getResources", &Page::GetResources),
@@ -62,19 +77,19 @@ Page::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceMethod("getAnnotation", &Page::GetAnnotation),
       InstanceMethod("getNumAnnots", &Page::GetNumAnnots),
       InstanceMethod("deleteAnnotation", &Page::DeleteAnnotation) });
-  constructor = Napi::Persistent(ctor);
+  constructor = Persistent(ctor);
   constructor.SuppressDestruct();
   target.Set("Page", ctor);
 }
 Napi::Value
 Page::GetRotation(const CallbackInfo& info)
 {
-  return Napi::Number::New(info.Env(), page->GetRotation());
+  return Number::New(info.Env(), page->GetRotation());
 }
 Napi::Value
 Page::GetNumFields(const CallbackInfo& info)
 {
-  return Napi::Number::New(info.Env(), page->GetNumFields());
+  return Number::New(info.Env(), page->GetNumFields());
 }
 
 Napi::Value
@@ -86,27 +101,27 @@ Page::GetField(const CallbackInfo& info)
     throw RangeError();
   }
   auto instance = Field::constructor.New({ External<PdfField>::New(
-    info.Env(), new PdfField(page->GetField(index))) });
-  return scope.Escape(instance);
+    scope.Env(), new PdfField(page->GetField(index))) });
+  return instance;
 }
 
 Napi::Value
-Page::GetFields(const CallbackInfo& info)
+Page::GetFieldsSummary(const CallbackInfo& info)
 {
   try {
     EscapableHandleScope scope(info.Env());
-    auto fields = Napi::Array::New(info.Env());
+    auto fields = Array::New(info.Env());
     for (size_t i = 0; i < static_cast<size_t>(page->GetNumFields()); ++i) {
-      auto obj = Napi::Object::New(info.Env());
+      auto obj = Object::New(info.Env());
       auto field = page->GetField(static_cast<int>(i));
-      obj.Set("index", Napi::Number::New(info.Env(), i));
+      obj.Set("index", Number::New(info.Env(), i));
       Page::GetFieldObject(info, obj, field);
       fields.Set(static_cast<uint32_t>(i), obj);
     }
     return scope.Escape(fields);
   } catch (PdfError& err) {
     stringstream errMsg;
-    errMsg << "An error occured in PoDoFo: " << err.GetError() << endl;
+    errMsg << "An error occurred in PoDoFo: " << err.GetError() << endl;
     throw Napi::Error::New(info.Env(), errMsg.str());
   }
 }
@@ -246,7 +261,7 @@ Page::GetFieldIndex(const CallbackInfo& info)
       break;
     }
   }
-  return Napi::Number::New(info.Env(), index);
+  return Number::New(info.Env(), index);
 }
 
 void
@@ -322,10 +337,11 @@ Napi::Value
 Page::GetContents(const CallbackInfo& info)
 {
   AssertFunctionArgs(info, 1, { napi_valuetype::napi_boolean });
+  EscapableHandleScope scope(info.Env());
   bool forAppending = info[0].As<Boolean>();
   PdfObject* contentsObj =
     forAppending ? page->GetContentsForAppending() : page->GetContents();
-  auto objPtr = Napi::External<PdfObject>::New(info.Env(), contentsObj);
+  auto objPtr = External<PdfObject>::New(scope.Env(), contentsObj);
   auto instance = Obj::constructor.New({ objPtr });
   return instance;
 }
@@ -333,8 +349,9 @@ Page::GetContents(const CallbackInfo& info)
 Napi::Value
 Page::GetResources(const CallbackInfo& info)
 {
+  EscapableHandleScope scope(info.Env());
   PdfObject* resources = page->GetResources();
-  auto objPtr = Napi::External<PdfObject>::New(info.Env(), resources);
+  auto objPtr = External<PdfObject>::New(scope.Env(), resources);
   auto instance = Obj::constructor.New({ objPtr });
   return instance;
 }
@@ -381,9 +398,10 @@ Napi::Value
 Page::GetAnnotation(const CallbackInfo& info)
 {
   AssertFunctionArgs(info, 1, { napi_valuetype::napi_number });
+  EscapableHandleScope scope(info.Env());
   int index = info[0].As<Number>();
   auto ptr = page->GetAnnotation(index);
-  auto instance = Napi::External<PdfAnnotation>::New(info.Env(), ptr);
+  auto instance = External<PdfAnnotation>::New(scope.Env(), ptr);
   return Annotation::constructor.New({ instance });
 }
 Napi::Value
@@ -391,19 +409,14 @@ Page::CreateAnnotation(const CallbackInfo& info)
 {
   AssertFunctionArgs(
     info, 2, { napi_valuetype::napi_number, napi_valuetype::napi_object });
+  EscapableHandleScope scope(info.Env());
   int flag = info[0].As<Number>();
   auto type = static_cast<EPdfAnnotation>(flag);
   auto obj = info[1].As<Object>();
   Rect* rect = Rect::Unwrap(obj);
   PdfAnnotation* annot = page->CreateAnnotation(type, *rect->GetRect());
   auto instance = Annotation::constructor.New(
-    { External<PdfAnnotation>::New(info.Env(), annot) });
+    { External<PdfAnnotation>::New(scope.Env(), annot) });
   return instance;
-}
-Page::~Page()
-{
-  Napi::HandleScope scope(Env());
-  delete page;
-  //  parent = nullptr;
 }
 }

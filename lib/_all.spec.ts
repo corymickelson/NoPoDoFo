@@ -1,0 +1,7 @@
+require('./document.spec')
+require('./field.spec')
+require('./object.spec')
+require('./page.spec')
+require('./painter.spec')
+require('./parser.spec')
+require('./signer.spec')

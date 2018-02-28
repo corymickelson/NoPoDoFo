@@ -2,7 +2,7 @@
  * This file is part of the NoPoDoFo (R) project.
  * Copyright (c) 2017-2018
  * Authors: Cory Mickelson, et al.
- * 
+ *
  * NoPoDoFo is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -35,18 +35,20 @@ CheckBox::CheckBox(const CallbackInfo& info)
   box = make_unique<PdfCheckBox>(v);
 }
 
-void CheckBox::Initialize(Napi::Env &env, Napi::Object &target) {
-    HandleScope scope(env);
-    Function ctor =
-      DefineClass(env,
-                  "CheckBox",
-                  { InstanceAccessor(
-                    "checked", &CheckBox::IsChecked, &CheckBox::SetChecked) });
-    constructor = Napi::Persistent(ctor);
-    constructor.SuppressDestruct();
+void
+CheckBox::Initialize(Napi::Env& env, Napi::Object& target)
+{
+  HandleScope scope(env);
+  Function ctor =
+    DefineClass(env,
+                "CheckBox",
+                { InstanceAccessor(
+                  "checked", &CheckBox::IsChecked, &CheckBox::SetChecked) });
+  constructor = Napi::Persistent(ctor);
+  constructor.SuppressDestruct();
 
-    target.Set("CheckBox", ctor);
-  }
+  target.Set("CheckBox", ctor);
+}
 Napi::Value
 CheckBox::IsChecked(const CallbackInfo& info)
 {
@@ -63,5 +65,4 @@ CheckBox::SetChecked(const CallbackInfo& info, const Napi::Value& value)
   bool checked = value.As<Boolean>();
   box->SetChecked(checked);
 }
-
 }
