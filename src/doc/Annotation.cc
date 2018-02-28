@@ -2,7 +2,7 @@
  * This file is part of the NoPoDoFo (R) project.
  * Copyright (c) 2017-2018
  * Authors: Cory Mickelson, et al.
- * 
+ *
  * NoPoDoFo is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -29,7 +29,47 @@ Annotation::Annotation(const CallbackInfo& info)
   , annot(info[0].As<External<PdfAnnotation>>().Data())
 {
 }
+Annotation::~Annotation()
+{
+  if (annot != nullptr) {
+    HandleScope scope(Env());
+    delete annot;
+    annot = nullptr;
+    doc = nullptr;
+  }
+}
+void
+Annotation::Initialize(Napi::Env& env, Napi::Object& target)
+{
+  HandleScope scope(env);
+  Function ctor = DefineClass(
+    env,
+    "Annotation",
+    { InstanceAccessor("flags", &Annotation::GetFlags, &Annotation::SetFlags),
+      InstanceMethod("hasAppearanceStream", &Annotation::HasAppearanceStream),
+      InstanceMethod("setBorderStyle", &Annotation::SetBorderStyle),
+      InstanceAccessor("title", &Annotation::GetTitle, &Annotation::SetTitle),
+      InstanceAccessor(
+        "content", &Annotation::GetContent, &Annotation::SetContent),
+      InstanceAccessor("destination",
+                       &Annotation::GetDestination,
+                       &Annotation::SetDestination),
+      InstanceMethod("hasDestination", &Annotation::HasDestination),
+      InstanceMethod("hasAction", &Annotation::HasAction),
+      InstanceMethod("setAction", &Annotation::SetAction),
+      InstanceMethod("getAction", &Annotation::GetAction),
+      InstanceAccessor("open", &Annotation::GetOpen, &Annotation::SetOpen),
+      InstanceMethod("getType", &Annotation::GetType),
+      InstanceAccessor("color", &Annotation::GetColor, &Annotation::SetColor),
+      InstanceAccessor(
+        "quadPoints", &Annotation::GetQuadPoints, &Annotation::SetQuadPoints),
+      InstanceMethod("setFileAttachment", &Annotation::SetFileAttachment),
+      InstanceMethod("hasFileAttachment", &Annotation::HasFileAttachment) });
 
+  constructor = Persistent(ctor);
+  constructor.SuppressDestruct();
+  target.Set("Annotation", ctor);
+}
 void
 Annotation::SetFlags(const CallbackInfo& info, const Napi::Value& value)
 {
@@ -39,19 +79,19 @@ Annotation::SetFlags(const CallbackInfo& info, const Napi::Value& value)
   }
   int jsValue = info[0].As<Number>();
   auto flag = static_cast<PoDoFo::EPdfAnnotationFlags>(jsValue);
-  annot->SetFlags(flag);
+  GetAnnotation().SetFlags(flag);
 }
 
 Napi::Value
 Annotation::GetFlags(const CallbackInfo& info)
 {
-  return Napi::Number::New(info.Env(), annot->GetFlags());
+  return Napi::Number::New(info.Env(), GetAnnotation().GetFlags());
 }
 
 Napi::Value
 Annotation::HasAppearanceStream(const CallbackInfo& info)
 {
-  return Napi::Boolean::New(info.Env(), annot->HasAppearanceStream());
+  return Napi::Boolean::New(info.Env(), GetAnnotation().HasAppearanceStream());
 }
 
 void
@@ -67,7 +107,7 @@ Annotation::SetBorderStyle(const CallbackInfo& info)
   double horizontal = info[0].As<Number>();
   double vertical = info[1].As<Number>();
   double width = info[2].As<Number>();
-  annot->SetBorderStyle(horizontal, vertical, width);
+  GetAnnotation().SetBorderStyle(horizontal, vertical, width);
 }
 
 void
@@ -79,7 +119,7 @@ Annotation::SetTitle(const CallbackInfo& info, const Napi::Value& value)
   }
   try {
     string title = info[0].As<String>().Utf8Value();
-    annot->SetTitle(PdfString(title));
+    GetAnnotation().SetTitle(PdfString(title));
   } catch (PdfError& err) {
     stringstream msg;
     msg << "PoDoFo PdfError: " << err.GetError() << endl;
@@ -90,7 +130,7 @@ Annotation::SetTitle(const CallbackInfo& info, const Napi::Value& value)
 Napi::Value
 Annotation::GetTitle(const CallbackInfo& info)
 {
-  return Napi::String::New(info.Env(), annot->GetTitle().GetString());
+  return Napi::String::New(info.Env(), GetAnnotation().GetTitle().GetString());
 }
 
 void
@@ -101,13 +141,14 @@ Annotation::SetContent(const CallbackInfo& info, const Napi::Value& value)
                            "SetContent requires string \"value\" argument.");
   }
   string content = value.As<String>().Utf8Value();
-  annot->SetContents(content);
+  GetAnnotation().SetContents(content);
 }
 
 Napi::Value
 Annotation::GetContent(const CallbackInfo& info)
 {
-  return Napi::String::New(info.Env(), annot->GetContents().GetString());
+  return Napi::String::New(info.Env(),
+                           GetAnnotation().GetContents().GetString());
 }
 
 void
@@ -143,7 +184,7 @@ Annotation::SetAction(const CallbackInfo& info)
   try {
     PdfAction action(flag, doc);
     action.SetURI(uri);
-    annot->SetAction(action);
+    GetAnnotation().SetAction(action);
   } catch (PdfError& err) {
     ErrorHandler(err, info);
   }
@@ -152,7 +193,7 @@ Annotation::SetAction(const CallbackInfo& info)
 Napi::Value
 Annotation::GetAction(const CallbackInfo& info)
 {
-  PdfAction* currentAction = annot->GetAction();
+  PdfAction* currentAction = GetAnnotation().GetAction();
   if (currentAction->HasScript()) {
     return Napi::String::New(info.Env(),
                              currentAction->GetScript().GetString());
@@ -166,7 +207,7 @@ Annotation::GetAction(const CallbackInfo& info)
 Napi::Value
 Annotation::HasAction(const CallbackInfo& info)
 {
-  return Napi::Boolean::New(info.Env(), annot->HasAction());
+  return Napi::Boolean::New(info.Env(), GetAnnotation().HasAction());
 }
 
 void
@@ -175,13 +216,13 @@ Annotation::SetOpen(const CallbackInfo& info, const Napi::Value& value)
   if (!value.IsBoolean()) {
     throw Napi::Error::New(info.Env(), "Requires Boolean type");
   }
-  annot->SetOpen(value.As<Boolean>());
+  GetAnnotation().SetOpen(value.As<Boolean>());
 }
 
 Napi::Value
 Annotation::GetOpen(const CallbackInfo& info)
 {
-  return Napi::Boolean::New(info.Env(), annot->GetOpen());
+  return Napi::Boolean::New(info.Env(), GetAnnotation().GetOpen());
 }
 
 void
@@ -193,7 +234,7 @@ Annotation::SetColor(const CallbackInfo& info, const Napi::Value& value)
     for (uint8_t i = 0; i < jsValue.Length(); i++) {
       rgb[i] = jsValue.Get(i).As<Number>();
     }
-    annot->SetColor(rgb[0], rgb[1], rgb[2]);
+    GetAnnotation().SetColor(rgb[0], rgb[1], rgb[2]);
   } else {
     throw Napi::TypeError::New(info.Env(),
                                "Requires RGB color: [Number, Number, Number]");
@@ -204,7 +245,7 @@ Napi::Value
 Annotation::GetColor(const CallbackInfo& info)
 {
   auto rgbArray = Napi::Array::New(info.Env());
-  auto pdfRgb = annot->GetColor();
+  auto pdfRgb = GetAnnotation().GetColor();
   if (pdfRgb.size() != 3) {
   }
   const double r = pdfRgb[0].GetNumber();
@@ -220,7 +261,7 @@ Napi::Value
 Annotation::GetType(const CallbackInfo& info)
 {
   string jsType;
-  switch (annot->GetType()) {
+  switch (GetAnnotation().GetType()) {
     case PoDoFo::EPdfAnnotation::ePdfAnnotation_3D: {
       jsType = "3D";
       break;
@@ -340,31 +381,51 @@ Annotation::GetType(const CallbackInfo& info)
 void
 Annotation::SetQuadPoints(const CallbackInfo& info, const Napi::Value& value)
 {
-  throw Error::New(info.Env(), "unimplemented");
+  PdfArray points;
+  auto nArray = value.As<Array>();
+  for (uint32_t i = 0; i < nArray.Length(); i++) {
+    auto item = nArray.Get(i);
+    if (!item.IsNumber()) {
+      throw Error::New(info.Env(), "QuadPoints must be integer values");
+    }
+    points.push_back(PdfObject(item));
+  }
+  try {
+    GetAnnotation().SetQuadPoints(points);
+  } catch (PdfError& err) {
+    ErrorHandler(err, info);
+  }
 }
 
 Napi::Value
 Annotation::GetQuadPoints(const CallbackInfo& info)
 {
-  return info.Env().Undefined();
+  auto jsArray = Array::New(info.Env());
+  uint32_t i = 0;
+  for (auto& item : GetAnnotation().GetQuadPoints()) {
+    auto value = Number::New(info.Env(), item.GetNumber());
+    jsArray.Set(i, Number::New(info.Env(), value));
+    ++i;
+  }
+  return jsArray;
 }
 
 void
 Annotation::SetFileAttachment(const CallbackInfo& info)
 {
-  throw Error::New(info.Env(), "unimplemented");
+  auto filename = info[0].As<String>().Utf8Value();
+  auto embed = info[1].As<Boolean>();
+  PdfFileSpec fileSpec(filename.c_str(), embed, doc->GetDocument());
+  try {
+    GetAnnotation().SetFileAttachement(fileSpec);
+  } catch (PdfError& err) {
+    ErrorHandler(err, info);
+  }
 }
 
 Napi::Value
 Annotation::HasFileAttachment(const CallbackInfo& info)
 {
-  return Napi::Boolean::New(info.Env(), annot->HasFileAttachement());
-}
-Annotation::~Annotation()
-{
-  if (annot != nullptr) {
-    HandleScope scope(Env());
-    delete annot;
-  }
+  return Napi::Boolean::New(info.Env(), GetAnnotation().HasFileAttachement());
 }
 }

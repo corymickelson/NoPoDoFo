@@ -30,7 +30,6 @@ FunctionReference Field::constructor;
 Field::Field(const CallbackInfo& info)
   : ObjectWrap(info)
   , field(make_unique<PdfField>(*info[0].As<External<PdfField>>().Data()))
-//    , field(info[0].As<External<PdfField>>().Data())
 {
 }
 

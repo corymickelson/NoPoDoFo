@@ -19,7 +19,7 @@
 import {access, constants} from 'fs'
 import {Obj} from './object';
 import {Page} from './page';
-import {Encrypt, ProtectionOption} from './encrypt';
+import {Encrypt, EncryptOption, ProtectionOption} from './encrypt';
 import {EventEmitter} from 'events';
 import {Font} from "./painter";
 import {Signer} from './signer';
@@ -48,43 +48,16 @@ export interface CreateFontOpts {
     fileName?: string
 }
 
-export interface IDocument {
-    encrypt: Encrypt
-
-    getPageCount(): number
-
-    getPage(pageN: number): Page
-
-    getObjects(): Array<Obj>
-
-    mergeDocument(doc: string): void
-
-    deletePage(pageIndex: number): void
-
-    getVersion(): number
-
-    isLinearized(): boolean
-
-    write(cb: (e: Error) => void, file?: string): void
-
-    writeUpdate(device: string | Signer): void
-
-    getTrailer(): Obj
-
-    isAllowed(protection: ProtectionOption): boolean
-
-    createFont(opts: CreateFontOpts): Font
-}
 
 
 /**
  * @class Document
  * @desc Document represents a PdfMemDocument, construct from an existing pdf document.
  * Document is the core class for reading and manipulating PDF files and writing them back to disk.
- * Document was designed to allow easy access to the object structur of a PDF file.
+ * Document was designed to allow easy access to the object structure of a PDF file.
  * Document should be used whenever you want to change the object structure of a PDF file.
  */
-export class Document extends EventEmitter implements IDocument {
+export class Document extends EventEmitter {
 
     private _instance: any
     private _loaded: boolean = false;
@@ -98,17 +71,16 @@ export class Document extends EventEmitter implements IDocument {
         this._password = value;
     }
 
-    set encrypt(instance: Encrypt) {
-        if (instance.option) this._instance.encrypt = instance.option
-        else {
-            throw Error("Set document encrypt with an instance of Encrypt with the optional EncryptInitOption defined at construction")
-        }
+    get password(): string {
+        throw TypeError('Passwords may not be retrieved after they\'ve been set on a document. For more information see Encrypt')
     }
 
-    get encrypt(): Encrypt {
-        const instance = this._instance.encrypt
-        return new Encrypt(instance)
+    get encrypt(): Encrypt | null {
+        if(this._instance.hasEncrypt()) {
+            return new Encrypt(this)
+        } else return null
     }
+
 
     /**
      * File is loaded asynchronously, extends eventEmitter, will publish a 'ready'event when document has been loaded
@@ -259,5 +231,13 @@ export class Document extends EventEmitter implements IDocument {
         if (device instanceof Signer)
             this._instance.writeUpdate((device as any)._instance)
         else this._instance.writeUpdate(device)
+    }
+
+    createEncrypt(opts: EncryptOption): Encrypt {
+        this._instance.encrypt = opts
+        if(this.encrypt === null) {
+            throw Error('Failed to set encrypt')
+        }
+        return this.encrypt as Encrypt
     }
 }

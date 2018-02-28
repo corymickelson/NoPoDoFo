@@ -24,3 +24,5 @@ dist/*
 *.out.pdf
 lib/*.js
 *.log
+.coveralls.yml
+.nyc_output/

@@ -149,7 +149,7 @@ function pageAddImg() {
         painter.finishPage()
 
         doc.write(e => {
-
+            if(e instanceof Error) t.fail()
             let objs = doc.getObjects()
             for (let i = 0; i < objs.length; i++) {
                 let o = objs[i]
@@ -197,7 +197,7 @@ function pageAddImg() {
                 if (err instanceof Error)
                     t.fail()
                 t.assert(existsSync(`/tmp/test.img.extract.${ext}`) === true)
-                if (existsSync('./img.out.pdf')) unlinkSync('./img.out.pdf')
+                // if (existsSync('./img.out.pdf')) unlinkSync('./img.out.pdf')
                 t.end()
             })
         }

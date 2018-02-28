@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import {IDocument, __mod} from './document'
+import {Document, __mod} from './document'
 import {Obj} from "./object";
 
 export class Form {
@@ -25,7 +25,7 @@ export class Form {
     get needAppearances() {return this._instance.needAppearances}
     set needAppearances(value:boolean) {this._instance.needAppearances = value}
 
-    constructor(document:IDocument) {
+    constructor(document:Document) {
         this._instance = new __mod.Form((document as any)._instance)
     }
 

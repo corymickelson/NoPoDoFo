@@ -45,7 +45,7 @@ SignatureField::SignatureField(const CallbackInfo& info)
       auto form = Form::Unwrap(info[1].As<Object>());
       auto doc = Document::Unwrap(info[2].As<Object>());
       field = new PdfSignatureField(
-        annot->GetAnnotation(), form->GetForm(), doc->GetDocument());
+        &annot->GetAnnotation(), form->GetForm(), doc->GetDocument());
 
     } else if (info.Length() == 1) {
       AssertFunctionArgs(info, 1, { napi_valuetype::napi_external });

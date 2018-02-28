@@ -1,0 +1,755 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for page.spec.ts</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="prettify.css" />
+    <link rel="stylesheet" href="base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="index.html">All files</a> page.spec.ts
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">89.43% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>110/123</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">59.46% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>22/37</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">100% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>34/34</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">90.91% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>110/121</span>
+      </div>
+    </div>
+  </div>
+  <div class='status-line high'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194
+195
+196
+197
+198
+199
+200
+201
+202
+203
+204
+205
+206
+207
+208
+209
+210
+211
+212
+213
+214
+215
+216
+217
+218
+219
+220
+221
+222
+223
+224
+225
+226
+227
+228
+229
+230
+231</td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">12x</span>
+<span class="cline-any cline-yes">12x</span>
+<span class="cline-any cline-yes">12x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">12x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import {existsSync, unlinkSync, writeFile} from 'fs'
+import {join} from 'path'
+import * as test from 'tape'
+import {Document} from './document'
+import {Obj} from "./object";
+import {Field} from './field';
+import {Painter} from "./painter";
+import {Image} from "./image";
+import {Page} from "./page";
+&nbsp;
+&nbsp;
+const filePath = join(__dirname, '../test-documents/test.pdf'),
+    outFile = './test.out.pdf',
+    doc = new Document(filePath)
+let page: Page;
+&nbsp;
+doc.on('ready', e =&gt; {
+    page = doc.getPage(0)
+    runAll()
+})
+&nbsp;
+function pageRotation() {
+&nbsp;
+    test('set page rotation', t =&gt; {
+        const originalRotation = page.rotation,
+            newRotation = originalRotation + 90
+        page.rotation = newRotation
+        doc.write(e =&gt; {
+            const testDoc = new Document(outFile)
+            testDoc.on('ready', e =&gt; {
+                <span class="missing-if-branch" title="if path not taken" >I</span>if (e instanceof Error) <span class="cstat-no" title="statement not covered" >t.fail()</span>
+                const testPage = testDoc.getPage(0)
+                t.assert(testPage.rotation === newRotation, 'Page rotation updated')
+                unlinkSync(outFile)
+                t.end()
+            })
+        }, outFile)
+    })
+}
+&nbsp;
+function pageProperties() {
+    test('page instance properties', t =&gt; {
+        t.assert(page.number === 1, 'page number valid')
+        t.assert(page.width &gt; 0, 'page width valid')
+        t.assert(page.height &gt; 0, 'page height valid')
+        t.end()
+    })
+}
+&nbsp;
+function pageTrimBox() {
+    test('get trimbox', t =&gt; {
+        const trimBox = page.trimBox
+        t.assert(trimBox.height &gt; 0, 'trimbox height is not null')
+        t.assert(trimBox.width &gt; 0, 'trimbox width not null')
+        t.assert(trimBox.left === 0, 'trimbox left')
+        t.assert(trimBox.bottom === 0, 'trimbox bottom')
+        t.end()
+    })
+}
+&nbsp;
+function pageFields() {
+    test('get number of fields', t =&gt; {
+        let n = page.getNumFields()
+        t.assert(typeof n === 'number')
+        // t.assert(page.getNumFields() === 22, 'page get number of fields counts all fields')
+        t.end()
+    })
+}
+&nbsp;
+function pageFieldInfoArray() {
+    test('get fields info', t =&gt; {
+        try {
+            const fields = page.getFieldsInfo()
+&nbsp;
+            // t.assert(fields.length === 22, 'page get field info get\'s info for each field')
+            t.assert(fields instanceof Array)
+            t.ok(fields)
+            t.assert(fields.length &gt; 0)
+            t.end()
+        }
+        catch (e) {
+<span class="cstat-no" title="statement not covered" >            console.log(e)</span>
+<span class="cstat-no" title="statement not covered" >            t.fail()</span>
+        }
+&nbsp;
+    })
+}
+&nbsp;
+function pageGetField() {
+    test('get field', t =&gt; {
+        const field = page.getField(0)
+&nbsp;
+        t.assert(field instanceof Field, 'is an instance of Field')
+        t.end()
+    })
+}
+&nbsp;
+function pageGetFields() {
+    test('get fields', t =&gt; {
+        const fields = page.getFields()
+        t.assert(Array.isArray(fields), 'returns an array')
+        t.assert(fields.length === page.getNumFields(), 'is not an empty array')
+        t.assert(fields[0] instanceof Field, 'contains instance(s) of Field')
+        t.end()
+    })
+}
+&nbsp;
+function pageGetAnnotsCount() {
+    test('page number of annotations', t =&gt; {
+        t.assert(page.getNumAnnots() === 22, 'get\'s all annotations on the page')
+        t.end()
+    })
+}
+&nbsp;
+function pageGetAnnot() {
+    test('page get annotation', t =&gt; {
+        const annot = page.getAnnotation(0)
+        t.ok(annot)
+        t.assert(annot.getType() === 'Widget')
+        t.end()
+    })
+}
+&nbsp;
+function pageContents() {
+    test('page contents', t =&gt; {
+        const contents = page.getContents(false)
+        t.assert(contents instanceof Obj, 'is an instance of Obj')
+        t.assert(contents.length &gt; 0, 'content is not null or empty')
+        t.end()
+    })
+}
+&nbsp;
+function pageResources() {
+    test('page resources', t =&gt; {
+        const resources = page.getResources()
+        t.assert(resources instanceof Obj, 'is instance ob Obj')
+        t.assert(resources.length &gt; 0, 'is not null or empty')
+        t.end()
+    })
+}
+&nbsp;
+function pageAddImg() {
+    test('add image', t =&gt; {
+        const painter = new Painter(doc),
+            img = new Image(doc, join(__dirname, '../test-documents/test.jpg'))
+&nbsp;
+        painter.page = page
+        painter.drawImage(img, 0, page.height - img.getHeight())
+        painter.finishPage()
+&nbsp;
+        doc.write(e =&gt; {
+            <span class="missing-if-branch" title="if path not taken" >I</span>if(e instanceof Error) <span class="cstat-no" title="statement not covered" >t.fail()</span>
+            let objs = doc.getObjects()
+            for (let i = 0; i &lt; objs.length; i++) {
+                let o = objs[i]
+                <span class="missing-if-branch" title="else path not taken" >E</span>if (o.type === 'Dictionary') {
+                    let objDict = o.asObject(),
+                        objType = objDict['Type'],
+                        objSubType = objDict['SubType']
+&nbsp;
+                    if ((objType &amp;&amp; objType.type === 'Name') ||
+                        (objSubType &amp;&amp; <span class="branch-3 cbranch-no" title="branch not covered" >objSubType.type === 'Name')</span>) {
+&nbsp;
+                        if ((objType &amp;&amp; objType.asName() === 'XObject') || (objSubType &amp;&amp; <span class="branch-3 cbranch-no" title="branch not covered" >objSubType.asName() === 'Image')</span>) {
+                            let imgObj = o.asObject()['Filter']
+&nbsp;
+                            <span class="missing-if-branch" title="if path not taken" >I</span>if (imgObj &amp;&amp; imgObj.type === 'Array') {
+                                const imgObjArr = <span class="cstat-no" title="statement not covered" >imgObj.asArray()</span>
+<span class="cstat-no" title="statement not covered" >                                if (imgObjArr.length === 1) {</span>
+<span class="cstat-no" title="statement not covered" >                                    if (imgObjArr[0].type === 'Name') {</span>
+                                    // if (imgObj.asArray().at(0).type === 'Name') {
+                                        // if (imgObj.asArray().at(0).asName() === 'DCTDecode') {
+<span class="cstat-no" title="statement not covered" >                                        if (imgObjArr[0].asName() === 'DCTDecode') {</span>
+<span class="cstat-no" title="statement not covered" >                                            extractImg(o, true)</span>
+<span class="cstat-no" title="statement not covered" >                                            return</span>
+                                        }
+                                    }
+                                }
+                            }
+                            else <span class="missing-if-branch" title="else path not taken" >E</span>if (imgObj &amp;&amp; imgObj.type === 'Name' &amp;&amp; imgObj.asName() === 'DCTDecode') {
+                                extractImg(o, true)
+                                return
+                            }
+                            else {
+<span class="cstat-no" title="statement not covered" >                                extractImg(o, false)</span>
+<span class="cstat-no" title="statement not covered" >                                return</span>
+                            }
+                        }
+                    }
+                }
+            }
+        }, './img.out.pdf')
+&nbsp;
+        function extractImg(obj: Obj, jpg: Boolean) {
+            let ext = jpg ? '.jpg' : <span class="branch-1 cbranch-no" title="branch not covered" >'.ppm'</span>
+            writeFile(`/tmp/test.img.extract.${ext}`, obj.stream, err =&gt; {
+                <span class="missing-if-branch" title="if path not taken" >I</span>if (err instanceof Error)
+<span class="cstat-no" title="statement not covered" >                    t.fail()</span>
+                t.assert(existsSync(`/tmp/test.img.extract.${ext}`) === true)
+                // if (existsSync('./img.out.pdf')) unlinkSync('./img.out.pdf')
+                t.end()
+            })
+        }
+    })
+}
+&nbsp;
+function runTest(test: Function) {
+    setImmediate(() =&gt; {
+        global.gc()
+        test()
+    })
+}
+&nbsp;
+export function runAll() {
+    [
+        pageRotation,
+        pageProperties,
+        pageTrimBox,
+        pageFields,
+        pageFieldInfoArray,
+        pageGetField,
+        pageGetFields,
+        pageGetAnnotsCount,
+        pageGetAnnot,
+        pageContents,
+        pageResources,
+        pageAddImg
+    ].map(i =&gt; runTest(i))
+}
+&nbsp;
+&nbsp;</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="https://istanbul.js.org/" target="_blank">istanbul</a> at Wed Feb 28 2018 16:13:55 GMT-0800 (PST)
+</div>
+</div>
+<script src="prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="sorter.js"></script>
+</body>
+</html>

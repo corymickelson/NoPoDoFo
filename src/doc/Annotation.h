@@ -38,37 +38,7 @@ public:
   ~Annotation();
 
   static FunctionReference constructor;
-  static void Initialize(Napi::Env& env, Napi::Object& target)
-  {
-    HandleScope scope(env);
-    Function ctor = DefineClass(
-      env,
-      "Annotation",
-      { InstanceAccessor("flags", &Annotation::GetFlags, &Annotation::SetFlags),
-        InstanceMethod("hasAppearanceStream", &Annotation::HasAppearanceStream),
-        InstanceMethod("setBorderStyle", &Annotation::SetBorderStyle),
-        InstanceAccessor("title", &Annotation::GetTitle, &Annotation::SetTitle),
-        InstanceAccessor(
-          "content", &Annotation::GetContent, &Annotation::SetContent),
-        InstanceAccessor("destination",
-                         &Annotation::GetDestination,
-                         &Annotation::SetDestination),
-        InstanceMethod("hasDestination", &Annotation::HasDestination),
-        InstanceMethod("hasAction", &Annotation::HasAction),
-        InstanceMethod("setAction", &Annotation::SetAction),
-        InstanceMethod("getAction", &Annotation::GetAction),
-        InstanceAccessor("open", &Annotation::GetOpen, &Annotation::SetOpen),
-        InstanceMethod("getType", &Annotation::GetType),
-        InstanceAccessor("color", &Annotation::GetColor, &Annotation::SetColor),
-        InstanceAccessor(
-          "quadPoints", &Annotation::GetQuadPoints, &Annotation::SetQuadPoints),
-        InstanceMethod("setFileAttachment", &Annotation::SetFileAttachment),
-        InstanceMethod("hasFileAttachment", &Annotation::HasFileAttachment) });
-
-    constructor = Persistent(ctor);
-    constructor.SuppressDestruct();
-    target.Set("Annotation", ctor);
-  }
+  static void Initialize(Napi::Env& env, Napi::Object& target);
   Napi::Value HasAppearanceStream(const CallbackInfo&);
   void SetFlags(const CallbackInfo&, const Napi::Value&);
   Napi::Value GetFlags(const CallbackInfo&);
@@ -93,11 +63,11 @@ public:
   void SetFileAttachment(const CallbackInfo&);
   Napi::Value HasFileAttachment(const CallbackInfo&);
 
-  PdfAnnotation* GetAnnotation() { return annot; }
+  PdfAnnotation& GetAnnotation() { return *annot; }
 
 private:
   PdfAnnotation* annot;
-  //  Document* doc;
+  Document* doc;
 };
 }
 #endif // NPDF_ANNOTATION_H
