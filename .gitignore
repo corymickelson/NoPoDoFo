@@ -25,4 +25,5 @@ dist/*
 lib/*.js
 *.log
 .coveralls.yml
-.nyc_output/
+.nyc_output
+coverage
