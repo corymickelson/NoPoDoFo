@@ -1,6 +1,7 @@
 # NoPoDoFo
 
 [![CircleCI](https://circleci.com/gh/corymickelson/NoPoDoFo.svg?style=svg)](https://circleci.com/gh/corymickelson/NoPoDoFo)
+[![Coverage Status](https://coveralls.io/repos/github/corymickelson/NoPoDoFo/badge.svg?branch=master)](https://coveralls.io/github/corymickelson/NoPoDoFo?branch=master)
 
  - NoPoDoFo aims to provide the Node.js ecosystem a functionally complete solution for PDF modification and creation. 
  - NoPoDoFo is a bindings library to

@@ -18,7 +18,7 @@
  */
 
 
-import {IDocument, __mod} from './document'
+import {Document, __mod} from './document'
 
 export class Image {
     private _instance:any
@@ -28,7 +28,7 @@ export class Image {
      * @param {IDocument} _doc - document to embed image in
      * @param {string | Buffer} data - image file path, or image buffer (buffer not yet implemented)
      */
-    constructor(private _doc: IDocument, data?: string | Buffer) {
+    constructor(private _doc: Document, data?: string | Buffer) {
         if (data) {
             this._instance = new __mod.Image((_doc as any)._instance, data)
         }
