@@ -87,7 +87,7 @@ Document::GetPage(const CallbackInfo& info)
   try {
     if (info.Length() < 1 || !info[0].IsNumber()) {
       throw Error::New(info.Env(),
-                             "getPage takes an argument of 1, of type number.");
+                       "getPage takes an argument of 1, of type number.");
     }
     int n = info[0].As<Number>();
     int pl = document->GetPageCount();
@@ -152,7 +152,7 @@ Document::GetVersion(const CallbackInfo& info)
   }
   if (v == 0.0) {
     throw Error::New(info.Env(),
-                           "Failed to parse document. Pdf version unknown.");
+                     "Failed to parse document. Pdf version unknown.");
   }
   return Number::New(info.Env(), v);
 }
@@ -189,8 +189,8 @@ Document::MergeDocument(const CallbackInfo& info)
   } catch (PdfError& err) {
     if (err.GetError() == ePdfError_InvalidPassword && info.Length() != 2) {
       throw Error::New(info.Env(),
-                             "Password required to modify this document. Call "
-                             "MergeDocument(filePath, password)");
+                       "Password required to modify this document. Call "
+                       "MergeDocument(filePath, password)");
     } else if (err.GetError() == ePdfError_InvalidPassword &&
                info.Length() == 2 && info[1].IsString()) {
       string password = info[1].As<String>().Utf8Value();
@@ -229,10 +229,10 @@ Document::SetEncrypt(const CallbackInfo& info, const Napi::Value& value)
     AssertFunctionArgs(info, 1, { napi_valuetype::napi_object });
     if (!value.IsObject()) {
       throw Error::New(info.Env(),
-                             "Set encrypt requires a single argument of"
-                             " type Object<{userPassword:string,"
-                             " ownerPassword:string, protection:Array<string>,"
-                             " algorithm: string, keyLength: int");
+                       "Set encrypt requires a single argument of"
+                       " type Object<{userPassword:string,"
+                       " ownerPassword:string, protection:Array<string>,"
+                       " algorithm: string, keyLength: int");
     }
     auto encryption = value.As<Object>();
     string ownerPwd;
@@ -361,8 +361,7 @@ Document::GetEncrypt(const CallbackInfo& info)
   const PdfEncrypt* enc = document->GetEncrypt();
   auto ptr = const_cast<PdfEncrypt*>(enc);
   auto encryptPtr = External<PdfEncrypt>::New(info.Env(), ptr);
-  auto instance = Encrypt::constructor.New(
-    { this->Value(), encryptPtr });
+  auto instance = Encrypt::constructor.New({ this->Value(), encryptPtr });
   return instance;
 }
 
@@ -562,32 +561,18 @@ public:
   }
 
   void ForUpdate(bool v) { update = v; }
-  void LoadFromBuffer(bool v) { loadBuffer = v; }
 
 private:
   Document& doc;
   string arg;
   bool update = false;
-  bool loadBuffer = false;
 
   // AsyncWorker interface
 protected:
   void Execute() override
   {
     try {
-#if PODOFO_VERSION_PATCH < 6
-      if (loadBuffer) {
-        SetError("LoadFromBuffer is only available on PoDoFo version 0.9.6+");
-      }
-#else
-      if (loadBuffer) {
-        doc.GetDocument()->LoadFromBuffer(arg.c_str(),
-                                           static_cast<long>(arg.length()));
-      }
-#endif
-      else {
-        doc.GetDocument()->Load(arg.c_str(), update);
-      }
+      doc.GetDocument()->Load(arg.c_str(), update);
     } catch (PdfError& e) {
       if (e.GetError() == ePdfError_InvalidPassword) {
         SetError("Password required to modify this document");
@@ -606,19 +591,7 @@ protected:
 Napi::Value
 Document::Load(const CallbackInfo& info)
 {
-  if (info.Length() < 2) {
-    throw Napi::Error::New(
-      info.Env(), "Load requires data (filepath or buffer) and callback");
-  }
-  string source;
-  if (info[0].IsString()) {
-    source = info[0].As<String>().Utf8Value();
-  }
-  bool loadBuffer = false;
-  if (info[0].IsBuffer()) {
-    source = info[0].As<Buffer<char>>().Data();
-    loadBuffer = true;
-  }
+  string source = info[0].As<String>().Utf8Value();
   auto cb = info[1].As<Function>();
   bool forUpdate = false;
   if (info.Length() == 3) {
@@ -628,7 +601,6 @@ Document::Load(const CallbackInfo& info)
   originPdf = source;
   DocumentLoadAsync* worker = new DocumentLoadAsync(cb, *this, source);
   worker->ForUpdate(forUpdate);
-  worker->LoadFromBuffer(loadBuffer);
   worker->Queue();
   return info.Env().Undefined();
 }
@@ -680,10 +652,11 @@ Document::WriteBuffer(const CallbackInfo& info)
 class GCAsync : public AsyncWorker
 {
 public:
-  GCAsync(const Function& callback, string doc, string pwd)
+  GCAsync(const Function& callback, string doc, string pwd, string output)
     : AsyncWorker(callback)
     , doc(std::move(doc))
     , pwd(std::move(pwd))
+    , output(std::move(output))
   {
   }
 
@@ -699,31 +672,45 @@ protected:
     if (parser.GetEncrypted()) {
       writer.SetEncrypted(*(parser.GetEncrypt()));
     }
-    PdfRefCountedBuffer r;
-    PdfOutputDevice device(&r);
-    writer.Write(&device);
-    value = Buffer<char>::Copy(Env(), r.GetBuffer(), r.GetSize());
+    if (output == "") {
+      PdfRefCountedBuffer r;
+      PdfOutputDevice device(&r);
+      writer.Write(&device);
+      value = string(r.GetBuffer());
+      size = r.GetSize();
+    } else {
+      writer.SetWriteMode(ePdfWriteMode_Compact);
+      writer.Write(output.c_str());
+      size = 0;
+      value = output;
+    }
   }
   void OnOK() override
   {
     HandleScope scope(Env());
-    Callback().Call({ Env().Null(), value });
+    if (size > 0) {
+      auto buffer = Buffer<char>::Copy(Env(), value.c_str(), size);
+      Callback().Call({ Env().Null(), buffer });
+    }
+    Callback().Call({ Env().Null(), String::New(Env(), value) });
   }
 
 private:
   string doc;
   string pwd;
-  Napi::Buffer<char> value;
+  string output;
+  string value;
+  long size;
 };
 
 Napi::Value
 Document::GC(const Napi::CallbackInfo& info)
 {
-  AssertFunctionArgs(info, 2, { napi_function, napi_string, napi_string });
-  string source = info[0].As<String>().Utf8Value();
-  string pwd = info[1].As<String>().Utf8Value();
-  auto cb = info[2].As<Function>();
-  auto worker = new GCAsync(cb, source, pwd);
+  string source = info[0].As<String>().Utf8Value(), pwd, output;
+  pwd = info[1].IsString() ? info[1].As<String>().Utf8Value() : "";
+  output = info[2].IsString() ? info[2].As<String>().Utf8Value() : "";
+  auto cb = info[3].As<Function>();
+  auto worker = new GCAsync(cb, source, pwd, output);
   worker->Queue();
   return info.Env().Undefined();
 }

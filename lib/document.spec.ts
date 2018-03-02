@@ -150,6 +150,22 @@ tap('Document Api', sub => {
                 })
             })
         })
+
+        sub.test('gc', standard => {
+            const output = `/tmp/${v4()}.pdf`
+            Document.gc(filePath, "", output, e => {
+                if(e instanceof Error) standard.fail()
+                else {
+                    access(output, F_OK, err => {
+                        if(err) standard.fail()
+                        else {
+                            standard.pass('Gc doc written to output location')
+                            standard.end()
+                        }
+                    })
+                }
+            })
+        })
     })
 
 })

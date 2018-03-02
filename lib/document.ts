@@ -23,6 +23,7 @@ import {Encrypt, EncryptOption, ProtectionOption} from './encrypt';
 import {EventEmitter} from 'events';
 import {Font} from "./painter";
 import {Signer} from './signer';
+import {F_OK} from "constants";
 
 export const __mod = require('bindings')('npdf')
 
@@ -81,6 +82,14 @@ export class Document extends EventEmitter {
         } else return null
     }
 
+    static gc(file:string, pwd:string, output:string, cb:(e:Error, d:string|Buffer) => void): void {
+        access(file, F_OK, err => {
+            if(err) {
+                throw Error('File not found')
+            }
+            __mod.Document.gc(file, pwd, output, cb)
+        })
+    }
 
     /**
      * File is loaded asynchronously, extends eventEmitter, will publish a 'ready'event when document has been loaded
@@ -89,10 +98,9 @@ export class Document extends EventEmitter {
      * @param update
      * @returns void
      */
-    constructor(file: string|Buffer, update: boolean = false) {
+    constructor(file: string, update: boolean = false) {
         super()
         this._instance = new __mod.Document()
-        if (typeof(file) === 'string') {
             access(file, constants.F_OK | constants.R_OK, err => {
                 if (err){
                     this.emit('error', Error('file not found'))
@@ -100,9 +108,7 @@ export class Document extends EventEmitter {
                     this.load(file, update)
                 }
             })
-        } else if(Buffer.isBuffer(file)) {
-            this.load(file, update)
-        }
+
     }
 
     /**
@@ -110,7 +116,7 @@ export class Document extends EventEmitter {
      * @param file - file path
      * @param update - load document for incremental updates
      */
-    private load(file: string | Buffer, update: boolean = false): void {
+    private load(file: string, update: boolean = false): void {
         this._instance.load(file, (e: Error) => {
             if (e) {
                 this.emit('error', e)
