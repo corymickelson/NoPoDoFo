@@ -48,10 +48,9 @@ public:
   Napi::Value WriteBuffer(const Napi::CallbackInfo&);
   Napi::Value GetWriteMode(const Napi::CallbackInfo&);
   void SetEncrypt(const Napi::CallbackInfo&, const Napi::Value&);
-  Napi::Value GetEncrypt(const Napi::CallbackInfo&);
-  Napi::Value HasEncrypt(const Napi::CallbackInfo&);
   Napi::Value GetObjects(const Napi::CallbackInfo&);
   Napi::Value GetTrailer(const Napi::CallbackInfo&);
+  Napi::Value GetCatalog(const Napi::CallbackInfo&);
   Napi::Value IsAllowed(const Napi::CallbackInfo&);
   Napi::Value CreateFont(const Napi::CallbackInfo&);
   static Napi::Value GC(const Napi::CallbackInfo&);

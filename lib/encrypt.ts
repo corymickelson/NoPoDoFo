@@ -46,8 +46,14 @@ export class Encrypt {
         return this._instance.permission
     }
 
-    constructor(doc:Document) {
-        this._instance = new __mod.Encrypt((doc as any)._instance)
+    constructor(doc:Document|NPDFInternal) {
+        if(doc instanceof Document) {
+            const encryptInstance = new __mod.Encrypt((doc as any)._instance)
+            this._instance = encryptInstance
+        } else {
+            console.info(`Using instance generated from Document`)
+            this._instance = doc
+        }
     }
     isAllowed(action: ProtectionOption): boolean {
         if(!this._complete) {

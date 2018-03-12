@@ -37,27 +37,27 @@ void
 Document::Initialize(Napi::Env& env, Napi::Object& target)
 {
   HandleScope scope(env);
-  Function ctor = DefineClass(
-    env,
-    "Document",
-    { StaticMethod("gc", &Document::GC),
-      InstanceAccessor("password", nullptr, &Document::SetPassword),
-      InstanceAccessor("encrypt", &Document::GetEncrypt, &Document::SetEncrypt),
-      InstanceMethod("load", &Document::Load),
-      InstanceMethod("getPageCount", &Document::GetPageCount),
-      InstanceMethod("getPage", &Document::GetPage),
-      InstanceMethod("mergeDocument", &Document::MergeDocument),
-      InstanceMethod("deletePage", &Document::DeletePage),
-      InstanceMethod("getVersion", &Document::GetVersion),
-      InstanceMethod("isLinearized", &Document::IsLinearized),
-      InstanceMethod("getWriteMode", &Document::GetWriteMode),
-      InstanceMethod("write", &Document::Write),
-      InstanceMethod("writeBuffer", &Document::WriteBuffer),
-      InstanceMethod("getObjects", &Document::GetObjects),
-      InstanceMethod("hasEncrypt", &Document::HasEncrypt),
-      InstanceMethod("getTrailer", &Document::GetTrailer),
-      InstanceMethod("isAllowed", &Document::IsAllowed),
-      InstanceMethod("createFont", &Document::CreateFont) });
+  Function ctor =
+    DefineClass(env,
+                "Document",
+                { StaticMethod("gc", &Document::GC),
+                  InstanceAccessor("password", nullptr, &Document::SetPassword),
+                  InstanceAccessor("encrypt", nullptr, &Document::SetEncrypt),
+                  InstanceMethod("load", &Document::Load),
+                  InstanceMethod("getPageCount", &Document::GetPageCount),
+                  InstanceMethod("getPage", &Document::GetPage),
+                  InstanceMethod("mergeDocument", &Document::MergeDocument),
+                  InstanceMethod("deletePage", &Document::DeletePage),
+                  InstanceMethod("getVersion", &Document::GetVersion),
+                  InstanceMethod("isLinearized", &Document::IsLinearized),
+                  InstanceMethod("getWriteMode", &Document::GetWriteMode),
+                  InstanceMethod("write", &Document::Write),
+                  InstanceMethod("writeBuffer", &Document::WriteBuffer),
+                  InstanceMethod("getObjects", &Document::GetObjects),
+                  InstanceMethod("getTrailer", &Document::GetTrailer),
+                  InstanceMethod("getCatalog", &Document::GetCatalog),
+                  InstanceMethod("isAllowed", &Document::IsAllowed),
+                  InstanceMethod("createFont", &Document::CreateFont) });
   constructor = Persistent(ctor);
   constructor.SuppressDestruct();
   target.Set("Document", ctor);
@@ -217,11 +217,7 @@ Document::GetWriteMode(const CallbackInfo& info)
   }
   return Napi::String::New(info.Env(), writeMode);
 }
-Napi::Value
-Document::HasEncrypt(const CallbackInfo& info)
-{
-  return Boolean::New(info.Env(), document->GetEncrypt() != nullptr);
-}
+
 void
 Document::SetEncrypt(const CallbackInfo& info, const Napi::Value& value)
 {
@@ -356,16 +352,6 @@ Document::SetEncrypt(const CallbackInfo& info, const Napi::Value& value)
 }
 
 Napi::Value
-Document::GetEncrypt(const CallbackInfo& info)
-{
-  const PdfEncrypt* enc = document->GetEncrypt();
-  auto ptr = const_cast<PdfEncrypt*>(enc);
-  auto encryptPtr = External<PdfEncrypt>::New(info.Env(), ptr);
-  auto instance = Encrypt::constructor.New({ this->Value(), encryptPtr });
-  return instance;
-}
-
-Napi::Value
 Document::GetObjects(const CallbackInfo& info)
 {
   try {
@@ -384,12 +370,21 @@ Document::GetObjects(const CallbackInfo& info)
   }
   return info.Env().Undefined();
 }
-
 Napi::Value
 Document::GetTrailer(const CallbackInfo& info)
 {
   const PdfObject* trailerPdObject = document->GetTrailer();
   auto* ptr = const_cast<PdfObject*>(trailerPdObject);
+  auto initPtr = Napi::External<PdfObject>::New(info.Env(), ptr);
+  auto instance = Obj::constructor.New({ initPtr });
+  return instance;
+}
+
+Napi::Value
+Document::GetCatalog(const CallbackInfo& info)
+{
+  const PdfObject* catalog = document->GetCatalog();
+  auto* ptr = const_cast<PdfObject*>(catalog);
   auto initPtr = Napi::External<PdfObject>::New(info.Env(), ptr);
   auto instance = Obj::constructor.New({ initPtr });
   return instance;
@@ -561,10 +556,12 @@ public:
   }
 
   void ForUpdate(bool v) { update = v; }
+  void SetPassword(string v) { pwd = std::move(v); }
 
 private:
   Document& doc;
   string arg;
+  string pwd = "";
   bool update = false;
 
   // AsyncWorker interface
@@ -575,7 +572,16 @@ protected:
       doc.GetDocument()->Load(arg.c_str(), update);
     } catch (PdfError& e) {
       if (e.GetError() == ePdfError_InvalidPassword) {
-        SetError("Password required to modify this document");
+        cout << "password missing" << endl;
+        if (pwd == "")
+          SetError("Password required to modify this document");
+        else {
+          try {
+            doc.GetDocument()->SetPassword(pwd);
+          } catch (PdfError& err) {
+            SetError("Invalid password");
+          }
+        }
       } else {
         SetError(ErrorHandler::WriteMsg(e));
       }
@@ -594,12 +600,18 @@ Document::Load(const CallbackInfo& info)
   string source = info[0].As<String>().Utf8Value();
   auto cb = info[1].As<Function>();
   bool forUpdate = false;
-  if (info.Length() == 3) {
+  if (info.Length() >= 3) {
     forUpdate = info[2].As<Boolean>();
     loadForIncrementalUpdates = forUpdate;
   }
   originPdf = source;
   DocumentLoadAsync* worker = new DocumentLoadAsync(cb, *this, source);
+  if (info.Length() >= 4) {
+    if (info[3].IsString()) {
+      string pwd = info[3].As<String>().Utf8Value();
+      worker->SetPassword(pwd); // pwd moved
+    }
+  }
   worker->ForUpdate(forUpdate);
   worker->Queue();
   return info.Env().Undefined();

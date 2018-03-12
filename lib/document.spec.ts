@@ -2,10 +2,10 @@ import {access, unlinkSync} from 'fs'
 import {join} from 'path'
 import * as tap from 'tape'
 import {Document, FontEncoding} from './document'
-import {EncryptOption} from './encrypt'
 import {F_OK} from "constants";
 import {v4} from 'uuid'
 import {Test} from "tape";
+import {Obj} from "./object";
 
 const filePath = join(__dirname, '../test-documents/test.pdf'),
     pwdDoc = join(__dirname, '../test-documents/pwd.pdf')
@@ -27,14 +27,28 @@ tap('Document Api', sub => {
                 t.assert(pdf.getPageCount() > 0, 'Page count exists')
                 t.throws(() => pdf.password, 'Passwords are kept secret')
                 t.doesNotThrow(() => pdf.encrypt, 'Encrypt should not throw, if not exits return null')
-                end( t)
+                t.throws(() => pdf.getPage(10), 'Range Error')
+                end(t)
+            })
+
+            standard.test('document trailer, catalog, objects', t => {
+                let objs = pdf.getObjects();
+                t.assert(objs instanceof Array, 'Gets all objects as an array')
+                t.assert(objs[0] instanceof Obj, 'array items instance of Obj')
+                let trailer = pdf.getTrailer(),
+                    catalog = pdf.getCatalog()
+                t.assert(trailer instanceof Obj, 'get trailer')
+                t.assert(trailer.type === 'Dictionary', 'trailer is a dictionary')
+                t.assert(catalog instanceof Obj, 'get catalog')
+                t.assert(catalog.type === 'Dictionary', 'catalog is a dictionary')
+                t.end()
             })
 
             standard.test('document create font', t => {
                 let font = pdf.createFont({fontName: 'monospace', encoding: FontEncoding.WinAnsi})
                 const m = font.getMetrics()
                 t.ok(m)
-                end( t)
+                end(t)
             })
 
             standard.test('document delete page object by index', t => {
@@ -42,13 +56,13 @@ tap('Document Api', sub => {
                 pdf.deletePage(0)
                 const afterCount = pdf.getPageCount()
                 t.assert(beforeCount - 1 === afterCount, 'Page removed and page count decremented')
-                end( t)
+                end(t)
             })
 
             standard.test('document information', t => {
                 t.false(pdf.isLinearized(), 'test.pdf is a non-linearized document')
                 t.true(pdf.getVersion() === 1.7, 'test.pdf PDF version is 1.7')
-                end( t)
+                end(t)
             })
 
             standard.test('can write', t => {
@@ -60,15 +74,35 @@ tap('Document Api', sub => {
                         else {
                             unlinkSync(outFile)
                             t.pass("Modified file written successfully")
-                            end( t)
+                            end(t)
                         }
                     })
                 }, outFile)
             })
+            standard.test('is allowed', t => {
+                t.ok(pdf.isAllowed('Copy'), 'Copy protection not defined. Can get ProtectionProperties')
+                t.end()
+            })
         })
 
         sub.test('document exceptions', standard => {
-            standard.plan(2)
+            standard.test('password required, password setter', t => {
+                t.plan(1)
+                const doc = new Document(pwdDoc)
+                doc.on('ready', () => {
+                    t.fail('Should have thrown password required error')
+                })
+                    .on('error', e => {
+                        if (e.message === "Password required to modify this document") {
+                            try {
+                                doc.password = 'secret'
+                                t.pass('password required and password set')
+                            } catch (pwdErr) {
+                                t.fail(pwdErr.message)
+                            }
+                        }
+                    })
+            })
             standard.test('password required', t => {
                 const doc = new Document(pwdDoc)
                 doc.on('ready', () => {
@@ -77,7 +111,7 @@ tap('Document Api', sub => {
                     .on('error', e => {
                         t.ok(e instanceof Error, 'should bubble up error')
                         t.assert(e.message === "Password required to modify this document")
-                        end( t)
+                        end(t)
                     })
             })
             standard.test('file not found', t => {
@@ -87,7 +121,7 @@ tap('Document Api', sub => {
                 })
                     .on('error', (e: Error) => {
                         t.assert(e.message === 'file not found')
-                        end( t)
+                        end(t)
                     })
             })
         })
@@ -105,34 +139,9 @@ tap('Document Api', sub => {
                         let doc2PC = doc2.getPageCount()
                         standard.assert(originalPC * 2 === doc2PC, "merged document")
                         unlinkSync(outFile)
-                        end(standard)
+                        standard.end()
                     })
                 }, outFile)
-            })
-        })
-
-        sub.test('encryption: user password', standard => {
-            const doc = new Document(filePath),
-                encryptionOption: EncryptOption = {
-                    ownerPassword: 'secret',
-                    userPassword: 'secret',
-                    keyLength: 40,
-                    protection: ['Edit', 'FillAndSign'],
-                    algorithm: 'aesv3'
-                },
-                secureDoc = join(__dirname, '../test-documents/secure.pdf')
-            doc.on('ready', () => {
-                doc.createEncrypt(encryptionOption)
-                doc.write(e => {
-                    if (e) standard.fail(e.message)
-                    let sDoc: Document = new Document(secureDoc)
-                    sDoc
-                        .on('ready', () => {
-                            standard.fail("Password required error should have been thrown.")
-                        }).on('error', e => {
-                        end(standard)
-                    })
-                }, secureDoc)
             })
         })
 
@@ -154,10 +163,10 @@ tap('Document Api', sub => {
         sub.test('gc', standard => {
             const output = `/tmp/${v4()}.pdf`
             Document.gc(filePath, "", output, e => {
-                if(e instanceof Error) standard.fail()
+                if (e instanceof Error) standard.fail()
                 else {
                     access(output, F_OK, err => {
-                        if(err) standard.fail()
+                        if (err) standard.fail()
                         else {
                             standard.pass('Gc doc written to output location')
                             standard.end()

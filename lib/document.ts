@@ -2,7 +2,7 @@
  * This file is part of the NoPoDoFo (R) project.
  * Copyright (c) 2017-2018
  * Authors: Cory Mickelson, et al.
- * 
+ *
  * NoPoDoFo is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -50,7 +50,6 @@ export interface CreateFontOpts {
 }
 
 
-
 /**
  * @class Document
  * @desc Document represents a PdfMemDocument, construct from an existing pdf document.
@@ -76,15 +75,13 @@ export class Document extends EventEmitter {
         throw TypeError('Passwords may not be retrieved after they\'ve been set on a document. For more information see Encrypt')
     }
 
-    get encrypt(): Encrypt | null {
-        if(this._instance.hasEncrypt()) {
-            return new Encrypt(this)
-        } else return null
+    get encrypt(): Encrypt {
+        return new Encrypt(this)
     }
 
-    static gc(file:string, pwd:string, output:string, cb:(e:Error, d:string|Buffer) => void): void {
+    static gc(file: string, pwd: string, output: string, cb: (e: Error, d: string | Buffer) => void): void {
         access(file, F_OK, err => {
-            if(err) {
+            if (err) {
                 throw Error('File not found')
             }
             __mod.Document.gc(file, pwd, output, cb)
@@ -98,16 +95,16 @@ export class Document extends EventEmitter {
      * @param update
      * @returns void
      */
-    constructor(file: string, update: boolean = false) {
+    constructor(file: string, update: boolean = false, pwd?: string) {
         super()
         this._instance = new __mod.Document()
-            access(file, constants.F_OK | constants.R_OK, err => {
-                if (err){
-                    this.emit('error', Error('file not found'))
-                } else {
-                    this.load(file, update)
-                }
-            })
+        access(file, constants.F_OK | constants.R_OK, err => {
+            if (err) {
+                this.emit('error', Error('file not found'))
+            } else {
+                this.load(file, update, pwd)
+            }
+        })
 
     }
 
@@ -115,11 +112,22 @@ export class Document extends EventEmitter {
      * load pdf file, emits 'ready' || 'error' events
      * @param file - file path
      * @param update - load document for incremental updates
+     * @todo Allow loading with password instead of waiting for an error to throw
      */
-    private load(file: string, update: boolean = false): void {
+    private load(file: string, update: boolean = false, pwd?: string): void {
         this._instance.load(file, (e: Error) => {
             if (e) {
-                this.emit('error', e)
+                if (e.message === "Password required to modify this document" && pwd) {
+                    try {
+                        this.password = pwd
+                        this._loaded = true
+                        this.emit('ready', this)
+                    } catch(e) {
+                        // TODO: handle password incorrect errors
+                    }
+                } else {
+                    this.emit('error', e)
+                }
             } else {
                 this._loaded = true
                 this.emit('ready', this)
@@ -210,6 +218,10 @@ export class Document extends EventEmitter {
         return new Obj(objInit)
     }
 
+    getCatalog(): Obj {
+        return new Obj(this._instance.getCatalog())
+    }
+
     isAllowed(protection: ProtectionOption): boolean {
         return this._instance.isAllowed(protection)
     }
@@ -241,7 +253,7 @@ export class Document extends EventEmitter {
 
     createEncrypt(opts: EncryptOption): Encrypt {
         this._instance.encrypt = opts
-        if(this.encrypt === null) {
+        if (this.encrypt === null) {
             throw Error('Failed to set encrypt')
         }
         return this.encrypt as Encrypt

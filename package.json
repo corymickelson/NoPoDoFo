@@ -26,6 +26,11 @@
     "prepush": "npm run coverage",
     "postinstall": "npm run lib-build"
   },
+  "nyc": {
+    "exclude": [
+      "**/*.spec.*"
+    ]
+  },
   "keywords": [
     "pdf"
   ],

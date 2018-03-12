@@ -34,19 +34,10 @@ Encrypt::Encrypt(const Napi::CallbackInfo& info)
 {
   AssertFunctionArgs(info, 1, { napi_object });
   document = Document::Unwrap(info[0].As<Object>());
-  if(info.Length() == 2 && info[1].Type() == napi_external) {
-    encrypt = info[1].As<External<PdfEncrypt>>().Data();
-  } else {
-    encrypt = const_cast<PdfEncrypt*>(document->GetDocument()->GetEncrypt());
-  }
 }
 Encrypt::~Encrypt()
 {
   HandleScope scope(Env());
-  if (encrypt != nullptr) {
-    delete encrypt;
-    encrypt = nullptr;
-  }
   document = nullptr;
 }
 void
@@ -58,7 +49,7 @@ Encrypt::Initialize(Napi::Env& env, Napi::Object& target)
     "Encrypt",
     { InstanceAccessor("user", &Encrypt::GetUserValue, nullptr),
       InstanceAccessor("owner", &Encrypt::GetOwnerValue, nullptr),
-      InstanceAccessor("permission", &Encrypt::GetOwnerValue, nullptr),
+      InstanceAccessor("permission", &Encrypt::GetPermissionValue, nullptr),
       InstanceAccessor("encryptionKey", &Encrypt::GetEncryptionKey, nullptr),
       InstanceAccessor("keyLength", &Encrypt::GetKeyLength, nullptr),
       InstanceMethod("isAllowed", &Encrypt::IsAllowed),
@@ -82,21 +73,21 @@ Encrypt::IsAllowed(const CallbackInfo& info)
   bool is = false;
   try {
     if (key == "Copy") {
-      is = encrypt->IsCopyAllowed();
+      is = GetEncrypt()->IsCopyAllowed();
     } else if (key == "Print") {
-      is = encrypt->IsEditAllowed();
+      is = GetEncrypt()->IsEditAllowed();
     } else if (key == "Edit") {
-      is = encrypt->IsEditAllowed();
+      is = GetEncrypt()->IsEditAllowed();
     } else if (key == "EditNotes") {
-      is = encrypt->IsEditNotesAllowed();
+      is = GetEncrypt()->IsEditNotesAllowed();
     } else if (key == "FillAndSign") {
-      is = encrypt->IsFillAndSignAllowed();
+      is = GetEncrypt()->IsFillAndSignAllowed();
     } else if (key == "Accessible") {
-      is = encrypt->IsAccessibilityAllowed();
+      is = GetEncrypt()->IsAccessibilityAllowed();
     } else if (key == "DocAssembly") {
-      is = encrypt->IsDocAssemblyAllowed();
+      is = GetEncrypt()->IsDocAssemblyAllowed();
     } else if (key == "HighPrint") {
-      is = encrypt->IsHighPrintAllowed();
+      is = GetEncrypt()->IsHighPrintAllowed();
     } else {
       throw Napi::Error::New(info.Env(), "Key unknown");
     }
@@ -136,40 +127,42 @@ Encrypt::Authenticate(const CallbackInfo& info)
                 ->GetArray()[0]
                 .GetString()
                 .GetStringUtf8();
-  return Napi::Boolean::New(info.Env(), encrypt->Authenticate(pwd, id));
+  // TODO: Fix const cast
+  auto auth = const_cast<PdfEncrypt*>(GetEncrypt())->Authenticate(pwd, id);
+  return Napi::Boolean::New(info.Env(), auth);
 }
 
 Napi::Value
 Encrypt::GetOwnerValue(const CallbackInfo& info)
 {
   return String::New(info.Env(),
-                     reinterpret_cast<const char*>(encrypt->GetOValue()));
+                     reinterpret_cast<const char*>(GetEncrypt()->GetOValue()));
 }
 
 Napi::Value
 Encrypt::GetUserValue(const CallbackInfo& info)
 {
   return String::New(info.Env(),
-                     reinterpret_cast<const char*>(encrypt->GetUValue()));
+                     reinterpret_cast<const char*>(GetEncrypt()->GetUValue()));
 }
 
 Napi::Value
 Encrypt::GetPermissionValue(const CallbackInfo& info)
 {
-  return Number::New(info.Env(), encrypt->GetPValue());
+  return Number::New(info.Env(), GetEncrypt()->GetPValue());
 }
 
 Napi::Value
 Encrypt::GetEncryptionKey(const CallbackInfo& info)
 {
   return String::New(
-    info.Env(), reinterpret_cast<const char*>(encrypt->GetEncryptionKey()));
+    info.Env(), reinterpret_cast<const char*>(GetEncrypt()->GetEncryptionKey()));
 }
 
 Napi::Value
 Encrypt::GetKeyLength(const CallbackInfo& info)
 {
-  return Number::New(info.Env(), encrypt->GetKeyLength());
+  return Number::New(info.Env(), GetEncrypt()->GetKeyLength());
 }
 
 }
