@@ -12,6 +12,7 @@
     "docs": "typedoc --mode modules --module commonjs --target es6 --exclude **/*.spec.* --out ./docs",
     "test": "npm run test:document && npm run test:page && npm run test:field && npm run test:object && npm run test:painter && npm run test:signer && npm run test:parser",
     "test:document": "node --expose-gc ./dist/document.spec.js",
+    "test:encrypt": "node --expose-gc ./dist/encrypt.spec.js",
     "test:page": "node --expose-gc ./dist/page.spec.js",
     "test:field": "node --expose-gc ./dist/field.spec.js",
     "test:object": "node --expose-gc ./dist/object.spec.js",
