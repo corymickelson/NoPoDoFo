@@ -2,7 +2,7 @@
  * This file is part of the NoPoDoFo (R) project.
  * Copyright (c) 2017-2018
  * Authors: Cory Mickelson, et al.
- * 
+ *
  * NoPoDoFo is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -16,7 +16,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 
 #include "Encrypt.h"
 #include "../ErrorHandler.h"
@@ -33,6 +32,9 @@ Encrypt::Encrypt(const Napi::CallbackInfo& info)
   : ObjectWrap(info)
 {
   AssertFunctionArgs(info, 1, { napi_object });
+  if(!info[0].As<Object>().InstanceOf(Document::constructor.Value())) {
+    throw TypeError();
+  }
   document = Document::Unwrap(info[0].As<Object>());
 }
 Encrypt::~Encrypt()
@@ -49,7 +51,7 @@ Encrypt::Initialize(Napi::Env& env, Napi::Object& target)
     "Encrypt",
     { InstanceAccessor("user", &Encrypt::GetUserValue, nullptr),
       InstanceAccessor("owner", &Encrypt::GetOwnerValue, nullptr),
-      InstanceAccessor("permission", &Encrypt::GetPermissionValue, nullptr),
+      InstanceAccessor("protections", &Encrypt::GetProtectionsValue, nullptr),
       InstanceAccessor("encryptionKey", &Encrypt::GetEncryptionKey, nullptr),
       InstanceAccessor("keyLength", &Encrypt::GetKeyLength, nullptr),
       InstanceMethod("isAllowed", &Encrypt::IsAllowed),
@@ -147,16 +149,26 @@ Encrypt::GetUserValue(const CallbackInfo& info)
 }
 
 Napi::Value
-Encrypt::GetPermissionValue(const CallbackInfo& info)
+Encrypt::GetProtectionsValue(const CallbackInfo &info)
 {
-  return Number::New(info.Env(), GetEncrypt()->GetPValue());
+  auto perm = Object::New(info.Env());
+  perm.Set("Accessible", GetEncrypt()->IsAccessibilityAllowed());
+  perm.Set("Print", GetEncrypt()->IsPrintAllowed());
+  perm.Set("Copy", GetEncrypt()->IsCopyAllowed());
+  perm.Set("DocAssembly", GetEncrypt()->IsDocAssemblyAllowed());
+  perm.Set("Edit", GetEncrypt()->IsEditAllowed());
+  perm.Set("EditNotes", GetEncrypt()->IsEditNotesAllowed());
+  perm.Set("FillAndSign", GetEncrypt()->IsFillAndSignAllowed());
+  perm.Set("HighPrint", GetEncrypt()->IsHighPrintAllowed());
+  return perm;
 }
 
 Napi::Value
 Encrypt::GetEncryptionKey(const CallbackInfo& info)
 {
   return String::New(
-    info.Env(), reinterpret_cast<const char*>(GetEncrypt()->GetEncryptionKey()));
+    info.Env(),
+    reinterpret_cast<const char*>(GetEncrypt()->GetEncryptionKey()));
 }
 
 Napi::Value
@@ -164,5 +176,4 @@ Encrypt::GetKeyLength(const CallbackInfo& info)
 {
   return Number::New(info.Env(), GetEncrypt()->GetKeyLength());
 }
-
 }

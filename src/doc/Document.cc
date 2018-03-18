@@ -21,7 +21,6 @@
 #include "../ErrorHandler.h"
 #include "../ValidateArguments.h"
 #include "../base/Obj.h"
-#include "Encrypt.h"
 #include "Font.h"
 #include "Page.h"
 
@@ -573,13 +572,17 @@ protected:
     } catch (PdfError& e) {
       if (e.GetError() == ePdfError_InvalidPassword) {
         cout << "password missing" << endl;
-        if (pwd == "")
+        if (pwd.empty())
           SetError("Password required to modify this document");
         else {
           try {
             doc.GetDocument()->SetPassword(pwd);
+            cout << "password set" << endl;
           } catch (PdfError& err) {
-            SetError("Invalid password");
+            cout << "Invalid password" << endl;
+            stringstream msg;
+            msg << "Invalid password.\n" << err.what() << endl;
+            SetError(msg.str());
           }
         }
       } else {
@@ -684,7 +687,7 @@ protected:
     if (parser.GetEncrypted()) {
       writer.SetEncrypted(*(parser.GetEncrypt()));
     }
-    if (output == "") {
+    if (output.empty()) {
       PdfRefCountedBuffer r;
       PdfOutputDevice device(&r);
       writer.Write(&device);
@@ -701,7 +704,7 @@ protected:
   {
     HandleScope scope(Env());
     if (size > 0) {
-      auto buffer = Buffer<char>::Copy(Env(), value.c_str(), size);
+      auto buffer = Buffer<char>::Copy(Env(), value.c_str(), static_cast<size_t>(size));
       Callback().Call({ Env().Null(), buffer });
     }
     Callback().Call({ Env().Null(), String::New(Env(), value) });

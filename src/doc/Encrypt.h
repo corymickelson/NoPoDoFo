@@ -39,12 +39,16 @@ public:
   Napi::Value Authenticate(const Napi::CallbackInfo&);
   Napi::Value GetOwnerValue(const Napi::CallbackInfo&);
   Napi::Value GetUserValue(const Napi::CallbackInfo&);
-  Napi::Value GetPermissionValue(const Napi::CallbackInfo&);
+  Napi::Value GetProtectionsValue(const Napi::CallbackInfo &);
   Napi::Value GetEncryptionKey(const Napi::CallbackInfo&);
   Napi::Value GetKeyLength(const Napi::CallbackInfo&);
 
+  // unique_ptr<PoDoFo::PdfEncrypt> GetEncrypt()
   const PoDoFo::PdfEncrypt* GetEncrypt()
   {
+    //    return make_unique<PoDoFo::PdfEncrypt>(
+    //      *PoDoFo::PdfEncrypt::CreatePdfEncrypt(
+    //        *document->GetDocument()->GetEncrypt()));
     return document->GetDocument()->GetEncrypt();
   }
 

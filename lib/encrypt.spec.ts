@@ -1,6 +1,6 @@
 import * as tap from 'tape'
 import {join} from "path"
-import {Encrypt, EncryptOption} from "./encrypt"
+import {EncryptOption, IEncrypt} from "./encrypt"
 import {Document} from "./document"
 import {access, unlinkSync} from "fs";
 import {F_OK} from "constants";
@@ -36,10 +36,7 @@ tap('encrypt api', sub => {
             }, secureDoc)
         })
     })
-    //     const encryptDoc = new Document(join(__dirname, '../test-documents/secure.pdf'), false, 'secret')
-    // encryptDoc.on('ready', (pdf: Document) => {
-    //
-    // })
+
     sub.test('Can read encrypted document, pwd provided', standard => {
         const encryptDoc = new Document(secureDoc, false, 'secret')
         encryptDoc.on('ready', e => {
@@ -47,14 +44,19 @@ tap('encrypt api', sub => {
                 standard.fail(`error thrown: ${e.message}`)
                 return
             }
-            const encryptObj = new Encrypt(encryptDoc)
-            standard.ok(encryptObj, 'encrypt object is NOT null')
-            standard.true((encryptObj as Encrypt).isAllowed('Edit'), 'Encrypt protections enforced, allowed with password')
-            standard.false((encryptObj as Encrypt).isAllowed('Copy'), 'Unset protections not allowed')
+            const encryptSubject = encryptDoc.encrypt as IEncrypt
+            standard.ok(encryptSubject, 'encrypt object is NOT null')
+            standard.true(encryptSubject.protections.hasOwnProperty('Edit') &&
+                encryptSubject.protections.Edit === true,
+                'Encrypt protections enforced, allowed with password')
+            standard.false(
+                encryptSubject.protections.Copy,
+                'Non explicitly set protections default to false')
             standard.end()
         })
             .on('error', () => standard.fail('Failed to throw error warning'))
     })
+
     sub.test('Can read encrypted document, pwd NOT provided', standard => {
         const encryptDoc = new Document(secureDoc)
         encryptDoc.on('ready', e  => {
@@ -63,11 +65,15 @@ tap('encrypt api', sub => {
             }
         })
             .on('error', e => {
-                standard.pass('error thrown, password required')
-                encryptDoc.password = 'secret'
-                const encrypt: Encrypt = encryptDoc.encrypt as Encrypt
-                standard.ok(encrypt)
-                standard.end()
+                if(e.message.match(/password required/gi).length > 0) {
+                    encryptDoc.password = 'secret'
+                    const encrypt = encryptDoc.encrypt as IEncrypt
+                    standard.ok(encrypt)
+                    standard.end()
+                } else {
+                    standard.fail('Password required error was NOT thrown')
+                }
+
             })
     })
 

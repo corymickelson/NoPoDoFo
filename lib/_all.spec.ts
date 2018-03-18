@@ -1,4 +1,5 @@
 require('./document.spec')
+require('./encrypt.spec')
 require('./field.spec')
 require('./object.spec')
 require('./page.spec')

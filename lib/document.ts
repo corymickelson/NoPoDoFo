@@ -19,7 +19,7 @@
 import {access, constants} from 'fs'
 import {Obj} from './object';
 import {Page} from './page';
-import {Encrypt, EncryptOption, ProtectionOption} from './encrypt';
+import {EncryptOption, IEncrypt, ProtectionOption} from './encrypt';
 import {EventEmitter} from 'events';
 import {Font} from "./painter";
 import {Signer} from './signer';
@@ -62,6 +62,7 @@ export class Document extends EventEmitter {
     private _instance: any
     private _loaded: boolean = false;
     private _password: string | undefined = undefined
+    private _encrypt: any
 
     get loaded() {
         return this._loaded
@@ -75,8 +76,9 @@ export class Document extends EventEmitter {
         throw TypeError('Passwords may not be retrieved after they\'ve been set on a document. For more information see Encrypt')
     }
 
-    get encrypt(): Encrypt {
-        return new Encrypt(this)
+    get encrypt(): IEncrypt {
+        if(this._encrypt) return this._encrypt
+        else return new __mod.Encrypt(this._instance)
     }
 
     static gc(file: string, pwd: string, output: string, cb: (e: Error, d: string | Buffer) => void): void {
@@ -112,18 +114,17 @@ export class Document extends EventEmitter {
      * load pdf file, emits 'ready' || 'error' events
      * @param file - file path
      * @param update - load document for incremental updates
-     * @todo Allow loading with password instead of waiting for an error to throw
      */
     private load(file: string, update: boolean = false, pwd?: string): void {
-        this._instance.load(file, (e: Error) => {
-            if (e) {
+        let cb = (e: Error) => {
+            if (e && e instanceof Error) {
                 if (e.message === "Password required to modify this document" && pwd) {
                     try {
                         this.password = pwd
                         this._loaded = true
                         this.emit('ready', this)
                     } catch(e) {
-                        // TODO: handle password incorrect errors
+                        this.emit('error', e)
                     }
                 } else {
                     this.emit('error', e)
@@ -132,7 +133,8 @@ export class Document extends EventEmitter {
                 this._loaded = true
                 this.emit('ready', this)
             }
-        }, update)
+        }
+        pwd ? this._instance.load(file, cb, update, pwd) : this._instance.load(file, cb, update)
     }
 
     getPageCount(): number {
@@ -251,11 +253,11 @@ export class Document extends EventEmitter {
         else this._instance.writeUpdate(device)
     }
 
-    createEncrypt(opts: EncryptOption): Encrypt {
+    createEncrypt(opts: EncryptOption): IEncrypt {
         this._instance.encrypt = opts
         if (this.encrypt === null) {
             throw Error('Failed to set encrypt')
         }
-        return this.encrypt as Encrypt
+        return this.encrypt as IEncrypt
     }
 }
