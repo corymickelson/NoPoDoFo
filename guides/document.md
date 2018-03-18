@@ -41,21 +41,20 @@ doc.write((e:Error, d:Buffer) => {
 })
 ```
 
-### Pdf Document Protection
-
-NoPoDoFo (PoDoFo compiled with libidn) provides the ability to set owner / user password(s), encryption key length, document protection, and encryption algorithm options.
-See [EncryptionOption](https://github.com/corymickelson/NoPoDoFo/blob/master/lib/encrypt.ts#L2-L8) for details. 
+### [Document Encryption](https://github.com/corymickelson/NoPoDoFo/tree/master/guides/encrypt.md)
+NoPoDoFo provides the ability to encrypt a document through ```Document.createEncrypt```.
+Encryption options are dependent on PoDoFo built with libidn and OpenSSL.
 ``` typescript
 let doc = new NoPoDoFo.Document('/path/to/doc.pdf')
 doc.on('ready', () => {
-    let encrypt = {
+    let encrypt:EncryptionOption = {
         userPassword: 'secret',
         ownerPassword: 'secret',
         protection: ['Copy', 'Print', 'Edit'],
         algorithm: 'aesv2',
         keyLength: 40
     }
-    doc.encrypt = encrypt // Creates a PdfEncrypt object and sets document encrypt to this object.
+    doc.createEncrypt(encrypt) // Creates a PdfEncrypt object and sets document encrypt to this object.
     doc.write((e:Error) => {}, 'output/path/doc.pdf') // write the document with new/updated encryption
 })
     .on('error', e => {

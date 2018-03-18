@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>&quot;rect&quot; | nopodofo</title>
+	<title>IEncrypt | nopodofo</title>
 	<meta name="description" content="">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -56,27 +56,127 @@
 					<a href="../globals.html">Globals</a>
 				</li>
 				<li>
-					<a href="_rect_.html">&quot;rect&quot;</a>
+					<a href="../modules/_encrypt_.html">&quot;encrypt&quot;</a>
+				</li>
+				<li>
+					<a href="_encrypt_.iencrypt.html">IEncrypt</a>
 				</li>
 			</ul>
-			<h1>External module &quot;rect&quot;</h1>
+			<h1>Interface IEncrypt</h1>
 		</div>
 	</div>
 </header>
 <div class="container container-main">
 	<div class="row">
 		<div class="col-8 col-content">
+			<section class="tsd-panel tsd-hierarchy">
+				<h3>Hierarchy</h3>
+				<ul class="tsd-hierarchy">
+					<li>
+						<span class="target">IEncrypt</span>
+					</li>
+				</ul>
+			</section>
 			<section class="tsd-panel-group tsd-index-group">
 				<h2>Index</h2>
 				<section class="tsd-panel tsd-index-panel">
 					<div class="tsd-index-content">
 						<section class="tsd-index-section ">
-							<h3>Classes</h3>
+							<h3>Properties</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-class tsd-parent-kind-external-module"><a href="../classes/_rect_.rect.html" class="tsd-kind-icon">Rect</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_encrypt_.iencrypt.html#encryptionkey" class="tsd-kind-icon">encryption<wbr>Key</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_encrypt_.iencrypt.html#keylength" class="tsd-kind-icon">key<wbr>Length</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_encrypt_.iencrypt.html#owner" class="tsd-kind-icon">owner</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_encrypt_.iencrypt.html#protections" class="tsd-kind-icon">protections</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_encrypt_.iencrypt.html#user" class="tsd-kind-icon">user</a></li>
+							</ul>
+						</section>
+						<section class="tsd-index-section ">
+							<h3>Methods</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_encrypt_.iencrypt.html#isallowed" class="tsd-kind-icon">is<wbr>Allowed</a></li>
 							</ul>
 						</section>
 					</div>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group ">
+				<h2>Properties</h2>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
+					<a name="encryptionkey" class="tsd-anchor"></a>
+					<h3>encryption<wbr>Key</h3>
+					<div class="tsd-signature tsd-kind-icon">encryption<wbr>Key<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/e2c617d/lib/encrypt.ts#L44">encrypt.ts:44</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
+					<a name="keylength" class="tsd-anchor"></a>
+					<h3>key<wbr>Length</h3>
+					<div class="tsd-signature tsd-kind-icon">key<wbr>Length<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/e2c617d/lib/encrypt.ts#L45">encrypt.ts:45</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
+					<a name="owner" class="tsd-anchor"></a>
+					<h3>owner</h3>
+					<div class="tsd-signature tsd-kind-icon">owner<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/e2c617d/lib/encrypt.ts#L42">encrypt.ts:42</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
+					<a name="protections" class="tsd-anchor"></a>
+					<h3>protections</h3>
+					<div class="tsd-signature tsd-kind-icon">protections<span class="tsd-signature-symbol">:</span> <a href="../modules/_encrypt_.html#protectionsummary" class="tsd-signature-type">ProtectionSummary</a></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/e2c617d/lib/encrypt.ts#L46">encrypt.ts:46</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
+					<a name="user" class="tsd-anchor"></a>
+					<h3>user</h3>
+					<div class="tsd-signature tsd-kind-icon">user<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/e2c617d/lib/encrypt.ts#L43">encrypt.ts:43</a></li>
+						</ul>
+					</aside>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group ">
+				<h2>Methods</h2>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
+					<a name="isallowed" class="tsd-anchor"></a>
+					<h3>is<wbr>Allowed</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
+						<li class="tsd-signature tsd-kind-icon">is<wbr>Allowed<span class="tsd-signature-symbol">(</span>action<span class="tsd-signature-symbol">: </span><a href="../modules/_encrypt_.html#protectionoption" class="tsd-signature-type">ProtectionOption</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/e2c617d/lib/encrypt.ts#L47">encrypt.ts:47</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>action: <a href="../modules/_encrypt_.html#protectionoption" class="tsd-signature-type">ProtectionOption</a></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
+						</li>
+					</ul>
 				</section>
 			</section>
 		</div>
@@ -87,62 +187,95 @@
 						<a href="../globals.html"><em>Globals</em></a>
 					</li>
 					<li class=" tsd-kind-external-module">
-						<a href="_annotation_.html">"annotation"</a>
+						<a href="../modules/_annotation_.html">"annotation"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
-						<a href="_data_.html">"data"</a>
+						<a href="../modules/_data_.html">"data"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
-						<a href="_document_.html">"document"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="_encrypt_.html">"encrypt"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="_field_.html">"field"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="_form_.html">"form"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="_image_.html">"image"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="_index_.html">"index"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="_object_.html">"object"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="_page_.html">"page"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="_painter_.html">"painter"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="_parser_.html">"parser"</a>
+						<a href="../modules/_document_.html">"document"</a>
 					</li>
 					<li class="current tsd-kind-external-module">
-						<a href="_rect_.html">"rect"</a>
+						<a href="../modules/_encrypt_.html">"encrypt"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
-						<a href="_reference_.html">"reference"</a>
+						<a href="../modules/_field_.html">"field"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
-						<a href="_signer_.html">"signer"</a>
+						<a href="../modules/_form_.html">"form"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
-						<a href="_stream_.html">"stream"</a>
+						<a href="../modules/_image_.html">"image"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
-						<a href="_table_.html">"table"</a>
+						<a href="../modules/_index_.html">"index"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="../modules/_object_.html">"object"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="../modules/_page_.html">"page"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="../modules/_painter_.html">"painter"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="../modules/_parser_.html">"parser"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="../modules/_rect_.html">"rect"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="../modules/_reference_.html">"reference"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="../modules/_signer_.html">"signer"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="../modules/_stream_.html">"stream"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="../modules/_table_.html">"table"</a>
 					</li>
 				</ul>
 			</nav>
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
-					<li class=" tsd-kind-class tsd-parent-kind-external-module">
-						<a href="../classes/_rect_.rect.html" class="tsd-kind-icon">Rect</a>
+				</ul>
+				<ul class="current">
+					<li class="current tsd-kind-interface tsd-parent-kind-external-module">
+						<a href="_encrypt_.iencrypt.html" class="tsd-kind-icon">IEncrypt</a>
+						<ul>
+							<li class=" tsd-kind-property tsd-parent-kind-interface">
+								<a href="_encrypt_.iencrypt.html#encryptionkey" class="tsd-kind-icon">encryption<wbr>Key</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-interface">
+								<a href="_encrypt_.iencrypt.html#keylength" class="tsd-kind-icon">key<wbr>Length</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-interface">
+								<a href="_encrypt_.iencrypt.html#owner" class="tsd-kind-icon">owner</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-interface">
+								<a href="_encrypt_.iencrypt.html#protections" class="tsd-kind-icon">protections</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-interface">
+								<a href="_encrypt_.iencrypt.html#user" class="tsd-kind-icon">user</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-interface">
+								<a href="_encrypt_.iencrypt.html#isallowed" class="tsd-kind-icon">is<wbr>Allowed</a>
+							</li>
+						</ul>
+					</li>
+				</ul>
+				<ul class="after-current">
+					<li class=" tsd-kind-type-alias tsd-parent-kind-external-module">
+						<a href="../modules/_encrypt_.html#encryptoption" class="tsd-kind-icon">Encrypt<wbr>Option</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-parent-kind-external-module">
+						<a href="../modules/_encrypt_.html#protectionoption" class="tsd-kind-icon">Protection<wbr>Option</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-parent-kind-external-module">
+						<a href="../modules/_encrypt_.html#protectionsummary" class="tsd-kind-icon">Protection<wbr>Summary</a>
 					</li>
 				</ul>
 			</nav>

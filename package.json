@@ -9,7 +9,7 @@
     "compile": "cmake-js compile -s=c++14 --prefer-clang",
     "compile:debug": "cmake-js build -D -s=c++14 --prefer-clang",
     "lib-build": "npm run compile && tsc -p tsconfig.json",
-    "docs": "typedoc --mode modules --module commonjs --target es6 --exclude **/*.spec.* --out ./docs",
+    "docs": "typedoc --options ./tsconfig.docs.json --out ./docs",
     "test": "npm run test:document && npm run test:page && npm run test:field && npm run test:object && npm run test:painter && npm run test:signer && npm run test:parser",
     "test:document": "node --expose-gc ./dist/document.spec.js",
     "test:encrypt": "node --expose-gc ./dist/encrypt.spec.js",

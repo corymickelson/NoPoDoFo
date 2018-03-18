@@ -23,5 +23,6 @@
  - [NoPoDoFo.Signer](https://github.com/corymickelson/NoPoDoFo/blob/master/guides/signer.md)
  - [NoPoDoFo.Parsers](https://github.com/corymickelson/NoPoDoFo/blob/master/guides/parsers.md)
  - [NoPoDoFo.Proxies](https://github.com/corymickelson/NoPoDoFo/blob/master/guides/proxies.md)
+ - [NoPoDoFo.Encrypt](https://github.com/corymickelson/NoPoDoFo/blob/master/guides/encrypt.md)
 
 Setting up a development environment for native addons can be found [here](https://corymickelson.github.io)

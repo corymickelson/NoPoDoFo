@@ -65,7 +65,8 @@
 		<div class="col-8 col-content">
 			<div class="tsd-panel tsd-typography">
 				<h1 id="nopodofo">NoPoDoFo</h1>
-				<p><a href="https://circleci.com/gh/corymickelson/NoPoDoFo"><img src="https://circleci.com/gh/corymickelson/NoPoDoFo.svg?style=svg" alt="CircleCI"></a></p>
+				<p><a href="https://circleci.com/gh/corymickelson/NoPoDoFo"><img src="https://circleci.com/gh/corymickelson/NoPoDoFo.svg?style=svg" alt="CircleCI"></a>
+				<a href="https://coveralls.io/github/corymickelson/NoPoDoFo?branch=master"><img src="https://coveralls.io/repos/github/corymickelson/NoPoDoFo/badge.svg?branch=master" alt="Coverage Status"></a></p>
 				<ul>
 					<li>NoPoDoFo aims to provide the Node.js ecosystem a functionally complete solution for PDF modification and creation. </li>
 					<li>NoPoDoFo is a bindings library to
@@ -86,6 +87,7 @@
 					<li><a href="https://github.com/corymickelson/NoPoDoFo/blob/master/guides/signer.md">NoPoDoFo.Signer</a></li>
 					<li><a href="https://github.com/corymickelson/NoPoDoFo/blob/master/guides/parsers.md">NoPoDoFo.Parsers</a></li>
 					<li><a href="https://github.com/corymickelson/NoPoDoFo/blob/master/guides/proxies.md">NoPoDoFo.Proxies</a></li>
+					<li><a href="https://github.com/corymickelson/NoPoDoFo/blob/master/guides/encrypt.md">NoPoDoFo.Encrypt</a></li>
 				</ul>
 				<p>Setting up a development environment for native addons can be found <a href="https://corymickelson.github.io">here</a></p>
 			</div>
@@ -96,79 +98,55 @@
 					<li class="globals  ">
 						<a href="globals.html"><em>Globals</em></a>
 					</li>
-					<li class="label tsd-is-external">
-						<span>Internals</span>
-					</li>
 					<li class=" tsd-kind-external-module">
-						<a href="modules/_field_spec_.html">"field.spec"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="modules/_object_spec_.html">"object.spec"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="modules/_page_spec_.html">"page.spec"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="modules/_painter_spec_.html">"painter.spec"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="modules/_parser_spec_.html">"parser.spec"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="modules/_signer_spec_.html">"signer.spec"</a>
-					</li>
-					<li class="label tsd-is-external">
-						<span>Externals</span>
-					</li>
-					<li class=" tsd-kind-external-module tsd-is-external">
 						<a href="modules/_annotation_.html">"annotation"</a>
 					</li>
-					<li class=" tsd-kind-external-module tsd-is-external">
+					<li class=" tsd-kind-external-module">
 						<a href="modules/_data_.html">"data"</a>
 					</li>
-					<li class=" tsd-kind-external-module tsd-is-external">
+					<li class=" tsd-kind-external-module">
 						<a href="modules/_document_.html">"document"</a>
 					</li>
-					<li class=" tsd-kind-external-module tsd-is-external">
+					<li class=" tsd-kind-external-module">
 						<a href="modules/_encrypt_.html">"encrypt"</a>
 					</li>
-					<li class=" tsd-kind-external-module tsd-is-external">
+					<li class=" tsd-kind-external-module">
 						<a href="modules/_field_.html">"field"</a>
 					</li>
-					<li class=" tsd-kind-external-module tsd-is-external">
+					<li class=" tsd-kind-external-module">
 						<a href="modules/_form_.html">"form"</a>
 					</li>
-					<li class=" tsd-kind-external-module tsd-is-external">
+					<li class=" tsd-kind-external-module">
 						<a href="modules/_image_.html">"image"</a>
 					</li>
-					<li class=" tsd-kind-external-module tsd-is-external">
+					<li class=" tsd-kind-external-module">
 						<a href="modules/_index_.html">"index"</a>
 					</li>
-					<li class=" tsd-kind-external-module tsd-is-external">
+					<li class=" tsd-kind-external-module">
 						<a href="modules/_object_.html">"object"</a>
 					</li>
-					<li class=" tsd-kind-external-module tsd-is-external">
+					<li class=" tsd-kind-external-module">
 						<a href="modules/_page_.html">"page"</a>
 					</li>
-					<li class=" tsd-kind-external-module tsd-is-external">
+					<li class=" tsd-kind-external-module">
 						<a href="modules/_painter_.html">"painter"</a>
 					</li>
-					<li class=" tsd-kind-external-module tsd-is-external">
+					<li class=" tsd-kind-external-module">
 						<a href="modules/_parser_.html">"parser"</a>
 					</li>
-					<li class=" tsd-kind-external-module tsd-is-external">
+					<li class=" tsd-kind-external-module">
 						<a href="modules/_rect_.html">"rect"</a>
 					</li>
-					<li class=" tsd-kind-external-module tsd-is-external">
+					<li class=" tsd-kind-external-module">
 						<a href="modules/_reference_.html">"reference"</a>
 					</li>
-					<li class=" tsd-kind-external-module tsd-is-external">
+					<li class=" tsd-kind-external-module">
 						<a href="modules/_signer_.html">"signer"</a>
 					</li>
-					<li class=" tsd-kind-external-module tsd-is-external">
+					<li class=" tsd-kind-external-module">
 						<a href="modules/_stream_.html">"stream"</a>
 					</li>
-					<li class=" tsd-kind-external-module tsd-is-external">
+					<li class=" tsd-kind-external-module">
 						<a href="modules/_table_.html">"table"</a>
 					</li>
 				</ul>
