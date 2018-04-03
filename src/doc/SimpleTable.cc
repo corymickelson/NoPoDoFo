@@ -24,12 +24,13 @@
 #include "Page.h"
 #include "Painter.h"
 
-using namespace PoDoFo;
-using namespace Napi;
 
 namespace NoPoDoFo {
 
-FunctionReference SimpleTable::constructor;
+using namespace PoDoFo;
+using namespace Napi;
+
+FunctionReference SimpleTable::constructor; // NOLINT
 
 SimpleTable::SimpleTable(const CallbackInfo& info)
   : ObjectWrap(info)

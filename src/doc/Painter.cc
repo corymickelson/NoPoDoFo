@@ -28,10 +28,13 @@
 #include "Page.h"
 #include "Rect.h"
 
+
+namespace NoPoDoFo {
+
 using namespace Napi;
 using namespace PoDoFo;
-namespace NoPoDoFo {
-FunctionReference Painter::constructor;
+
+FunctionReference Painter::constructor; // NOLINT
 Painter::Painter(const Napi::CallbackInfo& info)
   : ObjectWrap(info)
 {

@@ -22,8 +22,6 @@
 
 #include "Document.h"
 
-#include <napi.h>
-#include <podofo/podofo.h>
 
 namespace NoPoDoFo {
 class Encrypt : public Napi::ObjectWrap<Encrypt>

@@ -21,10 +21,15 @@
 #include "../ErrorHandler.h"
 #include "../ValidateArguments.h"
 
+
+namespace NoPoDoFo {
+
 using namespace Napi;
 using namespace PoDoFo;
-namespace NoPoDoFo {
-FunctionReference Image::constructor;
+
+using std::string;
+
+FunctionReference Image::constructor; // NOLINT
 
 Image::Image(const CallbackInfo& info)
   : ObjectWrap(info)

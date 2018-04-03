@@ -25,7 +25,7 @@ namespace NoPoDoFo {
 using namespace Napi;
 using namespace PoDoFo;
 
-FunctionReference TextField::constructor;
+FunctionReference TextField::constructor; // NOLINT
 
 TextField::TextField(const CallbackInfo& info)
   : ObjectWrap(info)

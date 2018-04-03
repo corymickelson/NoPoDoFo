@@ -21,11 +21,13 @@
 #include "Document.h"
 #include "Page.h"
 
+
+namespace NoPoDoFo {
+
 using namespace Napi;
 using namespace PoDoFo;
 
-namespace NoPoDoFo {
-FunctionReference Field::constructor;
+FunctionReference Field::constructor; // NOLINT
 
 Field::Field(const CallbackInfo& info)
   : ObjectWrap(info)

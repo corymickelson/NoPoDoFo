@@ -23,12 +23,14 @@
 #include <iostream>
 #include <stack>
 
-using namespace Napi;
-using namespace PoDoFo;
+
 
 namespace NoPoDoFo {
 
-FunctionReference ContentsTokenizer::constructor;
+using namespace Napi;
+using namespace PoDoFo;
+
+FunctionReference ContentsTokenizer::constructor; // NOLINT
 
 ContentsTokenizer::ContentsTokenizer(const Napi::CallbackInfo& info)
   : ObjectWrap(info)

@@ -25,7 +25,7 @@ namespace NoPoDoFo {
 using namespace Napi;
 using namespace PoDoFo;
 
-FunctionReference ListBox::constructor;
+FunctionReference ListBox::constructor; // NOLINT
 
 ListBox::ListBox(const Napi::CallbackInfo& info)
   : ObjectWrap(info)

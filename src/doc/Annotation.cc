@@ -22,7 +22,7 @@
 
 namespace NoPoDoFo {
 
-FunctionReference Annotation::constructor;
+FunctionReference Annotation::constructor; // NOLINT
 
 Annotation::Annotation(const CallbackInfo& info)
   : ObjectWrap(info)

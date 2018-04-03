@@ -26,10 +26,13 @@
 #include "../doc/Form.h"
 #include "Signer.h"
 
+
+namespace NoPoDoFo {
+
 using namespace Napi;
 using namespace PoDoFo;
-namespace NoPoDoFo {
-FunctionReference SignatureField::constructor;
+
+FunctionReference SignatureField::constructor; // NOLINT
 
 SignatureField::SignatureField(const CallbackInfo& info)
   : ObjectWrap<SignatureField>(info)

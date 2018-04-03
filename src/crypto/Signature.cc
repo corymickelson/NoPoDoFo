@@ -22,7 +22,8 @@
 
 using namespace PoDoFo;
 using namespace Napi;
-using namespace std;
+
+using std::string;
 
 Napi::Value
 NPDFSignatureData(const Napi::CallbackInfo& info)

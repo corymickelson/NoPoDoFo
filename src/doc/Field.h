@@ -24,24 +24,23 @@
 #include "Page.h"
 #include <napi.h>
 #include <podofo/podofo.h>
-#include <string>
 
 namespace NoPoDoFo {
 class Field : public Napi::ObjectWrap<Field>
 {
 public:
-  explicit Field(const CallbackInfo& info);
+  explicit Field(const Napi::CallbackInfo& info);
   static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
 
-  Napi::Value GetType(const CallbackInfo&);
-  Napi::Value GetFieldName(const CallbackInfo&);
-  Napi::Value GetAlternateName(const CallbackInfo&);
-  Napi::Value GetMappingName(const CallbackInfo&);
-  void SetAlternateName(const CallbackInfo&);
-  void SetMappingName(const CallbackInfo&);
-  void SetRequired(const CallbackInfo&);
-  Napi::Value IsRequired(const CallbackInfo&);
+  Napi::Value GetType(const Napi::CallbackInfo&);
+  Napi::Value GetFieldName(const Napi::CallbackInfo&);
+  Napi::Value GetAlternateName(const Napi::CallbackInfo&);
+  Napi::Value GetMappingName(const Napi::CallbackInfo&);
+  void SetAlternateName(const Napi::CallbackInfo&);
+  void SetMappingName(const Napi::CallbackInfo&);
+  void SetRequired(const Napi::CallbackInfo&);
+  Napi::Value IsRequired(const Napi::CallbackInfo&);
   PoDoFo::PdfField& GetField() { return *field; }
 
 private:

@@ -25,11 +25,14 @@
 #include "../base/Dictionary.h"
 #include "Font.h"
 
-using namespace PoDoFo;
-
 namespace NoPoDoFo {
 
-FunctionReference Encoding::constructor;
+using namespace PoDoFo;
+using namespace Napi;
+
+using std::string;
+
+FunctionReference Encoding::constructor; // NOLINT
 
 Encoding::Encoding(const Napi::CallbackInfo& info)
   : ObjectWrap(info)

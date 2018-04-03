@@ -25,7 +25,6 @@
 #include <napi.h>
 #include <podofo/podofo.h>
 
-using namespace std;
 
 namespace NoPoDoFo {
 class Document : public Napi::ObjectWrap<Document>
@@ -34,7 +33,7 @@ public:
   static Napi::FunctionReference constructor;
   explicit Document(const Napi::CallbackInfo& callbackInfo); // constructor
   ~Document();
-  string originPdf;
+  std::string originPdf;
   static void Initialize(Napi::Env& env, Napi::Object& target);
   Napi::Value Load(const Napi::CallbackInfo&);
   Napi::Value GetPageCount(const Napi::CallbackInfo&);
@@ -49,6 +48,7 @@ public:
   Napi::Value GetWriteMode(const Napi::CallbackInfo&);
   void SetEncrypt(const Napi::CallbackInfo&, const Napi::Value&);
   Napi::Value GetObjects(const Napi::CallbackInfo&);
+  Napi::Value GetObject(const Napi::CallbackInfo&);
   Napi::Value GetTrailer(const Napi::CallbackInfo&);
   Napi::Value GetCatalog(const Napi::CallbackInfo&);
   Napi::Value IsAllowed(const Napi::CallbackInfo&);

@@ -20,7 +20,7 @@
 #include "CheckBox.h"
 
 namespace NoPoDoFo {
-FunctionReference CheckBox::constructor;
+FunctionReference CheckBox::constructor; // NOLINT
 
 CheckBox::CheckBox(const CallbackInfo& info)
   : ObjectWrap<CheckBox>(info)

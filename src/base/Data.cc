@@ -22,10 +22,13 @@
 #include "../ValidateArguments.h"
 
 namespace NoPoDoFo {
+
 using namespace PoDoFo;
 using namespace Napi;
 
-FunctionReference Data::constructor;
+using std::string;
+
+FunctionReference Data::constructor; // NOLINT
 
 Data::Data(const Napi::CallbackInfo& info)
   : ObjectWrap(info)
@@ -68,7 +71,7 @@ Data::Write(const CallbackInfo& info)
 {
   AssertFunctionArgs(info, 1, { napi_string });
   string output = info[0].As<String>().Utf8Value();
-  if (output.empty() || output == "") {
+  if (output.empty() || output.empty()) {
     throw Error::New(info.Env(), "output must be valid path");
   }
   try {

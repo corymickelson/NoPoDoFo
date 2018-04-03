@@ -29,7 +29,7 @@ namespace NoPoDoFo {
 class ListField : public Napi::ObjectWrap<ListField>
 {
 public:
-  explicit ListField(const CallbackInfo& info);
+  explicit ListField(const Napi::CallbackInfo& info);
   static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
   void InsertItem(const Napi::CallbackInfo&);

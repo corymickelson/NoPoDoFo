@@ -24,11 +24,15 @@
 #include "Dictionary.h"
 #include "Ref.h"
 
+
+namespace NoPoDoFo {
+
 using namespace Napi;
 using namespace PoDoFo;
 
-namespace NoPoDoFo {
-FunctionReference Obj::constructor;
+using std::string;
+
+FunctionReference Obj::constructor; // NOLINT
 
 void
 Obj::Initialize(Napi::Env& env, Napi::Object& target)

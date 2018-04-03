@@ -23,12 +23,17 @@
 #include "Obj.h"
 #include <algorithm>
 
-using namespace std;
+
+namespace NoPoDoFo {
+
 using namespace Napi;
 using namespace PoDoFo;
 
-namespace NoPoDoFo {
-FunctionReference Dictionary::constructor;
+using std::string;
+using std::map;
+using std::vector;
+
+FunctionReference Dictionary::constructor; // NOLINT
 
 Dictionary::Dictionary(const CallbackInfo& info)
   : ObjectWrap<Dictionary>(info)

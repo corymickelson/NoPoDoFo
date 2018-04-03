@@ -25,7 +25,6 @@
 
 #include <utility>
 
-using namespace std;
 
 namespace NoPoDoFo {
 class Obj : public Napi::ObjectWrap<Obj>

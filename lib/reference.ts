@@ -17,6 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import {Obj} from "./object";
+import {Document} from './document'
 
 
 export class Ref {
@@ -57,10 +58,18 @@ export class Ref {
     }
 
     /**
-     * If ref is an indirect object, de-reference ref to PdfObject
+     * @desc If Ref is an indirect object (most likely) you can "de-reference" the reference to an object.
+     * @todo: This should be possible without needing to pass the document
+     * @todo Replace error message with link to documentation
+     * @param {Document} document - the document that contains the reference
+     * @returns {Obj}
      */
-    deref(): Obj {
-        return new Obj(this._instance.getObject())
+    deRef(document:Document): Obj {
+        if(document instanceof Document === false) {
+            throw TypeError('Ref.deRef requires a Document instance. For more information please see the docs')
+        }
+        const instance = this._instance.getObject((document as any)._instance)
+        return new Obj(instance)
     }
 
 }

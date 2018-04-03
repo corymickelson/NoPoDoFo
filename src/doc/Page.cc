@@ -28,7 +28,7 @@ namespace NoPoDoFo {
 using namespace Napi;
 using namespace PoDoFo;
 
-FunctionReference Page::constructor;
+FunctionReference Page::constructor; // NOLINT
 
 Page::Page(const CallbackInfo& info)
   : ObjectWrap(info)

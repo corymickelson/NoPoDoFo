@@ -17,16 +17,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "../doc/Document.h"
 #include "Ref.h"
 #include "../ErrorHandler.h"
 #include "../ValidateArguments.h"
 #include "Obj.h"
 
+namespace NoPoDoFo {
+
 using namespace Napi;
 using namespace PoDoFo;
 
-namespace NoPoDoFo {
-Napi::FunctionReference Ref::constructor;
+using std::string;
+
+Napi::FunctionReference Ref::constructor; // NOLINT
 
 Ref::Ref(const Napi::CallbackInfo& info)
   : ObjectWrap(info)
@@ -114,9 +118,9 @@ Ref::IsIndirect(const Napi::CallbackInfo& info)
 Napi::Value
 Ref::GetObj(const CallbackInfo& info)
 {
-  PdfObject obj(*ref);
-  auto instancePtr = External<PdfObject>::New(info.Env(), &obj);
-  return Obj::constructor.New({ instancePtr });
+  Document* document = Document::Unwrap(info[0].As<Object>());
+  PdfObject* target = document->GetDocument()->GetObjects().GetObject(GetRef());
+  return Obj::constructor.New({External<PdfObject>::New(info.Env(), target)});
 }
 Ref::~Ref()
 {

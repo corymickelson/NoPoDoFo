@@ -24,7 +24,6 @@
 #include <podofo/podofo.h>
 #include <string>
 
-using namespace std;
 
 namespace NoPoDoFo {
 class Stream : public Napi::ObjectWrap<Stream>

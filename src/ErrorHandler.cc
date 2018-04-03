@@ -20,11 +20,14 @@
 
 #include "ErrorHandler.h"
 
-using namespace std;
-using namespace Napi;
 using namespace PoDoFo;
 
-ErrorHandler::ErrorHandler() {}
+using Napi::Error;
+using Napi::CallbackInfo;
+
+using std::string;
+using std::stringstream;
+using std::endl;
 
 ErrorHandler::ErrorHandler(PoDoFo::PdfError& err, const CallbackInfo& info)
 {
@@ -32,14 +35,14 @@ ErrorHandler::ErrorHandler(PoDoFo::PdfError& err, const CallbackInfo& info)
   stringstream eMsg;
   eMsg << "PoDoFo error: " << msg << endl;
   err.PrintErrorMsg();
-  throw Napi::Error::New(info.Env(), eMsg.str());
+  throw Error::New(info.Env(), eMsg.str());
 }
 
-ErrorHandler::ErrorHandler(Error& err, const Napi::CallbackInfo& info)
+ErrorHandler::ErrorHandler(Error& err, const CallbackInfo& info)
 {
   stringstream msg;
   msg << "JS error: " << err.Message() << endl;
-  throw Napi::Error::New(info.Env(), msg.str());
+  throw Error::New(info.Env(), msg.str());
 }
 
 string
@@ -50,7 +53,7 @@ ErrorHandler::WriteMsg(PoDoFo::PdfError& err)
 }
 
 string
-ErrorHandler::WriteMsg(Napi::Error& err)
+ErrorHandler::WriteMsg(Error& err)
 {
   stringstream msg;
   msg << "JS error: " << err.Message() << endl;

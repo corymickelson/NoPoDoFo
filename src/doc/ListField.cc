@@ -25,7 +25,7 @@ namespace NoPoDoFo {
 using namespace PoDoFo;
 using namespace Napi;
 
-FunctionReference ListField::constructor;
+FunctionReference ListField::constructor; // NOLINT
 
 ListField::ListField(const CallbackInfo& info)
   : ObjectWrap(info)

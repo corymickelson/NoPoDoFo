@@ -21,11 +21,13 @@
 #include "../base/Obj.h"
 #include "Document.h"
 
+
+namespace NoPoDoFo {
+
 using namespace Napi;
 using namespace PoDoFo;
 
-namespace NoPoDoFo {
-FunctionReference Form::constructor;
+FunctionReference Form::constructor; // NOLINT
 
 Form::Form(const Napi::CallbackInfo& info)
   : ObjectWrap<Form>(info)

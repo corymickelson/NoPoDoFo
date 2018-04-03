@@ -21,11 +21,15 @@
 #include "../ErrorHandler.h"
 #include "../ValidateArguments.h"
 
+
+namespace NoPoDoFo {
+
 using namespace Napi;
 using namespace PoDoFo;
 
-namespace NoPoDoFo {
-FunctionReference Stream::constructor;
+using std::string;
+
+FunctionReference Stream::constructor; // NOLINT
 
 Stream::Stream(const CallbackInfo& info)
   : ObjectWrap(info)

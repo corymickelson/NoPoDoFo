@@ -31,7 +31,7 @@ test('document objects instance of nopodofo.Obj', t => {
                 if (refs.length > 0) {
                     let ref = refs[0].asReference()
                     if (!ref.isIndirect()) continue
-                    let refObj = ref.deref()
+                    let refObj = ref.deRef(doc)
                     t.assert(refObj instanceof Obj, "Object ref types can dereference to object")
                     found = true
                     break

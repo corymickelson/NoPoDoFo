@@ -23,10 +23,15 @@
 #include "../base/Stream.h"
 #include "Encoding.h"
 
-using namespace PoDoFo;
 
 namespace NoPoDoFo {
-FunctionReference Font::constructor;
+
+using namespace PoDoFo;
+using namespace Napi;
+
+using std::string;
+
+FunctionReference Font::constructor; // NOLINT
 
 Font::Font(const Napi::CallbackInfo& info)
   : ObjectWrap(info)

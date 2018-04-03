@@ -27,10 +27,12 @@
 #include <podofo/podofo.h>
 #include <vector>
 
-using namespace std;
-using namespace PoDoFo;
 
 namespace NoPoDoFo {
+
+using namespace PoDoFo;
+using namespace Napi;
+
 class Annotation : public ObjectWrap<Annotation>
 {
 public:

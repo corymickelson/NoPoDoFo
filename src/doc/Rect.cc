@@ -19,10 +19,13 @@
 
 #include "Rect.h"
 
+
+namespace NoPoDoFo {
+
 using namespace Napi;
 using namespace PoDoFo;
-namespace NoPoDoFo {
-FunctionReference Rect::constructor;
+
+FunctionReference Rect::constructor; // NOLINT
 
 Rect::Rect(const CallbackInfo& info)
   : ObjectWrap(info)

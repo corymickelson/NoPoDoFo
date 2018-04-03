@@ -23,11 +23,17 @@
 #include "../ValidateArguments.h"
 #include <algorithm>
 
+
+namespace NoPoDoFo {
+
 using namespace Napi;
 using namespace PoDoFo;
 
-namespace NoPoDoFo {
-FunctionReference ExtGState::constructor;
+using std::string;
+using std::find;
+using std::vector;
+
+FunctionReference ExtGState::constructor; // NOLINT
 
 ExtGState::ExtGState(const Napi::CallbackInfo& info)
   : ObjectWrap(info)

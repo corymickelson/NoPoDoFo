@@ -22,12 +22,15 @@
 #include "../ValidateArguments.h"
 #include "Obj.h"
 
-using namespace Napi;
-using namespace PoDoFo;
 
 namespace NoPoDoFo {
 
-Napi::FunctionReference Array::constructor;
+using namespace Napi;
+using namespace PoDoFo;
+
+using std::string;
+
+Napi::FunctionReference Array::constructor; // NOLINT
 
 Array::Array(const CallbackInfo& info)
   : ObjectWrap<Array>(info)

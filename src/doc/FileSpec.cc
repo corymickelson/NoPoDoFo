@@ -19,11 +19,15 @@
 
 #include "FileSpec.h"
 
+
+namespace NoPoDoFo {
+
 using namespace Napi;
 using namespace PoDoFo;
 
-namespace NoPoDoFo {
-FunctionReference FileSpec::constructor;
+using std::string;
+
+FunctionReference FileSpec::constructor; // NOLINT
 
 void
 FileSpec::Initialize(Napi::Env& env, Napi::Object& target)

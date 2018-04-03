@@ -11,7 +11,7 @@
       "variables": [
         {
           "name": "CMAKE_TOOLCHAIN_FILE",
-          "value": "C:\\Srcs\\vcpkg\\scripts\\buildsystems\\vcpkg.cmake"
+          "value": "C:\\Libs\\vcpkg\\scripts\\buildsystems\\vcpkg.cmake"
         },
         {
           "name": "CMAKE_JS_VERSION",

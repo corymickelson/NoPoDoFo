@@ -22,11 +22,18 @@
 #include "../ValidateArguments.h"
 #include <algorithm>
 
+
+namespace NoPoDoFo {
+
 using namespace Napi;
 using namespace PoDoFo;
 
-namespace NoPoDoFo {
-Napi::FunctionReference Encrypt::constructor;
+using std::cout;
+using std::endl;
+using std::string;
+using std::vector;
+
+Napi::FunctionReference Encrypt::constructor; // NOLINT
 
 Encrypt::Encrypt(const Napi::CallbackInfo& info)
   : ObjectWrap(info)
@@ -40,6 +47,7 @@ Encrypt::Encrypt(const Napi::CallbackInfo& info)
 Encrypt::~Encrypt()
 {
   HandleScope scope(Env());
+  cout << "Destructing encrypt" << endl;
   document = nullptr;
 }
 void
@@ -69,7 +77,8 @@ Encrypt::IsAllowed(const CallbackInfo& info)
                                 "EditNotes",   "FillAndSign", "Accessible",
                                 "DocAssembly", "HighPrint" };
   string key = info[0].As<String>().Utf8Value();
-  if (find(candidates.begin(), candidates.end(), key) == candidates.end()) {
+  if (std::find(candidates.begin(), candidates.end(), key) ==
+      candidates.end()) {
     throw Napi::Error::New(info.Env(), "key must be of type ProtectionOption");
   }
   bool is = false;

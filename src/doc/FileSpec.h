@@ -24,7 +24,6 @@
 #include <napi.h>
 #include <podofo/podofo.h>
 
-using namespace std;
 namespace NoPoDoFo {
 class FileSpec : public Napi::ObjectWrap<FileSpec>
 {

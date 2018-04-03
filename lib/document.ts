@@ -17,13 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import {access, constants} from 'fs'
-import {Obj} from './object';
+import {NPDFInternal, Obj} from './object';
 import {Page} from './page';
 import {EncryptOption, IEncrypt, ProtectionOption} from './encrypt';
 import {EventEmitter} from 'events';
 import {Font} from "./painter";
 import {Signer} from './signer';
-import {F_OK} from "constants";
+import {F_OK, R_OK} from "constants";
+import {Ref} from "./reference";
 
 export const __mod = require('bindings')('npdf')
 
@@ -59,7 +60,7 @@ export interface CreateFontOpts {
  */
 export class Document extends EventEmitter {
 
-    private _instance: any
+    private readonly _instance: any
     private _loaded: boolean = false;
     private _password: string | undefined = undefined
     private _encrypt: any
@@ -73,11 +74,11 @@ export class Document extends EventEmitter {
     }
 
     get password(): string {
-        throw TypeError('Passwords may not be retrieved after they\'ve been set on a document. For more information see Encrypt')
+        throw EvalError()
     }
 
     get encrypt(): IEncrypt {
-        if(this._encrypt) return this._encrypt
+        if (this._encrypt) return this._encrypt
         else return new __mod.Encrypt(this._instance)
     }
 
@@ -95,6 +96,7 @@ export class Document extends EventEmitter {
      * @constructor
      * @param {string} [file] - pdf file path (optional)
      * @param update
+     * @param {string} [pwd] - document password
      * @returns void
      */
     constructor(file: string, update: boolean = false, pwd?: string) {
@@ -114,6 +116,7 @@ export class Document extends EventEmitter {
      * load pdf file, emits 'ready' || 'error' events
      * @param file - file path
      * @param update - load document for incremental updates
+     * @param pwd
      */
     private load(file: string, update: boolean = false, pwd?: string): void {
         let cb = (e: Error) => {
@@ -123,7 +126,7 @@ export class Document extends EventEmitter {
                         this.password = pwd
                         this._loaded = true
                         this.emit('ready', this)
-                    } catch(e) {
+                    } catch (e) {
                         this.emit('error', e)
                     }
                 } else {
@@ -155,6 +158,17 @@ export class Document extends EventEmitter {
         return new Page(page);
     }
 
+    getObject(ref: Ref): Obj {
+        if (!ref || ref instanceof Ref === false) {
+            throw TypeError()
+        }
+        else if (ref.isIndirect() === false) {
+            throw Error('Document.GetObject is only possible when the object referenced is an indirect object')
+        }
+        const objInstance = this._instance.getObject((ref as any)._instance)
+        return new Obj(objInstance)
+    }
+
     getObjects(): Array<Obj> {
         const objects: Array<any> = this._instance.getObjects()
         return objects.map(value => {
@@ -166,12 +180,26 @@ export class Document extends EventEmitter {
      * @description Append doc to the end of the loaded doc
      * @param {string} doc - pdf file path
      * @param password
+     * @returns {Promise}
      */
-    mergeDocument(doc: string, password?: string): void {
-        if (!this._loaded) {
-            throw new Error('load a pdf file before calling this method')
-        }
-        password !== null ? this._instance.mergeDocument(doc, password) : this._instance.mergeDocument(doc)
+    mergeDocument(doc: string, password?: string): Promise<any> {
+        return new Promise((resolve, reject) => {
+            if (!this._loaded) {
+                reject(new Error('load a pdf file before calling this method'))
+            }
+            access(doc, F_OK | R_OK, err => {
+                if (err) return reject(err)
+                else {
+                    try {
+                        password !== null ? this._instance.mergeDocument(doc, password) : this._instance.mergeDocument(doc)
+                        return resolve()
+                    } catch (err) {
+                        return reject(err)
+                    }
+                }
+            })
+        })
+
     }
 
     deletePage(pageIndex: number): void {

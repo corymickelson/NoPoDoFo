@@ -23,13 +23,13 @@
 #include "../doc/Document.h"
 #include "Obj.h"
 
-using namespace std;
-using namespace Napi;
-using namespace PoDoFo;
 
 namespace NoPoDoFo {
 
-FunctionReference Vector::constructor;
+using namespace Napi;
+using namespace PoDoFo;
+
+FunctionReference Vector::constructor; // NOLINT
 
 Vector::Vector(const Napi::CallbackInfo& info)
   : ObjectWrap(info)

@@ -20,17 +20,16 @@
 #define NPDF_VALIDATEARGUMENTS_H
 
 #include <napi.h>
+#include <iostream>
 #include <sstream>
-#include <string>
-#include <vector>
 
-using namespace Napi;
-using namespace std;
+using std::endl;
+using std::stringstream;
 
 static void
-AssertFunctionArgs(const CallbackInfo& info,
+AssertFunctionArgs(const Napi::CallbackInfo& info,
                    int expectedCount,
-                   const vector<napi_valuetype>& expectedTypes)
+                   const std::vector<napi_valuetype>& expectedTypes)
 {
   stringstream eMsg;
   if (info.Length() < static_cast<size_t>(expectedCount)) {

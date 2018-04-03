@@ -21,11 +21,15 @@
 #include "../ErrorHandler.h"
 #include "../ValidateArguments.h"
 
+
+namespace NoPoDoFo {
+
 using namespace Napi;
 using namespace PoDoFo;
 
-namespace NoPoDoFo {
-FunctionReference Signer::constructor;
+using std::string;
+
+FunctionReference Signer::constructor; // NOLINT
 
 Signer::Signer(const Napi::CallbackInfo& info)
   : ObjectWrap(info)

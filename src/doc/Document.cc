@@ -21,16 +21,19 @@
 #include "../ErrorHandler.h"
 #include "../ValidateArguments.h"
 #include "../base/Obj.h"
+#include "../base/Ref.h"
 #include "Font.h"
 #include "Page.h"
 
 using namespace Napi;
-using namespace std;
 using namespace PoDoFo;
+
+using std::cout;
+using std::endl;
 
 namespace NoPoDoFo {
 
-FunctionReference Document::constructor;
+FunctionReference Document::constructor; // NOLINT
 
 void
 Document::Initialize(Napi::Env& env, Napi::Object& target)
@@ -53,6 +56,7 @@ Document::Initialize(Napi::Env& env, Napi::Object& target)
                   InstanceMethod("write", &Document::Write),
                   InstanceMethod("writeBuffer", &Document::WriteBuffer),
                   InstanceMethod("getObjects", &Document::GetObjects),
+                  InstanceMethod("getObject", &Document::GetObject),
                   InstanceMethod("getTrailer", &Document::GetTrailer),
                   InstanceMethod("getCatalog", &Document::GetCatalog),
                   InstanceMethod("isAllowed", &Document::IsAllowed),
@@ -64,12 +68,12 @@ Document::Initialize(Napi::Env& env, Napi::Object& target)
 Document::Document(const CallbackInfo& info)
   : ObjectWrap(info)
   , document(new PdfMemDocument())
-{
-}
+{}
 
 Document::~Document()
 {
   HandleScope scope(Env());
+  cout << "Destructing document object." << endl;
   delete document;
   document = nullptr;
 }
@@ -83,23 +87,11 @@ Document::GetPageCount(const CallbackInfo& info)
 Napi::Value
 Document::GetPage(const CallbackInfo& info)
 {
-  try {
-    if (info.Length() < 1 || !info[0].IsNumber()) {
-      throw Error::New(info.Env(),
-                       "getPage takes an argument of 1, of type number.");
-    }
-    int n = info[0].As<Number>();
-    int pl = document->GetPageCount();
-    if (n > pl) {
-      throw RangeError::New(info.Env(), "Index out of page count range");
-    }
-    PdfPage* page = document->GetPage(n);
-    auto pagePtr = External<PdfPage>::New(info.Env(), page);
-    auto instance = Page::constructor.New({ this->Value(), pagePtr });
-    return instance;
-  } catch (PdfError& err) {
-    ErrorHandler(err, info);
-  }
+  int n = info[0].As<Number>();
+  PdfPage* page = document->GetPage(n);
+  auto pagePtr = External<PdfPage>::New(info.Env(), page);
+  auto instance = Page::constructor.New({ this->Value(), pagePtr });
+  return instance;
 }
 
 void
@@ -167,9 +159,6 @@ Document::DeletePage(const CallbackInfo& info)
 {
   AssertFunctionArgs(info, 1, { napi_valuetype::napi_number });
   int pageIndex = info[0].As<Number>();
-  if (pageIndex < 0 || pageIndex > document->GetPageCount()) {
-    throw Error::New(info.Env(), "Page index out of range");
-  }
   try {
     document->GetPagesTree()->DeletePage(pageIndex);
   } catch (PdfError& err) {
@@ -369,6 +358,15 @@ Document::GetObjects(const CallbackInfo& info)
   }
   return info.Env().Undefined();
 }
+
+Napi::Value
+Document::GetObject(const CallbackInfo& info)
+{
+  auto ref = Ref::Unwrap(info[0].As<Object>());
+  PdfObject* target = document->GetObjects().GetObject(ref->GetRef());
+  return Obj::constructor.New({ External<PdfObject>::New(info.Env(), target) });
+}
+
 Napi::Value
 Document::GetTrailer(const CallbackInfo& info)
 {
@@ -494,8 +492,7 @@ public:
     : Napi::AsyncWorker(cb)
     , doc(doc)
     , arg(std::move(arg))
-  {
-  }
+  {}
 
 private:
   Document& doc;
@@ -551,8 +548,7 @@ public:
     : AsyncWorker(cb)
     , doc(doc)
     , arg(std::move(arg))
-  {
-  }
+  {}
 
   void ForUpdate(bool v) { update = v; }
   void SetPassword(string v) { pwd = std::move(v); }
@@ -626,8 +622,7 @@ public:
   DocumentWriteBufferAsync(Function& cb, Document& doc)
     : AsyncWorker(cb)
     , doc(doc)
-  {
-  }
+  {}
 
 private:
   Document& doc;
@@ -672,8 +667,7 @@ public:
     , doc(std::move(doc))
     , pwd(std::move(pwd))
     , output(std::move(output))
-  {
-  }
+  {}
 
 protected:
   void Execute() override
@@ -704,7 +698,8 @@ protected:
   {
     HandleScope scope(Env());
     if (size > 0) {
-      auto buffer = Buffer<char>::Copy(Env(), value.c_str(), static_cast<size_t>(size));
+      auto buffer =
+        Buffer<char>::Copy(Env(), value.c_str(), static_cast<size_t>(size));
       Callback().Call({ Env().Null(), buffer });
     }
     Callback().Call({ Env().Null(), String::New(Env(), value) });

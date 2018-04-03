@@ -132,16 +132,20 @@ tap('Document Api', sub => {
             doc.on('ready', () => {
                 let originalPC = doc.getPageCount()
                 doc.mergeDocument(filePath)
-                doc.write(e => {
-                    if (e) standard.fail(e.message)
-                    const doc2 = new Document(outFile)
-                    doc2.on('ready', () => {
-                        let doc2PC = doc2.getPageCount()
-                        standard.assert(originalPC * 2 === doc2PC, "merged document")
-                        unlinkSync(outFile)
-                        standard.end()
+                    .then(() => {
+                        doc.write(e => {
+                            if (e) standard.fail(e.message)
+                            const doc2 = new Document(outFile)
+                            doc2.on('ready', () => {
+                                let doc2PC = doc2.getPageCount()
+                                standard.assert(originalPC * 2 === doc2PC, "merged document")
+                                unlinkSync(outFile)
+                                standard.end()
+                            })
+                        }, outFile)
                     })
-                }, outFile)
+                    .catch(e => standard.fail(e.message))
+
             })
         })
 
