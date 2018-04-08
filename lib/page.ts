@@ -19,7 +19,7 @@
 import { IFieldInfo, Field } from './field'
 import {  Rect } from './rect';
 import {  Obj } from './object';
-import { Annotation, NPDFAnnotationType, NPDFAnnotation } from './annotation';
+import { Annotation, NPDFAnnotation } from './annotation';
 
 export interface IPage {
     rotation: number
@@ -102,7 +102,8 @@ export class Page implements IPage {
     getMediaBox(): Rect {
         const mediaBoxPositions = this._instance.getMediaBox()
         const mediaBoxRect = new Rect([mediaBoxPositions.left, mediaBoxPositions.bottom, mediaBoxPositions.width, mediaBoxPositions.height])
-        return mediaBoxPositions
+        // return mediaBoxPositions
+        return mediaBoxRect
     }
     getBleedBox(): Rect {
         const positions = this._instance.getBleedBox()
