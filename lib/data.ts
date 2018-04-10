@@ -17,14 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import { __mod } from "./document";
+import { NPDFInternal } from "./object";
 
-export type External = any
 export class Data {
     private _instance: any
     get value(): string {
         return this._instance.value
     }
-    constructor(value: string | External) {
+    constructor(value: string | NPDFInternal) {
         if (typeof value === 'string') {
             this._instance = new __mod.Data(value)
         } else {

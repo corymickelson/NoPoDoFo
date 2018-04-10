@@ -22,6 +22,8 @@
 namespace NoPoDoFo {
 FunctionReference CheckBox::constructor; // NOLINT
 
+using std::make_unique;
+
 CheckBox::CheckBox(const CallbackInfo& info)
   : ObjectWrap<CheckBox>(info)
 {

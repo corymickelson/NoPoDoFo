@@ -20,7 +20,6 @@
 #ifndef NPDF_SIGNATURE_H
 #define NPDF_SIGNATURE_H
 
-#include <gsl/gsl>
 #include <napi.h>
 #include <openssl/err.h>
 #include <openssl/evp.h>

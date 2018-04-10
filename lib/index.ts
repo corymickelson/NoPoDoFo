@@ -16,50 +16,110 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import { Document as doc } from './document'
-import { Obj as obj } from './object'
-import { Page as page } from './page'
+import { Data } from './data'
+import { Document, FontEncoding } from './document'
+import { Obj } from './object'
+import { Page } from './page'
 import {
-    Annotation as annot,
-    NPDFAction as action,
-    NPDFAnnotation as annotenum,
-    NPDFAnnotationFlag as annotflags,
-    NPDFAnnotationType as annottype
+    Annotation,
+    NPDFAction,
+    NPDFAnnotation,
+    NPDFAnnotationFlag,
+    NPDFAnnotationType
 } from './annotation'
 import {
-    CheckBox as checkbox,
-    Field as field,
-    TextField as textfield,
-    ListBox as listbox,
-    ComboBox as combobox
+    CheckBox,
+    Field,
+    TextField,
+    ListBox,
+    ComboBox
 } from './field'
-import { Image as image } from './image'
-import { Painter as painter } from './painter'
-import { Rect as rect } from './rect'
-import { Signer as sign } from './signer'
-import {Stream as stream} from './stream'
-import {Form as form} from './form'
-import {ContentsTokenizer as ct} from './parser'
+import { Image } from './image'
+import {
+    Painter,
+    Encoding,
+    ExtGState,
+    Font,
+    NPDFAlignment,
+    NPDFBlendMode,
+    NPDFColorSpace,
+    NPDFFontType,
+    NPDFLineCapStyle,
+    NPDFLineJoinStyle,
+    NPDFRenderingIntent,
+    NPDFStokeStyle,
+    NPDFTextRenderingMode,
+    NPDFVerticalAlignment
+} from './painter'
+import { Rect } from './rect'
+import { Signer, signature } from './signer'
+import { Stream } from './stream'
+import { Form } from './form'
+import { ContentsTokenizer } from './parser'
+import {Ref} from './reference'
+import {Cell, Table} from './table'
 
-export const Document = doc,
-    Page = page,
-    Obj = obj,
-    Annotation = annot,
-    NPdfAction = action,
-    NPdfAnnotation = annotenum,
-    NPdfAnnotationFlag = annotflags,
-    NPdfAnnotationType = annottype,
-    Field = field,
-    Form = form,
-    CheckBox = checkbox,
-    TextField = textfield,
-    ListBox = listbox,
-    ComboBox = combobox,
-    Image = image,
-    Painter = painter,
-    Rect = rect,
-    Signature = sign,
-    Stream = stream,
-    ContentsTokenizer = ct,
-    CONVERSION = 0.0028346456693
+
+export default {
+    ContentsTokenizer,
+    Form,
+    Stream,
+    Rect,
+    Image,
+    Data,
+    Document,
+    FontEncoding,
+    Obj,
+    Page,
+    Annotation,
+    NPDFAction,
+    NPDFAnnotation,
+    NPDFAnnotationFlag,
+    NPDFAnnotationType,
+    CheckBox,
+    Field,
+    TextField,
+    ListBox,
+    ComboBox,
+    Painter,
+    Encoding,
+    ExtGState,
+    Font,
+    NPDFAlignment,
+    NPDFBlendMode,
+    NPDFColorSpace,
+    NPDFFontType,
+    NPDFLineCapStyle,
+    NPDFLineJoinStyle,
+    NPDFRenderingIntent,
+    NPDFStokeStyle,
+    NPDFTextRenderingMode,
+    NPDFVerticalAlignment,
+    Signer,
+    signature,
+    Ref,
+    Cell,
+    Table,
+}
+export const CONVERSION = 0.0028346456693
+// export const Document = doc,
+//     Page = page,
+//     Obj = obj,
+//     Annotation = annot,
+//     NPdfAction = action,
+//     NPdfAnnotation = annotenum,
+//     NPdfAnnotationFlag = annotflags,
+//     NPdfAnnotationType = annottype,
+//     Field = field,
+//     Form = form,
+//     CheckBox = checkbox,
+//     TextField = textfield,
+//     ListBox = listbox,
+//     ComboBox = combobox,
+//     Image = image,
+//     Painter = painter,
+//     Rect = rect,
+//     Signature = sign,
+//     Stream = stream,
+//     ContentsTokenizer = ct,
 

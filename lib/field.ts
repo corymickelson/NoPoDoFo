@@ -48,6 +48,12 @@ export type FieldType =
 
 export class Field {
 
+    get readOnly():boolean {
+        return this._instance.readOnly
+    }
+    set readOnly(v:boolean) {
+        this._instance.readOnly = v
+    }
     constructor(private _instance: NPDFInternal) {
     }
 

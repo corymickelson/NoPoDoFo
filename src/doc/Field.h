@@ -41,6 +41,9 @@ public:
   void SetMappingName(const Napi::CallbackInfo&);
   void SetRequired(const Napi::CallbackInfo&);
   Napi::Value IsRequired(const Napi::CallbackInfo&);
+  void SetReadOnly(const Napi::CallbackInfo&, const Napi::Value&);
+  Napi::Value IsReadOnly(const Napi::CallbackInfo&);
+
   PoDoFo::PdfField& GetField() { return *field; }
 
 private:
