@@ -25,4 +25,6 @@
  - [NoPoDoFo.Proxies](https://github.com/corymickelson/NoPoDoFo/blob/master/guides/proxies.md)
  - [NoPoDoFo.Encrypt](https://github.com/corymickelson/NoPoDoFo/blob/master/guides/encrypt.md)
 
+For use with AWS Lambda read [AWS Lambda guide](https://github.com/corymickelson/NoPoDoFo/blob/master/guides/aws_lambda.md)
+
 Setting up a development environment for native addons can be found [here](https://corymickelson.github.io)
