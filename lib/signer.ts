@@ -18,9 +18,8 @@
  */
 import { __mod, Document } from './document'
 import { SignatureField } from "./field";
-import { existsSync } from "fs";
-import { Data } from './data';
-import { Annotation } from './annotation';
+import {access} from "fs";
+import {F_OK, R_OK} from 'constants'
 
 /**
  * The Signer class binds PoDoFo::PdfSignOutputDevice
@@ -55,9 +54,23 @@ export class Signer {
     }
 }
 
-export function signature(certfile: string, pkeyfile: string, password: string = ''): string {
-    if (!existsSync(certfile) || !existsSync(pkeyfile)) {
-        throw Error("One or both files not found")
+export function signature(certfile: string, pkeyfile: string, password: string = ''): Promise<string> {
+    return new Promise((resolve, reject) => {
+    const check = (file:string) => {
+        return new Promise((resolve, reject) => {
+            access(file, F_OK | R_OK, err => {
+                err ? reject(err) : resolve()
+            })
+        })
     }
-    return __mod.signature(certfile, pkeyfile, password)
+    Promise.all([check(certfile), check(pkeyfile)])
+        .then(() => {
+            resolve(__mod.signature(certfile, pkeyfile, password))
+        })
+        .catch(err => {
+           reject(err)
+        })
+
+    })
+
 }

@@ -101,9 +101,7 @@ export class Page implements IPage {
     }
     getMediaBox(): Rect {
         const mediaBoxPositions = this._instance.getMediaBox()
-        const mediaBoxRect = new Rect([mediaBoxPositions.left, mediaBoxPositions.bottom, mediaBoxPositions.width, mediaBoxPositions.height])
-        // return mediaBoxPositions
-        return mediaBoxRect
+        return new Rect([mediaBoxPositions.left, mediaBoxPositions.bottom, mediaBoxPositions.width, mediaBoxPositions.height])
     }
     getBleedBox(): Rect {
         const positions = this._instance.getBleedBox()

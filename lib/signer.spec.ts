@@ -11,8 +11,8 @@ import {Signer, signature} from "./signer";
 tap('Signer', sub => {
     const doc = new Document(join(__dirname, '../test-documents/test.pdf'), true)
     doc.on('ready', async e => {
-        sub.test('Sign Sync', standard => {
-            standard.plan(1)
+        sub.test('Sign Sync', async standard => {
+            standard.plan(2)
             if (e instanceof Error) throw e
             try {
                 let form = new Form(doc),
@@ -33,7 +33,8 @@ tap('Signer', sub => {
                     annot = page.createAnnotation(NPDFAnnotation.Widget, rect)
                 annot.flag = NPDFAnnotationFlag.Hidden | NPDFAnnotationFlag.Invisible
                 const field = new SignatureField(annot, form, doc),
-                    signatureData = signature(join(__dirname, '../test-documents/certificate.pem'), join(__dirname, '../test-documents/key.pem'))
+                    signatureData = await signature(join(__dirname, '../test-documents/certificate.pem'), join(__dirname, '../test-documents/key.pem'))
+                standard.ok(signatureData)
                 field.setReason('test')
                 field.setLocation('here')
                 field.setCreator('me')
