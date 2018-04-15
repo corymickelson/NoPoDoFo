@@ -544,27 +544,35 @@ Document::Write(const CallbackInfo& info)
 class DocumentLoadAsync : public AsyncWorker
 {
 public:
-  DocumentLoadAsync(Function& cb, Document& doc, string arg)
+  DocumentLoadAsync(Function& cb, Document& doc, string arg, PdfRefCountedInputDevice* refBuffer)
     : AsyncWorker(cb)
     , doc(doc)
     , arg(std::move(arg))
+    , refBuffer(refBuffer)
   {}
 
   void ForUpdate(bool v) { update = v; }
   void SetPassword(string v) { pwd = std::move(v); }
+  void SetUseBuffer(bool v) { useBuffer = v; }
 
 private:
   Document& doc;
+  PdfRefCountedInputDevice* refBuffer;
   string arg;
-  string pwd = "";
+  string pwd;
   bool update = false;
+  bool useBuffer = false;
 
   // AsyncWorker interface
 protected:
   void Execute() override
   {
     try {
-      doc.GetDocument()->Load(arg.c_str(), update);
+      if (!useBuffer) doc.GetDocument()->Load(arg.c_str(), update);
+      else {
+//        PdfRefCountedInputDevice refBuffer(buffer.Data(), buffer.Length());
+        doc.GetDocument()->LoadFromDevice(*refBuffer);
+      }
     } catch (PdfError& e) {
       if (e.GetError() == ePdfError_InvalidPassword) {
         cout << "password missing" << endl;
@@ -593,25 +601,37 @@ protected:
   }
 };
 
+/**
+ * @details Javascript parameters: (file: string|Buffer, cb:Function, update: boolean = false, isBuffer, pwd?: string)
+ * @param info
+ * @return
+ */
 Napi::Value
 Document::Load(const CallbackInfo& info)
 {
-  string source = info[0].As<String>().Utf8Value();
-  auto cb = info[1].As<Function>();
-  bool forUpdate = false;
-  if (info.Length() >= 3) {
-    forUpdate = info[2].As<Boolean>();
-    loadForIncrementalUpdates = forUpdate;
+  Function cb;
+  bool forUpdate, useBuffer = false;
+  string source, pwd;
+  PdfRefCountedInputDevice *inputDevice = nullptr;
+
+  cb = info[1].As<Function>();
+  forUpdate = info[2].As<Boolean>();
+  pwd = info[4].As<String>().Utf8Value();
+  if(info[3].As<Boolean>()) {
+    auto buffer = info[0].As<Buffer<char>>();
+    useBuffer = true;
+    inputDevice = new PdfRefCountedInputDevice(buffer.Data(), buffer.Length());
+  } else {
+    source = info[0].As<String>().Utf8Value();
+    originPdf = source;
   }
-  originPdf = source;
-  DocumentLoadAsync* worker = new DocumentLoadAsync(cb, *this, source);
-  if (info.Length() >= 4) {
-    if (info[3].IsString()) {
-      string pwd = info[3].As<String>().Utf8Value();
-      worker->SetPassword(pwd); // pwd moved
-    }
-  }
+
+  loadForIncrementalUpdates = forUpdate;
+  DocumentLoadAsync* worker = new DocumentLoadAsync(cb, *this, source, inputDevice);
+
+  worker->SetPassword(pwd); // pwd moved
   worker->ForUpdate(forUpdate);
+  worker->SetUseBuffer(useBuffer);
   worker->Queue();
   return info.Env().Undefined();
 }

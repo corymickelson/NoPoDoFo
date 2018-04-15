@@ -27,7 +27,8 @@ import {F_OK, R_OK} from "constants";
 import {Ref} from "./reference";
 
 export const __mod = require('bindings')('npdf')
-export type Callback = (err: Error, data: Buffer|string) => void
+export type Callback = (err: Error, data: Buffer | string) => void
+
 export enum FontEncoding {
     WinAnsi = 1,
     Standard = 2,
@@ -99,16 +100,21 @@ export class Document extends EventEmitter {
      * @param {string} [pwd] - document password
      * @returns void
      */
-    constructor(file: string, update: boolean = false, pwd?: string) {
+    constructor(file: string | Buffer, update: boolean = false, pwd?: string) {
         super()
         this._instance = new __mod.Document()
-        access(file, constants.F_OK | constants.R_OK, err => {
-            if (err) {
-                this.emit('error', Error('file not found'))
-            } else {
-                this.load(file, update, pwd)
-            }
-        })
+        if (Buffer.isBuffer(file)) {
+            this.load(file, update, pwd || '')
+        } else {
+            access(file, constants.F_OK | constants.R_OK, err => {
+                if (err) {
+                    this.emit('error', Error('file not found'))
+                } else {
+                    this.load(file, update, pwd || '')
+                }
+            })
+        }
+
 
     }
 
@@ -118,7 +124,7 @@ export class Document extends EventEmitter {
      * @param update - load document for incremental updates
      * @param pwd
      */
-    private load(file: string, update: boolean = false, pwd?: string): void {
+    private load(file: string | Buffer, update: boolean = false, pwd?: string): void {
         let cb = (e: Error) => {
             if (e && e instanceof Error) {
                 if (e.message === "Password required to modify this document" && pwd) {
@@ -137,7 +143,7 @@ export class Document extends EventEmitter {
                 this.emit('ready', this)
             }
         }
-        pwd ? this._instance.load(file, cb, update, pwd) : this._instance.load(file, cb, update)
+        this._instance.load(file, cb, update, Buffer.isBuffer(file), pwd || '')
     }
 
     getPageCount(): number {
@@ -236,7 +242,7 @@ export class Document extends EventEmitter {
         if (!this._loaded) {
             throw Error('Document has not been loaded, await ready event')
         }
-        if (typeof output === 'string' && cb !== null ||cb !== undefined) {
+        if (typeof output === 'string' && cb !== null || cb !== undefined) {
             this._instance.write(output, cb)
         } else {
             this._instance.writeBuffer(output)

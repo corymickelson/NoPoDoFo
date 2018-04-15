@@ -1,4 +1,4 @@
-import {access, unlinkSync, writeFileSync} from 'fs'
+import {access, readFile, unlinkSync, writeFileSync} from 'fs'
 import {join} from 'path'
 import * as tap from 'tape'
 import {Document, FontEncoding} from './document'
@@ -164,6 +164,22 @@ tap('Document Api', sub => {
             })
         })
 
+        sub.test('load buffer', standard => {
+            standard.plan(1)
+            readFile('./test-documents/default_wab.pdf', (err, data) => {
+                if (err) standard.fail()
+                else {
+                    const document = new Document(data)
+                    document.on('ready', pdf => {
+                        if (pdf instanceof Error) standard.fail()
+                        else standard.pass()
+                    })
+                        .on('error', e => {
+                            standard.fail(e)
+                        })
+                }
+            })
+        })
         sub.test('gc', standard => {
             const output = `/tmp/${v4()}.pdf`
             Document.gc(filePath, "", output, e => {
