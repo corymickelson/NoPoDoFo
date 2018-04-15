@@ -64,10 +64,10 @@ tap('Painter Api', sub => {
             t.doesNotThrow(() => table.draw({x: 300, y: 300}, painter))
 
             painter.finishPage()
-            pdf.write((e: Error, d: any) => {
+            pdf.write(outFile, (e: Error, d: any) => {
                 if (e instanceof Error) t.fail()
                 t.end()
-            }, outFile)
+            })
         })
 
     })

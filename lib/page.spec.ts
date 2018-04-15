@@ -25,7 +25,7 @@ function pageRotation() {
         const originalRotation = page.rotation,
             newRotation = originalRotation + 90
         page.rotation = newRotation
-        doc.write(e => {
+        doc.write(outFile, e => {
             const testDoc = new Document(outFile)
             testDoc.on('ready', e => {
                 if (e instanceof Error) t.fail()
@@ -34,7 +34,7 @@ function pageRotation() {
                 unlinkSync(outFile)
                 t.end()
             })
-        }, outFile)
+        })
     })
 }
 
@@ -148,7 +148,7 @@ function pageAddImg() {
         painter.drawImage(img, 0, page.height - img.getHeight())
         painter.finishPage()
 
-        doc.write(e => {
+        doc.write('./img.out.pdf', e => {
             if(e instanceof Error) t.fail()
             let objs = doc.getObjects()
             for (let i = 0; i < objs.length; i++) {
@@ -189,7 +189,7 @@ function pageAddImg() {
                     }
                 }
             }
-        }, './img.out.pdf')
+        })
 
         function extractImg(obj: Obj, jpg: Boolean) {
             let ext = jpg ? '.jpg' : '.ppm'

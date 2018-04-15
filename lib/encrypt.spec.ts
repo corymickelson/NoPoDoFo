@@ -21,7 +21,7 @@ tap('encrypt api', sub => {
             secureDoc = join(__dirname, '../test-documents/secure.tmp.pdf')
         doc.on('ready', () => {
             doc.createEncrypt(encryptionOption)
-            doc.write(e => {
+            doc.write(secureDoc, e => {
                 if (e instanceof Error) standard.fail()
                 else {
                     access(secureDoc, F_OK, err => {
@@ -33,7 +33,7 @@ tap('encrypt api', sub => {
                         }
                     })
                 }
-            }, secureDoc)
+            })
         })
     })
 

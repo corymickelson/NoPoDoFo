@@ -626,26 +626,23 @@ public:
 
 private:
   Document& doc;
-  string value = "";
-  size_t size = 0;
+  PdfRefCountedBuffer output;
 
 protected:
   void Execute() override
   {
-    PdfRefCountedBuffer docBuffer;
-    PdfOutputDevice device(&docBuffer);
+    PdfOutputDevice device(&output);
     doc.GetDocument()->Write(&device);
-    value = string(docBuffer.GetBuffer());
-    size = docBuffer.GetSize();
   }
   void OnOK() override
   {
     HandleScope scope(Env());
-    if (value.empty() || size == 0) {
+    if (output.GetSize() == 0) {
       SetError("Error, failed to write to buffer");
     }
     Callback().Call(
-      { Env().Null(), Buffer<char>::Copy(Env(), value.c_str(), size) });
+      { Env().Null(),
+        Buffer<char>::Copy(Env(), output.GetBuffer(), output.GetSize()) });
   }
 };
 
@@ -667,6 +664,7 @@ public:
     , doc(std::move(doc))
     , pwd(std::move(pwd))
     , output(std::move(output))
+    , size(0)
   {}
 
 protected:

@@ -1,4 +1,4 @@
-import {access, unlinkSync} from 'fs'
+import {access, unlinkSync, writeFileSync} from 'fs'
 import {join} from 'path'
 import * as tap from 'tape'
 import {Document, FontEncoding} from './document'
@@ -67,7 +67,7 @@ tap('Document Api', sub => {
 
             standard.test('can write', t => {
                 const outFile = `${v4()}.pdf`
-                pdf.write((e, v) => {
+                pdf.write(outFile, (e, v) => {
                     if (e instanceof Error) t.fail('Failed to write document')
                     access(outFile, F_OK, err => {
                         if (err) t.fail('Failed to write document')
@@ -77,7 +77,7 @@ tap('Document Api', sub => {
                             end(t)
                         }
                     })
-                }, outFile)
+                })
             })
             standard.test('is allowed', t => {
                 t.ok(pdf.isAllowed('Copy'), 'Copy protection not defined. Can get ProtectionProperties')
@@ -133,7 +133,7 @@ tap('Document Api', sub => {
                 let originalPC = doc.getPageCount()
                 doc.mergeDocument(filePath)
                     .then(() => {
-                        doc.write(e => {
+                        doc.write(outFile, e => {
                             if (e) standard.fail(e.message)
                             const doc2 = new Document(outFile)
                             doc2.on('ready', () => {
@@ -142,7 +142,7 @@ tap('Document Api', sub => {
                                 unlinkSync(outFile)
                                 standard.end()
                             })
-                        }, outFile)
+                        })
                     })
                     .catch(e => standard.fail(e.message))
 

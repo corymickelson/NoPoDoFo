@@ -27,7 +27,7 @@ import {F_OK, R_OK} from "constants";
 import {Ref} from "./reference";
 
 export const __mod = require('bindings')('npdf')
-
+export type Callback = (err: Error, data: Buffer|string) => void
 export enum FontEncoding {
     WinAnsi = 1,
     Standard = 2,
@@ -229,17 +229,17 @@ export class Document extends EventEmitter {
 
     /**
      * Persist changes and write to disk or if no arguments provided returns Buffer
-     * @param {string} [file] - optional, if provided, will try to write to file
-     * @param {Function} cb - Callbck Function
+     * @param {string|Function} output - optional, if provided, will try to write to file
+     * @param {Function} [cb] - optional callback
      */
-    write(cb: (e: Error, v: Buffer | void) => void, file?: string): void {
+    write(output: Callback | string, cb?: Callback): void {
         if (!this._loaded) {
             throw Error('Document has not been loaded, await ready event')
         }
-        if (file) {
-            this._instance.write(file, cb)
+        if (typeof output === 'string' && cb !== null ||cb !== undefined) {
+            this._instance.write(output, cb)
         } else {
-            this._instance.writeBuffer(cb)
+            this._instance.writeBuffer(output)
         }
     }
 
