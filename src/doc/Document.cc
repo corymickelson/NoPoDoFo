@@ -185,8 +185,12 @@ Document::MergeDocument(const CallbackInfo& info)
       mergedDoc.SetPassword(password);
     }
   }
+  try {
+    document->Append(mergedDoc);
+  } catch (PdfError& err) {
+    ErrorHandler(err, info);
+  }
 
-  document->Append(mergedDoc);
 }
 
 Napi::Value
@@ -544,7 +548,10 @@ Document::Write(const CallbackInfo& info)
 class DocumentLoadAsync : public AsyncWorker
 {
 public:
-  DocumentLoadAsync(Function& cb, Document& doc, string arg, PdfRefCountedInputDevice* refBuffer)
+  DocumentLoadAsync(Function& cb,
+                    Document& doc,
+                    string arg,
+                    PdfRefCountedInputDevice* refBuffer)
     : AsyncWorker(cb)
     , doc(doc)
     , arg(std::move(arg))
@@ -568,9 +575,9 @@ protected:
   void Execute() override
   {
     try {
-      if (!useBuffer) doc.GetDocument()->Load(arg.c_str(), update);
+      if (!useBuffer)
+        doc.GetDocument()->Load(arg.c_str(), update);
       else {
-//        PdfRefCountedInputDevice refBuffer(buffer.Data(), buffer.Length());
         doc.GetDocument()->LoadFromDevice(*refBuffer);
       }
     } catch (PdfError& e) {
@@ -602,7 +609,8 @@ protected:
 };
 
 /**
- * @details Javascript parameters: (file: string|Buffer, cb:Function, update: boolean = false, isBuffer, pwd?: string)
+ * @details Javascript parameters: (file: string|Buffer, cb:Function, update:
+ * boolean = false, isBuffer, pwd?: string)
  * @param info
  * @return
  */
@@ -612,24 +620,24 @@ Document::Load(const CallbackInfo& info)
   Function cb;
   bool forUpdate, useBuffer = false;
   string source, pwd;
-  PdfRefCountedInputDevice *inputDevice = nullptr;
+  PdfRefCountedInputDevice* inputDevice = nullptr;
 
   cb = info[1].As<Function>();
   forUpdate = info[2].As<Boolean>();
   pwd = info[4].As<String>().Utf8Value();
-  if(info[3].As<Boolean>()) {
+  if (info[3].As<Boolean>()) {
     auto buffer = info[0].As<Buffer<char>>();
     useBuffer = true;
     inputDevice = new PdfRefCountedInputDevice(buffer.Data(), buffer.Length());
   } else {
     source = info[0].As<String>().Utf8Value();
-    originPdf = source;
   }
 
   loadForIncrementalUpdates = forUpdate;
-  DocumentLoadAsync* worker = new DocumentLoadAsync(cb, *this, source, inputDevice);
+  DocumentLoadAsync* worker =
+    new DocumentLoadAsync(cb, *this, source, inputDevice);
 
-  worker->SetPassword(pwd); // pwd moved
+  worker->SetPassword(pwd);
   worker->ForUpdate(forUpdate);
   worker->SetUseBuffer(useBuffer);
   worker->Queue();

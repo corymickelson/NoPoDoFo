@@ -2,7 +2,7 @@
  * This file is part of the NoPoDoFo (R) project.
  * Copyright (c) 2017-2018
  * Authors: Cory Mickelson, et al.
- * 
+ *
  * NoPoDoFo is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -17,14 +17,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-
 #ifndef NPDF_DOCUMENT_H
 #define NPDF_DOCUMENT_H
 
 #include <napi.h>
 #include <podofo/podofo.h>
-
 
 namespace NoPoDoFo {
 class Document : public Napi::ObjectWrap<Document>
@@ -33,7 +30,6 @@ public:
   static Napi::FunctionReference constructor;
   explicit Document(const Napi::CallbackInfo& callbackInfo); // constructor
   ~Document();
-  std::string originPdf;
   static void Initialize(Napi::Env& env, Napi::Object& target);
   Napi::Value Load(const Napi::CallbackInfo&);
   Napi::Value GetPageCount(const Napi::CallbackInfo&);

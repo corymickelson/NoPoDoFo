@@ -80,7 +80,11 @@ export class Document extends EventEmitter {
 
     get encrypt(): IEncrypt {
         if (this._encrypt) return this._encrypt
-        else return new __mod.Encrypt(this._instance)
+        else {
+            const encrypt = new __mod.Encrypt(this._instance)
+            this._encrypt = encrypt
+            return encrypt
+        }
     }
 
     static gc(file: string, pwd: string, output: string, cb: (e: Error, d: string | Buffer) => void): void {
