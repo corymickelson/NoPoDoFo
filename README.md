@@ -8,7 +8,7 @@
  [PoDoFo](http://podofo.sourceforge.net/index.html).
  - NoPoDoFo is still in <mark>early development.</mark> 
 
-### __Current Version 0.4.0__
+### __Current Version 0.5.0__
 [![NPM](https://nodei.co/npm/nopodofo.png?downloads=true&downloadRank=true)](http://nodei.co/npm/nopodofo)
 
 ### [Documentation](https://corymickelson.github.io/NoPoDoFo/index)
