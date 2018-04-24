@@ -45,9 +45,23 @@ Document::Initialize(Napi::Env& env, Napi::Object& target)
                 { StaticMethod("gc", &Document::GC),
                   InstanceAccessor("password", nullptr, &Document::SetPassword),
                   InstanceAccessor("encrypt", nullptr, &Document::SetEncrypt),
+                  InstanceAccessor("pageMode", &Document::GetPageMode, &Document::SetPageMode),
+                  InstanceAccessor("pageLayout", nullptr, &Document::SetPageLayout),
+                  InstanceAccessor("printingScale", nullptr, &Document::SetPrintingScale),
+                  InstanceAccessor("baseURI", nullptr, &Document::SetBaseURI),
+                  InstanceAccessor("language", nullptr, &Document::SetLanguage),
+                  InstanceMethod("hideToolbar", &Document::SetHideToolbar),
+                  InstanceMethod("hideMenubar", &Document::SetHideMenubar),
+                  InstanceMethod("hideWindowUI", &Document::SetHideWindowUI),
+                  InstanceMethod("fitWindow", &Document::SetFitWindow),
+                  InstanceMethod("centerWindow", &Document::SetCenterWindow),
+                  InstanceMethod("displayDocTitle", &Document::SetDisplayDocTitle),
+                  InstanceMethod("useFullScreen", &Document::SetUseFullScreen),
+                  InstanceMethod("attachFile", &Document::AttachFile),
                   InstanceMethod("load", &Document::Load),
                   InstanceMethod("getPageCount", &Document::GetPageCount),
                   InstanceMethod("getPage", &Document::GetPage),
+                  InstanceMethod("insertExistingPage", &Document::InsertExistingPage),
                   InstanceMethod("mergeDocument", &Document::MergeDocument),
                   InstanceMethod("deletePage", &Document::DeletePage),
                   InstanceMethod("getVersion", &Document::GetVersion),
@@ -108,6 +122,119 @@ Document::SetPassword(const CallbackInfo& info, const Napi::Value& value)
   } catch (Error& err) {
     ErrorHandler(err, info);
   }
+}
+
+void Document::SetHideMenubar(const Napi::CallbackInfo &) {
+  document->SetHideMenubar();
+}
+
+Napi::Value
+Document::GetPageMode(const CallbackInfo& info)
+{
+  string mode;
+  switch (document->GetPageMode()) {
+    case ePdfPageModeDontCare:
+      mode = "DontCare";
+      break;
+    case ePdfPageModeFullScreen:
+      mode = "FullScreen";
+      break;
+    case ePdfPageModeUseAttachments:
+      mode = "UseAttachments";
+      break;
+    case ePdfPageModeUseBookmarks:
+      mode = "UseBookmarks";
+      break;
+    case ePdfPageModeUseNone:
+      mode = "UseNone";
+      break;
+    case ePdfPageModeUseOC:
+      mode = "UseOC";
+      break;
+    case ePdfPageModeUseThumbs:
+      mode = "UseThumbs";
+      break;
+  }
+  return String::New(info.Env(), mode);
+}
+
+void
+Document::SetPageMode(const CallbackInfo&, const Napi::Value& value)
+{
+  int flag = value.As<Number>();
+  auto mode = static_cast<EPdfPageMode>(flag);
+  document->SetPageMode(mode);
+}
+
+void
+Document::SetPageLayout(const CallbackInfo&, const Napi::Value& value)
+{
+  int flag = value.As<Number>();
+  auto mode = static_cast<EPdfPageLayout>(flag);
+  document->SetPageLayout(mode);
+}
+
+void
+Document::SetUseFullScreen(const CallbackInfo&)
+{
+  document->SetUseFullScreen();
+}
+
+void
+Document::SetHideToolbar(const CallbackInfo&)
+{
+  document->SetHideMenubar();
+}
+
+void
+Document::SetHideWindowUI(const CallbackInfo&)
+{
+  document->SetHideWindowUI();
+}
+
+void
+Document::SetFitWindow(const CallbackInfo&)
+{
+  document->SetFitWindow();
+}
+
+void
+Document::SetCenterWindow(const CallbackInfo&)
+{
+  document->SetCenterWindow();
+}
+
+void
+Document::SetDisplayDocTitle(const CallbackInfo&)
+{
+  document->SetDisplayDocTitle();
+}
+
+void
+Document::SetPrintingScale(const CallbackInfo&, const Napi::Value& value)
+{
+  PdfName scale(value.As<String>().Utf8Value());
+  document->SetPrintScaling(scale);
+}
+
+void
+Document::SetBaseURI(const CallbackInfo&, const Napi::Value& value)
+{
+  document->SetBaseURI(value.As<String>().Utf8Value());
+}
+
+void
+Document::SetLanguage(const CallbackInfo&, const Napi::Value& value)
+{
+  document->SetLanguage(value.As<String>().Utf8Value());
+}
+
+void
+Document::AttachFile(const CallbackInfo&info)
+{
+  string filepath = info[0].As<String>().Utf8Value();
+  PdfFileSpec attachment(filepath.c_str(), true, document);
+  document->AttachFile(attachment);
 }
 
 Napi::Value
@@ -190,7 +317,6 @@ Document::MergeDocument(const CallbackInfo& info)
   } catch (PdfError& err) {
     ErrorHandler(err, info);
   }
-
 }
 
 Napi::Value
@@ -489,6 +615,25 @@ Document::CreateFont(const CallbackInfo& info)
   }
 }
 
+/**
+ * @brief Document::InsertPage
+ * @param info - (OtherDocument: Document, OtherDocPageIndex: int,
+ * InsertAtIndex: int): Page
+ * @return
+ */
+Napi::Value
+Document::InsertExistingPage(const CallbackInfo& info)
+{
+  auto pDoc = Document::Unwrap(info[0].As<Object>());
+  int pDocIndex = info[1].As<Number>();
+  int insertIndex = info[2].As<Number>();
+  document->InsertExistingPageAt(pDoc->GetDocument(), pDocIndex, insertIndex);
+  PdfPage* page = document->GetPage(insertIndex);
+  auto pagePtr = External<PdfPage>::New(info.Env(), page);
+  auto instance = Page::constructor.New({ this->Value(), pagePtr });
+  return instance;
+}
+
 class DocumentWriteAsync : public AsyncWorker
 {
 public:
@@ -750,4 +895,5 @@ Document::GC(const Napi::CallbackInfo& info)
   worker->Queue();
   return info.Env().Undefined();
 }
+
 }

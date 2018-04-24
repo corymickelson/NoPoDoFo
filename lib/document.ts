@@ -42,6 +42,27 @@ export enum FontEncoding {
     Identity = 0
 }
 
+export enum PageMode {
+    DontCare,
+    FullScreen,
+    UseAttachments,
+    UseBookmarks,
+    UseNone,
+    UseOC,
+    UseThumbs
+}
+
+export enum PageLayout {
+    Ignore,
+    Default,
+    SinglePage,
+    OneColumn,
+    TwoColumnLeft,
+    TwoColumnRight,
+    TwoPageLeft,
+    TwoPageRight
+}
+
 export interface CreateFontOpts {
     fontName: string,
     bold?: boolean,
@@ -76,6 +97,30 @@ export class Document extends EventEmitter {
 
     get password(): string {
         throw EvalError()
+    }
+
+    set pageMode(v: PageMode) {
+        this._instance.pageMode = v
+    }
+
+    get pageMode(): PageMode {
+        return this._instance.pageMode
+    }
+
+    set pageLayout(v: PageLayout) {
+        this._instance.pageLayout = v
+    }
+
+    set printingScale(v: string) {
+        this._instance.printingScale = v
+    }
+
+    set baseURI(v: string) {
+        this._instance.baseURI = v
+    }
+
+    set language(v: string) {
+        this._instance.language = v
     }
 
     get encrypt(): IEncrypt {

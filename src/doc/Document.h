@@ -37,6 +37,20 @@ public:
   void MergeDocument(const Napi::CallbackInfo&);
   void DeletePage(const Napi::CallbackInfo&);
   void SetPassword(const Napi::CallbackInfo&, const Napi::Value&);
+  Napi::Value GetPageMode(const Napi::CallbackInfo&);
+  void SetPageMode(const Napi::CallbackInfo&, const Napi::Value&);
+  void SetPageLayout(const Napi::CallbackInfo&, const Napi::Value&);
+  void SetUseFullScreen(const Napi::CallbackInfo&);
+  void SetHideToolbar(const Napi::CallbackInfo&);
+  void SetHideMenubar(const Napi::CallbackInfo&);
+  void SetHideWindowUI(const Napi::CallbackInfo&);
+  void SetFitWindow(const Napi::CallbackInfo&);
+  void SetCenterWindow(const Napi::CallbackInfo&);
+  void SetDisplayDocTitle(const Napi::CallbackInfo&);
+  void SetPrintingScale(const Napi::CallbackInfo&, const Napi::Value&);
+  void SetBaseURI(const Napi::CallbackInfo&, const Napi::Value&);
+  void SetLanguage(const Napi::CallbackInfo&, const Napi::Value&);
+  void AttachFile(const Napi::CallbackInfo&);
   Napi::Value GetVersion(const Napi::CallbackInfo&);
   Napi::Value IsLinearized(const Napi::CallbackInfo&);
   Napi::Value Write(const Napi::CallbackInfo&);
@@ -49,6 +63,7 @@ public:
   Napi::Value GetCatalog(const Napi::CallbackInfo&);
   Napi::Value IsAllowed(const Napi::CallbackInfo&);
   Napi::Value CreateFont(const Napi::CallbackInfo&);
+  Napi::Value InsertExistingPage(const Napi::CallbackInfo&);
   static Napi::Value GC(const Napi::CallbackInfo&);
 
   PoDoFo::PdfMemDocument* GetDocument() { return document; }

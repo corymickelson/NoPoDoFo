@@ -78,7 +78,6 @@ export enum NPDFAnnotation {
     RichMedia,      // PDF 1.7 ADBE ExtensionLevel 3 ALX: Petr P. Petrov
     WebMedia,       // PDF 1.7 IPDF ExtensionLevel 3
 }
-
 export enum NPDFAnnotationFlag {
     Invisible = 0x0001,
     Hidden = 0x0002,
@@ -91,7 +90,6 @@ export enum NPDFAnnotationFlag {
     ToggleNoView = 0x0100,
     LockedContents = 0x0200
 }
-
 export enum NPDFAction {
     GoTo = 0,
     GoToR,
