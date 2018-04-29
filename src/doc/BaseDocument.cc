@@ -22,6 +22,8 @@
 #include "../ValidateArguments.h"
 #include "../base/Obj.h"
 #include "../base/Ref.h"
+#include "../doc/Rect.h"
+#include "FileSpec.h"
 #include "Font.h"
 #include "Page.h"
 
@@ -33,7 +35,7 @@ using std::endl;
 
 namespace NoPoDoFo {
 
-BaseDocument::BaseDocument() {}
+BaseDocument::BaseDocument() = default;
 
 BaseDocument::~BaseDocument()
 {
@@ -356,5 +358,121 @@ BaseDocument::CreateFont(const CallbackInfo& info)
   } catch (PdfError& err) {
     ErrorHandler(err, info);
   }
+}
+/**
+ * @note Javascript args (doc:Document, pageN:number, atN:number)
+ * @param info
+ * @return
+ */
+Napi::Value
+BaseDocument::InsertExistingPage(const CallbackInfo& info)
+{
+  auto memDoc = Document::Unwrap(info[0].As<Object>());
+  int memPageN = info[1].As<Number>();
+  int atN = info[2].As<Number>();
+  if (document->GetPageCount() < atN) {
+    throw RangeError();
+  }
+  document->InsertExistingPageAt(memDoc->GetDocument(), memPageN, atN);
+  return Number::New(info.Env(), document->GetPageCount());
+}
+Napi::Value
+BaseDocument::GetInfo(const CallbackInfo& info)
+{
+  PdfInfo* i = document->GetInfo();
+  auto infoObj = Object::New(info.Env());
+  infoObj.Set("author", i->GetAuthor().GetStringUtf8());
+  infoObj.Set("createdAt", i->GetCreationDate().GetTime());
+  infoObj.Set("creator", i->GetCreator().GetStringUtf8());
+  infoObj.Set("keywords", i->GetKeywords().GetStringUtf8());
+  infoObj.Set("producer", i->GetProducer().GetStringUtf8());
+  infoObj.Set("subject", i->GetSubject().GetStringUtf8());
+  infoObj.Set("title", i->GetTitle().GetStringUtf8());
+  return infoObj;
+}
+/**
+ *
+ * @param info
+ * @return Obj - The outline object dictionary
+ */
+Napi::Value
+BaseDocument::GetOutlines(const CallbackInfo& info)
+{
+  auto outline = document->GetOutlines(info[0].As<Boolean>())->GetObject();
+  return Obj::constructor.New(
+    { External<PdfObject>::New(info.Env(), outline) });
+}
+Napi::Value
+BaseDocument::GetNamesTree(const CallbackInfo& info)
+{
+  return Obj::constructor.New({ External<PdfObject>::New(
+    info.Env(), document->GetNamesTree(info[0].As<Boolean>())->GetObject()) });
+}
+Napi::Value
+BaseDocument::CreatePage(const CallbackInfo& info)
+{
+  auto r = Rect::Unwrap(info[0].As<Object>())->GetRect();
+  return Page::constructor.New(
+    { External<PdfPage>::New(info.Env(), document->CreatePage(*r)) });
+}
+Napi::Value
+BaseDocument::CreatePages(const Napi::CallbackInfo& info)
+{
+  auto coll = info[0].As<Array>();
+  vector<PdfRect> rects;
+  for (int n = coll.Length(); n >= 0; n++) {
+    PdfRect r = *Rect::Unwrap(coll.Get(n).As<Object>())->GetRect();
+    rects.push_back(r);
+  }
+  document->CreatePages(rects);
+  return Number::New(info.Env(), document->GetPageCount());
+}
+Napi::Value
+BaseDocument::InsertPage(const Napi::CallbackInfo& info)
+{
+  auto rect = Rect::Unwrap(info[0].As<Object>())->GetRect();
+  int index = info[1].As<Number>();
+  document->InsertPage(*rect, index);
+  return Page::constructor.New(
+    { External<PdfPage>::New(info.Env(), document->GetPage(index)) });
+}
+Napi::Value
+BaseDocument::Append(const Napi::CallbackInfo& info)
+{
+  AssertFunctionArgs(info, 1, { napi_valuetype::napi_string });
+  string docPath = info[0].As<String>().Utf8Value();
+  PdfMemDocument mergedDoc;
+  try {
+    mergedDoc.Load(docPath.c_str());
+  } catch (PdfError& err) {
+    if (err.GetError() == ePdfError_InvalidPassword && info.Length() != 2) {
+      throw Error::New(info.Env(),
+                       "Password required to modify this document. Call "
+                       "MergeDocument(filePath, password)");
+    } else if (err.GetError() == ePdfError_InvalidPassword &&
+               info.Length() == 2 && info[1].IsString()) {
+      string password = info[1].As<String>().Utf8Value();
+      mergedDoc.SetPassword(password);
+    }
+  }
+  try {
+    document->Append(mergedDoc);
+  } catch (PdfError& err) {
+    ErrorHandler(err, info);
+  }
+}
+/**
+ * @note Javascript args (attachmentName:string)
+ * @param info
+ * @return
+ */
+Napi::Value
+BaseDocument::GetAttachment(const CallbackInfo& info)
+{
+  return FileSpec::constructor.New({ External<PdfFileSpec>::New(
+    info.Env(), document->GetAttachment(info[0].As<String>().Utf8Value())) });
+}
+void BaseDocument::AddNamedDestination(const Napi::CallbackInfo& info) {
+
 }
 }

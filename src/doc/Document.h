@@ -36,7 +36,6 @@ public:
   ~Document();
   static void Initialize(Napi::Env& env, Napi::Object& target);
   Napi::Value Load(const Napi::CallbackInfo&);
-  void MergeDocument(const Napi::CallbackInfo&);
   void DeletePage(const Napi::CallbackInfo&);
   void SetPassword(const Napi::CallbackInfo&, const Napi::Value&);
   Napi::Value Write(const Napi::CallbackInfo&);
@@ -44,10 +43,9 @@ public:
   void SetEncrypt(const Napi::CallbackInfo&, const Napi::Value&);
   Napi::Value GetTrailer(const Napi::CallbackInfo&);
   Napi::Value GetCatalog(const Napi::CallbackInfo&);
-  Napi::Value InsertExistingPage(const Napi::CallbackInfo&);
   static Napi::Value GC(const Napi::CallbackInfo&);
 
-  PoDoFo::PdfMemDocument* GetDocument() { return document; }
+  PoDoFo::PdfMemDocument* GetDocument() override { return document; }
   bool LoadedForIncrementalUpdates() { return loadForIncrementalUpdates; }
 
 private:

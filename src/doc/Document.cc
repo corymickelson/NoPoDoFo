@@ -51,6 +51,7 @@ Document::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceAccessor("printingScale", nullptr, &Document::SetPrintingScale),
       InstanceAccessor("baseURI", nullptr, &Document::SetBaseURI),
       InstanceAccessor("language", nullptr, &Document::SetLanguage),
+      InstanceAccessor("info", &Document::GetInfo, nullptr),
       InstanceMethod("hideToolbar", &Document::SetHideToolbar),
       InstanceMethod("hideMenubar", &Document::SetHideMenubar),
       InstanceMethod("hideWindowUI", &Document::SetHideWindowUI),
@@ -63,7 +64,8 @@ Document::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceMethod("getPageCount", &Document::GetPageCount),
       InstanceMethod("getPage", &Document::GetPage),
       InstanceMethod("insertExistingPage", &Document::InsertExistingPage),
-      InstanceMethod("mergeDocument", &Document::MergeDocument),
+      InstanceMethod("insertPage", &Document::InsertPage),
+      InstanceMethod("append", &Document::Append),
       InstanceMethod("deletePage", &Document::DeletePage),
       InstanceMethod("getVersion", &Document::GetVersion),
       InstanceMethod("isLinearized", &Document::IsLinearized),
@@ -75,7 +77,13 @@ Document::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceMethod("getTrailer", &Document::GetTrailer),
       InstanceMethod("getCatalog", &Document::GetCatalog),
       InstanceMethod("isAllowed", &Document::IsAllowed),
-      InstanceMethod("createFont", &Document::CreateFont) });
+      InstanceMethod("createFont", &Document::CreateFont),
+      InstanceMethod("getOutlines", &Document::GetOutlines),
+      InstanceMethod("getNames", &Document::GetNamesTree),
+      InstanceMethod("createPage", &Document::CreatePage),
+      InstanceMethod("createPages", &Document::CreatePages),
+      InstanceMethod("getAttachment", &Document::GetAttachment)
+    });
   constructor = Persistent(ctor);
   constructor.SuppressDestruct();
   target.Set("Document", ctor);
@@ -124,31 +132,6 @@ Document::DeletePage(const CallbackInfo& info)
   }
 }
 
-void
-Document::MergeDocument(const CallbackInfo& info)
-{
-  AssertFunctionArgs(info, 1, { napi_valuetype::napi_string });
-  string docPath = info[0].As<String>().Utf8Value();
-  PdfMemDocument mergedDoc;
-  try {
-    mergedDoc.Load(docPath.c_str());
-  } catch (PdfError& err) {
-    if (err.GetError() == ePdfError_InvalidPassword && info.Length() != 2) {
-      throw Error::New(info.Env(),
-                       "Password required to modify this document. Call "
-                       "MergeDocument(filePath, password)");
-    } else if (err.GetError() == ePdfError_InvalidPassword &&
-               info.Length() == 2 && info[1].IsString()) {
-      string password = info[1].As<String>().Utf8Value();
-      mergedDoc.SetPassword(password);
-    }
-  }
-  try {
-    document->Append(mergedDoc);
-  } catch (PdfError& err) {
-    ErrorHandler(err, info);
-  }
-}
 void
 Document::SetEncrypt(const CallbackInfo& info, const Napi::Value& value)
 {
@@ -306,24 +289,6 @@ Document::GetCatalog(const CallbackInfo& info)
   auto* ptr = const_cast<PdfObject*>(catalog);
   auto initPtr = Napi::External<PdfObject>::New(info.Env(), ptr);
   auto instance = Obj::constructor.New({ initPtr });
-  return instance;
-}
-/**
- * @brief Document::InsertPage
- * @param info - (OtherDocument: Document, OtherDocPageIndex: int,
- * InsertAtIndex: int): Page
- * @return
- */
-Napi::Value
-Document::InsertExistingPage(const CallbackInfo& info)
-{
-  auto pDoc = Document::Unwrap(info[0].As<Object>());
-  int pDocIndex = info[1].As<Number>();
-  int insertIndex = info[2].As<Number>();
-  document->InsertExistingPageAt(pDoc->GetDocument(), pDocIndex, insertIndex);
-  PdfPage* page = document->GetPage(insertIndex);
-  auto pagePtr = External<PdfPage>::New(info.Env(), page);
-  auto instance = Page::constructor.New({ this->Value(), pagePtr });
   return instance;
 }
 

@@ -30,13 +30,11 @@ public:
   BaseDocument();
   ~BaseDocument();
   Napi::Value GetPageCount(const Napi::CallbackInfo&);
-
   Napi::Value GetPage(const Napi::CallbackInfo&);
   Napi::Value GetObjects(const Napi::CallbackInfo&);
   Napi::Value GetObject(const Napi::CallbackInfo&);
   Napi::Value IsAllowed(const Napi::CallbackInfo&);
   Napi::Value CreateFont(const Napi::CallbackInfo&);
-  Napi::Value InsertExistingPage(const Napi::CallbackInfo&);
   Napi::Value GetPageMode(const Napi::CallbackInfo&);
   void SetPageMode(const Napi::CallbackInfo&, const Napi::Value&);
   void SetPageLayout(const Napi::CallbackInfo&, const Napi::Value&);
@@ -54,13 +52,18 @@ public:
   Napi::Value GetVersion(const Napi::CallbackInfo&);
   Napi::Value IsLinearized(const Napi::CallbackInfo&);
   Napi::Value GetWriteMode(const Napi::CallbackInfo&);
-
+  Napi::Value InsertExistingPage(const Napi::CallbackInfo&);
   Napi::Value GetInfo(const Napi::CallbackInfo&);
   Napi::Value GetOutlines(const Napi::CallbackInfo&);
   Napi::Value GetNamesTree(const Napi::CallbackInfo&);
-  Napi::Value GetPagesTree(const Napi::CallbackInfo&);
+  Napi::Value CreatePage(const Napi::CallbackInfo&);
+  Napi::Value CreatePages(const Napi::CallbackInfo&);
+  Napi::Value InsertPage(const Napi::CallbackInfo&);
+  Napi::Value Append(const Napi::CallbackInfo&);
+  Napi::Value GetAttachment(const Napi::CallbackInfo&);
+  void AddNamedDestination(const Napi::CallbackInfo&);
 
-  PoDoFo::PdfDocument* GetDocument() { return document; }
+  virtual PoDoFo::PdfDocument* GetDocument() { return document; }
 
 protected:
   void SetInstance(PoDoFo::PdfDocument* v) { document = v; }
