@@ -16,7 +16,8 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import {__mod, Document} from './document'
+import {__mod} from './base-document'
+import {Document} from './document'
 import {NPDFInternal, Obj} from "./object";
 import {Annotation} from "./annotation";
 import {Form} from "./form";

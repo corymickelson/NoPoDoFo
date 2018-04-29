@@ -17,7 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import { Page } from "./page";
-import { __mod, Document } from "./document";
+import  {__mod} from "./base-document";
+import {Document } from "./document";
 
 /**
  * This class is a parser for content streams in PDF documents.
