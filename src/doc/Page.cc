@@ -32,18 +32,8 @@ FunctionReference Page::constructor; // NOLINT
 
 Page::Page(const CallbackInfo& info)
   : ObjectWrap(info)
-  , doc(Document::Unwrap(info[0].As<Object>()))
 {
-  if (info[1].Type() == napi_external) {
-    page = new PdfPage(*info[1].As<External<PdfPage>>().Data());
-  } else if (info[1].IsNumber()) {
-    if (info[1].As<Number>().Int32Value() >= 0 &&
-        doc->GetDocument()->GetPageCount() <
-          info[1].As<Number>().Int32Value()) {
-      int index = info[1].As<Number>();
-      page = new PdfPage(*doc->GetDocument()->GetPage(index));
-    }
-  }
+  page = new PdfPage(*info[0].As<External<PdfPage>>().Data());
 }
 Page::~Page()
 {

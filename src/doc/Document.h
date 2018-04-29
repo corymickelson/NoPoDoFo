@@ -20,11 +20,15 @@
 #ifndef NPDF_DOCUMENT_H
 #define NPDF_DOCUMENT_H
 
+#include "BaseDocument.h"
+
 #include <napi.h>
 #include <podofo/podofo.h>
 
 namespace NoPoDoFo {
-class Document : public Napi::ObjectWrap<Document>
+class Document
+  : public Napi::ObjectWrap<Document>
+  , public BaseDocument
 {
 public:
   static Napi::FunctionReference constructor;
@@ -32,37 +36,14 @@ public:
   ~Document();
   static void Initialize(Napi::Env& env, Napi::Object& target);
   Napi::Value Load(const Napi::CallbackInfo&);
-  Napi::Value GetPageCount(const Napi::CallbackInfo&);
-  Napi::Value GetPage(const Napi::CallbackInfo&);
   void MergeDocument(const Napi::CallbackInfo&);
   void DeletePage(const Napi::CallbackInfo&);
   void SetPassword(const Napi::CallbackInfo&, const Napi::Value&);
-  Napi::Value GetPageMode(const Napi::CallbackInfo&);
-  void SetPageMode(const Napi::CallbackInfo&, const Napi::Value&);
-  void SetPageLayout(const Napi::CallbackInfo&, const Napi::Value&);
-  void SetUseFullScreen(const Napi::CallbackInfo&);
-  void SetHideToolbar(const Napi::CallbackInfo&);
-  void SetHideMenubar(const Napi::CallbackInfo&);
-  void SetHideWindowUI(const Napi::CallbackInfo&);
-  void SetFitWindow(const Napi::CallbackInfo&);
-  void SetCenterWindow(const Napi::CallbackInfo&);
-  void SetDisplayDocTitle(const Napi::CallbackInfo&);
-  void SetPrintingScale(const Napi::CallbackInfo&, const Napi::Value&);
-  void SetBaseURI(const Napi::CallbackInfo&, const Napi::Value&);
-  void SetLanguage(const Napi::CallbackInfo&, const Napi::Value&);
-  void AttachFile(const Napi::CallbackInfo&);
-  Napi::Value GetVersion(const Napi::CallbackInfo&);
-  Napi::Value IsLinearized(const Napi::CallbackInfo&);
   Napi::Value Write(const Napi::CallbackInfo&);
   Napi::Value WriteBuffer(const Napi::CallbackInfo&);
-  Napi::Value GetWriteMode(const Napi::CallbackInfo&);
   void SetEncrypt(const Napi::CallbackInfo&, const Napi::Value&);
-  Napi::Value GetObjects(const Napi::CallbackInfo&);
-  Napi::Value GetObject(const Napi::CallbackInfo&);
   Napi::Value GetTrailer(const Napi::CallbackInfo&);
   Napi::Value GetCatalog(const Napi::CallbackInfo&);
-  Napi::Value IsAllowed(const Napi::CallbackInfo&);
-  Napi::Value CreateFont(const Napi::CallbackInfo&);
   Napi::Value InsertExistingPage(const Napi::CallbackInfo&);
   static Napi::Value GC(const Napi::CallbackInfo&);
 

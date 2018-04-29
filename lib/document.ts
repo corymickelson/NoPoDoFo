@@ -16,17 +16,17 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import {access, constants} from 'fs'
-import {NPDFInternal, Obj} from './object';
-import {Page} from './page';
-import {EncryptOption, IEncrypt, ProtectionOption} from './encrypt';
-import {EventEmitter} from 'events';
-import {Font} from "./painter";
-import {Signer} from './signer';
-import {F_OK, R_OK} from "constants";
-import {Ref} from "./reference";
+import { access, constants } from 'fs'
+import { NPDFInternal, Obj } from './object';
+import { Page } from './page';
+import { EncryptOption, IEncrypt, ProtectionOption } from './encrypt';
+import { EventEmitter } from 'events';
+import { Font } from "./painter";
+import { Signer } from './signer';
+import { F_OK, R_OK } from "constants";
+import { Ref } from "./reference";
+import { BaseDocument, __mod } from './base-document'
 
-export const __mod = require('bindings')('npdf')
 export type Callback = (err: Error, data: Buffer | string) => void
 
 export enum FontEncoding {
@@ -80,56 +80,12 @@ export interface CreateFontOpts {
  * Document was designed to allow easy access to the object structure of a PDF file.
  * Document should be used whenever you want to change the object structure of a PDF file.
  */
-export class Document extends EventEmitter {
-
+export class Document extends BaseDocument {
     private readonly _instance: any
     private _loaded: boolean = false;
-    private _password: string | undefined = undefined
-    private _encrypt: any
 
     get loaded() {
         return this._loaded
-    }
-
-    set password(value: string) {
-        this._password = value;
-    }
-
-    get password(): string {
-        throw EvalError()
-    }
-
-    set pageMode(v: PageMode) {
-        this._instance.pageMode = v
-    }
-
-    get pageMode(): PageMode {
-        return this._instance.pageMode
-    }
-
-    set pageLayout(v: PageLayout) {
-        this._instance.pageLayout = v
-    }
-
-    set printingScale(v: string) {
-        this._instance.printingScale = v
-    }
-
-    set baseURI(v: string) {
-        this._instance.baseURI = v
-    }
-
-    set language(v: string) {
-        this._instance.language = v
-    }
-
-    get encrypt(): IEncrypt {
-        if (this._encrypt) return this._encrypt
-        else {
-            const encrypt = new __mod.Encrypt(this._instance)
-            this._encrypt = encrypt
-            return encrypt
-        }
     }
 
     static gc(file: string, pwd: string, output: string, cb: (e: Error, d: string | Buffer) => void): void {
@@ -152,6 +108,7 @@ export class Document extends EventEmitter {
     constructor(file: string | Buffer, update: boolean = false, pwd?: string) {
         super()
         this._instance = new __mod.Document()
+        this.setInternal(this._instance)
         if (Buffer.isBuffer(file)) {
             this.load(file, update, pwd || '')
         } else {
@@ -163,8 +120,6 @@ export class Document extends EventEmitter {
                 }
             })
         }
-
-
     }
 
     /**
@@ -193,42 +148,6 @@ export class Document extends EventEmitter {
             }
         }
         this._instance.load(file, cb, update, Buffer.isBuffer(file), pwd || '')
-    }
-
-    getPageCount(): number {
-        if (!this._loaded) {
-            throw new Error('load a pdf file before calling this method')
-        }
-        return this._instance.getPageCount()
-    }
-
-    getPage(pageN: number): Page {
-        if (pageN > this.getPageCount() || pageN < 0) {
-            throw new RangeError("pageN out of range")
-        }
-        if (!this._loaded) {
-            throw new Error('load a pdf file before calling this method')
-        }
-        const page: Page = this._instance.getPage(pageN)
-        return new Page(page);
-    }
-
-    getObject(ref: Ref): Obj {
-        if (!ref || ref instanceof Ref === false) {
-            throw TypeError()
-        }
-        else if (ref.isIndirect() === false) {
-            throw Error('Document.GetObject is only possible when the object referenced is an indirect object')
-        }
-        const objInstance = this._instance.getObject((ref as any)._instance)
-        return new Obj(objInstance)
-    }
-
-    getObjects(): Array<Obj> {
-        const objects: Array<any> = this._instance.getObjects()
-        return objects.map(value => {
-            return new Obj(value)
-        })
     }
 
     /**
@@ -267,21 +186,6 @@ export class Document extends EventEmitter {
         this._instance.deletePage(pageIndex)
     }
 
-    getVersion(): number {
-        if (!this._loaded) {
-            throw new Error('load a pdf file before calling this method')
-        }
-        return this._instance.getVersion()
-    }
-
-    isLinearized(): boolean {
-        if (!this._loaded) {
-            throw new Error('load a pdf file before calling this method')
-        }
-        return this._instance.isLinearized()
-    }
-
-
     /**
      * Persist changes and write to disk or if no arguments provided returns Buffer
      * @param {string|Function} output - optional, if provided, will try to write to file
@@ -309,25 +213,6 @@ export class Document extends EventEmitter {
 
     isAllowed(protection: ProtectionOption): boolean {
         return this._instance.isAllowed(protection)
-    }
-
-    /**
-     * @desc Creates a PdfFont instance for use in NoPoDoFo generated Pdf Document. Note
-     *      it is up to the user to check that the specified font family exists on the system.
-     *      For font management use font-manager
-     * @see https://github.com/corymickelson/font-manager
-     * @param {CreateFontOpts & Object} opts
-     * @returns {Font}
-     */
-    createFont(opts: CreateFontOpts & Object): Font {
-        const instance = this._instance.createFont(
-            opts.fontName,
-            opts.hasOwnProperty('bold') ? opts.bold : false,
-            opts.hasOwnProperty('italic') ? opts.italic : false,
-            opts.hasOwnProperty('encoding') ? opts.encoding : 1,
-            opts.hasOwnProperty('embed') ? opts.embed : false,
-            opts.hasOwnProperty('fileName') ? opts.fileName : null)
-        return new Font(instance)
     }
 
     writeUpdate(device: string | Signer): void {

@@ -39,50 +39,54 @@ void
 Document::Initialize(Napi::Env& env, Napi::Object& target)
 {
   HandleScope scope(env);
-  Function ctor =
-    DefineClass(env,
-                "Document",
-                { StaticMethod("gc", &Document::GC),
-                  InstanceAccessor("password", nullptr, &Document::SetPassword),
-                  InstanceAccessor("encrypt", nullptr, &Document::SetEncrypt),
-                  InstanceAccessor("pageMode", &Document::GetPageMode, &Document::SetPageMode),
-                  InstanceAccessor("pageLayout", nullptr, &Document::SetPageLayout),
-                  InstanceAccessor("printingScale", nullptr, &Document::SetPrintingScale),
-                  InstanceAccessor("baseURI", nullptr, &Document::SetBaseURI),
-                  InstanceAccessor("language", nullptr, &Document::SetLanguage),
-                  InstanceMethod("hideToolbar", &Document::SetHideToolbar),
-                  InstanceMethod("hideMenubar", &Document::SetHideMenubar),
-                  InstanceMethod("hideWindowUI", &Document::SetHideWindowUI),
-                  InstanceMethod("fitWindow", &Document::SetFitWindow),
-                  InstanceMethod("centerWindow", &Document::SetCenterWindow),
-                  InstanceMethod("displayDocTitle", &Document::SetDisplayDocTitle),
-                  InstanceMethod("useFullScreen", &Document::SetUseFullScreen),
-                  InstanceMethod("attachFile", &Document::AttachFile),
-                  InstanceMethod("load", &Document::Load),
-                  InstanceMethod("getPageCount", &Document::GetPageCount),
-                  InstanceMethod("getPage", &Document::GetPage),
-                  InstanceMethod("insertExistingPage", &Document::InsertExistingPage),
-                  InstanceMethod("mergeDocument", &Document::MergeDocument),
-                  InstanceMethod("deletePage", &Document::DeletePage),
-                  InstanceMethod("getVersion", &Document::GetVersion),
-                  InstanceMethod("isLinearized", &Document::IsLinearized),
-                  InstanceMethod("getWriteMode", &Document::GetWriteMode),
-                  InstanceMethod("write", &Document::Write),
-                  InstanceMethod("writeBuffer", &Document::WriteBuffer),
-                  InstanceMethod("getObjects", &Document::GetObjects),
-                  InstanceMethod("getObject", &Document::GetObject),
-                  InstanceMethod("getTrailer", &Document::GetTrailer),
-                  InstanceMethod("getCatalog", &Document::GetCatalog),
-                  InstanceMethod("isAllowed", &Document::IsAllowed),
-                  InstanceMethod("createFont", &Document::CreateFont) });
+  Function ctor = DefineClass(
+    env,
+    "Document",
+    { StaticMethod("gc", &Document::GC),
+      InstanceAccessor("password", nullptr, &Document::SetPassword),
+      InstanceAccessor("encrypt", nullptr, &Document::SetEncrypt),
+      InstanceAccessor(
+        "pageMode", &Document::GetPageMode, &Document::SetPageMode),
+      InstanceAccessor("pageLayout", nullptr, &Document::SetPageLayout),
+      InstanceAccessor("printingScale", nullptr, &Document::SetPrintingScale),
+      InstanceAccessor("baseURI", nullptr, &Document::SetBaseURI),
+      InstanceAccessor("language", nullptr, &Document::SetLanguage),
+      InstanceMethod("hideToolbar", &Document::SetHideToolbar),
+      InstanceMethod("hideMenubar", &Document::SetHideMenubar),
+      InstanceMethod("hideWindowUI", &Document::SetHideWindowUI),
+      InstanceMethod("fitWindow", &Document::SetFitWindow),
+      InstanceMethod("centerWindow", &Document::SetCenterWindow),
+      InstanceMethod("displayDocTitle", &Document::SetDisplayDocTitle),
+      InstanceMethod("useFullScreen", &Document::SetUseFullScreen),
+      InstanceMethod("attachFile", &Document::AttachFile),
+      InstanceMethod("load", &Document::Load),
+      InstanceMethod("getPageCount", &Document::GetPageCount),
+      InstanceMethod("getPage", &Document::GetPage),
+      InstanceMethod("insertExistingPage", &Document::InsertExistingPage),
+      InstanceMethod("mergeDocument", &Document::MergeDocument),
+      InstanceMethod("deletePage", &Document::DeletePage),
+      InstanceMethod("getVersion", &Document::GetVersion),
+      InstanceMethod("isLinearized", &Document::IsLinearized),
+      InstanceMethod("getWriteMode", &Document::GetWriteMode),
+      InstanceMethod("write", &Document::Write),
+      InstanceMethod("writeBuffer", &Document::WriteBuffer),
+      InstanceMethod("getObjects", &Document::GetObjects),
+      InstanceMethod("getObject", &Document::GetObject),
+      InstanceMethod("getTrailer", &Document::GetTrailer),
+      InstanceMethod("getCatalog", &Document::GetCatalog),
+      InstanceMethod("isAllowed", &Document::IsAllowed),
+      InstanceMethod("createFont", &Document::CreateFont) });
   constructor = Persistent(ctor);
   constructor.SuppressDestruct();
   target.Set("Document", ctor);
 }
 Document::Document(const CallbackInfo& info)
   : ObjectWrap(info)
+  , BaseDocument()
   , document(new PdfMemDocument())
-{}
+{
+  BaseDocument::SetInstance(document);
+}
 
 Document::~Document()
 {
@@ -90,22 +94,6 @@ Document::~Document()
   cout << "Destructing document object." << endl;
   delete document;
   document = nullptr;
-}
-Napi::Value
-Document::GetPageCount(const CallbackInfo& info)
-{
-  int pages = document->GetPageCount();
-  return Number::New(info.Env(), pages);
-}
-
-Napi::Value
-Document::GetPage(const CallbackInfo& info)
-{
-  int n = info[0].As<Number>();
-  PdfPage* page = document->GetPage(n);
-  auto pagePtr = External<PdfPage>::New(info.Env(), page);
-  auto instance = Page::constructor.New({ this->Value(), pagePtr });
-  return instance;
 }
 
 void
@@ -122,163 +110,6 @@ Document::SetPassword(const CallbackInfo& info, const Napi::Value& value)
   } catch (Error& err) {
     ErrorHandler(err, info);
   }
-}
-
-void Document::SetHideMenubar(const Napi::CallbackInfo &) {
-  document->SetHideMenubar();
-}
-
-Napi::Value
-Document::GetPageMode(const CallbackInfo& info)
-{
-  string mode;
-  switch (document->GetPageMode()) {
-    case ePdfPageModeDontCare:
-      mode = "DontCare";
-      break;
-    case ePdfPageModeFullScreen:
-      mode = "FullScreen";
-      break;
-    case ePdfPageModeUseAttachments:
-      mode = "UseAttachments";
-      break;
-    case ePdfPageModeUseBookmarks:
-      mode = "UseBookmarks";
-      break;
-    case ePdfPageModeUseNone:
-      mode = "UseNone";
-      break;
-    case ePdfPageModeUseOC:
-      mode = "UseOC";
-      break;
-    case ePdfPageModeUseThumbs:
-      mode = "UseThumbs";
-      break;
-  }
-  return String::New(info.Env(), mode);
-}
-
-void
-Document::SetPageMode(const CallbackInfo&, const Napi::Value& value)
-{
-  int flag = value.As<Number>();
-  auto mode = static_cast<EPdfPageMode>(flag);
-  document->SetPageMode(mode);
-}
-
-void
-Document::SetPageLayout(const CallbackInfo&, const Napi::Value& value)
-{
-  int flag = value.As<Number>();
-  auto mode = static_cast<EPdfPageLayout>(flag);
-  document->SetPageLayout(mode);
-}
-
-void
-Document::SetUseFullScreen(const CallbackInfo&)
-{
-  document->SetUseFullScreen();
-}
-
-void
-Document::SetHideToolbar(const CallbackInfo&)
-{
-  document->SetHideMenubar();
-}
-
-void
-Document::SetHideWindowUI(const CallbackInfo&)
-{
-  document->SetHideWindowUI();
-}
-
-void
-Document::SetFitWindow(const CallbackInfo&)
-{
-  document->SetFitWindow();
-}
-
-void
-Document::SetCenterWindow(const CallbackInfo&)
-{
-  document->SetCenterWindow();
-}
-
-void
-Document::SetDisplayDocTitle(const CallbackInfo&)
-{
-  document->SetDisplayDocTitle();
-}
-
-void
-Document::SetPrintingScale(const CallbackInfo&, const Napi::Value& value)
-{
-  PdfName scale(value.As<String>().Utf8Value());
-  document->SetPrintScaling(scale);
-}
-
-void
-Document::SetBaseURI(const CallbackInfo&, const Napi::Value& value)
-{
-  document->SetBaseURI(value.As<String>().Utf8Value());
-}
-
-void
-Document::SetLanguage(const CallbackInfo&, const Napi::Value& value)
-{
-  document->SetLanguage(value.As<String>().Utf8Value());
-}
-
-void
-Document::AttachFile(const CallbackInfo&info)
-{
-  string filepath = info[0].As<String>().Utf8Value();
-  PdfFileSpec attachment(filepath.c_str(), true, document);
-  document->AttachFile(attachment);
-}
-
-Napi::Value
-Document::GetVersion(const CallbackInfo& info)
-{
-  EPdfVersion versionE = document->GetPdfVersion();
-  double v = 0.0;
-  switch (versionE) {
-    case ePdfVersion_1_1:
-      v = 1.1;
-      break;
-    case ePdfVersion_1_3:
-      v = 1.3;
-      break;
-    case ePdfVersion_1_0:
-      v = 1.0;
-      break;
-    case ePdfVersion_1_2:
-      v = 1.2;
-      break;
-    case ePdfVersion_1_4:
-      v = 1.4;
-      break;
-    case ePdfVersion_1_5:
-      v = 1.5;
-      break;
-    case ePdfVersion_1_6:
-      v = 1.6;
-      break;
-    case ePdfVersion_1_7:
-      v = 1.7;
-      break;
-  }
-  if (v == 0.0) {
-    throw Error::New(info.Env(),
-                     "Failed to parse document. Pdf version unknown.");
-  }
-  return Number::New(info.Env(), v);
-}
-
-Napi::Value
-Document::IsLinearized(const CallbackInfo& info)
-{
-  return Boolean::New(info.Env(), document->IsLinearized());
 }
 
 void
@@ -318,185 +149,146 @@ Document::MergeDocument(const CallbackInfo& info)
     ErrorHandler(err, info);
   }
 }
-
-Napi::Value
-Document::GetWriteMode(const CallbackInfo& info)
-{
-  string writeMode;
-  switch (document->GetWriteMode()) {
-    case ePdfWriteMode_Clean: {
-      writeMode = "Clean";
-      break;
-    }
-    case ePdfWriteMode_Compact: {
-      writeMode = "Compact";
-      break;
-    }
-  }
-  return Napi::String::New(info.Env(), writeMode);
-}
-
 void
 Document::SetEncrypt(const CallbackInfo& info, const Napi::Value& value)
 {
+  AssertFunctionArgs(info, 1, { napi_external });
   try {
-    AssertFunctionArgs(info, 1, { napi_valuetype::napi_object });
-    if (!value.IsObject()) {
-      throw Error::New(info.Env(),
-                       "Set encrypt requires a single argument of"
-                       " type Object<{userPassword:string,"
-                       " ownerPassword:string, protection:Array<string>,"
-                       " algorithm: string, keyLength: int");
-    }
-    auto encryption = value.As<Object>();
-    string ownerPwd;
-    string userPwd;
-    int nperm = 0;
-    int algoParameter = 0;
-    int key = 0;
-    if (!encryption.Has("ownerPassword") || !encryption.Has("keyLength") ||
-        !encryption.Has("protection") || !encryption.Has("algorithm")) {
-      throw Error::New(info.Env(), "something is not right");
-    }
-    try {
-      if (encryption.Has("ownerPassword")) {
-        ownerPwd = encryption.Get("ownerPassword").As<String>().Utf8Value();
-      }
-      if (encryption.Has("userPassword")) {
-        userPwd = encryption.Get("userPassword").As<String>().Utf8Value();
-      }
-      if (encryption.Has("protection")) {
-        if (encryption.Get("protection").IsArray()) {
-          auto permissions = encryption.Get("protection").As<Array>();
-          if (!permissions.IsEmpty()) {
-            for (uint32_t i = 0; i < permissions.Length(); ++i) {
-              if (permissions.Get(i).IsString()) {
-                string permission = permissions.Get(i).As<String>().Utf8Value();
-                if (permission == "Copy")
-                  nperm |= 0x00000010;
-                else if (permission == "Print")
-                  nperm |= 0x00000004;
-                else if (permission == "Edit")
-                  nperm |= 0x00000008;
-                else if (permission == "EditNotes")
-                  nperm |= 0x00000020;
-                else if (permission == "FillAndSign")
-                  nperm |= 0x00000100;
-                else if (permission == "Accessible")
-                  nperm |= 0x00000200;
-                else if (permission == "DocAssembly")
-                  nperm |= 0x00000400;
-                else if (permission == "HighPrint")
-                  nperm |= 0x00000800;
-                else {
-                  stringstream msg;
-                  msg << "Unknown permission parameter: " << permission
-                      << ". Permission must be one or more of: "
-                      << "[Copy, Print, Edit, EditNotes, FillAndSign, "
-                         "Accessible, DocAssembly, HighPrint]"
-                      << endl;
-                  throw Error::New(info.Env(), msg.str());
-                }
-              }
-            }
-          }
-        } else {
-          throw Error::New(info.Env(), "shit");
-        }
-      }
-      if (encryption.Has("algorithm")) {
-        // rc4v1 =1 rc4v2 = 2 aesv2 = 4 aesv3 = 8
-        Napi::Value algoProp = encryption.Get("algorithm");
-        string algo;
-        if (algoProp.IsString()) {
-          algo = algoProp.As<String>().Utf8Value();
-          if (algo == "rc4v1")
-            algoParameter = 1;
-          else if (algo == "rc4v2")
-            algoParameter = 2;
-          else if (algo == "aesv2")
-            algoParameter = 4;
-          else if (algo == "aesv3")
-            algoParameter = 8;
-          else {
-            stringstream msg;
-            msg << "Unknown permission parameter: " << algo
-                << ". Permission must be one or more of: [rc4v1, rc4v2, aesv2, "
-                   "aesv3]"
-                << endl;
-            throw Error::New(info.Env(), msg.str());
-          }
-        }
-      }
-      if (encryption.Has("keyLength")) {
-        // 40 56 80 96 128 256
-        int keyValues[6] = { 40, 56, 80, 96, 128, 256 };
-        Napi::Value keyProp = encryption.Get("keyLength");
-        if (keyProp.IsNumber()) {
-          key = keyProp.As<Number>();
-          for (int i = 0; i < 6; ++i) {
-            if (keyValues[i] == key)
-              break;
-            if (keyValues[i] != key && i == 6) {
-              stringstream msg;
-              msg
-                << "Unknown permission parameter: " << key
-                << ". Permission must be one or more of: [40, 56, 80, 96, 128, "
-                   "256]"
-                << endl;
-              throw Error::New(info.Env(), msg.str());
-            }
-          }
-        }
-      }
-    } catch (PdfError& err) {
-      stringstream msg;
-      msg << "Parse Encrypt Object failed with error: " << err.GetError()
-          << endl;
-      throw Error::New(info.Env(), msg.str());
-    }
-    document->SetEncrypted(
-      userPwd,
-      ownerPwd,
-      nperm,
-      static_cast<PdfEncrypt::EPdfEncryptAlgorithm>(algoParameter),
-      static_cast<PdfEncrypt::EPdfKeyLength>(key));
-  } catch (PdfError& err) {
+    const PdfEncrypt* e = value.As<External<PdfEncrypt>>().Data();
+    document->SetEncrypted(*e);
+  }
+  //  try {
+  //    AssertFunctionArgs(info, 1, { napi_valuetype::napi_object });
+  //    if (!value.IsObject()) {
+  //      throw Error::New(info.Env(),
+  //                       "Set encrypt requires a single argument of"
+  //                       " type Object<{userPassword:string,"
+  //                       " ownerPassword:string, protection:Array<string>,"
+  //                       " algorithm: string, keyLength: int");
+  //    }
+  //    auto encryption = value.As<Object>();
+  //    string ownerPwd;
+  //    string userPwd;
+  //    int nperm = 0;
+  //    int algoParameter = 0;
+  //    int key = 0;
+  //    if (!encryption.Has("ownerPassword") || !encryption.Has("keyLength") ||
+  //        !encryption.Has("protection") || !encryption.Has("algorithm")) {
+  //      throw Error::New(info.Env(), "something is not right");
+  //    }
+  //    try {
+  //      if (encryption.Has("ownerPassword")) {
+  //        ownerPwd = encryption.Get("ownerPassword").As<String>().Utf8Value();
+  //      }
+  //      if (encryption.Has("userPassword")) {
+  //        userPwd = encryption.Get("userPassword").As<String>().Utf8Value();
+  //      }
+  //      if (encryption.Has("protection")) {
+  //        if (encryption.Get("protection").IsArray()) {
+  //          auto permissions = encryption.Get("protection").As<Array>();
+  //          if (!permissions.IsEmpty()) {
+  //            for (uint32_t i = 0; i < permissions.Length(); ++i) {
+  //              if (permissions.Get(i).IsString()) {
+  //                string permission =
+  //                permissions.Get(i).As<String>().Utf8Value(); if (permission
+  //                == "Copy")
+  //                  nperm |= 0x00000010;
+  //                else if (permission == "Print")
+  //                  nperm |= 0x00000004;
+  //                else if (permission == "Edit")
+  //                  nperm |= 0x00000008;
+  //                else if (permission == "EditNotes")
+  //                  nperm |= 0x00000020;
+  //                else if (permission == "FillAndSign")
+  //                  nperm |= 0x00000100;
+  //                else if (permission == "Accessible")
+  //                  nperm |= 0x00000200;
+  //                else if (permission == "DocAssembly")
+  //                  nperm |= 0x00000400;
+  //                else if (permission == "HighPrint")
+  //                  nperm |= 0x00000800;
+  //                else {
+  //                  stringstream msg;
+  //                  msg << "Unknown permission parameter: " << permission
+  //                      << ". Permission must be one or more of: "
+  //                      << "[Copy, Print, Edit, EditNotes, FillAndSign, "
+  //                         "Accessible, DocAssembly, HighPrint]"
+  //                      << endl;
+  //                  throw Error::New(info.Env(), msg.str());
+  //                }
+  //              }
+  //            }
+  //          }
+  //        } else {
+  //          throw Error::New(info.Env(), "shit");
+  //        }
+  //      }
+  //      if (encryption.Has("algorithm")) {
+  //        // rc4v1 =1 rc4v2 = 2 aesv2 = 4 aesv3 = 8
+  //        Napi::Value algoProp = encryption.Get("algorithm");
+  //        string algo;
+  //        if (algoProp.IsString()) {
+  //          algo = algoProp.As<String>().Utf8Value();
+  //          if (algo == "rc4v1")
+  //            algoParameter = 1;
+  //          else if (algo == "rc4v2")
+  //            algoParameter = 2;
+  //          else if (algo == "aesv2")
+  //            algoParameter = 4;
+  //          else if (algo == "aesv3")
+  //            algoParameter = 8;
+  //          else {
+  //            stringstream msg;
+  //            msg << "Unknown permission parameter: " << algo
+  //                << ". Permission must be one or more of: [rc4v1, rc4v2,
+  //                aesv2, "
+  //                   "aesv3]"
+  //                << endl;
+  //            throw Error::New(info.Env(), msg.str());
+  //          }
+  //        }
+  //      }
+  //      if (encryption.Has("keyLength")) {
+  //        // 40 56 80 96 128 256
+  //        int keyValues[6] = { 40, 56, 80, 96, 128, 256 };
+  //        Napi::Value keyProp = encryption.Get("keyLength");
+  //        if (keyProp.IsNumber()) {
+  //          key = keyProp.As<Number>();
+  //          for (int i = 0; i < 6; ++i) {
+  //            if (keyValues[i] == key)
+  //              break;
+  //            if (keyValues[i] != key && i == 6) {
+  //              stringstream msg;
+  //              msg
+  //                << "Unknown permission parameter: " << key
+  //                << ". Permission must be one or more of: [40, 56, 80, 96,
+  //                128, "
+  //                   "256]"
+  //                << endl;
+  //              throw Error::New(info.Env(), msg.str());
+  //            }
+  //          }
+  //        }
+  //      }
+  //    } catch (PdfError& err) {
+  //      stringstream msg;
+  //      msg << "Parse Encrypt Object failed with error: " << err.GetError()
+  //          << endl;
+  //      throw Error::New(info.Env(), msg.str());
+  //    }
+  //    document->SetEncrypted(
+  //      userPwd,
+  //      ownerPwd,
+  //      nperm,
+  //      static_cast<PdfEncrypt::EPdfEncryptAlgorithm>(algoParameter),
+  //      static_cast<PdfEncrypt::EPdfKeyLength>(key));
+  catch (PdfError& err) {
     stringstream msg;
     msg << "PdfMemDocument::SetEncrypt failed with error: " << err.GetError()
         << endl;
     throw Error::New(info.Env(), msg.str());
   }
 }
-
-Napi::Value
-Document::GetObjects(const CallbackInfo& info)
-{
-  try {
-    auto js = Array::New(info.Env());
-    uint32_t count = 0;
-    for (auto& item : document->GetObjects()) {
-      auto instance = External<PdfObject>::New(info.Env(), item);
-      js[count] = Obj::constructor.New({ instance });
-      ++count;
-    }
-    return js;
-  } catch (PdfError& err) {
-    ErrorHandler(err, info);
-  } catch (Error& err) {
-    ErrorHandler(err, info);
-  }
-  return info.Env().Undefined();
-}
-
-Napi::Value
-Document::GetObject(const CallbackInfo& info)
-{
-  auto ref = Ref::Unwrap(info[0].As<Object>());
-  PdfObject* target = document->GetObjects().GetObject(ref->GetRef());
-  return Obj::constructor.New({ External<PdfObject>::New(info.Env(), target) });
-}
-
 Napi::Value
 Document::GetTrailer(const CallbackInfo& info)
 {
@@ -516,105 +308,6 @@ Document::GetCatalog(const CallbackInfo& info)
   auto instance = Obj::constructor.New({ initPtr });
   return instance;
 }
-
-Napi::Value
-Document::IsAllowed(const CallbackInfo& info)
-{
-  AssertFunctionArgs(info, 1, { napi_valuetype::napi_string });
-  string allowed = info[0].As<String>().Utf8Value();
-  bool is;
-  if (allowed == "Print") {
-    is = document->IsPrintAllowed();
-  } else if (allowed == "Edit") {
-    is = document->IsEditAllowed();
-  } else if (allowed == "Copy") {
-    is = document->IsCopyAllowed();
-  } else if (allowed == "EditNotes") {
-    is = document->IsEditNotesAllowed();
-  } else if (allowed == "FillAndSign") {
-    is = document->IsFillAndSignAllowed();
-  } else if (allowed == "Accessible") {
-    is = document->IsAccessibilityAllowed();
-  } else if (allowed == "DocAssembly") {
-    is = document->IsDocAssemblyAllowed();
-  } else if (allowed == "HighPrint") {
-    is = document->IsHighPrintAllowed();
-  } else {
-    throw Napi::Error::New(
-      info.Env(),
-      "Unknown argument. Please see definitions file for isAllowed args");
-  }
-  return Napi::Boolean::New(info.Env(), is);
-}
-
-Value
-Document::CreateFont(const CallbackInfo& info)
-{
-  AssertFunctionArgs(info, 1, { napi_valuetype::napi_string });
-  auto fontName = info[0].As<String>().Utf8Value();
-  bool bold = false;
-  bool italic = false;
-  const PdfEncoding* encoding = nullptr;
-  bool embed = false;
-  const char* filename = nullptr;
-  if (info.Length() >= 2 && info[1].IsBoolean())
-    bold = info[1].As<Boolean>();
-  if (info.Length() >= 3 && info[2].IsBoolean())
-    italic = info[2].As<Boolean>();
-  if (info.Length() >= 4 && info[3].IsNumber()) {
-    int n = info[3].As<Number>();
-    switch (n) {
-      case 1:
-        encoding = new PdfWinAnsiEncoding();
-        break;
-      case 2:
-        encoding = new PdfStandardEncoding();
-        break;
-      case 3:
-        encoding = new PdfDocEncoding();
-        break;
-      case 4:
-        encoding = new PdfMacRomanEncoding();
-        break;
-      case 5:
-        encoding = new PdfMacExpertEncoding();
-        break;
-      case 6:
-        encoding = new PdfSymbolEncoding();
-        break;
-      case 7:
-        encoding = new PdfZapfDingbatsEncoding();
-        break;
-      case 8:
-        encoding = new PdfWin1250Encoding();
-        break;
-      case 9:
-        encoding = new PdfIso88592Encoding();
-        break;
-      default:
-        encoding = new PdfIdentityEncoding(0, 0xffff, true);
-    }
-  }
-  if (info.Length() >= 5 && info[4].IsBoolean())
-    embed = info[4].As<Boolean>();
-  if (info.Length() >= 6 && info[5].IsString())
-    filename = info[5].As<String>().Utf8Value().c_str();
-  try {
-    PdfFont* font =
-      document->CreateFont(fontName.c_str(),
-                           bold,
-                           italic,
-                           false,
-                           encoding,
-                           PdfFontCache::eFontCreationFlags_AutoSelectBase14,
-                           embed,
-                           filename);
-    return Font::constructor.New({ External<PdfFont>::New(info.Env(), font) });
-  } catch (PdfError& err) {
-    ErrorHandler(err, info);
-  }
-}
-
 /**
  * @brief Document::InsertPage
  * @param info - (OtherDocument: Document, OtherDocPageIndex: int,
@@ -895,5 +588,4 @@ Document::GC(const Napi::CallbackInfo& info)
   worker->Queue();
   return info.Env().Undefined();
 }
-
 }

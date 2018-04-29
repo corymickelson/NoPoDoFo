@@ -2,7 +2,7 @@
  * This file is part of the NoPoDoFo (R) project.
  * Copyright (c) 2017-2018
  * Authors: Cory Mickelson, et al.
- * 
+ *
  * NoPoDoFo is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -22,9 +22,9 @@
 
 #define CONVERSION_CONSTANT 0.002834645669291339
 
+#include "Document.h"
 #include <napi.h>
 #include <podofo/podofo.h>
-#include "Document.h"
 
 namespace NoPoDoFo {
 
@@ -42,7 +42,7 @@ public:
   Napi::Value GetNumFields(const Napi::CallbackInfo&);
   void SetRotation(const Napi::CallbackInfo&, const Napi::Value&);
   Napi::Value GetField(const Napi::CallbackInfo&);
-  Napi::Value GetFieldsSummary(const Napi::CallbackInfo &);
+  Napi::Value GetFieldsSummary(const Napi::CallbackInfo&);
   Napi::Value GetFieldIndex(const Napi::CallbackInfo&);
   void SetPageWidth(const Napi::CallbackInfo&, const Napi::Value&);
   void SetPageHeight(const Napi::CallbackInfo&, const Napi::Value&);
@@ -65,7 +65,6 @@ public:
 
 private:
   PoDoFo::PdfPage* page;
-  Document* doc;
   void GetFieldObject(const Napi::CallbackInfo& info,
                       Napi::Object&,
                       PoDoFo::PdfField&);
