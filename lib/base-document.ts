@@ -19,11 +19,24 @@
 import { EventEmitter } from "events";
 import { NPDFInternal, Obj } from "./object";
 import { IEncrypt } from "./encrypt";
-import { PageMode, PageLayout, CreateFontOpts } from "./document";
+import { PageMode, PageLayout, CreateFontOpts, Document } from "./document";
 import { Ref } from "./reference";
 import { Page } from "./page";
 import { Font } from "./painter";
+import { access } from "fs";
+import { R_OK, F_OK } from "constants";
+import { NPDFVersion, NPDFWriteMode, Rect } from ".";
 export const __mod = require('bindings')('npdf')
+
+export interface NPDFInfo {
+    author:string
+    createdAt:Date
+    creator:string
+    keywords:string
+    producer:string
+    subject:string
+    title:string
+}
 
 export enum NPDFDestinationFit {
     Fit,
@@ -75,6 +88,20 @@ export class BaseDocument extends EventEmitter {
     set language(v: string) {
         this._base.language = v
     }
+
+    get writeMode(): NPDFWriteMode {
+        return this.base.writeMode as NPDFWriteMode
+    }
+    /**
+     * @todo: refactor internal implementation to use enum
+     */
+    get version(): NPDFVersion {
+        return this.base.version as NPDFVersion
+    }
+
+    get info(): NPDFInfo {
+
+    }
     get encrypt(): IEncrypt {
         if (this._encrypt) return this._encrypt
         else {
@@ -90,7 +117,7 @@ export class BaseDocument extends EventEmitter {
      * @todo Fix this, should not have to pass internal to Base Class
      * @param instance - document instance
      */
-    setInternal(instance:NPDFInternal): void {
+    setInternal(instance: NPDFInternal): void {
         this._base = instance
     }
     getPageCount(): number {
@@ -149,4 +176,36 @@ export class BaseDocument extends EventEmitter {
             opts.hasOwnProperty('fileName') ? opts.fileName : null)
         return new Font(instance)
     }
+
+    attachFile(file: string): Promise<void> {
+        return new Promise((resolve, reject) => {
+            access(file, F_OK | R_OK, err => {
+                if (err) {
+                    return reject('File Not Found')
+                }
+                else {
+                    this._base.attachFile(file)
+                    return resolve()
+                }
+            })
+
+        })
+    }
+
+    insertExistingPage(doc:Document, docIndex:number, atIndex:number):number {
+        return this.base.getPageCount()
+    }
+
+    getOutlines(create:boolean = false):Obj {
+        return new Obj()
+    }
+
+    getNamesTree(create:boolean = false): Obj {
+        retur new Obj()
+    }
+
+    createPage(opt:Rect):Page {}
+    createPages(opts:Rect[]):number {}
+    insertPage(opt:Rect, at:number):Page {}
+
 }

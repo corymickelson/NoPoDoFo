@@ -30,6 +30,7 @@ using namespace PoDoFo;
 
 using std::cout;
 using std::endl;
+using std::string;
 
 namespace NoPoDoFo {
 
@@ -83,8 +84,7 @@ Document::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceMethod("createPage", &Document::CreatePage),
       InstanceMethod("createPages", &Document::CreatePages),
       InstanceMethod("getAttachment", &Document::GetAttachment),
-      InstanceMethod("addNamedDestination", &Document::AddNamedDestination)
-    });
+      InstanceMethod("addNamedDestination", &Document::AddNamedDestination) });
   constructor = Persistent(ctor);
   constructor.SuppressDestruct();
   target.Set("Document", ctor);

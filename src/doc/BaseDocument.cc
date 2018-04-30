@@ -32,14 +32,19 @@ using namespace PoDoFo;
 
 using std::cout;
 using std::endl;
+using std::string;
 
 namespace NoPoDoFo {
 
-BaseDocument::BaseDocument() = default;
+BaseDocument::BaseDocument()
+{
+  std::cout << "Constructing Base" << std::endl;
+}
 
 BaseDocument::~BaseDocument()
 {
-  delete document;
+  std::cout << "Destructing BaseDocument" << std::endl;
+  delete this->document;
 }
 
 Napi::Value
@@ -462,7 +467,8 @@ BaseDocument::Append(const Napi::CallbackInfo& info)
   }
 }
 /**
- * @note Javascript args (page::Page, Destination: NPDFDestinationFit, attachmentName:string)
+ * @note Javascript args (page::Page, Destination: NPDFDestinationFit,
+ * attachmentName:string)
  * @param info
  * @return
  */
@@ -472,12 +478,14 @@ BaseDocument::GetAttachment(const CallbackInfo& info)
   return FileSpec::constructor.New({ External<PdfFileSpec>::New(
     info.Env(), document->GetAttachment(info[0].As<String>().Utf8Value())) });
 }
-void BaseDocument::AddNamedDestination(const Napi::CallbackInfo& info) {
+void
+BaseDocument::AddNamedDestination(const Napi::CallbackInfo& info)
+{
   PdfPage* page = Page::Unwrap(info[0].As<Object>())->GetPage();
-  EPdfDestinationFit fit = static_cast<EPdfDestinationFit>(info[1].As<Number>().Int32Value());
+  EPdfDestinationFit fit =
+    static_cast<EPdfDestinationFit>(info[1].As<Number>().Int32Value());
   string name = info[2].As<String>().Utf8Value();
   PdfDestination destination(page, fit);
   document->AddNamedDestination(destination, name);
 }
 }
-

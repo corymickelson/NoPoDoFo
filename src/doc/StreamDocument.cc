@@ -69,4 +69,10 @@ StreamDocument::Initialize(Napi::Env& env, Napi::Object& target)
   constructor.SuppressDestruct();
   target.Set("StreamDocument", ctor);
 }
+
+void
+StreamDocument::Close(const CallbackInfo&)
+{
+  document->Close();
+}
 }

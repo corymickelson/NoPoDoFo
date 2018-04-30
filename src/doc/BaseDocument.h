@@ -63,13 +63,13 @@ public:
   Napi::Value GetAttachment(const Napi::CallbackInfo&);
   void AddNamedDestination(const Napi::CallbackInfo&);
 
-  virtual PoDoFo::PdfDocument* GetDocument() { return document; }
+  PoDoFo::PdfDocument* GetDocument() { return document; }
 
 protected:
   void SetInstance(PoDoFo::PdfDocument* v) { document = v; }
 
 private:
-  PoDoFo::PdfDocument* document;
+  PoDoFo::PdfDocument* document = nullptr;
 };
 }
 #endif

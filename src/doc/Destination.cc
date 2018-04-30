@@ -24,7 +24,7 @@ using namespace Napi;
 
 namespace NoPoDoFo {
 
-FunctionReference constructor; //NOLINT
+FunctionReference Destination::constructor; // NOLINT
 
 Destination::Destination(const CallbackInfo& info)
   : ObjectWrap(info)
@@ -48,7 +48,7 @@ Destination::~Destination()
 void
 Destination::Initialize(Napi::Env& env, Napi::Object& target)
 {
-  HandleScope scope(Env());
+  HandleScope scope(env);
   Function ctor = DefineClass(
     env,
     "Destination",
@@ -64,7 +64,7 @@ Destination::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceMethod("addToDictionary", &Destination::AddToDictionary) });
   constructor = Napi::Persistent(ctor);
   constructor.SuppressDestruct();
-  target.Set("Document", ctor);
+  target.Set("Destination", ctor);
 }
 Napi::Value
 Destination::GetPage(const Napi::CallbackInfo& info)

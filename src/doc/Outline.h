@@ -20,19 +20,20 @@
 #ifndef NPDF_OUTLINE_H
 #define NPDF_OUTLINE_H
 
-#include <podofo/podofo.h
 #include "BaseDocument.h"
 #include <napi.h>
+#include <podofo/podofo.h>
 
 namespace NoPoDoFo {
 
 /**
- * @note PdfOutlineItem Wrapper, PdfOutline::CreateRoot exposed through BaseDocument.
+ * @note PdfOutlineItem Wrapper, PdfOutline::CreateRoot exposed through
+ * BaseDocument.
  */
 class Outline : public Napi::ObjectWrap<Outline>
 {
 public:
-  explicit Outline(const Napi::CallbackInfo& callbackInfo);
+  explicit Outline(const Napi::CallbackInfo& info);
   ~Outline();
   static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
@@ -58,7 +59,7 @@ public:
   PoDoFo::PdfOutlines* GetOutline() { return outlines; }
 
 private:
-  PoDoFo::PdfOutlines* outlines;
+  PoDoFo::PdfOutlines* outlines = nullptr;
 };
 }
 #endif // NPDF_OUTLINE_H

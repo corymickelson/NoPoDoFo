@@ -23,7 +23,7 @@ using namespace PoDoFo;
 
 namespace NoPoDoFo {
 
-FunctionReference constructor; //NOLINT
+FunctionReference Outline::constructor; // NOLINT
 
 Outline::Outline(const CallbackInfo& info)
   : ObjectWrap(info)
@@ -61,7 +61,7 @@ Outline::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceMethod("erase", &Outline::Erase) });
   constructor = Napi::Persistent(ctor);
   constructor.SuppressDestruct();
-  target.Set("Document", ctor);
+  target.Set("Outline", ctor);
 }
 void
 Outline::SetDestination(const Napi::CallbackInfo&, const Napi::Value&)

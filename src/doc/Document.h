@@ -45,7 +45,7 @@ public:
   Napi::Value GetCatalog(const Napi::CallbackInfo&);
   static Napi::Value GC(const Napi::CallbackInfo&);
 
-  PoDoFo::PdfMemDocument* GetDocument() override { return document; }
+  PoDoFo::PdfMemDocument* GetDocument() { return document; }
   bool LoadedForIncrementalUpdates() { return loadForIncrementalUpdates; }
 
 private:
