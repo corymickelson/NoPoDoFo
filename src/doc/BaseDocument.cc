@@ -480,3 +480,4 @@ void BaseDocument::AddNamedDestination(const Napi::CallbackInfo& info) {
   document->AddNamedDestination(destination, name);
 }
 }
+
