@@ -25,7 +25,7 @@
     "build:test:coverage": " npm run compile && nyc node --expose-gc ./dist/_all.spec.js && nyc report --reporter=text-lcov | coveralls",
     "precommit": "npm run lib-build && npm run test",
     "prepush": "npm run coverage",
-    "postinstall": "npm run lib-build"
+    "install": "npm run lib-build"
   },
   "nyc": {
     "exclude": [
