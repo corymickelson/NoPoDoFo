@@ -6,9 +6,10 @@
   "types": "dist/index.d.ts",
   "repository": "git+https://github.com/corymickelson/NoPoDoFo.git",
   "scripts": {
-    "compile": "cmake-js compile -s=c++14 --prefer-clang",
-    "compile:debug": "cmake-js build -D -s=c++14 --prefer-clang",
-    "lib-build": "npm run compile && tsc -p tsconfig.json",
+    "build:all": "node ./scripts/install.js && tsc -p tsconfig.json",
+    "build:debug": "node ./scripts/install.js -D",
+    "build:test": "npm run build:all && npm run test",
+    "build:test:coverage": " npm run build:all && nyc node --expose-gc ./dist/_all.spec.js && nyc report --reporter=text-lcov | coveralls",
     "docs": "typedoc --options ./tsconfig.docs.json --out ./docs",
     "test": "npm run test:document && npm run test:page && npm run test:field && npm run test:object && npm run test:painter && npm run test:signer && npm run test:parser",
     "test:document": "node --expose-gc ./dist/document.spec.js",
@@ -20,12 +21,10 @@
     "test:painter": "node --expose-gc ./dist/painter.spec.js",
     "test:parser": "node --expose-gc ./dist/parser.spec.js",
     "test:all": "node --expose-gc ./dist/_all.spec.js",
-    "build:test": "npm run lib-build && npm run test",
     "coverage": "nyc node --expose-gc ./dist/_all.spec.js && nyc report --reporter=text-lcov | coveralls",
-    "build:test:coverage": " npm run compile && nyc node --expose-gc ./dist/_all.spec.js && nyc report --reporter=text-lcov | coveralls",
-    "precommit": "npm run lib-build && npm run test",
+    "precommit": "npm run build:all && npm run test",
     "prepush": "npm run coverage",
-    "postinstall": "node ./scripts/install.js && tsc -p tsconfig.json"
+    "postinstall": "npm run build:all"
   },
   "nyc": {
     "exclude": [

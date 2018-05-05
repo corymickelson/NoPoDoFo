@@ -13,7 +13,11 @@ function findModules(dir = '../', depth = 0) {
     return findModules(dir + '../', depth++)
   }
 }
+let cmd = 'cmake-js'
+if (process.argv.length >= 3) {
+  if (process.argv[2] === '-D') cmd += ' -D'
+}
 
-const cmd = `cmake-js compile --CDPROJECT_DIR=${findModules()} --prefer-clang --s=c++14`
+cmd += ` --CDPROJECT_DIR=${findModules()} --prefer-clang --s=c++14`
 console.log('CMD: ', cmd)
 run(cmd, {"stdio": "inherit"})
