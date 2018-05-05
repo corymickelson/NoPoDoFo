@@ -39,11 +39,12 @@ add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES})
 set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "" SUFFIX ".node")
 
 find_package(OpenSSL REQUIRED)
-
+# find_path(NAPI_INCLUDE_DIR napi.h PATHS 
+#     ${CMAKE_SOURCE_DIR}/node_modules/node-addon-api
+#     ${PROJECT_DIR}/node_modules/node-addon-api)
 target_include_directories(${PROJECT_NAME} PRIVATE
-        ${CMAKE_SOURCE_DIR}/node_modules/node-addon-api
-        ${CMAKE_SOURCE_DIR}/node_modules/node-addon-api/src
-        ${CMAKE_SOURCE_DIR}/include
+        ${PROJECT_DIR}/node_modules/node-addon-api
+        ${PROJECT_DIR}/node_modules/node-addon-api/src
         ${OPENSSL_INCLUDE_DIR}
         ${CMAKE_JS_INC})
 target_link_libraries(${PROJECT_NAME} PRIVATE ${CMAKE_JS_LIB} ${OPENSSL_LIBRARIES})
