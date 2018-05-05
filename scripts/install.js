@@ -7,10 +7,10 @@ function findModules(dir = '../', depth = 0) {
    throw Error('Depth error') 
   }
   let files = readdirSync(dir)
-  if (files.indexOf('node_modules')) {
+  if (files.indexOf('node_modules') !== -1) {
     return join(__dirname, dir)
   } else {
-    return findModules(dir + '../', depth++)
+    return findModules(dir + '../', depth + 1)
   }
 }
 let cmd = 'cmake-js'
