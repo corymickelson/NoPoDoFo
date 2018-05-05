@@ -2,11 +2,14 @@ const {execSync: run} = require('child_process')
 const {join} = require('path')
 const {readdirSync} = require('fs')
 
-function findModules(dir = '../', depth = 0) {
+function findModules(dir = './', depth = 0) {
+  console.log('dir: ', dir)
+  console.log('depth: ', depth)
   if (depth >= 4) {
    throw Error('Depth error') 
   }
   let files = readdirSync(dir)
+  console.log(JSON.stringify(files))
   if (files.indexOf('node_modules') !== -1) {
     return join(__dirname, dir)
   } else {
