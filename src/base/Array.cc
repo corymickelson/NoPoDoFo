@@ -2,7 +2,7 @@
  * This file is part of the NoPoDoFo (R) project.
  * Copyright (c) 2017-2018
  * Authors: Cory Mickelson, et al.
- * 
+ *
  * NoPoDoFo is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -22,7 +22,6 @@
 #include "../ValidateArguments.h"
 #include "Obj.h"
 
-
 namespace NoPoDoFo {
 
 using namespace Napi;
@@ -35,8 +34,7 @@ Napi::FunctionReference Array::constructor; // NOLINT
 Array::Array(const CallbackInfo& info)
   : ObjectWrap<Array>(info)
   , array(new PdfArray(*info[0].As<External<PdfArray>>().Data()))
-{
-}
+{}
 
 Array::~Array()
 {
@@ -56,7 +54,7 @@ Array::Initialize(Napi::Env& env, Napi::Object& target)
     { InstanceAccessor("dirty", &Array::IsDirty, &Array::SetDirty),
       InstanceAccessor("length", &Array::Length, nullptr),
       InstanceAccessor("immutable", &Array::GetImmutable, &Array::SetImmutable),
-      InstanceMethod("toArray", &Array::ToArray),
+      InstanceMethod("toJS", &Array::ToArray),
       InstanceMethod("at", &Array::At),
       InstanceMethod("contains", &Array::ContainsString),
       InstanceMethod("indexOf", &Array::GetStringIndex),
@@ -179,7 +177,12 @@ Array::GetObjAtIndex(const CallbackInfo& info)
     throw Napi::RangeError();
   }
   PdfObject item = GetArray()[index];
-  auto initPtr = Napi::External<PdfObject>::New(info.Env(), &item);
+  auto initPtr = Napi::External<PdfObject>::New(
+    info.Env(), &item, [](Napi::Env env, PdfObject* data) {
+      HandleScope scope(env);
+      delete data;
+      data = nullptr;
+    });
   auto instance = Obj::constructor.New({ initPtr });
   return instance;
 }
@@ -191,7 +194,12 @@ Array::ToArray(const Napi::CallbackInfo& info)
   try {
     uint32_t counter = 0;
     for (auto& it : *GetArray()) {
-      const auto initPtr = External<PdfObject>::New(Env(), &it);
+      const auto initPtr = External<PdfObject>::New(
+        Env(), &it, [](Napi::Env env, PdfObject* data) {
+          HandleScope scope(env);
+          delete data;
+          data = nullptr;
+        });
       const auto instance = Obj::constructor.New({ initPtr });
       js.Set(counter, instance);
       counter++;

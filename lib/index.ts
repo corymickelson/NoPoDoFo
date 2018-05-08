@@ -54,7 +54,7 @@ import {
 import {Rect} from './rect'
 import {Signer, signature} from './signer'
 import {Stream} from './stream'
-import {Form} from './form'
+import {IForm} from './form'
 import {ContentsTokenizer} from './parser'
 import {Ref} from './reference'
 import {Cell, Table} from './table'
@@ -62,7 +62,7 @@ import {Cell, Table} from './table'
 
 export {
     ContentsTokenizer,
-    Form,
+    IForm,
     Stream,
     Rect,
     Image,

@@ -2,7 +2,7 @@
  * This file is part of the NoPoDoFo (R) project.
  * Copyright (c) 2017-2018
  * Authors: Cory Mickelson, et al.
- * 
+ *
  * NoPoDoFo is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -17,10 +17,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "../doc/Document.h"
 #include "Ref.h"
 #include "../ErrorHandler.h"
 #include "../ValidateArguments.h"
+#include "../doc/Document.h"
 #include "Obj.h"
 
 namespace NoPoDoFo {
@@ -120,7 +120,12 @@ Ref::GetObj(const CallbackInfo& info)
 {
   Document* document = Document::Unwrap(info[0].As<Object>());
   PdfObject* target = document->GetDocument()->GetObjects().GetObject(GetRef());
-  return Obj::constructor.New({External<PdfObject>::New(info.Env(), target)});
+  return Obj::constructor.New({ External<PdfObject>::New(
+    info.Env(), target, [](Napi::Env env, PdfObject* data) {
+      HandleScope scope(env);
+      delete data;
+      data = nullptr;
+    }) });
 }
 Ref::~Ref()
 {

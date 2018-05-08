@@ -2,7 +2,7 @@
  * This file is part of the NoPoDoFo (R) project.
  * Copyright (c) 2017-2018
  * Authors: Cory Mickelson, et al.
- * 
+ *
  * NoPoDoFo is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -25,11 +25,14 @@
 #include <napi.h>
 #include <podofo/podofo.h>
 
+using std::string;
+
 namespace NoPoDoFo {
 class Field : public Napi::ObjectWrap<Field>
 {
 public:
   explicit Field(const Napi::CallbackInfo& info);
+  ~Field();
   static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
 
@@ -44,10 +47,16 @@ public:
   void SetReadOnly(const Napi::CallbackInfo&, const Napi::Value&);
   Napi::Value IsReadOnly(const Napi::CallbackInfo&);
 
-  PoDoFo::PdfField& GetField() { return *field; }
+  PoDoFo::PdfField* GetField() { return field; }
+
+  string fieldName;
+  string fieldType;
+
+protected:
+  string TypeString();
 
 private:
-  std::unique_ptr<PoDoFo::PdfField> field;
+  PoDoFo::PdfField* field;
 };
 }
 #endif // NPDF_PDFFIELD_H

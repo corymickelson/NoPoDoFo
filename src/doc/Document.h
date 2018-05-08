@@ -23,7 +23,13 @@
 #include <napi.h>
 #include <podofo/podofo.h>
 
+using std::map;
+using std::pair;
+using std::string;
+using std::vector;
+
 namespace NoPoDoFo {
+
 class Document : public Napi::ObjectWrap<Document>
 {
 public:
@@ -49,6 +55,7 @@ public:
   Napi::Value GetCatalog(const Napi::CallbackInfo&);
   Napi::Value IsAllowed(const Napi::CallbackInfo&);
   Napi::Value CreateFont(const Napi::CallbackInfo&);
+  Napi::Value GetForm(const Napi::CallbackInfo&);
   static Napi::Value GC(const Napi::CallbackInfo&);
 
   PoDoFo::PdfMemDocument* GetDocument() { return document; }

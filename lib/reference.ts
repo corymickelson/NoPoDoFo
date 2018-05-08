@@ -20,6 +20,12 @@ import {Obj} from "./object";
 import {Document} from './document'
 
 
+export interface IRef {
+    objectNumber:number
+    generation: number
+    isIndirect(): boolean
+    toString():string
+}
 export class Ref {
 
     get objectNumber() {

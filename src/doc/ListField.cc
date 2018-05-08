@@ -2,7 +2,7 @@
  * This file is part of the NoPoDoFo (R) project.
  * Copyright (c) 2017-2018
  * Authors: Cory Mickelson, et al.
- * 
+ *
  * NoPoDoFo is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -33,8 +33,8 @@ ListField::ListField(const CallbackInfo& info)
   AssertFunctionArgs(info, 1, { napi_valuetype::napi_object });
   auto wrap = info[0].As<Object>();
   auto field = Field::Unwrap(wrap);
-//  auto listField = new PdfListField(field->GetField());
-  list = make_unique<PdfListField>(*new PdfListField(field->GetField()));
+  //  auto listField = new PdfListField(field->GetField());
+  list = make_unique<PdfListField>(*new PdfListField(*field->GetField()));
 }
 
 void
@@ -112,5 +112,4 @@ ListField::GetSelectedItem(const CallbackInfo& info)
   int index = list->GetSelectedItem();
   return Number::New(info.Env(), index);
 }
-
 }

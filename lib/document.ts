@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import {access, constants} from 'fs'
-import {NPDFInternal, Obj} from './object';
+import {NPDFInternal, Obj, IObj} from './object';
 import {Page} from './page';
 import {EncryptOption, IEncrypt, ProtectionOption} from './encrypt';
 import {EventEmitter} from 'events';
@@ -25,6 +25,7 @@ import {Font} from "./painter";
 import {Signer} from './signer';
 import {F_OK, R_OK} from "constants";
 import {Ref} from "./reference";
+import {IForm} from "./form";
 
 export const __mod = require('bindings')('npdf')
 export type Callback = (err: Error, data: Buffer | string) => void
@@ -65,9 +66,22 @@ export class Document extends EventEmitter {
     private _loaded: boolean = false;
     private _password: string | undefined = undefined
     private _encrypt: any
+    private _objects?: Array<Obj>
 
     get loaded() {
         return this._loaded
+    }
+
+    get body(): Array<IObj> {
+        // return this._instance.getObjects()
+        // if (!this._objects) {
+            // return (this._instance.getObjects() as NPDFInternal[]).map(i => new Obj(i))
+            return this._instance.body
+        // }
+        // return this._objects
+    }
+    get form(): IForm|null {
+        return this._instance.form
     }
 
     set password(value: string) {

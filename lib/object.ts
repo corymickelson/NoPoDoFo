@@ -17,8 +17,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import { __mod } from "./document";
-import { Ref } from "./reference";
+import { Ref, IRef } from "./reference";
 import { Stream } from "stream";
+import {ok} from 'assert'
+import { NPDFDictionary } from "./dictionary";
 
 export type NPDFInternal = any
 
@@ -31,8 +33,8 @@ export interface NArray {
     [key: number]: Obj
     immutable: boolean
     length: number
-    unshift: (...v:Array<Obj>) => number
-    push: (...v:Array<Obj>) => number
+    unshift: (...v: Array<Obj>) => number
+    push: (...v: Array<Obj>) => number
     pop: () => Obj
     shift: () => Obj
 }
@@ -41,7 +43,7 @@ export interface NObj {
     length: number
     stream: Stream
     type: PDType
-    hasStream():boolean
+    hasStream(): boolean
     getOffset(key: string): Promise<number>
     write(output: string, cb: Function): void
     flateCompressStream(): void
@@ -56,6 +58,42 @@ export interface NObj {
     asReference(): Ref
     asBuffer(): Buffer
 }
+
+export interface IObj {
+    reference: number
+    length: number
+    stream: Stream
+    type: PDType
+    immutable: boolean
+    hasStream(): boolean
+    getOffset(key: string): Promise<number>
+    write(output: string, cb: Function): void
+    flateCompressStream(): void
+    delayedStreamLoad(): void
+    getBool(): boolean
+    getDictionary(): NPDFDictionary 
+    getString(): string
+    getName(): string
+    getReal(): number
+    getNumber(): number
+    getArray(): IArray
+    getReference(): IRef
+    getBuffer(): Buffer
+    clear(): void
+    eq(i:NPDFInternal): boolean
+}
+export interface IArray {
+    dirty:boolean
+    length: number
+    immutable: boolean
+    toJS(): Array<any>
+    at(i:number): IObj
+    pop(): IObj
+    clear(): void
+    push(v:Object): void
+    write(destination:string): void
+}
+
 /**
  * @desc This class represents a PDF indirect Object in memory
  *      It is possible to manipulate the stream which can be appended to the
@@ -309,7 +347,24 @@ export class Obj implements NObj {
     }
 
     asObject(): { [key: string]: Obj } {
-        const internal: NPDFInternal = this._instance.getDictionary()
+        return Obj.objProxy(this._instance.getDictionary())
+    }
+
+    asReference(): Ref {
+        const i = this._instance.getReference()
+        return new Ref(i)
+    }
+
+    asBuffer(): Buffer {
+        return this._instance.getRawData()
+    }
+
+    /**
+     * 
+     * @param internal - NPDFInternal Dictionary
+     */
+    static objProxy(internal: NPDFInternal): { [key: string]: Obj } {
+        ok(internal instanceof __mod.Dictionary)
         let data = internal.toObject()
         return new Proxy<{ [key: string]: Obj }>(internal, {
             get(target: NPDFInternal, prop: any) {
@@ -394,14 +449,5 @@ export class Obj implements NObj {
                 return false
             }
         })
-    }
-
-    asReference(): Ref {
-        const i = this._instance.getReference()
-        return new Ref(i)
-    }
-
-    asBuffer(): Buffer {
-        return this._instance.getRawData()
     }
 }

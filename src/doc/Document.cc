@@ -23,6 +23,7 @@
 #include "../base/Obj.h"
 #include "../base/Ref.h"
 #include "Font.h"
+#include "Form.h"
 #include "Page.h"
 
 using namespace Napi;
@@ -39,28 +40,30 @@ void
 Document::Initialize(Napi::Env& env, Napi::Object& target)
 {
   HandleScope scope(env);
-  Function ctor =
-    DefineClass(env,
-                "Document",
-                { StaticMethod("gc", &Document::GC),
-                  InstanceAccessor("password", nullptr, &Document::SetPassword),
-                  InstanceAccessor("encrypt", nullptr, &Document::SetEncrypt),
-                  InstanceMethod("load", &Document::Load),
-                  InstanceMethod("getPageCount", &Document::GetPageCount),
-                  InstanceMethod("getPage", &Document::GetPage),
-                  InstanceMethod("mergeDocument", &Document::MergeDocument),
-                  InstanceMethod("deletePage", &Document::DeletePage),
-                  InstanceMethod("getVersion", &Document::GetVersion),
-                  InstanceMethod("isLinearized", &Document::IsLinearized),
-                  InstanceMethod("getWriteMode", &Document::GetWriteMode),
-                  InstanceMethod("write", &Document::Write),
-                  InstanceMethod("writeBuffer", &Document::WriteBuffer),
-                  InstanceMethod("getObjects", &Document::GetObjects),
-                  InstanceMethod("getObject", &Document::GetObject),
-                  InstanceMethod("getTrailer", &Document::GetTrailer),
-                  InstanceMethod("getCatalog", &Document::GetCatalog),
-                  InstanceMethod("isAllowed", &Document::IsAllowed),
-                  InstanceMethod("createFont", &Document::CreateFont) });
+  Function ctor = DefineClass(
+    env,
+    "Document",
+    { StaticMethod("gc", &Document::GC),
+      InstanceAccessor("password", nullptr, &Document::SetPassword),
+      InstanceAccessor("encrypt", nullptr, &Document::SetEncrypt),
+      InstanceAccessor("form", &Document::GetForm, nullptr),
+      InstanceAccessor("body", &Document::GetObjects, nullptr),
+      InstanceMethod("load", &Document::Load),
+      InstanceMethod("getPageCount", &Document::GetPageCount),
+      InstanceMethod("getPage", &Document::GetPage),
+      InstanceMethod("mergeDocument", &Document::MergeDocument),
+      InstanceMethod("deletePage", &Document::DeletePage),
+      InstanceMethod("getVersion", &Document::GetVersion),
+      InstanceMethod("isLinearized", &Document::IsLinearized),
+      InstanceMethod("getWriteMode", &Document::GetWriteMode),
+      InstanceMethod("write", &Document::Write),
+      InstanceMethod("writeBuffer", &Document::WriteBuffer),
+      //                  InstanceMethod("getObjects", &Document::GetObjects),
+      InstanceMethod("getObject", &Document::GetObject),
+      InstanceMethod("getTrailer", &Document::GetTrailer),
+      InstanceMethod("getCatalog", &Document::GetCatalog),
+      InstanceMethod("isAllowed", &Document::IsAllowed),
+      InstanceMethod("createFont", &Document::CreateFont) });
   constructor = Persistent(ctor);
   constructor.SuppressDestruct();
   target.Set("Document", ctor);
@@ -72,7 +75,6 @@ Document::Document(const CallbackInfo& info)
 
 Document::~Document()
 {
-  HandleScope scope(Env());
   cout << "Destructing document object." << endl;
   delete document;
   document = nullptr;
@@ -88,9 +90,8 @@ Napi::Value
 Document::GetPage(const CallbackInfo& info)
 {
   int n = info[0].As<Number>();
-  PdfPage* page = document->GetPage(n);
-  auto pagePtr = External<PdfPage>::New(info.Env(), page);
-  auto instance = Page::constructor.New({ this->Value(), pagePtr });
+  Napi::Object instance =
+    Page::constructor.New({ this->Value(), Number::New(info.Env(), n) });
   return instance;
 }
 
@@ -190,7 +191,6 @@ Document::MergeDocument(const CallbackInfo& info)
   } catch (PdfError& err) {
     ErrorHandler(err, info);
   }
-
 }
 
 Napi::Value
@@ -349,8 +349,15 @@ Document::GetObjects(const CallbackInfo& info)
   try {
     auto js = Array::New(info.Env());
     uint32_t count = 0;
-    for (auto& item : document->GetObjects()) {
-      auto instance = External<PdfObject>::New(info.Env(), item);
+    for (auto item : document->GetObjects()) {
+      auto instance = External<PdfObject>::New(
+        info.Env(), item, [](Napi::Env env, PdfObject* data) {
+          HandleScope scope(env);
+          cout << "Finalizing Object# " << data->Reference().ObjectNumber()
+               << endl;
+          delete data;
+          data = nullptr;
+        });
       js[count] = Obj::constructor.New({ instance });
       ++count;
     }
@@ -368,7 +375,12 @@ Document::GetObject(const CallbackInfo& info)
 {
   auto ref = Ref::Unwrap(info[0].As<Object>());
   PdfObject* target = document->GetObjects().GetObject(ref->GetRef());
-  return Obj::constructor.New({ External<PdfObject>::New(info.Env(), target) });
+  return Obj::constructor.New({ External<PdfObject>::New(
+    info.Env(), target, [](Napi::Env env, PdfObject* data) {
+      HandleScope scope(env);
+      delete data;
+      data = nullptr;
+    }) });
 }
 
 Napi::Value
@@ -376,7 +388,12 @@ Document::GetTrailer(const CallbackInfo& info)
 {
   const PdfObject* trailerPdObject = document->GetTrailer();
   auto* ptr = const_cast<PdfObject*>(trailerPdObject);
-  auto initPtr = Napi::External<PdfObject>::New(info.Env(), ptr);
+  auto initPtr = Napi::External<PdfObject>::New(
+    info.Env(), ptr, [](Napi::Env env, PdfObject* data) {
+      HandleScope scope(env);
+      delete data;
+      data = nullptr;
+    });
   auto instance = Obj::constructor.New({ initPtr });
   return instance;
 }
@@ -487,6 +504,15 @@ Document::CreateFont(const CallbackInfo& info)
   } catch (PdfError& err) {
     ErrorHandler(err, info);
   }
+}
+
+Napi::Value
+Document::GetForm(const CallbackInfo& info)
+{
+  if (!document->GetAcroForm()) {
+    return info.Env().Null();
+  }
+  return Form::constructor.New({ this->Value() });
 }
 
 class DocumentWriteAsync : public AsyncWorker
@@ -664,13 +690,14 @@ protected:
   }
   void OnOK() override
   {
-    HandleScope scope(Env());
+    auto env = Env();
+    HandleScope scope(env);
     if (output.GetSize() == 0) {
       SetError("Error, failed to write to buffer");
     }
-    Callback().Call(
-      { Env().Null(),
-        Buffer<char>::Copy(Env(), output.GetBuffer(), output.GetSize()) });
+    Callback().Call({ Env().Null(),
+                      Buffer<char>::Copy(
+                        scope.Env(), output.GetBuffer(), output.GetSize()) });
   }
 };
 

@@ -2,7 +2,7 @@
  * This file is part of the NoPoDoFo (R) project.
  * Copyright (c) 2017-2018
  * Authors: Cory Mickelson, et al.
- * 
+ *
  * NoPoDoFo is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -24,12 +24,13 @@
 #include "Dictionary.h"
 #include "Ref.h"
 
-
 namespace NoPoDoFo {
 
 using namespace Napi;
 using namespace PoDoFo;
 
+using std::cout;
+using std::endl;
 using std::string;
 
 FunctionReference Obj::constructor; // NOLINT
@@ -70,15 +71,15 @@ Obj::Initialize(Napi::Env& env, Napi::Object& target)
 Obj::Obj(const Napi::CallbackInfo& info)
   : ObjectWrap<Obj>(info)
   , obj(info[0].As<External<PdfObject>>().Data())
-{
-}
+{}
 
 Obj::~Obj()
 {
-  if (obj != nullptr) {
-    HandleScope scope(Env());
-    delete obj;
-  }
+  //  if (obj != nullptr) {
+  HandleScope scope(Env());
+  cout << "Destructing Object" << endl;
+  //    delete obj;
+  //  }
 }
 
 void
@@ -191,7 +192,8 @@ Obj::Reference(const CallbackInfo& info)
     EscapableHandleScope scope(info.Env());
     PdfReference init = obj->Reference();
     auto initPtr = Napi::External<PdfReference>::New(info.Env(), &init);
-    return scope.Escape(Ref::constructor.New({ initPtr }));
+    //    return scope.Escape(Ref::constructor.New({ initPtr }));
+    return Ref::constructor.New({ initPtr });
   } catch (PdfError& err) {
     ErrorHandler(err, info);
   } catch (Napi::Error& err) {
@@ -275,7 +277,8 @@ Obj::GetArray(const CallbackInfo& info)
   }
   auto ptr = External<PdfArray>::New(info.Env(), &obj->GetArray());
   auto instance = NoPoDoFo::Array::constructor.New({ ptr });
-  return scope.Escape(instance);
+  //  return scope.Escape(instance);
+  return instance;
 }
 
 Napi::Value
@@ -297,7 +300,8 @@ Obj::GetReference(const CallbackInfo& info)
   auto init = obj->GetReference();
   auto ptr = External<PdfReference>::New(info.Env(), &init);
   auto instance = Ref::constructor.New({ ptr });
-  return scope.Escape(instance);
+  //  return scope.Escape(instance);
+  return instance;
 }
 
 Napi::Value
@@ -307,10 +311,17 @@ Obj::GetDictionary(const CallbackInfo& info)
     throw Napi::Error::New(info.Env(), "Obj only accessible as Dictionary");
   }
   EscapableHandleScope scope(info.Env());
-  auto init = obj->GetDictionary();
-  auto ptr = External<PdfDictionary>::New(info.Env(), &init);
+  auto init = new PdfDictionary(obj->GetDictionary());
+  auto ptr = External<PdfDictionary>::New(
+    info.Env(), init, [](Napi::Env env, PdfDictionary* data) {
+      cout << "Finalizer Dictionary" << endl;
+      HandleScope scope(env);
+      delete data;
+      data = nullptr;
+    });
   auto instance = Dictionary::constructor.New({ ptr });
-  return scope.Escape(instance);
+  //  return scope.Escape(instance);
+  return instance;
 }
 
 Napi::Value
@@ -330,8 +341,7 @@ public:
     : Napi::AsyncWorker(cb)
     , obj(obj)
     , arg(std::move(arg))
-  {
-  }
+  {}
 
 protected:
   void Execute() override
@@ -376,8 +386,7 @@ public:
     : AsyncWorker(cb)
     , obj(obj)
     , arg(std::move(dest))
-  {
-  }
+  {}
 
 protected:
   void Execute() override

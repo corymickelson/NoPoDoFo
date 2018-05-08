@@ -2,7 +2,7 @@
  * This file is part of the NoPoDoFo (R) project.
  * Copyright (c) 2017-2018
  * Authors: Cory Mickelson, et al.
- * 
+ *
  * NoPoDoFo is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -23,23 +23,24 @@
 #include "Obj.h"
 #include <algorithm>
 
-
 namespace NoPoDoFo {
 
 using namespace Napi;
 using namespace PoDoFo;
 
-using std::string;
+using std::cout;
+using std::endl;
 using std::map;
+using std::string;
 using std::vector;
 
 FunctionReference Dictionary::constructor; // NOLINT
 
 Dictionary::Dictionary(const CallbackInfo& info)
   : ObjectWrap<Dictionary>(info)
-  , dict(new PdfDictionary(*info[0].As<External<PdfDictionary>>().Data()))
-{
-}
+  //  , obj(Obj::Unwrap(info[0].As<Object>()))
+  , dict(info[0].As<External<PdfDictionary>>().Data())
+{}
 void
 Dictionary::Initialize(Napi::Env& env, Napi::Object& target)
 {
@@ -100,7 +101,7 @@ Dictionary::AddKey(const CallbackInfo& info)
     o = *obj->GetObject();
   }
   PdfName key(info[0].As<String>().Utf8Value());
-  GetDictionary()->AddKey(key, o);
+  GetDictionary().AddKey(key, o);
 }
 
 Napi::Value
@@ -108,14 +109,19 @@ Dictionary::GetKey(const CallbackInfo& info)
 {
   AssertFunctionArgs(info, 1, { napi_valuetype::napi_string });
   string k = info[0].As<String>().Utf8Value();
-  if (!GetDictionary()->HasKey(PdfName(k))) {
+  if (!GetDictionary().HasKey(PdfName(k))) {
     throw Napi::Error::New(info.Env(),
                            "Key could not be found, please use "
                            "Dictionary.HasKey before accessing key value");
   }
   try {
-    PdfObject* v = GetDictionary()->GetKey(PdfName(k));
-    auto objPtr = Napi::External<PdfObject>::New(info.Env(), v);
+    PdfObject* v = GetDictionary().GetKey(PdfName(k));
+    auto objPtr = Napi::External<PdfObject>::New(
+      info.Env(), v, [](Napi::Env env, PdfObject* data) {
+        HandleScope scope(env);
+        delete data;
+        data = nullptr;
+      });
     auto instance = Obj::constructor.New({ objPtr });
     return instance;
   } catch (PdfError& err) {
@@ -129,7 +135,7 @@ Dictionary::GetKey(const CallbackInfo& info)
 Napi::Value
 Dictionary::GetKeys(const CallbackInfo& info)
 {
-  TKeyMap keys = GetDictionary()->GetKeys();
+  TKeyMap keys = GetDictionary().GetKeys();
   auto js = Napi::Array::New(info.Env());
   auto it = keys.begin();
   size_t n = 0;
@@ -148,7 +154,7 @@ Dictionary::RemoveKey(const CallbackInfo& info)
 {
   AssertFunctionArgs(info, 1, { napi_string });
   try {
-    GetDictionary()->RemoveKey(PdfName(info[0].As<String>().Utf8Value()));
+    GetDictionary().RemoveKey(PdfName(info[0].As<String>().Utf8Value()));
   } catch (PdfError& err) {
     ErrorHandler(err, info);
   }
@@ -159,7 +165,7 @@ Napi::Value
 Dictionary::HasKey(const CallbackInfo& info)
 {
   string key = info[0].As<String>().Utf8Value();
-  return Napi::Boolean::New(info.Env(), GetDictionary()->HasKey(key));
+  return Napi::Boolean::New(info.Env(), GetDictionary().HasKey(key));
 }
 
 Napi::Value
@@ -172,7 +178,7 @@ void
 Dictionary::SetImmutable(const CallbackInfo& info, const Napi::Value& value)
 {
   if (value.IsBoolean()) {
-    GetDictionary()->SetImmutable(value.As<Boolean>());
+    GetDictionary().SetImmutable(value.As<Boolean>());
   } else {
     throw Napi::Error::New(info.Env(), "Value must be boolean type");
   }
@@ -181,39 +187,39 @@ Dictionary::SetImmutable(const CallbackInfo& info, const Napi::Value& value)
 Napi::Value
 Dictionary::GetImmutable(const CallbackInfo& info)
 {
-  return Napi::Boolean::New(info.Env(), GetDictionary()->GetImmutable());
+  return Napi::Boolean::New(info.Env(), GetDictionary().GetImmutable());
 }
 
 void
 Dictionary::SetDirty(const CallbackInfo& info, const Napi::Value& value)
 {
   AssertFunctionArgs(info, 1, { napi_valuetype::napi_boolean });
-  GetDictionary()->SetDirty(value.As<Boolean>());
+  GetDictionary().SetDirty(value.As<Boolean>());
 }
 
 Napi::Value
 Dictionary::GetDirty(const CallbackInfo& info)
 {
-  return Napi::Boolean::New(info.Env(), GetDictionary()->IsDirty());
+  return Napi::Boolean::New(info.Env(), GetDictionary().IsDirty());
 }
 
 Napi::Value
 Dictionary::GetKeyAs(const CallbackInfo& info)
 {
   AssertFunctionArgs(info, 2, { napi_valuetype::napi_string });
-  string type = info[0].As<String>().Utf8Value();
-  string key = info[1].As<String>().Utf8Value();
+  string type = info[1].As<String>().Utf8Value();
+  string key = info[0].As<String>().Utf8Value();
   vector<string> valid = { "boolean", "long", "name", "real" };
   if (find(valid.begin(), valid.end(), type) != valid.end()) {
     if (type == "boolean") {
-      return Boolean::New(info.Env(), GetDictionary()->GetKeyAsBool(key));
+      return Boolean::New(info.Env(), GetDictionary().GetKeyAsBool(key));
     } else if (type == "long") {
-      return Number::New(info.Env(), GetDictionary()->GetKeyAsLong(key));
+      return Number::New(info.Env(), GetDictionary().GetKeyAsLong(key));
     } else if (type == "name") {
       return String::New(info.Env(),
-                         GetDictionary()->GetKeyAsName(key).GetName());
+                         GetDictionary().GetKeyAsName(key).GetName());
     } else if (type == "real") {
-      return Number::New(info.Env(), GetDictionary()->GetKeyAsReal(key));
+      return Number::New(info.Env(), GetDictionary().GetKeyAsReal(key));
     } else {
       throw Napi::Error::New(info.Env(),
                              "Type must be one of: boolean, long, real, name.");
@@ -229,7 +235,7 @@ Dictionary::WriteSync(const CallbackInfo& info)
   try {
     string output = info[0].As<String>().Utf8Value();
     PdfOutputDevice device(output.c_str());
-    GetDictionary()->Write(&device, ePdfWriteMode_Default);
+    GetDictionary().Write(&device, ePdfWriteMode_Default);
   } catch (PdfError& err) {
     ErrorHandler(err, info);
   } catch (Napi::Error& err) {
@@ -242,11 +248,16 @@ Dictionary::ToObject(const CallbackInfo& info)
 {
   try {
     auto js = Object::New(info.Env());
-    auto keys = GetDictionary()->GetKeys();
+    auto keys = GetDictionary().GetKeys();
     map<PoDoFo::PdfName, PoDoFo::PdfObject*>::const_iterator it;
     for (it = keys.begin(); it != keys.end(); it++) {
       auto key = String::New(info.Env(), (*it).first.GetName());
-      auto ptr = External<PdfObject>::New(info.Env(), (*it).second);
+      auto ptr = External<PdfObject>::New(
+        info.Env(), (*it).second, [](Napi::Env env, PdfObject* data) {
+          HandleScope scope(env);
+          delete data;
+          data = nullptr;
+        });
       auto value = Obj::constructor.New({ ptr });
       js.Set(key, value);
     }
@@ -266,8 +277,7 @@ public:
     : Napi::AsyncWorker(cb)
     , dict(dict)
     , arg(std::move(dest))
-  {
-  }
+  {}
   ~DictWriteAsync()
   {
     HandleScope scope(Env());
@@ -279,7 +289,7 @@ protected:
   {
     try {
       PdfOutputDevice device(arg.c_str());
-      dict->GetDictionary()->Write(&device, ePdfWriteMode_Default);
+      dict->GetDictionary().Write(&device, ePdfWriteMode_Default);
     } catch (PdfError& err) {
       SetError(ErrorHandler::WriteMsg(err));
     } catch (Napi::Error& err) {
@@ -317,9 +327,7 @@ Dictionary::Write(const CallbackInfo& info)
 }
 Dictionary::~Dictionary()
 {
-  if (dict != nullptr) {
-    HandleScope scope(Env());
-    delete dict;
-  }
+  HandleScope scope(Env());
+  cout << "Destructing Dictionary" << endl;
 }
 }

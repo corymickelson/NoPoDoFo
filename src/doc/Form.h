@@ -2,7 +2,7 @@
  * This file is part of the NoPoDoFo (R) project.
  * Copyright (c) 2017-2018
  * Authors: Cory Mickelson, et al.
- * 
+ *
  * NoPoDoFo is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -35,11 +35,13 @@ public:
   static void Initialize(Napi::Env& env, Napi::Object& target);
   void SetNeedAppearances(const Napi::CallbackInfo&, const Napi::Value&);
   Napi::Value GetNeedAppearances(const Napi::CallbackInfo&);
-  Napi::Value GetObject(const Napi::CallbackInfo&);
+  Napi::Value GetFormDictionary(const Napi::CallbackInfo&);
   PoDoFo::PdfAcroForm* GetForm() { return doc->GetDocument()->GetAcroForm(); }
 
 private:
   Document* doc;
+  Napi::Object formDict;
+  //  PoDoFo::PdfAcroForm* form;
 };
 }
 #endif

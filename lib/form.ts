@@ -16,20 +16,9 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import {Document, __mod} from './document'
-import {Obj} from "./object";
+import { NPDFDictionary } from './dictionary';
 
-export class Form {
-    private _instance:any
-
-    get needAppearances() {return this._instance.needAppearances}
-    set needAppearances(value:boolean) {this._instance.needAppearances = value}
-
-    constructor(document:Document) {
-        this._instance = new __mod.Form((document as any)._instance)
-    }
-
-    getObject():Obj {
-        return new Obj(this._instance.getObject())
-    }
+export interface IForm {
+    needAppearances: boolean
+    dictionary: NPDFDictionary 
 }

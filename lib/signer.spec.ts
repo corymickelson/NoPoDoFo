@@ -1,11 +1,11 @@
 import * as tap from 'tape'
-import {Document} from './document'
-import {SignatureField} from './field'
-import {NPDFAnnotation, NPDFAnnotationFlag} from './annotation'
-import {Rect} from './rect'
-import {join} from 'path'
-import {Form} from "./form";
-import {Signer, signature} from "./signer";
+import { Document } from './document'
+import { SignatureField } from './field'
+import { NPDFAnnotation, NPDFAnnotationFlag } from './annotation'
+import { Rect } from './rect'
+import { join } from 'path'
+import { IForm } from "./form";
+import { Signer, signature } from "./signer";
 
 
 tap('Signer', sub => {
@@ -15,24 +15,20 @@ tap('Signer', sub => {
             standard.plan(2)
             if (e instanceof Error) throw e
             try {
-                let form = new Form(doc),
-                    formDict = form.getObject().asObject()
-                if (!formDict['SigFlags'] ||
-                    formDict['SigFlags'].type !== 'Number' ||
-                    formDict['SigFlags'].asNumber() !== 3) {
-                    if (formDict['SigFlags']) {
-                        delete formDict['SigFlags']
-                    }
-                    formDict['SigFlags'] = (3 as any)
+                if ((doc.form as IForm).dictionary.hasKey('SigFlags') ||
+                    (doc.form as IForm).dictionary.getKey('SigFlags').type !== 'Number' ||
+                    (doc.form as IForm).dictionary.getKey('SigFlags').getNumber() !== 3) {
+                    (doc.form as IForm).dictionary.removeKey('SigFlags');
+                    (doc.form as IForm).dictionary.addKey('SigFlags', 3)
                 }
-                if (form.needAppearances)
-                    form.needAppearances = false
+                if ((doc.form as IForm).needAppearances)
+                    (doc.form as IForm).needAppearances = false
 
                 const rect = new Rect([0, 0, 10, 10]),
                     page = doc.getPage(1),
                     annot = page.createAnnotation(NPDFAnnotation.Widget, rect)
                 annot.flag = NPDFAnnotationFlag.Hidden | NPDFAnnotationFlag.Invisible
-                const field = new SignatureField(annot, form, doc),
+                const field = new SignatureField(annot, doc),
                     signatureData = await signature(join(__dirname, '../test-documents/certificate.pem'), join(__dirname, '../test-documents/key.pem'))
                 standard.ok(signatureData)
                 field.setReason('test')
@@ -59,7 +55,7 @@ tap('Signer', sub => {
                 })
             }
             catch
-                (e) {
+            (e) {
                 console.error(e)
             }
         })

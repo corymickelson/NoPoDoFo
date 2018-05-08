@@ -19,7 +19,7 @@
 import {__mod, Document} from './document'
 import {NPDFInternal, Obj} from "./object";
 import {Annotation} from "./annotation";
-import {Form} from "./form";
+import {IForm} from "./form";
 
 
 export interface IFieldInfo {
@@ -200,9 +200,9 @@ export class ComboBox extends EnumerableField {
 export class SignatureField {
     private _instance: any
 
-    constructor(annot: Annotation | any, form?: Form, doc?: Document) {
-        if (form instanceof Form && doc instanceof Document) {
-            this._instance = new __mod.SignatureField((annot as any)._instance, (form as any)._instance, (doc as any)._instance)
+    constructor(annot: Annotation | any, doc?: Document) {
+        if (doc instanceof Document) {
+            this._instance = new __mod.SignatureField((annot as any)._instance, doc.form, (doc as any)._instance)
         }
         else {
             this._instance = new __mod.SignatureField(annot)

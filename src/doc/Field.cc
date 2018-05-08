@@ -26,13 +26,27 @@ namespace NoPoDoFo {
 using namespace Napi;
 using namespace PoDoFo;
 
+using std::cout;
+using std::endl;
+
 FunctionReference Field::constructor; // NOLINT
 
 Field::Field(const CallbackInfo& info)
   : ObjectWrap(info)
-  , field(make_unique<PdfField>(*info[0].As<External<PdfField>>().Data()))
-{}
+  , field(info[0].As<External<PdfField>>().Data())
+//  , field(make_unique<PdfField>(*info[0].As<External<PdfField>>().Data()))
+{
+  fieldName = field->GetFieldName().GetStringUtf8();
+  fieldType = TypeString();
+}
 
+Field::~Field()
+{
+  cout << "Destructing Field: " << fieldName << " of type: " << fieldType
+       << endl;
+  //  HandleScope scope(Env());
+  //  delete field;
+}
 void
 Field::Initialize(Napi::Env& env, Napi::Object& target)
 {
@@ -54,11 +68,11 @@ Field::Initialize(Napi::Env& env, Napi::Object& target)
   target.Set("Field", ctor);
 }
 
-Napi::Value
-Field::GetType(const CallbackInfo& info)
+string
+Field::TypeString()
 {
   string typeStr;
-  switch (GetField().GetType()) {
+  switch (GetField()->GetType()) {
     case PoDoFo::EPdfField::ePdfField_CheckBox:
       typeStr = "CheckBox";
       break;
@@ -81,30 +95,34 @@ Field::GetType(const CallbackInfo& info)
       typeStr = "TextField";
       break;
     case PoDoFo::EPdfField::ePdfField_Unknown:
-      throw Napi::Error::New(info.Env(), "Pdf Field Unknown");
+      typeStr = "Unknown";
   }
-  return Napi::String::New(info.Env(), typeStr);
+  return typeStr;
+}
+Napi::Value
+Field::GetType(const CallbackInfo& info)
+{
+  return Napi::String::New(info.Env(), fieldType);
 }
 
 Napi::Value
 Field::GetFieldName(const CallbackInfo& info)
 {
-  return Napi::String::New(info.Env(),
-                           GetField().GetFieldName().GetStringUtf8());
+  return Napi::String::New(info.Env(), fieldName);
 }
 
 Napi::Value
 Field::GetAlternateName(const CallbackInfo& info)
 {
   return Napi::String::New(info.Env(),
-                           GetField().GetAlternateName().GetStringUtf8());
+                           GetField()->GetAlternateName().GetStringUtf8());
 }
 
 Napi::Value
 Field::GetMappingName(const CallbackInfo& info)
 {
   return Napi::String::New(info.Env(),
-                           GetField().GetMappingName().GetStringUtf8());
+                           GetField()->GetMappingName().GetStringUtf8());
 }
 
 void
@@ -112,7 +130,7 @@ Field::SetAlternateName(const CallbackInfo& info)
 {
   AssertFunctionArgs(info, 1, { napi_valuetype::napi_string });
   PdfString value(info[0].As<String>().Utf8Value().c_str());
-  GetField().SetAlternateName(value);
+  GetField()->SetAlternateName(value);
 }
 
 void
@@ -120,7 +138,7 @@ Field::SetMappingName(const CallbackInfo& info)
 {
   AssertFunctionArgs(info, 1, { napi_valuetype::napi_string });
   PdfString value(info[0].As<String>().Utf8Value().c_str());
-  GetField().SetMappingName(value);
+  GetField()->SetMappingName(value);
 }
 
 void
@@ -128,24 +146,24 @@ Field::SetRequired(const CallbackInfo& info)
 {
   AssertFunctionArgs(info, 1, { napi_valuetype::napi_boolean });
   bool value = info[0].As<Boolean>();
-  GetField().SetRequired(value);
+  GetField()->SetRequired(value);
 }
 
 Napi::Value
 Field::IsRequired(const CallbackInfo& info)
 {
-  return Napi::Boolean::New(info.Env(), GetField().IsRequired());
+  return Napi::Boolean::New(info.Env(), GetField()->IsRequired());
 }
 
 Napi::Value
 Field::IsReadOnly(const Napi::CallbackInfo& info)
 {
-  return Boolean::New(info.Env(), GetField().IsReadOnly());
+  return Boolean::New(info.Env(), GetField()->IsReadOnly());
 }
 
 void
 Field::SetReadOnly(const Napi::CallbackInfo& info, const Napi::Value& value)
 {
-  GetField().SetReadOnly(value.As<Boolean>());
+  GetField()->SetReadOnly(value.As<Boolean>());
 }
 }

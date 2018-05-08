@@ -2,7 +2,7 @@
  * This file is part of the NoPoDoFo (R) project.
  * Copyright (c) 2017-2018
  * Authors: Cory Mickelson, et al.
- * 
+ *
  * NoPoDoFo is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -18,39 +18,41 @@
  */
 
 #include "Form.h"
+#include "../base/Dictionary.h"
 #include "../base/Obj.h"
 #include "Document.h"
-
+#include <iostream>
 
 namespace NoPoDoFo {
 
 using namespace Napi;
 using namespace PoDoFo;
 
+using std::cout;
+using std::endl;
+
 FunctionReference Form::constructor; // NOLINT
 
 Form::Form(const Napi::CallbackInfo& info)
   : ObjectWrap<Form>(info)
+  //  , form(info[0].As<External<PdfAcroForm>>().Data())
+  , doc(Document::Unwrap(info[0].As<Object>()))
+{}
+Form::~Form()
 {
-  if (info.Length() != 1) {
-    throw Napi::Error::New(info.Env(), "Form requires document parameter");
-  }
-  Object docObj = info[0].As<Object>();
-  doc = Document::Unwrap(docObj);
-  if (!doc->GetDocument()->GetAcroForm()) {
-    throw Napi::Error::New(info.Env(), "Null Form");
-  }
+  cout << "Destructing Form" << endl;
 }
 void
 Form::Initialize(Napi::Env& env, Napi::Object& target)
 {
   HandleScope scope(env);
-  Function ctor = DefineClass(env,
-                              "Form",
-                              { InstanceMethod("getObject", &Form::GetObject),
-                                InstanceAccessor("needAppearances",
-                                                 &Form::GetNeedAppearances,
-                                                 &Form::SetNeedAppearances) });
+  Function ctor = DefineClass(
+    env,
+    "Form",
+    { InstanceAccessor("dictionary", &Form::GetFormDictionary, nullptr),
+      InstanceAccessor("needAppearances",
+                       &Form::GetNeedAppearances,
+                       &Form::SetNeedAppearances) });
   constructor = Napi::Persistent(ctor);
   constructor.SuppressDestruct();
 
@@ -75,18 +77,23 @@ Form::GetNeedAppearances(const CallbackInfo& info)
 }
 
 Napi::Value
-Form::GetObject(const CallbackInfo& info)
+Form::GetFormDictionary(const CallbackInfo& info)
 {
+  //  return formDict;
   auto obj = GetForm()->GetObject();
-  auto nObj = Napi::External<PdfObject>::New(info.Env(), obj);
-  auto objInstance = Obj::constructor.New({ nObj });
-  return objInstance;
-}
-Form::~Form()
-{
-  if (doc != nullptr) {
-    HandleScope scope(Env());
-    doc = nullptr;
+  if (GetForm()->GetObject()->GetDataType() ==
+      EPdfDataType::ePdfDataType_Null) {
+    cout << "Something is wrong! Form Object is empty" << endl;
+    throw Error::New(info.Env(), "Form Object empty");
   }
+  auto ptr = new PdfDictionary(obj->GetDictionary());
+  auto instance = External<PdfDictionary>::New(
+    info.Env(), ptr, [](Napi::Env env, PdfDictionary* data) {
+      HandleScope scope(env);
+      cout << "Form Dictionary Finalizer" << endl;
+      delete data;
+      data = nullptr;
+    });
+  return Dictionary::constructor.New({ instance });
 }
 }

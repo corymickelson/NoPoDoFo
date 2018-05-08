@@ -2,7 +2,7 @@
  * This file is part of the NoPoDoFo (R) project.
  * Copyright (c) 2017-2018
  * Authors: Cory Mickelson, et al.
- * 
+ *
  * NoPoDoFo is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -16,8 +16,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-
 
 #include "Encoding.h"
 #include "../ErrorHandler.h"
@@ -61,7 +59,7 @@ Encoding::AddToDictionary(const Napi::CallbackInfo& info)
   AssertFunctionArgs(info, 1, { napi_valuetype::napi_object });
   auto wrap = info[0].As<Object>();
   Dictionary* d = Dictionary::Unwrap(wrap);
-  PdfDictionary dict = *d->GetDictionary();
+  PdfDictionary dict = d->GetDictionary();
   encoding->AddToDictionary(dict);
   return info.Env().Undefined();
 }

@@ -1,12 +1,12 @@
-import {existsSync, unlinkSync, writeFile} from 'fs'
-import {join} from 'path'
+import { existsSync, unlinkSync, writeFile } from 'fs'
+import { join } from 'path'
 import * as test from 'tape'
-import {Document} from './document'
-import {Obj} from "./object";
-import {Field} from './field';
-import {Painter} from "./painter";
-import {Image} from "./image";
-import {Page} from "./page";
+import { Document } from './document'
+import { Obj, IObj } from "./object";
+import { Field } from './field';
+import { Painter } from "./painter";
+import { Image } from "./image";
+import { Page } from "./page";
 
 
 const filePath = join(__dirname, '../test-documents/test.pdf'),
@@ -147,37 +147,44 @@ function pageAddImg() {
         painter.page = page
         painter.drawImage(img, 0, page.height - img.getHeight())
         painter.finishPage()
-
+        function extractImg(obj: IObj, jpg: Boolean) {
+            let ext = jpg ? '.jpg' : '.ppm'
+            writeFile(`/tmp/test.img.extract.${ext}`, obj.stream, err => {
+                if (err instanceof Error)
+                    t.fail()
+                t.assert(existsSync(`/tmp/test.img.extract.${ext}`) === true)
+                // if (existsSync('./img.out.pdf')) unlinkSync('./img.out.pdf')
+                t.end()
+            })
+        }
         doc.write('./img.out.pdf', e => {
-            if(e instanceof Error) t.fail()
-            let objs = doc.getObjects()
-            for (let i = 0; i < objs.length; i++) {
-                let o = objs[i]
+            if (e instanceof Error) t.fail()
+            doc.body.forEach(o => {
                 if (o.type === 'Dictionary') {
-                    let objDict = o.asObject(),
-                        objType = objDict['Type'],
-                        objSubType = objDict['SubType']
+                    let objDict = o.getDictionary(),
+                        objType = objDict.hasKey('Type') ? objDict.getKey('Type') : null,
+                        objSubType = objDict.hasKey('SubType') ? objDict.getKey('SubType') : null
 
                     if ((objType && objType.type === 'Name') ||
                         (objSubType && objSubType.type === 'Name')) {
 
-                        if ((objType && objType.asName() === 'XObject') || (objSubType && objSubType.asName() === 'Image')) {
-                            let imgObj = o.asObject()['Filter']
+                        if ((objType && objType.getName() === 'XObject') || (objSubType && objSubType.getName() === 'Image')) {
+                            let imgObj = objDict.hasKey('Filter') ? objDict.getKey('Filter') : null
 
                             if (imgObj && imgObj.type === 'Array') {
-                                const imgObjArr = imgObj.asArray()
+                                const imgObjArr = imgObj.getArray()
                                 if (imgObjArr.length === 1) {
-                                    if (imgObjArr[0].type === 'Name') {
-                                    // if (imgObj.asArray().at(0).type === 'Name') {
+                                    if (imgObjArr.at(0).type === 'Name') {
+                                        // if (imgObj.asArray().at(0).type === 'Name') {
                                         // if (imgObj.asArray().at(0).asName() === 'DCTDecode') {
-                                        if (imgObjArr[0].asName() === 'DCTDecode') {
+                                        if (imgObjArr.at(0).getName() === 'DCTDecode') {
                                             extractImg(o, true)
                                             return
                                         }
                                     }
                                 }
                             }
-                            else if (imgObj && imgObj.type === 'Name' && imgObj.asName() === 'DCTDecode') {
+                            else if (imgObj && imgObj.type === 'Name' && imgObj.getName() === 'DCTDecode') {
                                 extractImg(o, true)
                                 return
                             }
@@ -188,19 +195,10 @@ function pageAddImg() {
                         }
                     }
                 }
-            }
+            })
+            
         })
 
-        function extractImg(obj: Obj, jpg: Boolean) {
-            let ext = jpg ? '.jpg' : '.ppm'
-            writeFile(`/tmp/test.img.extract.${ext}`, obj.stream, err => {
-                if (err instanceof Error)
-                    t.fail()
-                t.assert(existsSync(`/tmp/test.img.extract.${ext}`) === true)
-                // if (existsSync('./img.out.pdf')) unlinkSync('./img.out.pdf')
-                t.end()
-            })
-        }
     })
 }
 

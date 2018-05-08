@@ -33,7 +33,7 @@ CheckBox::CheckBox(const CallbackInfo& info)
   }
   auto fieldObj = info[0].As<Object>();
   Field* field = Field::Unwrap(fieldObj);
-  PdfCheckBox v(field->GetField());
+  PdfCheckBox v(*field->GetField());
   box = make_unique<PdfCheckBox>(v);
 }
 
