@@ -27,3 +27,4 @@ lib/*.js
 .coveralls.yml
 .nyc_output
 coverage
+*.tmp.*
