@@ -2,7 +2,7 @@
  * This file is part of the NoPoDoFo (R) project.
  * Copyright (c) 2017-2018
  * Authors: Cory Mickelson, et al.
- * 
+ *
  * NoPoDoFo is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -27,7 +27,6 @@
 #include "Image.h"
 #include "Page.h"
 #include "Rect.h"
-
 
 namespace NoPoDoFo {
 
@@ -378,7 +377,7 @@ Painter::SetFont(const Napi::CallbackInfo& info, const Napi::Value& value)
 {
   Font* font = Font::Unwrap(value.As<Object>());
   try {
-    painter->SetFont(font->GetPoDoFoFont());
+    painter->SetFont(font->GetFont());
   } catch (PdfError& err) {
     ErrorHandler(err, info);
   }

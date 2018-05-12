@@ -2,7 +2,7 @@
  * This file is part of the NoPoDoFo (R) project.
  * Copyright (c) 2017-2018
  * Authors: Cory Mickelson, et al.
- * 
+ *
  * NoPoDoFo is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -23,7 +23,6 @@
 #include "Font.h"
 #include "Page.h"
 #include "Painter.h"
-
 
 namespace NoPoDoFo {
 
@@ -122,7 +121,7 @@ SimpleTable::SetFont(const CallbackInfo& info, const Napi::Value& value)
       !value.As<Object>().InstanceOf(Font::constructor.Value())) {
     throw Error::New(info.Env(), "value must be an instance of NoPoDoFo Font");
   }
-  const auto pFont = Font::Unwrap(value.As<Object>())->GetPoDoFoFont();
+  const auto pFont = Font::Unwrap(value.As<Object>())->GetFont();
   model->SetFont(pFont);
 }
 

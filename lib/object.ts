@@ -20,7 +20,7 @@ import { __mod } from "./document";
 import { Ref, IRef } from "./reference";
 import { Stream } from "stream";
 import {ok} from 'assert'
-import { NPDFDictionary } from "./dictionary";
+import { IDictionary } from "./dictionary";
 
 export type NPDFInternal = any
 
@@ -71,7 +71,7 @@ export interface IObj {
     flateCompressStream(): void
     delayedStreamLoad(): void
     getBool(): boolean
-    getDictionary(): NPDFDictionary 
+    getDictionary(): IDictionary 
     getString(): string
     getName(): string
     getReal(): number

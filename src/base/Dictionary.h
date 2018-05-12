@@ -20,7 +20,7 @@
 #ifndef NPDF_DICTIONARY_H
 #define NPDF_DICTIONARY_H
 
-#include "./Obj.h"
+#include "../doc/Document.h"
 #include <napi.h>
 #include <podofo/podofo.h>
 #include <string>
@@ -34,6 +34,9 @@ public:
   static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
 
+  static Napi::Value ResolveDictionary(const Napi::CallbackInfo&);
+  static PoDoFo::PdfDictionary* TryResolve(PoDoFo::PdfDocument*,
+                                           PoDoFo::PdfObject*);
   void AddKey(const Napi::CallbackInfo&);
   Napi::Value GetKey(const Napi::CallbackInfo&);
   Napi::Value GetKeys(const Napi::CallbackInfo&);
@@ -49,12 +52,11 @@ public:
   void WriteSync(const Napi::CallbackInfo&);
   Napi::Value ToObject(const Napi::CallbackInfo&);
   Napi::Value Eq(const Napi::CallbackInfo&);
-
   PoDoFo::PdfDictionary GetDictionary() { return *dict; }
 
 private:
   PoDoFo::PdfDictionary* dict;
-  //  Obj* obj;
+  Document* doc;
 };
 }
 #endif

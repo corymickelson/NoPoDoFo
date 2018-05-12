@@ -36,11 +36,29 @@ using std::vector;
 
 FunctionReference Dictionary::constructor; // NOLINT
 
+/**
+ * @note Dictionary accepts a pointer to a PdfDictionary. The passed in
+ * PdfDictionary needs to be a stack allocated object. The constructor will
+ * create a heap allocated obj with the PdfDictionary copy constructor
+ * @brief Dictionary::Dictionary
+ * @param info
+ */
 Dictionary::Dictionary(const CallbackInfo& info)
-  : ObjectWrap<Dictionary>(info)
-  //  , obj(Obj::Unwrap(info[0].As<Object>()))
-  , dict(info[0].As<External<PdfDictionary>>().Data())
-{}
+  : ObjectWrap(info)
+  , doc(Document::Unwrap(info[0].As<Object>()))
+{
+  dict = new PdfDictionary(*info[1].As<External<PdfDictionary>>().Data());
+}
+
+Dictionary::~Dictionary()
+{
+  HandleScope scope(Env());
+  cout << "Destructing Dictionary" << endl;
+  delete dict;
+  dict = nullptr;
+  doc = nullptr;
+}
+
 void
 Dictionary::Initialize(Napi::Env& env, Napi::Object& target)
 {
@@ -48,7 +66,8 @@ Dictionary::Initialize(Napi::Env& env, Napi::Object& target)
   Function ctor = DefineClass(
     env,
     "Dictionary",
-    { InstanceMethod("getKey", &Dictionary::GetKey),
+    { StaticMethod("resolveDictionary", &Dictionary::ResolveDictionary),
+      InstanceMethod("getKey", &Dictionary::GetKey),
       InstanceMethod("getKeys", &Dictionary::GetKeys),
       InstanceMethod("hasKey", &Dictionary::HasKey),
       InstanceMethod("addKey", &Dictionary::AddKey),
@@ -66,6 +85,32 @@ Dictionary::Initialize(Napi::Env& env, Napi::Object& target)
   constructor.SuppressDestruct();
 
   target.Set("Dictionary", ctor);
+}
+
+Value
+Dictionary::ResolveDictionary(const CallbackInfo& info)
+{
+  auto doc = Document::Unwrap(info[0].As<Object>());
+  auto candidate = Obj::Unwrap(info[1].As<Object>());
+  auto i = TryResolve(doc->GetDocument(), candidate->GetObject());
+  if (!i) {
+    return info.Env().Null();
+  } else {
+    return Dictionary::constructor.New(
+      { doc->Value(), External<PdfDictionary>::New(info.Env(), i) });
+  }
+}
+
+PdfDictionary*
+Dictionary::TryResolve(PdfDocument* doc, PdfObject* candidate)
+{
+  if (candidate->IsDictionary()) {
+    return &candidate->GetDictionary();
+  } else if (candidate->IsReference()) {
+    return TryResolve(doc,
+                      doc->GetObjects()->GetObject(candidate->GetReference()));
+  }
+  return nullptr;
 }
 Napi::Value
 Dictionary::Eq(const CallbackInfo& info)
@@ -324,10 +369,5 @@ Dictionary::Write(const CallbackInfo& info)
     ErrorHandler(err, info);
   }
   return info.Env().Undefined();
-}
-Dictionary::~Dictionary()
-{
-  HandleScope scope(Env());
-  cout << "Destructing Dictionary" << endl;
 }
 }

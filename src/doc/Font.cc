@@ -2,7 +2,7 @@
  * This file is part of the NoPoDoFo (R) project.
  * Copyright (c) 2017-2018
  * Authors: Cory Mickelson, et al.
- * 
+ *
  * NoPoDoFo is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -23,7 +23,6 @@
 #include "../base/Stream.h"
 #include "Encoding.h"
 
-
 namespace NoPoDoFo {
 
 using namespace PoDoFo;
@@ -35,11 +34,27 @@ FunctionReference Font::constructor; // NOLINT
 
 Font::Font(const Napi::CallbackInfo& info)
   : ObjectWrap(info)
+  , doc(Document::Unwrap(info[0].As<Object>()))
 {
-  AssertFunctionArgs(info, 1, { napi_valuetype::napi_external });
-  font = info[0].As<External<PdfFont>>().Data();
+  if (info.Length() == 3 && info[2].As<Boolean>() == true) {
+    obj = info[1].As<External<PdfObject>>().Data();
+  } else {
+    font = info[0].As<External<PdfFont>>().Data();
+  }
 }
 
+Font::~Font()
+{
+  Napi::HandleScope scope(Env());
+  if (font)
+    delete font;
+  if (obj)
+    delete obj;
+  doc = nullptr;
+  font = nullptr;
+  obj = nullptr;
+  //  font = nullptr;
+}
 void
 Font::Initialize(Napi::Env& env, Napi::Object& target)
 {
@@ -232,11 +247,5 @@ Font::EmbedFont(const Napi::CallbackInfo& info)
   } catch (PdfError& err) {
     ErrorHandler(err, info);
   }
-}
-Font::~Font()
-{
-  Napi::HandleScope scope(Env());
-  delete font;
-  //  font = nullptr;
 }
 }

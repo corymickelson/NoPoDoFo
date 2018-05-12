@@ -2,7 +2,7 @@
  * This file is part of the NoPoDoFo (R) project.
  * Copyright (c) 2017-2018
  * Authors: Cory Mickelson, et al.
- * 
+ *
  * NoPoDoFo is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -20,6 +20,7 @@
 #ifndef NPDF_FONT_H
 #define NPDF_FONT_H
 
+#include "../doc/Document.h"
 #include <napi.h>
 #include <podofo/podofo.h>
 
@@ -55,10 +56,15 @@ public:
   void WriteToStream(const Napi::CallbackInfo&);
   void EmbedFont(const Napi::CallbackInfo&);
 
-  PoDoFo::PdfFont* GetPoDoFoFont() { return font; }
+  PoDoFo::PdfFont* GetFont()
+  {
+    return font ? font : doc->GetDocument()->GetFont(obj);
+  }
 
 private:
   PoDoFo::PdfFont* font;
+  PoDoFo::PdfObject* obj;
+  Document* doc;
 };
 }
 #endif // NPDF_FONT_H

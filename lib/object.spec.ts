@@ -4,30 +4,23 @@ import * as test from 'tape'
 import {join} from 'path';
 import { IForm } from './form';
 
-test.skip('tmp', t => {
-    const filePath = join(__dirname, '../test-documents/test.pdf'),
-        doc = new Document(filePath)
+test('tmp', t => {
+    const filePath = join(__dirname, '../test-documents/signed.pdf'),
+          doc      = new Document(filePath)
     doc.on('ready', e => {
-        const dict = (doc.form as IForm).dictionary
-        console.log(Object.keys(dict))
-        t.false((doc.form as IForm).needAppearances)
-        t.ok(dict)
-        const page = doc.getPage(0)
-        const fields = page.getFields()
-        const arrays = doc.body.filter(i => i.type === 'Array')
-        const references = doc.body.filter(i => i.type === 'Reference')
+        (doc.form as IForm).SigFlags
         t.end()
     })
 })
-test('document objects instance of nopodofo.Obj', t => {
+test.skip('document objects instance of nopodofo.Obj', t => {
     const filePath = join(__dirname, '../test-documents/test.pdf'),
-        doc = new Document(filePath)
+          doc      = new Document(filePath)
     doc.on('ready', e => {
         if (e instanceof Error) t.fail()
         let body = doc.body
         if (body[1].type === 'Dictionary') {
             let nObj = body[1].getDictionary(),
-                ks = nObj.getKeys()
+                ks   = nObj.getKeys()
             // t.assert((nObj as any)[ks[0]] instanceof Obj) 
             ks.forEach(key => {
                 let x = nObj.getKey(key)
@@ -74,7 +67,7 @@ test('document objects instance of nopodofo.Obj', t => {
         // t.assert(dict instanceof Dictionary, "Can get object as dictionary where type === Dictionary")
 
         let arrs = body.filter((i: any) => i.type === 'Array'),
-            arr = arrs[0].getArray()
+            arr  = arrs[0].getArray()
         t.throws(() => arr.pop(), "This operation should fail since the underlying PdfArray is immutable")
         let arrObj = arr.at(0)
         t.assert(arrObj instanceof Obj, "Should return an Obj via array bracket getter notation")

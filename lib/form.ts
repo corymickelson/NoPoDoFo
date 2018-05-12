@@ -16,9 +16,20 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import { NPDFDictionary } from './dictionary';
+import { IDictionary } from './dictionary';
+import { Font } from './painter';
 
+export enum ISigFlags {
+    SignatureExists = 1,
+    AppendOnly = 2,
+    SignatureExistsAppendOnly = 3
+}
 export interface IForm {
     needAppearances: boolean
-    dictionary: NPDFDictionary 
+    dictionary: IDictionary
+    DA?: string
+    DR?: IDictionary
+    Fonts?: Font[]
+    SigFlags?: ISigFlags
 }
+

@@ -95,6 +95,17 @@ Document::GetPage(const CallbackInfo& info)
   return instance;
 }
 
+Napi::Value
+Document::GetForm(const CallbackInfo& info)
+{
+  if (!document->GetAcroForm(true)) {
+    return info.Env().Null();
+  }
+  Napi::Object instance =
+    Form::constructor.New({ this->Value(), Boolean::New(info.Env(), true) });
+  return instance;
+}
+
 void
 Document::SetPassword(const CallbackInfo& info, const Napi::Value& value)
 {
@@ -504,15 +515,6 @@ Document::CreateFont(const CallbackInfo& info)
   } catch (PdfError& err) {
     ErrorHandler(err, info);
   }
-}
-
-Napi::Value
-Document::GetForm(const CallbackInfo& info)
-{
-  if (!document->GetAcroForm()) {
-    return info.Env().Null();
-  }
-  return Form::constructor.New({ this->Value() });
 }
 
 class DocumentWriteAsync : public AsyncWorker

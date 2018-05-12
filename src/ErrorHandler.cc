@@ -2,7 +2,7 @@
  * This file is part of the NoPoDoFo (R) project.
  * Copyright (c) 2017-2018
  * Authors: Cory Mickelson, et al.
- * 
+ *
  * NoPoDoFo is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -17,17 +17,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #include "ErrorHandler.h"
 
 using namespace PoDoFo;
 
-using Napi::Error;
 using Napi::CallbackInfo;
+using Napi::Error;
 
+using std::endl;
 using std::string;
 using std::stringstream;
-using std::endl;
 
 ErrorHandler::ErrorHandler(PoDoFo::PdfError& err, const CallbackInfo& info)
 {
@@ -35,14 +34,14 @@ ErrorHandler::ErrorHandler(PoDoFo::PdfError& err, const CallbackInfo& info)
   stringstream eMsg;
   eMsg << "PoDoFo error: " << msg << endl;
   err.PrintErrorMsg();
-  throw Error::New(info.Env(), eMsg.str());
+  Error::New(info.Env(), eMsg.str()).ThrowAsJavaScriptException();
 }
 
 ErrorHandler::ErrorHandler(Error& err, const CallbackInfo& info)
 {
   stringstream msg;
   msg << "JS error: " << err.Message() << endl;
-  throw Error::New(info.Env(), msg.str());
+  Error::New(info.Env(), msg.str()).ThrowAsJavaScriptException();
 }
 
 string

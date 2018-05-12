@@ -36,12 +36,26 @@ public:
   void SetNeedAppearances(const Napi::CallbackInfo&, const Napi::Value&);
   Napi::Value GetNeedAppearances(const Napi::CallbackInfo&);
   Napi::Value GetFormDictionary(const Napi::CallbackInfo&);
-  PoDoFo::PdfAcroForm* GetForm() { return doc->GetDocument()->GetAcroForm(); }
+  Napi::Value SigFlags(const Napi::CallbackInfo&);
+  void SetSigFlags(const Napi::CallbackInfo&, const Napi::Value&);
+  Napi::Value GetDefaultAppearance(const Napi::CallbackInfo&);
+  void SetDefaultAppearance(const Napi::CallbackInfo&, const Napi::Value&);
+  Napi::Value GetDR(const Napi::CallbackInfo&);
+  void SetDR(const Napi::CallbackInfo&, const Napi::Value&);
+  Napi::Value GetCalculationOrder(const Napi::CallbackInfo&);
+  void SetCalculationOrder(const Napi::CallbackInfo&, const Napi::Value&);
+  Napi::Value GetFont(const Napi::CallbackInfo&);
+
+  PoDoFo::PdfAcroForm* GetForm() { return form; }
+
+protected:
+  void FlattenFields(PoDoFo::PdfArray&, vector<PoDoFo::PdfField*>*);
+  PoDoFo::PdfDictionary* DR();
 
 private:
+  bool create = true;
   Document* doc;
-  Napi::Object formDict;
-  //  PoDoFo::PdfAcroForm* form;
+  PoDoFo::PdfAcroForm* form;
 };
 }
 #endif
