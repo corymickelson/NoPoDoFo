@@ -67,8 +67,8 @@ Form::Initialize(Napi::Env& env, Napi::Object& target)
         "DA", &Form::GetDefaultAppearance, &Form::SetDefaultAppearance),
       InstanceAccessor(
         "CO", &Form::GetCalculationOrder, &Form::SetCalculationOrder),
-      InstanceAccessor("DR", &Form::GetDR, &Form::SetDR),
-      InstanceAccessor("fonts", &Form::GetFont, nullptr) });
+      InstanceAccessor("DR", &Form::GetResource, &Form::SetResource),
+      InstanceAccessor("Fonts", &Form::GetFont, nullptr) });
   constructor = Napi::Persistent(ctor);
   constructor.SuppressDestruct();
   target.Set("Form", ctor);
@@ -175,7 +175,7 @@ Form::SetDefaultAppearance(const CallbackInfo& info, const Napi::Value& value)
 }
 
 Napi::Value
-Form::GetDR(const CallbackInfo& info)
+Form::GetResource(const CallbackInfo& info)
 {
   auto d = DR();
   if (d) {
@@ -205,7 +205,7 @@ Form::GetDR(const CallbackInfo& info)
 }
 
 void
-Form::SetDR(const CallbackInfo& info, const Napi::Value& value)
+Form::SetResource(const CallbackInfo& info, const Napi::Value& value)
 {
   if (!value.As<Object>().InstanceOf(Dictionary::constructor.Value())) {
     TypeError::New(
@@ -288,11 +288,16 @@ Form::GetFont(const CallbackInfo& info)
           auto fk = Dictionary::TryResolve(doc->GetDocument(), k.second);
           if (fk && fk->GetKey(Name::TYPE)->IsName() &&
               fk->GetKey(Name::TYPE)->GetName() == Name::FONT) {
+            PdfObject* font = k.second;
+            if (font->IsReference()) {
+              font = doc->GetDocument()->GetObjects().GetObject(
+                k.second->GetReference());
+            }
             js.Set(n,
                    Font::constructor.New(
                      { doc->Value(),
-                       External<PdfObject>::New(info.Env(), k.second),
-                       Boolean::New(info.Env(), true) }));
+                       External<PdfFont>::New(
+                         info.Env(), doc->GetDocument()->GetFont(font)) }));
           }
         }
         return js;
@@ -308,13 +313,6 @@ Form::DR()
   if (GetForm()->GetObject()->GetDictionary().HasKey(Name::DR)) {
     PdfObject* drObj = GetForm()->GetObject()->GetDictionary().GetKey(Name::DR);
     return Dictionary::TryResolve(doc->GetDocument(), drObj);
-    //    if (drObj->IsReference()) {
-    //      drObj =
-    //      doc->GetDocument()->GetObjects().GetObject(drObj->GetReference());
-    //    }
-    //    return &drObj->GetDictionary();
-    //  } else {
-    //    return nullptr;
   } else
     return nullptr;
 }

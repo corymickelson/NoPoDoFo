@@ -40,8 +40,8 @@ public:
   void SetSigFlags(const Napi::CallbackInfo&, const Napi::Value&);
   Napi::Value GetDefaultAppearance(const Napi::CallbackInfo&);
   void SetDefaultAppearance(const Napi::CallbackInfo&, const Napi::Value&);
-  Napi::Value GetDR(const Napi::CallbackInfo&);
-  void SetDR(const Napi::CallbackInfo&, const Napi::Value&);
+  Napi::Value GetResource(const Napi::CallbackInfo&);
+  void SetResource(const Napi::CallbackInfo&, const Napi::Value&);
   Napi::Value GetCalculationOrder(const Napi::CallbackInfo&);
   void SetCalculationOrder(const Napi::CallbackInfo&, const Napi::Value&);
   Napi::Value GetFont(const Napi::CallbackInfo&);

@@ -72,15 +72,13 @@ export class Document extends EventEmitter {
         return this._loaded
     }
 
-    get body(): Array<IObj> {
-        // return this._instance.getObjects()
-        // if (!this._objects) {
-            // return (this._instance.getObjects() as NPDFInternal[]).map(i => new Obj(i))
-            return this._instance.body
-        // }
-        // return this._objects
-    }
-    get form(): IForm|null {
+    /**
+     * @description If the document has an AcroForm Dictionary return the form as an instance of IForm.
+     *      If there is not an AcroForm Dictionary for the document, doing a get on form will create an new 
+     *      empty AcroForm Dictionary.
+     * @todo: Add configuration to disable creation of new form on form getter.
+     */
+    get form(): IForm {
         return this._instance.form
     }
 
