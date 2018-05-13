@@ -45,17 +45,22 @@ public:
   Napi::Value GetCalculationOrder(const Napi::CallbackInfo&);
   void SetCalculationOrder(const Napi::CallbackInfo&, const Napi::Value&);
   Napi::Value GetFont(const Napi::CallbackInfo&);
+  void SetFont(const Napi::CallbackInfo&, const Napi::Value&);
 
-  PoDoFo::PdfAcroForm* GetForm() { return form; }
+  //  PoDoFo::PdfAcroForm* GetForm()
+  //  {
+  //    return doc->GetDocument()->GetAcroForm(create);
+  //  }
 
 protected:
   void FlattenFields(PoDoFo::PdfArray&, vector<PoDoFo::PdfField*>*);
   PoDoFo::PdfDictionary* DR();
+  void AddFont(PoDoFo::PdfFont*);
 
 private:
   bool create = true;
   Document* doc;
-  PoDoFo::PdfAcroForm* form;
+  //  PoDoFo::PdfAcroForm* form;
 };
 }
 #endif

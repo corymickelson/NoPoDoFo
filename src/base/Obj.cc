@@ -75,11 +75,8 @@ Obj::Obj(const Napi::CallbackInfo& info)
 
 Obj::~Obj()
 {
-  //  if (obj != nullptr) {
   HandleScope scope(Env());
   cout << "Destructing Object" << endl;
-  //    delete obj;
-  //  }
 }
 
 void
@@ -189,10 +186,8 @@ Napi::Value
 Obj::Reference(const CallbackInfo& info)
 {
   try {
-    EscapableHandleScope scope(info.Env());
     PdfReference init = obj->Reference();
     auto initPtr = Napi::External<PdfReference>::New(info.Env(), &init);
-    //    return scope.Escape(Ref::constructor.New({ initPtr }));
     return Ref::constructor.New({ initPtr });
   } catch (PdfError& err) {
     ErrorHandler(err, info);

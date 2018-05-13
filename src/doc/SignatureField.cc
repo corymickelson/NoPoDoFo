@@ -2,7 +2,7 @@
  * This file is part of the NoPoDoFo (R) project.
  * Copyright (c) 2017-2018
  * Authors: Cory Mickelson, et al.
- * 
+ *
  * NoPoDoFo is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -26,7 +26,6 @@
 #include "../doc/Form.h"
 #include "Signer.h"
 
-
 namespace NoPoDoFo {
 
 using namespace Napi;
@@ -47,8 +46,9 @@ SignatureField::SignatureField(const CallbackInfo& info)
       auto annot = Annotation::Unwrap(info[0].As<Object>());
       auto form = Form::Unwrap(info[1].As<Object>());
       auto doc = Document::Unwrap(info[2].As<Object>());
-      field = new PdfSignatureField(
-        &annot->GetAnnotation(), form->GetForm(), doc->GetDocument());
+      field = new PdfSignatureField(&annot->GetAnnotation(),
+                                    doc->GetDocument()->GetAcroForm(),
+                                    doc->GetDocument());
 
     } else if (info.Length() == 1) {
       AssertFunctionArgs(info, 1, { napi_valuetype::napi_external });

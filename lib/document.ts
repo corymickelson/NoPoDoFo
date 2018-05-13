@@ -21,7 +21,7 @@ import {NPDFInternal, Obj, IObj} from './object';
 import {Page} from './page';
 import {EncryptOption, IEncrypt, ProtectionOption} from './encrypt';
 import {EventEmitter} from 'events';
-import {Font} from "./painter";
+import {Font, IFont} from "./painter";
 import {Signer} from './signer';
 import {F_OK, R_OK} from "constants";
 import {Ref} from "./reference";
@@ -286,7 +286,7 @@ export class Document extends EventEmitter {
      * @param {CreateFontOpts & Object} opts
      * @returns {Font}
      */
-    createFont(opts: CreateFontOpts & Object): Font {
+    createFont(opts: CreateFontOpts & Object): IFont {
         const instance = this._instance.createFont(
             opts.fontName,
             opts.hasOwnProperty('bold') ? opts.bold : false,
@@ -294,7 +294,8 @@ export class Document extends EventEmitter {
             opts.hasOwnProperty('encoding') ? opts.encoding : 1,
             opts.hasOwnProperty('embed') ? opts.embed : false,
             opts.hasOwnProperty('fileName') ? opts.fileName : null)
-        return new Font(instance)
+        // return new Font(instance)
+        return instance
     }
 
     writeUpdate(device: string | Signer): void {

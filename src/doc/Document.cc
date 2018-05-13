@@ -102,7 +102,7 @@ Document::GetForm(const CallbackInfo& info)
     return info.Env().Null();
   }
   Napi::Object instance =
-    Form::constructor.New({ this->Value(), Boolean::New(info.Env(), true) });
+    Form::constructor.New({ this->Value(), Boolean::New(info.Env(), false) });
   return instance;
 }
 
@@ -511,7 +511,8 @@ Document::CreateFont(const CallbackInfo& info)
                            PdfFontCache::eFontCreationFlags_AutoSelectBase14,
                            embed,
                            filename);
-    return Font::constructor.New({ External<PdfFont>::New(info.Env(), font) });
+    return Font::constructor.New(
+      { this->Value(), External<PdfFont>::New(info.Env(), font) });
   } catch (PdfError& err) {
     ErrorHandler(err, info);
   }

@@ -19,7 +19,7 @@
 import { __mod } from "./document";
 import { Ref, IRef } from "./reference";
 import { Stream } from "stream";
-import {ok} from 'assert'
+import { ok } from 'assert'
 import { IDictionary } from "./dictionary";
 
 export type NPDFInternal = any
@@ -71,7 +71,7 @@ export interface IObj {
     flateCompressStream(): void
     delayedStreamLoad(): void
     getBool(): boolean
-    getDictionary(): IDictionary 
+    getDictionary(): IDictionary
     getString(): string
     getName(): string
     getReal(): number
@@ -80,18 +80,18 @@ export interface IObj {
     getReference(): IRef
     getBuffer(): Buffer
     clear(): void
-    eq(i:NPDFInternal): boolean
+    eq(i: NPDFInternal): boolean
 }
 export interface IArray {
-    dirty:boolean
+    dirty: boolean
     length: number
     immutable: boolean
     toJS(): Array<any>
-    at(i:number): IObj
+    at(i: number): IObj
     pop(): IObj
     clear(): void
-    push(v:Object): void
-    write(destination:string): void
+    push(v: Object): void
+    write(destination: string): void
 }
 
 /**

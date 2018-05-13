@@ -52,6 +52,7 @@ public:
   Napi::Value IsBold(const Napi::CallbackInfo&);
   Napi::Value IsItalic(const Napi::CallbackInfo&);
   Napi::Value StringWidth(const Napi::CallbackInfo&);
+  Napi::Value GetObject(const Napi::CallbackInfo&);
 
   void WriteToStream(const Napi::CallbackInfo&);
   void EmbedFont(const Napi::CallbackInfo&);

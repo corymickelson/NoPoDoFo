@@ -66,7 +66,7 @@ Dictionary::Initialize(Napi::Env& env, Napi::Object& target)
   Function ctor = DefineClass(
     env,
     "Dictionary",
-    { StaticMethod("resolveDictionary", &Dictionary::ResolveDictionary),
+    { StaticMethod("tryGetDictionary", &Dictionary::ResolveDictionary),
       InstanceMethod("getKey", &Dictionary::GetKey),
       InstanceMethod("getKeys", &Dictionary::GetKeys),
       InstanceMethod("hasKey", &Dictionary::HasKey),
@@ -133,20 +133,34 @@ Dictionary::AddKey(const CallbackInfo& info)
   }
   auto v = info[1];
   PdfObject o;
-
+  PdfName key(info[0].As<String>().Utf8Value());
   if (v.IsBoolean()) {
     o = PdfObject(v.As<Boolean>());
   } else if (v.IsNumber()) {
     o = PdfObject(v.As<Number>().DoubleValue());
   } else if (v.IsString()) {
     o = PdfObject(PdfString(v.As<String>().Utf8Value()));
-  } else if (v.IsObject()) {
+  } else if (v.IsObject() &&
+             v.As<Object>().InstanceOf(Obj::constructor.Value())) {
     auto objWrap = info[1].As<Object>();
-    Obj* obj = Obj::Unwrap(objWrap);
-    o = *obj->GetObject();
+    PdfObject* obj = Obj::Unwrap(objWrap)->GetObject();
+    if (obj->IsDictionary()) {
+      o = obj->Reference();
+      cout << "Adding key: " << key.GetName() << " as reference#"
+           << obj->Reference().ObjectNumber() << endl;
+    } else
+      o = *obj;
+  } else {
+    TypeError::New(info.Env(),
+                   "Invalid dictionary value type. See NoPoDoFo documentation "
+                   "for more information and examples.")
+      .ThrowAsJavaScriptException();
   }
-  PdfName key(info[0].As<String>().Utf8Value());
-  GetDictionary().AddKey(key, o);
+  try {
+    GetDictionary().AddKey(key, o);
+  } catch (PdfError& err) {
+    ErrorHandler(err, info);
+  }
 }
 
 Napi::Value
@@ -160,7 +174,7 @@ Dictionary::GetKey(const CallbackInfo& info)
                            "Dictionary.HasKey before accessing key value");
   }
   try {
-    PdfObject* v = GetDictionary().GetKey(PdfName(k));
+    auto v = new PdfObject(*GetDictionary().GetKey(PdfName(k)));
     auto objPtr = Napi::External<PdfObject>::New(
       info.Env(), v, [](Napi::Env env, PdfObject* data) {
         HandleScope scope(env);

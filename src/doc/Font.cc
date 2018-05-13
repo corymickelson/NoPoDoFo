@@ -20,6 +20,7 @@
 #include "Font.h"
 #include "../ErrorHandler.h"
 #include "../ValidateArguments.h"
+#include "../base/Obj.h"
 #include "../base/Stream.h"
 #include "Encoding.h"
 
@@ -59,14 +60,15 @@ Font::Initialize(Napi::Env& env, Napi::Object& target)
     "Font",
     { InstanceAccessor("size", &Font::GetFontSize, &Font::SetFontSize),
       InstanceAccessor("scale", &Font::GetFontScale, &Font::SetFontScale),
+      InstanceAccessor("object", &Font::GetObject, nullptr),
       InstanceAccessor(
         "charSpace", &Font::GetFontCharSpace, &Font::SetFontCharSpace),
       InstanceAccessor("wordSpace", &Font::GetWordSpace, &Font::SetWordSpace),
       InstanceAccessor("underline", &Font::IsUnderlined, &Font::SetUnderline),
       InstanceAccessor("strikeOut", &Font::IsStrikeOut, &Font::SetStrikeOut),
+      InstanceAccessor("identifier", &Font::GetIdentifier, nullptr),
       InstanceMethod("isBold", &Font::IsBold),
       InstanceMethod("isItalic", &Font::IsItalic),
-      InstanceMethod("getIdentifier", &Font::GetIdentifier),
       InstanceMethod("getMetrics", &Font::GetFontMetric),
       InstanceMethod("getEncoding", &Font::GetEncoding),
       InstanceMethod("write", &Font::WriteToStream),
@@ -220,6 +222,20 @@ Font::StringWidth(const CallbackInfo& info)
   string text = info[0].As<String>().Utf8Value();
   return Number::New(info.Env(),
                      GetFont()->GetFontMetrics()->StringWidth(text));
+}
+
+Napi::Value
+Font::GetObject(const CallbackInfo& info)
+{
+  auto i = new PdfObject(*GetFont()->GetObject());
+  return Obj::constructor.New({ External<PdfObject>::New(
+    info.Env(), i, [](Napi::Env env, PdfObject* data) {
+      cout << "Finalizing Font Object[" << data->Reference().ObjectNumber()
+           << "]" << endl;
+      HandleScope scope(env);
+      delete data;
+      data = nullptr;
+    }) });
 }
 void
 Font::WriteToStream(const Napi::CallbackInfo& info)

@@ -22,7 +22,7 @@ import {Stream} from './stream'
 import {__mod, Document} from './document'
 import {Rect} from "./rect";
 import {NPDFPoint} from "./painter";
-import { Obj } from './object';
+import { Obj, IObj } from './object';
 
 export type NPDFcmyk = [number, number, number, number]
 export type NPDFrgb = [number, number, number]
@@ -347,7 +347,27 @@ export interface FontMetrics {
     fontType?: string
 }
 
+export interface IFont {
+    object: IObj
+    size: number
+    scale: number
+    charSpace: number
+    wordSpace: number
+    underline: boolean
+    strikeOut: boolean
+    identifier: string
+    isBold(): boolean
+    isItalic(): boolean
+    getEncoding(): Encoding
+    getMetrics(): FontMetrics
+    stringWidth(v:string): number
+    write(content: string, stream: Stream): void
+    embed(): void
+}
 export class Font {
+    public get object() {
+        return this._instance.object
+    }
     public get size() {
         return this._instance.size
     }
