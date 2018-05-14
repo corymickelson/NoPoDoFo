@@ -35,8 +35,8 @@ public:
   static void Initialize(Napi::Env& env, Napi::Object& target);
 
   static Napi::Value ResolveDictionary(const Napi::CallbackInfo&);
-  static PoDoFo::PdfDictionary* TryResolve(PoDoFo::PdfDocument*,
-                                           PoDoFo::PdfObject*);
+  static PoDoFo::PdfDictionary& Resolve(PoDoFo::PdfDocument*,
+                                        PoDoFo::PdfObject*);
   void AddKey(const Napi::CallbackInfo&);
   Napi::Value GetKey(const Napi::CallbackInfo&);
   Napi::Value GetKeys(const Napi::CallbackInfo&);
@@ -52,11 +52,12 @@ public:
   void WriteSync(const Napi::CallbackInfo&);
   Napi::Value ToObject(const Napi::CallbackInfo&);
   Napi::Value Eq(const Napi::CallbackInfo&);
-  PoDoFo::PdfDictionary GetDictionary() { return *dict; }
+  PoDoFo::PdfDictionary& GetDictionary() { return obj->GetDictionary(); }
 
 private:
-  PoDoFo::PdfDictionary* dict;
-  Document* doc;
+  //  Document* doc;
+  PoDoFo::PdfObject* obj;
+  //  PoDoFo::PdfDictionary* dict;
 };
 }
 #endif

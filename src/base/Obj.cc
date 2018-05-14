@@ -305,18 +305,8 @@ Obj::GetDictionary(const CallbackInfo& info)
   if (!obj->IsDictionary()) {
     throw Napi::Error::New(info.Env(), "Obj only accessible as Dictionary");
   }
-  EscapableHandleScope scope(info.Env());
-  auto init = new PdfDictionary(obj->GetDictionary());
-  auto ptr = External<PdfDictionary>::New(
-    info.Env(), init, [](Napi::Env env, PdfDictionary* data) {
-      cout << "Finalizer Dictionary" << endl;
-      HandleScope scope(env);
-      delete data;
-      data = nullptr;
-    });
-  auto instance = Dictionary::constructor.New({ ptr });
-  //  return scope.Escape(instance);
-  return instance;
+  return Dictionary::constructor.New(
+    { External<PdfObject>::New(info.Env(), new PdfObject(*obj)) });
 }
 
 Napi::Value

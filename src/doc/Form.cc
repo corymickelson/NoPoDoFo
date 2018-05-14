@@ -50,6 +50,7 @@ Form::~Form()
 {
   cout << "Destructing Form" << endl;
   //  delete form;
+  //  delete dict;
   doc = nullptr;
 }
 void
@@ -97,22 +98,16 @@ Napi::Value
 Form::GetFormDictionary(const CallbackInfo& info)
 {
   auto obj = doc->GetDocument()->GetAcroForm()->GetObject();
-  auto instance =
-    External<PdfDictionary>::New(info.Env(), &obj->GetDictionary());
-  return Dictionary::constructor.New({ doc->Value(), instance });
+  auto instance = External<PdfObject>::New(info.Env(), new PdfObject(*obj));
+  return Dictionary::constructor.New({ instance });
 }
 
 Napi::Value
 Form::SigFlags(const CallbackInfo& info)
 {
-  int flag = 0;
-  if (doc->GetDocument()->GetAcroForm()->GetObject()->GetDictionary().HasKey(
-        Name::SIG_FLAGS)) {
-    flag = static_cast<int>(doc->GetDocument()
-                              ->GetAcroForm()
-                              ->GetObject()
-                              ->GetDictionary()
-                              .GetKeyAsReal(Name::SIG_FLAGS));
+  long flag = 0;
+  if (GetDictionary()->HasKey(Name::SIG_FLAGS)) {
+    flag = GetDictionary()->GetKey(Name::SIG_FLAGS)->GetNumber();
   }
   return Number::New(info.Env(), flag);
 }
@@ -124,27 +119,18 @@ Form::SetSigFlags(const CallbackInfo& info, const Napi::Value& value)
     TypeError::New(info.Env(), "value must be of type number")
       .ThrowAsJavaScriptException();
   } else {
-    double f = value.As<Number>().DoubleValue();
+    long f = value.As<Number>().Int64Value();
     if (f < 1 || f > 3) {
       RangeError::New(info.Env(),
                       "SigFlags value can only be 1, 2, or 3. See NPDFSigFlags "
                       "for more information.")
         .ThrowAsJavaScriptException();
     } else {
-      if (doc->GetDocument()
-            ->GetAcroForm()
-            ->GetObject()
-            ->GetDictionary()
-            .HasKey(Name::SIG_FLAGS)) {
-        doc->GetDocument()
-          ->GetAcroForm()
-          ->GetObject()
-          ->GetDictionary()
-          .RemoveKey(Name::SIG_FLAGS);
+      if (GetDictionary()->HasKey(Name::SIG_FLAGS)) {
+        GetDictionary()->RemoveKey(Name::SIG_FLAGS);
       }
       try {
-        doc->GetDocument()->GetAcroForm()->GetObject()->GetDictionary().AddKey(
-          Name::SIG_FLAGS, PdfObject(f));
+        GetDictionary()->AddKey(Name::SIG_FLAGS, PdfVariant(f));
       } catch (PdfError& err) {
         ErrorHandler(err, info);
       }
@@ -155,19 +141,8 @@ Form::SetSigFlags(const CallbackInfo& info, const Napi::Value& value)
 Napi::Value
 Form::GetDefaultAppearance(const CallbackInfo& info)
 {
-  cout << doc->GetDocument()
-            ->GetAcroForm()
-            ->GetObject()
-            ->GetDictionary()
-            .GetKey(Name::DA)
-            ->GetString()
-            .GetStringUtf8()
-       << endl;
-  if (doc->GetDocument()->GetAcroForm()->GetObject()->GetDictionary().HasKey(
-        Name::DA)) {
-    auto da =
-      doc->GetDocument()->GetAcroForm()->GetObject()->GetDictionary().GetKey(
-        Name::DA);
+  if (GetDictionary()->HasKey(Name::DA)) {
+    auto da = GetDictionary()->GetKey(Name::DA);
     if (da->IsString()) {
       return String::New(info.Env(), da->GetString().GetStringUtf8());
     } else {
@@ -186,19 +161,11 @@ Form::SetDefaultAppearance(const CallbackInfo& info, const Napi::Value& value)
       .ThrowAsJavaScriptException();
   } else {
     try {
-      auto dict =
-        doc->GetDocument()->GetAcroForm()->GetObject()->GetDictionary();
-      if (dict.HasKey(Name::DA)) {
-        dict.RemoveKey(Name::DA);
-        //        doc->GetDocument()
-        //          ->GetAcroForm()
-        //          ->GetObject()
-        //          ->GetDictionary()
-        //          .RemoveKey(Name::DA);
+      if (GetDictionary()->HasKey(Name::DA)) {
+        GetDictionary()->RemoveKey(Name::DA);
       }
-      //      doc->GetDocument()->GetAcroForm()->GetObject()->GetDictionary().AddKey(
-      //        PdfName(Name::DA), PdfString(value.As<String>().Utf8Value()));
-      dict.AddKey(PdfName(Name::DA), PdfString(value.As<String>().Utf8Value()));
+      GetDictionary()->AddKey(PdfName(Name::DA),
+                              PdfString(value.As<String>().Utf8Value()));
     } catch (PdfError& err) {
       ErrorHandler(err, info);
     }
@@ -208,10 +175,14 @@ Form::SetDefaultAppearance(const CallbackInfo& info, const Napi::Value& value)
 Napi::Value
 Form::GetResource(const CallbackInfo& info)
 {
-  auto d = DR();
-  if (d) {
+  if (GetDictionary()->HasKey(Name::DR)) {
+    PdfObject* drObj = GetDictionary()->GetKey(Name::DR);
+    if (drObj->IsReference()) {
+      drObj = doc->GetDocument()->GetObjects().GetObject(drObj->Reference());
+    }
+    //    auto dr = Dictionary::Resolve(doc->GetDocument(), drObj);
     return Dictionary::constructor.New(
-      { doc->Value(), External<PdfDictionary>::New(info.Env(), d) });
+      { External<PdfObject>::New(info.Env(), new PdfObject(*drObj)) });
   }
   return info.Env().Null();
 }
@@ -228,10 +199,15 @@ Form::SetResource(const CallbackInfo& info, const Napi::Value& value)
     try {
       auto formDict =
         doc->GetDocument()->GetAcroForm()->GetObject()->GetDictionary();
-      auto dr = Dictionary::Unwrap(value.As<Object>())->GetDictionary();
+      auto dr = Obj::Unwrap(value.As<Object>());
+      if (dr->GetObject()->GetDataType() != ePdfDataType_Dictionary)
+        TypeError::New(
+          info.Env(),
+          "Default resource must be an instance of NoPoDoFo::Dictionary")
+          .ThrowAsJavaScriptException();
       if (formDict.HasKey(Name::DR))
         formDict.RemoveKey(Name::DR);
-      formDict.AddKey(PdfName(Name::DR), dr);
+      formDict.AddKey(PdfName(Name::DR), dr->GetObject()->Reference());
     } catch (PdfError& err) {
       ErrorHandler(err, info);
     }
@@ -266,10 +242,8 @@ Form::GetCalculationOrder(const CallbackInfo& info)
             n++;
           } else {
             js.Set(n,
-                   Dictionary::constructor.New(
-                     { doc->Value(),
-                       External<PdfDictionary>::New(
-                         info.Env(), &value->GetDictionary()) }));
+                   Dictionary::constructor.New({ External<PdfObject>::New(
+                     info.Env(), new PdfObject(*value)) }));
             n++;
           }
         }
@@ -290,32 +264,29 @@ Form::GetFont(const CallbackInfo& info)
 {
   auto js = Array::New(info.Env());
   uint32_t n = 0;
-  auto dr = DR();
-  if (dr) {
-    if (dr->HasKey(Name::FONT)) {
-      auto f = dr->GetKey(Name::FONT);
-      auto fd = Dictionary::TryResolve(doc->GetDocument(), f);
-      if (fd) {
-        auto fdKeys = fd->GetKeys();
-        for (auto k : fdKeys) {
-          auto fk = Dictionary::TryResolve(doc->GetDocument(), k.second);
-          if (fk && fk->GetKey(Name::TYPE)->IsName() &&
-              fk->GetKey(Name::TYPE)->GetName() == Name::FONT) {
-            PdfObject* font = k.second;
-            if (font->IsReference()) {
-              font = doc->GetDocument()->GetObjects().GetObject(
-                k.second->GetReference());
-            }
-            js.Set(n,
-                   Font::constructor.New(
-                     { doc->Value(),
-                       External<PdfFont>::New(
-                         info.Env(), doc->GetDocument()->GetFont(font)) }));
-          }
+  if (GetDictionary()->HasKey(Name::DR)) {
+    PdfObject* drObj = GetDictionary()->GetKey(Name::DR);
+    auto dr = Dictionary::Resolve(doc->GetDocument(), drObj);
+    auto f = dr.GetKey(Name::FONT);
+    auto fd = Dictionary::Resolve(doc->GetDocument(), f);
+    auto fdKeys = fd.GetKeys();
+    for (auto k : fdKeys) {
+      auto fk = Dictionary::Resolve(doc->GetDocument(), k.second);
+      if (fk.GetKey(Name::TYPE)->IsName() &&
+          fk.GetKey(Name::TYPE)->GetName() == Name::FONT) {
+        PdfObject* font = k.second;
+        if (font->IsReference()) {
+          font = doc->GetDocument()->GetObjects().GetObject(
+            k.second->GetReference());
         }
-        return js;
+        js.Set(n,
+               Font::constructor.New(
+                 { doc->Value(),
+                   External<PdfFont>::New(
+                     info.Env(), doc->GetDocument()->GetFont(font)) }));
       }
     }
+    return js;
   }
   return info.Env().Null();
 }
@@ -337,33 +308,19 @@ Form::SetFont(const CallbackInfo& info, const Napi::Value& value)
   }
 }
 
-PdfDictionary*
-Form::DR()
-{
-  if (doc->GetDocument()->GetAcroForm()->GetObject()->GetDictionary().HasKey(
-        Name::DR)) {
-    PdfObject* drObj =
-      doc->GetDocument()->GetAcroForm()->GetObject()->GetDictionary().GetKey(
-        Name::DR);
-    return Dictionary::TryResolve(doc->GetDocument(), drObj);
-  } else
-    return nullptr;
-}
-
 void
 Form::AddFont(PdfFont* font)
 {
-  auto dr = DR();
-  if (!dr) {
-    return;
-  }
-  if (dr->HasKey(Name::FONT)) {
-    auto fd = dr->GetKey(Name::FONT)->IsReference()
+
+  if (GetDictionary()->HasKey(Name::DR)) {
+    PdfObject* drObj = GetDictionary()->GetKey(Name::DR);
+    auto dr = Dictionary::Resolve(doc->GetDocument(), drObj);
+    auto fd = dr.GetKey(Name::FONT)->IsReference()
                 ? doc->GetDocument()
                     ->GetObjects()
-                    .GetObject(dr->GetKey(Name::FONT)->GetReference())
+                    .GetObject(dr.GetKey(Name::FONT)->GetReference())
                     ->GetDictionary()
-                : dr->GetKey(Name::FONT)->GetDictionary();
+                : dr.GetKey(Name::FONT)->GetDictionary();
     if (!fd.HasKey(font->GetIdentifier())) {
       fd.AddKey(font->GetIdentifier(), font->GetObject()->Reference());
     }

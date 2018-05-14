@@ -37,26 +37,28 @@ using std::vector;
 FunctionReference Dictionary::constructor; // NOLINT
 
 /**
- * @note Dictionary accepts a pointer to a PdfDictionary. The passed in
- * PdfDictionary needs to be a stack allocated object. The constructor will
- * create a heap allocated obj with the PdfDictionary copy constructor
+ * @note
  * @brief Dictionary::Dictionary
  * @param info
  */
 Dictionary::Dictionary(const CallbackInfo& info)
   : ObjectWrap(info)
-  , doc(Document::Unwrap(info[0].As<Object>()))
+  //  , doc(Document::Unwrap(info[0].As<Object>()))
+  , obj(info[0].As<External<PdfObject>>().Data())
+//  , dict(new PdfDictionary(Dictionary::Resolve(doc->GetDocument(), obj)))
 {
-  dict = new PdfDictionary(*info[1].As<External<PdfDictionary>>().Data());
+  //  dict = info[1].As<External<PdfDictionary>>().Data();
 }
 
 Dictionary::~Dictionary()
 {
   HandleScope scope(Env());
   cout << "Destructing Dictionary" << endl;
-  delete dict;
-  dict = nullptr;
-  doc = nullptr;
+  delete obj;
+  //  delete dict;
+  //  dict = nullptr;
+  obj = nullptr;
+  //  doc = nullptr;
 }
 
 void
@@ -91,26 +93,23 @@ Value
 Dictionary::ResolveDictionary(const CallbackInfo& info)
 {
   auto doc = Document::Unwrap(info[0].As<Object>());
-  auto candidate = Obj::Unwrap(info[1].As<Object>());
-  auto i = TryResolve(doc->GetDocument(), candidate->GetObject());
-  if (!i) {
-    return info.Env().Null();
-  } else {
-    return Dictionary::constructor.New(
-      { doc->Value(), External<PdfDictionary>::New(info.Env(), i) });
+  auto value = Obj::Unwrap(info[1].As<Object>())->GetObject();
+  if (value->IsReference()) {
+    value = doc->GetDocument()->GetObjects().GetObject(value->Reference());
   }
+  return Dictionary::constructor.New(
+    { External<PdfObject>::New(info.Env(), new PdfObject(*value)) });
 }
 
-PdfDictionary*
-Dictionary::TryResolve(PdfDocument* doc, PdfObject* candidate)
+PdfDictionary&
+Dictionary::Resolve(PdfDocument* doc, PdfObject* candidate)
 {
   if (candidate->IsDictionary()) {
-    return &candidate->GetDictionary();
+    return candidate->GetDictionary();
   } else if (candidate->IsReference()) {
-    return TryResolve(doc,
-                      doc->GetObjects()->GetObject(candidate->GetReference()));
+    return Resolve(doc,
+                   doc->GetObjects()->GetObject(candidate->GetReference()));
   }
-  return nullptr;
 }
 Napi::Value
 Dictionary::Eq(const CallbackInfo& info)
@@ -132,32 +131,33 @@ Dictionary::AddKey(const CallbackInfo& info)
       "add key requires a key and value. Key and value args not found");
   }
   auto v = info[1];
-  PdfObject o;
   PdfName key(info[0].As<String>().Utf8Value());
-  if (v.IsBoolean()) {
-    o = PdfObject(v.As<Boolean>());
-  } else if (v.IsNumber()) {
-    o = PdfObject(v.As<Number>().DoubleValue());
-  } else if (v.IsString()) {
-    o = PdfObject(PdfString(v.As<String>().Utf8Value()));
-  } else if (v.IsObject() &&
-             v.As<Object>().InstanceOf(Obj::constructor.Value())) {
-    auto objWrap = info[1].As<Object>();
-    PdfObject* obj = Obj::Unwrap(objWrap)->GetObject();
-    if (obj->IsDictionary()) {
-      o = obj->Reference();
-      cout << "Adding key: " << key.GetName() << " as reference#"
-           << obj->Reference().ObjectNumber() << endl;
-    } else
-      o = *obj;
-  } else {
-    TypeError::New(info.Env(),
-                   "Invalid dictionary value type. See NoPoDoFo documentation "
-                   "for more information and examples.")
-      .ThrowAsJavaScriptException();
-  }
   try {
-    GetDictionary().AddKey(key, o);
+
+    if (v.IsBoolean()) {
+      GetDictionary().AddKey(key, PdfVariant(v.As<Boolean>()));
+    } else if (v.IsNumber()) {
+      GetDictionary().AddKey(key, PdfVariant(v.As<Number>().Int64Value()));
+    } else if (v.IsString()) {
+      GetDictionary().AddKey(key, PdfString(v.As<String>().Utf8Value()));
+    } else if (v.IsObject() &&
+               v.As<Object>().InstanceOf(Obj::constructor.Value())) {
+      auto objWrap = info[1].As<Object>();
+      PdfObject* obj = Obj::Unwrap(objWrap)->GetObject();
+      if (obj->IsDictionary()) {
+        GetDictionary().AddKey(key, obj->Reference());
+        cout << "Adding key: " << key.GetName() << " as reference#"
+             << obj->Reference().ObjectNumber() << endl;
+      } else
+        GetDictionary().AddKey(key, obj);
+    } else {
+      TypeError::New(
+        info.Env(),
+        "Invalid dictionary value type. See NoPoDoFo documentation "
+        "for more information and examples.")
+        .ThrowAsJavaScriptException();
+    }
+
   } catch (PdfError& err) {
     ErrorHandler(err, info);
   }

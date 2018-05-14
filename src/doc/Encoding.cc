@@ -59,8 +59,7 @@ Encoding::AddToDictionary(const Napi::CallbackInfo& info)
   AssertFunctionArgs(info, 1, { napi_valuetype::napi_object });
   auto wrap = info[0].As<Object>();
   Dictionary* d = Dictionary::Unwrap(wrap);
-  PdfDictionary dict = d->GetDictionary();
-  encoding->AddToDictionary(dict);
+  encoding->AddToDictionary(d->GetDictionary());
   return info.Env().Undefined();
 }
 Napi::Value

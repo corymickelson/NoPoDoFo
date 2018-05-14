@@ -58,7 +58,7 @@ Document::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceMethod("getWriteMode", &Document::GetWriteMode),
       InstanceMethod("write", &Document::Write),
       InstanceMethod("writeBuffer", &Document::WriteBuffer),
-      //                  InstanceMethod("getObjects", &Document::GetObjects),
+      //                  InstanceMethod("getAcroForm", &Document::GetForm),
       InstanceMethod("getObject", &Document::GetObject),
       InstanceMethod("getTrailer", &Document::GetTrailer),
       InstanceMethod("getCatalog", &Document::GetCatalog),
@@ -98,11 +98,11 @@ Document::GetPage(const CallbackInfo& info)
 Napi::Value
 Document::GetForm(const CallbackInfo& info)
 {
-  if (!document->GetAcroForm(true)) {
+  if (!document->GetAcroForm()) {
     return info.Env().Null();
   }
   Napi::Object instance =
-    Form::constructor.New({ this->Value(), Boolean::New(info.Env(), false) });
+    Form::constructor.New({ this->Value(), Boolean::New(info.Env(), true) });
   return instance;
 }
 

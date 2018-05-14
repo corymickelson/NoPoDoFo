@@ -47,20 +47,21 @@ public:
   Napi::Value GetFont(const Napi::CallbackInfo&);
   void SetFont(const Napi::CallbackInfo&, const Napi::Value&);
 
-  //  PoDoFo::PdfAcroForm* GetForm()
-  //  {
-  //    return doc->GetDocument()->GetAcroForm(create);
-  //  }
+  PoDoFo::PdfAcroForm* GetForm()
+  {
+    return doc->GetDocument()->GetAcroForm(create);
+  }
+  PoDoFo::PdfDictionary* GetDictionary()
+  {
+    return &doc->GetDocument()->GetAcroForm()->GetObject()->GetDictionary();
+  }
 
 protected:
-  void FlattenFields(PoDoFo::PdfArray&, vector<PoDoFo::PdfField*>*);
-  PoDoFo::PdfDictionary* DR();
   void AddFont(PoDoFo::PdfFont*);
 
 private:
-  bool create = true;
+  bool create = false;
   Document* doc;
-  //  PoDoFo::PdfAcroForm* form;
 };
 }
 #endif
