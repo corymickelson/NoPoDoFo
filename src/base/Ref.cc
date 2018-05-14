@@ -119,7 +119,8 @@ Napi::Value
 Ref::GetObj(const CallbackInfo& info)
 {
   Document* document = Document::Unwrap(info[0].As<Object>());
-  PdfObject* target = document->GetDocument()->GetObjects().GetObject(GetRef());
+  PdfObject* target =
+    new PdfObject(*document->GetDocument()->GetObjects().GetObject(GetRef()));
   return Obj::constructor.New({ External<PdfObject>::New(
     info.Env(), target, [](Napi::Env env, PdfObject* data) {
       HandleScope scope(env);

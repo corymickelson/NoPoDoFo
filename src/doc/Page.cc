@@ -339,12 +339,13 @@ Page::GetContents(const CallbackInfo& info)
   bool forAppending = info[0].As<Boolean>();
   PdfObject* contentsObj = forAppending ? GetPage()->GetContentsForAppending()
                                         : GetPage()->GetContents();
-  auto objPtr = External<PdfObject>::New(
-    info.Env(), contentsObj, [](Napi::Env env, PdfObject* data) {
-      HandleScope scope(env);
-      delete data;
-      data = nullptr;
-    });
+  auto objPtr = External<PdfObject>::New(info.Env(),
+                                         new PdfObject(*contentsObj),
+                                         [](Napi::Env env, PdfObject* data) {
+                                           HandleScope scope(env);
+                                           delete data;
+                                           data = nullptr;
+                                         });
   auto instance = Obj::constructor.New({ objPtr });
   return instance;
 }
@@ -355,7 +356,7 @@ Page::GetResources(const CallbackInfo& info)
   EscapableHandleScope scope(info.Env());
   PdfObject* resources = GetPage()->GetResources();
   auto objPtr = External<PdfObject>::New(
-    info.Env(), resources, [](Napi::Env env, PdfObject* data) {
+    info.Env(), new PdfObject(*resources), [](Napi::Env env, PdfObject* data) {
       HandleScope scope(env);
       delete data;
       data = nullptr;

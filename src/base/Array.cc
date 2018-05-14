@@ -176,9 +176,9 @@ Array::GetObjAtIndex(const CallbackInfo& info)
   if (index > GetArray()->size()) {
     throw Napi::RangeError();
   }
-  PdfObject item = GetArray()[index];
+  auto item = new PdfObject(GetArray()[index]);
   auto initPtr = Napi::External<PdfObject>::New(
-    info.Env(), &item, [](Napi::Env env, PdfObject* data) {
+    info.Env(), item, [](Napi::Env env, PdfObject* data) {
       HandleScope scope(env);
       delete data;
       data = nullptr;
@@ -195,7 +195,7 @@ Array::ToArray(const Napi::CallbackInfo& info)
     uint32_t counter = 0;
     for (auto& it : *GetArray()) {
       const auto initPtr = External<PdfObject>::New(
-        Env(), &it, [](Napi::Env env, PdfObject* data) {
+        Env(), new PdfObject(it), [](Napi::Env env, PdfObject* data) {
           HandleScope scope(env);
           delete data;
           data = nullptr;

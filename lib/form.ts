@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import { IDictionary } from './dictionary';
-import { Font } from './painter';
+import { Font, IFont } from './painter';
 
 export enum ISigFlags {
     SignatureExists = 1,
@@ -29,7 +29,8 @@ export interface IForm {
     dictionary: IDictionary
     DA?: string
     DR?: IDictionary
-    Fonts?: Font[]
+    Fonts?: IFont[]
     SigFlags?: ISigFlags
 }
+
 

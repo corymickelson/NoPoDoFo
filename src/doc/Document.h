@@ -56,6 +56,7 @@ public:
   Napi::Value IsAllowed(const Napi::CallbackInfo&);
   Napi::Value CreateFont(const Napi::CallbackInfo&);
   Napi::Value GetForm(const Napi::CallbackInfo&);
+  Napi::Value GetFont(const Napi::CallbackInfo&);
   static Napi::Value GC(const Napi::CallbackInfo&);
 
   PoDoFo::PdfMemDocument* GetDocument() { return document; }

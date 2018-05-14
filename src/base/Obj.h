@@ -2,7 +2,7 @@
  * This file is part of the NoPoDoFo (R) project.
  * Copyright (c) 2017-2018
  * Authors: Cory Mickelson, et al.
- * 
+ *
  * NoPoDoFo is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -25,14 +25,11 @@
 
 #include <utility>
 
-
 namespace NoPoDoFo {
 class Obj : public Napi::ObjectWrap<Obj>
 {
 public:
   explicit Obj(const Napi::CallbackInfo&);
-  ~Obj();
-
   static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
   Napi::Value GetStream(const Napi::CallbackInfo&);

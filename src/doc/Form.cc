@@ -42,17 +42,12 @@ Form::Form(const Napi::CallbackInfo& info)
   : ObjectWrap(info)
   , create(info[1].As<Boolean>())
   , doc(Document::Unwrap(info[0].As<Object>()))
-{
-  //  form = new PdfAcroForm(doc->GetDocument(),
-  //                         doc->GetDocument()->GetAcroForm(create)->GetObject());
-}
-Form::~Form()
-{
-  cout << "Destructing Form" << endl;
-  //  delete form;
-  //  delete dict;
-  doc = nullptr;
-}
+{}
+// Form::~Form()
+//{
+//  cout << "Destructing Form" << endl;
+//  doc = nullptr;
+//}
 void
 Form::Initialize(Napi::Env& env, Napi::Object& target)
 {
@@ -178,7 +173,7 @@ Form::GetResource(const CallbackInfo& info)
   if (GetDictionary()->HasKey(Name::DR)) {
     PdfObject* drObj = GetDictionary()->GetKey(Name::DR);
     if (drObj->IsReference()) {
-      drObj = doc->GetDocument()->GetObjects().GetObject(drObj->Reference());
+      drObj = doc->GetDocument()->GetObjects().GetObject(drObj->GetReference());
     }
     //    auto dr = Dictionary::Resolve(doc->GetDocument(), drObj);
     return Dictionary::constructor.New(
@@ -267,24 +262,31 @@ Form::GetFont(const CallbackInfo& info)
   if (GetDictionary()->HasKey(Name::DR)) {
     PdfObject* drObj = GetDictionary()->GetKey(Name::DR);
     auto dr = Dictionary::Resolve(doc->GetDocument(), drObj);
-    auto f = dr.GetKey(Name::FONT);
-    auto fd = Dictionary::Resolve(doc->GetDocument(), f);
-    auto fdKeys = fd.GetKeys();
-    for (auto k : fdKeys) {
-      auto fk = Dictionary::Resolve(doc->GetDocument(), k.second);
-      if (fk.GetKey(Name::TYPE)->IsName() &&
-          fk.GetKey(Name::TYPE)->GetName() == Name::FONT) {
-        PdfObject* font = k.second;
-        if (font->IsReference()) {
-          font = doc->GetDocument()->GetObjects().GetObject(
-            k.second->GetReference());
-        }
-        js.Set(n,
-               Font::constructor.New(
-                 { doc->Value(),
-                   External<PdfFont>::New(
-                     info.Env(), doc->GetDocument()->GetFont(font)) }));
+    auto drFont = dr.GetKey(Name::FONT);
+    auto fd = Dictionary::Resolve(doc->GetDocument(), drFont);
+    for (auto k : fd.GetKeys()) {
+      PdfObject* fontObject;
+      if (k.second->IsReference()) {
+        fontObject =
+          doc->GetDocument()->GetObjects().GetObject(k.second->GetReference());
+        auto font = doc->GetDocument()->GetFont(fontObject);
+        cout << "Font: " << font->GetFontMetrics()->GetFontname() << endl;
+      } else {
+        fontObject = k.second;
       }
+      auto fObj = new PdfObject(*fontObject);
+      js.Set(n,
+             Font::constructor.New(
+               { doc->Value(),
+                 External<PdfObject>::New(
+                   info.Env(), fObj, [](Napi::Env env, PdfObject* data) {
+                     cout << "Finalizing Font Object" << endl;
+                     cout << "From Form::GetFont" << endl;
+                     HandleScope scope(env);
+                     delete data;
+                     data = nullptr;
+                   }) }));
+      n++;
     }
     return js;
   }

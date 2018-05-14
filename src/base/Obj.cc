@@ -73,12 +73,6 @@ Obj::Obj(const Napi::CallbackInfo& info)
   , obj(info[0].As<External<PdfObject>>().Data())
 {}
 
-Obj::~Obj()
-{
-  HandleScope scope(Env());
-  cout << "Destructing Object" << endl;
-}
-
 void
 Obj::Clear(const Napi::CallbackInfo& info)
 {

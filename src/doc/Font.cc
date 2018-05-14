@@ -38,18 +38,14 @@ FunctionReference Font::constructor; // NOLINT
 Font::Font(const Napi::CallbackInfo& info)
   : ObjectWrap(info)
   , doc(Document::Unwrap(info[0].As<Object>()))
-{
-  font = info[1].As<External<PdfFont>>().Data();
-}
+  , obj(info[1].As<External<PdfObject>>().Data())
+{}
 
 Font::~Font()
 {
   cout << "Destructing Font" << endl;
   Napi::HandleScope scope(Env());
-  if (font)
-    delete font;
   doc = nullptr;
-  font = nullptr;
 }
 void
 Font::Initialize(Napi::Env& env, Napi::Object& target)
@@ -227,11 +223,11 @@ Font::StringWidth(const CallbackInfo& info)
 Napi::Value
 Font::GetObject(const CallbackInfo& info)
 {
-  auto i = new PdfObject(*GetFont()->GetObject());
+  //  auto i = new PdfObject(*GetFont()->GetObject());
+  auto fObj = new PdfObject(*obj);
   return Obj::constructor.New({ External<PdfObject>::New(
-    info.Env(), i, [](Napi::Env env, PdfObject* data) {
-      cout << "Finalizing Font Object[" << data->Reference().ObjectNumber()
-           << "]" << endl;
+    info.Env(), fObj, [](Napi::Env env, PdfObject* data) {
+      cout << "Finalizing Object#" << data->Reference().ObjectNumber() << endl;
       HandleScope scope(env);
       delete data;
       data = nullptr;

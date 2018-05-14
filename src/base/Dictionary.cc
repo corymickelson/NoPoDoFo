@@ -43,22 +43,15 @@ FunctionReference Dictionary::constructor; // NOLINT
  */
 Dictionary::Dictionary(const CallbackInfo& info)
   : ObjectWrap(info)
-  //  , doc(Document::Unwrap(info[0].As<Object>()))
   , obj(info[0].As<External<PdfObject>>().Data())
-//  , dict(new PdfDictionary(Dictionary::Resolve(doc->GetDocument(), obj)))
-{
-  //  dict = info[1].As<External<PdfDictionary>>().Data();
-}
+{}
 
 Dictionary::~Dictionary()
 {
   HandleScope scope(Env());
   cout << "Destructing Dictionary" << endl;
   delete obj;
-  //  delete dict;
-  //  dict = nullptr;
   obj = nullptr;
-  //  doc = nullptr;
 }
 
 void
@@ -81,7 +74,7 @@ Dictionary::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceMethod("clear", &Dictionary::Clear),
       InstanceMethod("write", &Dictionary::Write),
       InstanceMethod("writeSync", &Dictionary::WriteSync),
-      InstanceMethod("toObject", &Dictionary::ToObject),
+      //      InstanceMethod("toObject", &Dictionary::ToObject),
       InstanceMethod("eq", &Dictionary::Eq) });
   constructor = Napi::Persistent(ctor);
   constructor.SuppressDestruct();
@@ -302,32 +295,33 @@ Dictionary::WriteSync(const CallbackInfo& info)
   }
 }
 
-Napi::Value
-Dictionary::ToObject(const CallbackInfo& info)
-{
-  try {
-    auto js = Object::New(info.Env());
-    auto keys = GetDictionary().GetKeys();
-    map<PoDoFo::PdfName, PoDoFo::PdfObject*>::const_iterator it;
-    for (it = keys.begin(); it != keys.end(); it++) {
-      auto key = String::New(info.Env(), (*it).first.GetName());
-      auto ptr = External<PdfObject>::New(
-        info.Env(), (*it).second, [](Napi::Env env, PdfObject* data) {
-          HandleScope scope(env);
-          delete data;
-          data = nullptr;
-        });
-      auto value = Obj::constructor.New({ ptr });
-      js.Set(key, value);
-    }
-    return js;
-  } catch (PdfError& err) {
-    ErrorHandler(err, info);
-  } catch (Napi::Error& err) {
-    ErrorHandler(err, info);
-  }
-  return info.Env().Undefined();
-}
+// Napi::Value
+// Dictionary::ToObject(const CallbackInfo& info)
+//{
+//  try {
+//    auto js = Object::New(info.Env());
+//    auto keys = GetDictionary().GetKeys();
+//    map<PoDoFo::PdfName, PoDoFo::PdfObject*>::const_iterator it;
+//    for (it = keys.begin(); it != keys.end(); it++) {
+//      auto key = String::New(info.Env(), (*it).first.GetName());
+//      auto ptr = External<PdfObject>::New(
+//        info.Env(), new PdfObject((*it).second), [](Napi::Env env, PdfObject*
+//        data) {
+//          HandleScope scope(env);
+//          delete data;
+//          data = nullptr;
+//        });
+//      auto value = Obj::constructor.New({ ptr });
+//      js.Set(key, value);
+//    }
+//    return js;
+//  } catch (PdfError& err) {
+//    ErrorHandler(err, info);
+//  } catch (Napi::Error& err) {
+//    ErrorHandler(err, info);
+//  }
+//  return info.Env().Undefined();
+//}
 
 class DictWriteAsync : public Napi::AsyncWorker
 {

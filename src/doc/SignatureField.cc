@@ -37,15 +37,11 @@ SignatureField::SignatureField(const CallbackInfo& info)
   : ObjectWrap<SignatureField>(info)
 {
   try {
-    if (info.Length() == 3) {
-      AssertFunctionArgs(info,
-                         3,
-                         { napi_valuetype::napi_object,
-                           napi_valuetype::napi_object,
-                           napi_valuetype::napi_object });
+    if (info.Length() == 2) {
+      AssertFunctionArgs(
+        info, 2, { napi_valuetype::napi_object, napi_valuetype::napi_object });
       auto annot = Annotation::Unwrap(info[0].As<Object>());
-      auto form = Form::Unwrap(info[1].As<Object>());
-      auto doc = Document::Unwrap(info[2].As<Object>());
+      auto doc = Document::Unwrap(info[1].As<Object>());
       field = new PdfSignatureField(&annot->GetAnnotation(),
                                     doc->GetDocument()->GetAcroForm(),
                                     doc->GetDocument());

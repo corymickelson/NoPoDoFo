@@ -311,4 +311,7 @@ export class Document extends EventEmitter {
         }
         return this.encrypt as IEncrypt
     }
+    getFont(identifier: string): IFont | null {
+        return this._instance.getFont(identifier)
+    }
 }

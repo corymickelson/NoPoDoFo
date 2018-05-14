@@ -20,6 +20,7 @@
 #include "Document.h"
 #include "../ErrorHandler.h"
 #include "../ValidateArguments.h"
+#include "../base/Names.h"
 #include "../base/Obj.h"
 #include "../base/Ref.h"
 #include "Font.h"
@@ -40,30 +41,30 @@ void
 Document::Initialize(Napi::Env& env, Napi::Object& target)
 {
   HandleScope scope(env);
-  Function ctor = DefineClass(
-    env,
-    "Document",
-    { StaticMethod("gc", &Document::GC),
-      InstanceAccessor("password", nullptr, &Document::SetPassword),
-      InstanceAccessor("encrypt", nullptr, &Document::SetEncrypt),
-      InstanceAccessor("form", &Document::GetForm, nullptr),
-      InstanceAccessor("body", &Document::GetObjects, nullptr),
-      InstanceMethod("load", &Document::Load),
-      InstanceMethod("getPageCount", &Document::GetPageCount),
-      InstanceMethod("getPage", &Document::GetPage),
-      InstanceMethod("mergeDocument", &Document::MergeDocument),
-      InstanceMethod("deletePage", &Document::DeletePage),
-      InstanceMethod("getVersion", &Document::GetVersion),
-      InstanceMethod("isLinearized", &Document::IsLinearized),
-      InstanceMethod("getWriteMode", &Document::GetWriteMode),
-      InstanceMethod("write", &Document::Write),
-      InstanceMethod("writeBuffer", &Document::WriteBuffer),
-      //                  InstanceMethod("getAcroForm", &Document::GetForm),
-      InstanceMethod("getObject", &Document::GetObject),
-      InstanceMethod("getTrailer", &Document::GetTrailer),
-      InstanceMethod("getCatalog", &Document::GetCatalog),
-      InstanceMethod("isAllowed", &Document::IsAllowed),
-      InstanceMethod("createFont", &Document::CreateFont) });
+  Function ctor =
+    DefineClass(env,
+                "Document",
+                { StaticMethod("gc", &Document::GC),
+                  InstanceAccessor("password", nullptr, &Document::SetPassword),
+                  InstanceAccessor("encrypt", nullptr, &Document::SetEncrypt),
+                  InstanceAccessor("form", &Document::GetForm, nullptr),
+                  InstanceAccessor("body", &Document::GetObjects, nullptr),
+                  InstanceMethod("load", &Document::Load),
+                  InstanceMethod("getPageCount", &Document::GetPageCount),
+                  InstanceMethod("getPage", &Document::GetPage),
+                  InstanceMethod("mergeDocument", &Document::MergeDocument),
+                  InstanceMethod("deletePage", &Document::DeletePage),
+                  InstanceMethod("getVersion", &Document::GetVersion),
+                  InstanceMethod("isLinearized", &Document::IsLinearized),
+                  InstanceMethod("getWriteMode", &Document::GetWriteMode),
+                  InstanceMethod("write", &Document::Write),
+                  InstanceMethod("writeBuffer", &Document::WriteBuffer),
+                  InstanceMethod("getObject", &Document::GetObject),
+                  InstanceMethod("getTrailer", &Document::GetTrailer),
+                  InstanceMethod("getCatalog", &Document::GetCatalog),
+                  InstanceMethod("isAllowed", &Document::IsAllowed),
+                  InstanceMethod("createFont", &Document::CreateFont),
+                  InstanceMethod("getFont", &Document::GetFont) });
   constructor = Persistent(ctor);
   constructor.SuppressDestruct();
   target.Set("Document", ctor);
@@ -104,6 +105,55 @@ Document::GetForm(const CallbackInfo& info)
   Napi::Object instance =
     Form::constructor.New({ this->Value(), Boolean::New(info.Env(), true) });
   return instance;
+}
+
+Value
+Document::GetFont(const CallbackInfo& info)
+{
+  auto id = info[0].As<String>().Utf8Value();
+  vector<PdfObject*> fontObjs;
+  vector<PdfFont*> fonts;
+  for (auto item : document->GetObjects()) {
+    if (item->IsDictionary()) {
+      if (item->GetDictionary().HasKey(Name::TYPE) &&
+          item->GetDictionary().GetKey(Name::TYPE)->IsName() &&
+          item->GetDictionary().GetKey(Name::TYPE)->GetName().GetName() ==
+            Name::FONT) {
+        fontObjs.push_back(item);
+      }
+    }
+    if (item->IsReference()) {
+      auto ref = document->GetObjects().GetObject(item->GetReference());
+      if (ref->IsDictionary()) {
+        if (ref->GetDictionary().HasKey(Name::TYPE) &&
+            ref->GetDictionary().GetKey(Name::TYPE)->IsName() &&
+            ref->GetDictionary().GetKey(Name::TYPE)->GetName().GetName() ==
+              Name::FONT) {
+          fontObjs.push_back(ref);
+        }
+      }
+    }
+  }
+  for (auto o : fontObjs) {
+    auto font = document->GetFont(o);
+    if (!font) {
+      continue;
+    } else {
+      fonts.push_back(font);
+    }
+  }
+  for (auto item : fonts) {
+    cout << "Font Identifier: " << item->GetIdentifier().GetName() << endl;
+    string itemId = item->GetIdentifier().GetName();
+    string itemName = item->GetFontMetrics()->GetFontname();
+    if (itemId == id || itemName == id) {
+      return Font::constructor.New(
+        { this->Value(),
+          External<PdfObject>::New(info.Env(),
+                                   new PdfObject(*item->GetObject())) });
+    }
+  }
+  return info.Env().Null();
 }
 
 void
@@ -362,7 +412,7 @@ Document::GetObjects(const CallbackInfo& info)
     uint32_t count = 0;
     for (auto item : document->GetObjects()) {
       auto instance = External<PdfObject>::New(
-        info.Env(), item, [](Napi::Env env, PdfObject* data) {
+        info.Env(), new PdfObject(*item), [](Napi::Env env, PdfObject* data) {
           HandleScope scope(env);
           cout << "Finalizing Object# " << data->Reference().ObjectNumber()
                << endl;
@@ -398,9 +448,9 @@ Napi::Value
 Document::GetTrailer(const CallbackInfo& info)
 {
   const PdfObject* trailerPdObject = document->GetTrailer();
-  auto* ptr = const_cast<PdfObject*>(trailerPdObject);
+  auto ptr = const_cast<PdfObject*>(trailerPdObject);
   auto initPtr = Napi::External<PdfObject>::New(
-    info.Env(), ptr, [](Napi::Env env, PdfObject* data) {
+    info.Env(), new PdfObject(*ptr), [](Napi::Env env, PdfObject* data) {
       HandleScope scope(env);
       delete data;
       data = nullptr;
@@ -413,8 +463,13 @@ Napi::Value
 Document::GetCatalog(const CallbackInfo& info)
 {
   const PdfObject* catalog = document->GetCatalog();
-  auto* ptr = const_cast<PdfObject*>(catalog);
-  auto initPtr = Napi::External<PdfObject>::New(info.Env(), ptr);
+  auto ptr = const_cast<PdfObject*>(catalog);
+  auto initPtr = Napi::External<PdfObject>::New(
+    info.Env(), new PdfObject(*ptr), [](Napi::Env env, PdfObject* data) {
+      HandleScope scope(env);
+      delete data;
+      data = nullptr;
+    });
   auto instance = Obj::constructor.New({ initPtr });
   return instance;
 }
@@ -511,8 +566,18 @@ Document::CreateFont(const CallbackInfo& info)
                            PdfFontCache::eFontCreationFlags_AutoSelectBase14,
                            embed,
                            filename);
+    auto fObj = new PdfObject(*font->GetObject());
     return Font::constructor.New(
-      { this->Value(), External<PdfFont>::New(info.Env(), font) });
+      { this->Value(),
+        External<PdfObject>::New(
+          info.Env(), fObj, [encoding](Napi::Env env, PdfObject* data) {
+            HandleScope scope(env);
+            cout << "Finalizing Font Object" << endl;
+            cout << "From Document::CreateFont" << endl;
+            delete encoding;
+            delete data;
+            data = nullptr;
+          }) });
   } catch (PdfError& err) {
     ErrorHandler(err, info);
   }
