@@ -22,7 +22,7 @@ import {Stream} from './stream'
 import {__mod, Document} from './document'
 import {Rect} from "./rect";
 import {NPDFPoint} from "./painter";
-import { Obj, IObj } from './object';
+import { IObj } from './object';
 
 export type NPDFcmyk = [number, number, number, number]
 export type NPDFrgb = [number, number, number]
@@ -457,7 +457,7 @@ export class Encoding {
     constructor(private _instance: any) {
     }
 
-    addToDictionary(target: {[key:string]: Obj}): void {
+    addToDictionary(target: {[key:string]: IObj}): void {
         this._instance.addToDictionary(target)
     }
 

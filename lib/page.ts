@@ -18,7 +18,7 @@
  */
 import { IFieldInfo, Field } from './field'
 import {  Rect } from './rect';
-import {  Obj } from './object';
+import {  IObj } from './object';
 import { Annotation, NPDFAnnotation } from './annotation';
 
 export interface IPage {
@@ -33,8 +33,8 @@ export interface IPage {
     getField(index: number): Field
     getFields(): Array<Field>
     getFieldIndex(fieldName: string): number
-    getContents(append: boolean): Obj
-    getResources(): Obj
+    getContents(append: boolean): IObj
+    getResources(): IObj
     getMediaBox(): Rect
     getBleedBox(): Rect
     getArtBox(): Rect
@@ -59,7 +59,7 @@ export class Page implements IPage {
         return this._instance.number
     }
     set number(n: number) {
-        throw Error("Can not change page number. Use Document.deletePage() to adjust page order.")
+        throw Error("Can not change page number. Use Document.splicePage() to adjust page order.")
     }
 
     get width() {
@@ -91,13 +91,11 @@ export class Page implements IPage {
 
     constructor(private _instance: any) { }
 
-    getContents(append: boolean): Obj {
-        const objInstance = this._instance.getContents(append)
-        return new Obj(objInstance)
+    getContents(append: boolean): IObj {
+        return this._instance.getContents(append)
     }
-    getResources(): Obj {
-        const objInstance = this._instance.getResources()
-        return new Obj(objInstance)
+    getResources(): IObj {
+        return this._instance.getResources()
     }
     getMediaBox(): Rect {
         const mediaBoxPositions = this._instance.getMediaBox()

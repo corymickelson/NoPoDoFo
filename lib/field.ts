@@ -17,9 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import {__mod, Document} from './document'
-import {NPDFInternal, Obj} from "./object";
+import {NPDFInternal, IObj} from "./object";
 import {Annotation} from "./annotation";
-import {IForm} from "./form";
 
 
 export interface IFieldInfo {
@@ -229,8 +228,7 @@ export class SignatureField {
         this._instance.setFieldName(n)
     }
 
-    getObject(): Obj {
-        const instance = this._instance.getObject()
-        return new Obj(instance)
+    getObject(): IObj {
+        return this._instance.getObject()
     }
 }

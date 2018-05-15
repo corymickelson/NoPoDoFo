@@ -43,8 +43,6 @@ public:
   }
 
 private:
-  //  unique_ptr<PoDoFo::PdfTextField> text;
-  //  PoDoFo::PdfTextField* text;
   Field* field;
 };
 }

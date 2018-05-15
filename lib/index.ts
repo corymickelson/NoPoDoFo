@@ -18,7 +18,7 @@
  */
 import {Data} from './data'
 import {Document, FontEncoding} from './document'
-import {Obj} from './object'
+import {IObj} from './object'
 import {Page} from './page'
 import {
     Annotation,
@@ -56,7 +56,7 @@ import {Signer, signature} from './signer'
 import {Stream} from './stream'
 import {IForm} from './form'
 import {ContentsTokenizer} from './parser'
-import {Ref} from './reference'
+import {IRef} from './reference'
 import {Cell, Table} from './table'
 
 
@@ -69,7 +69,7 @@ export {
     Data,
     Document,
     FontEncoding,
-    Obj,
+    IObj,
     Page,
     Annotation,
     NPDFAction,
@@ -97,7 +97,7 @@ export {
     NPDFVerticalAlignment,
     Signer,
     signature,
-    Ref,
+    IRef,
     Cell,
     Table
 }

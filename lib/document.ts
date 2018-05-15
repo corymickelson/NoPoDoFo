@@ -16,16 +16,16 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import {access, constants} from 'fs'
-import {NPDFInternal, Obj, IObj} from './object';
-import {Page} from './page';
-import {EncryptOption, IEncrypt, ProtectionOption} from './encrypt';
-import {EventEmitter} from 'events';
-import {Font, IFont} from "./painter";
-import {Signer} from './signer';
-import {F_OK, R_OK} from "constants";
-import {Ref} from "./reference";
-import {IForm} from "./form";
+import { access, constants } from 'fs'
+import { IObj } from './object';
+import { Page } from './page';
+import { EncryptOption, IEncrypt, ProtectionOption } from './encrypt';
+import { EventEmitter } from 'events';
+import { Font, IFont } from "./painter";
+import { Signer } from './signer';
+import { F_OK, R_OK } from "constants";
+import { IRef } from "./reference";
+import { IForm } from "./form";
 
 export const __mod = require('bindings')('npdf')
 export type Callback = (err: Error, data: Buffer | string) => void
@@ -66,15 +66,30 @@ export class Document extends EventEmitter {
     private _loaded: boolean = false;
     private _password: string | undefined = undefined
     private _encrypt: any
-    private _objects?: Array<Obj>
 
+    get body(): IObj[] {
+        return this._instance.body
+    }
+    get trailer(): IObj {
+        return this._instance.trailer
+    }
+    get catalog(): IObj {
+        return this._instance.catalog
+    }
+    get version(): number {
+        return this._instance.version
+    }
+    /**
+     * @desc A Document has been read into memory
+     * @returns {boolean}
+     */
     get loaded() {
         return this._loaded
     }
 
     /**
      * @description If the document has an AcroForm Dictionary return the form as an instance of IForm.
-     *      If there is not an AcroForm Dictionary for the document, doing a get on form will create an new 
+     *      If there is not an AcroForm Dictionary for the document, doing a get on form will create an new
      *      empty AcroForm Dictionary.
      * @todo: Add configuration to disable creation of new form on form getter.
      */
@@ -87,7 +102,7 @@ export class Document extends EventEmitter {
     }
 
     get password(): string {
-        throw EvalError()
+        throw EvalError('Password is not a retrievable property')
     }
 
     get encrypt(): IEncrypt {
@@ -130,19 +145,17 @@ export class Document extends EventEmitter {
                 }
             })
         }
-
-
     }
 
     /**
-     * load pdf file, emits 'ready' || 'error' events
+     * @desc load pdf file, emits 'ready' || 'error' events
      * @param file - file path
      * @param update - load document for incremental updates
      * @param pwd
      */
     private load(file: string | Buffer, update: boolean = false, pwd?: string): void {
         let cb = (e: Error) => {
-            if (e && e instanceof Error) {
+            if (e) {
                 if (e.message === "Password required to modify this document" && pwd) {
                     try {
                         this.password = pwd
@@ -180,22 +193,19 @@ export class Document extends EventEmitter {
         return new Page(page);
     }
 
-    getObject(ref: Ref): Obj {
-        if (!ref || ref instanceof Ref === false) {
+    /**
+     * @desc Get an NoPoDoFo Obj from an indirect reference
+     * @param {IRef} ref
+     * @returns {IObj}
+     */
+    getObject(ref: IRef): IObj {
+        if (!ref || (ref as any)._instaance instanceof __mod.Ref === false) {
             throw TypeError()
         }
         else if (ref.isIndirect() === false) {
             throw Error('Document.GetObject is only possible when the object referenced is an indirect object')
         }
-        const objInstance = this._instance.getObject((ref as any)._instance)
-        return new Obj(objInstance)
-    }
-
-    getObjects(): Array<Obj> {
-        const objects: Array<any> = this._instance.getObjects()
-        return objects.map(value => {
-            return new Obj(value)
-        })
+        return this._instance.getObject((ref as any)._instance)
     }
 
     /**
@@ -204,7 +214,7 @@ export class Document extends EventEmitter {
      * @param password
      * @returns {Promise}
      */
-    mergeDocument(doc: string, password?: string): Promise<any> {
+    appendDocument(doc: string, password?: string): Promise<any> {
         return new Promise((resolve, reject) => {
             if (!this._loaded) {
                 reject(new Error('load a pdf file before calling this method'))
@@ -213,7 +223,7 @@ export class Document extends EventEmitter {
                 if (err) return reject(err)
                 else {
                     try {
-                        password !== null ? this._instance.mergeDocument(doc, password) : this._instance.mergeDocument(doc)
+                        password !== null ? this._instance.appendDocument(doc, password) : this._instance.appendDocument(doc)
                         return resolve()
                     } catch (err) {
                         return reject(err)
@@ -224,14 +234,14 @@ export class Document extends EventEmitter {
 
     }
 
-    deletePage(pageIndex: number): void {
+    splicePage(pageIndex: number): void {
         if (!this._loaded) {
             throw new Error('load a pdf file before calling this method')
         }
         if (this.getPageCount() < pageIndex || pageIndex < 0) {
             throw new RangeError('page index out of range')
         }
-        this._instance.deletePage(pageIndex)
+        this._instance.splicePage(pageIndex)
     }
 
     getVersion(): number {
@@ -265,15 +275,6 @@ export class Document extends EventEmitter {
         }
     }
 
-    getTrailer(): Obj {
-        let objInit = this._instance.getTrailer()
-        return new Obj(objInit)
-    }
-
-    getCatalog(): Obj {
-        return new Obj(this._instance.getCatalog())
-    }
-
     isAllowed(protection: ProtectionOption): boolean {
         return this._instance.isAllowed(protection)
     }
@@ -287,15 +288,13 @@ export class Document extends EventEmitter {
      * @returns {Font}
      */
     createFont(opts: CreateFontOpts & Object): IFont {
-        const instance = this._instance.createFont(
+        return this._instance.createFont(
             opts.fontName,
             opts.hasOwnProperty('bold') ? opts.bold : false,
             opts.hasOwnProperty('italic') ? opts.italic : false,
             opts.hasOwnProperty('encoding') ? opts.encoding : 1,
             opts.hasOwnProperty('embed') ? opts.embed : false,
             opts.hasOwnProperty('fileName') ? opts.fileName : null)
-        // return new Font(instance)
-        return instance
     }
 
     writeUpdate(device: string | Signer): void {
@@ -311,6 +310,7 @@ export class Document extends EventEmitter {
         }
         return this.encrypt as IEncrypt
     }
+
     getFont(identifier: string): IFont | null {
         return this._instance.getFont(identifier)
     }

@@ -1,11 +1,8 @@
-import { IForm } from './form'
 import { NPDFName as name, NPDFName } from './names'
 import { Document, __mod, FontEncoding } from './document'
 import { join } from 'path'
 import * as tap from 'tape'
-import { Font, IFont } from './painter';
-import { Dictionary, IDictionary } from './dictionary'
-import { Obj, IObj } from './object';
+import { IDictionary, IObj, resolveDictionary } from './object';
 
 const filePath = join(__dirname, '../test-documents/test.pdf')
 
@@ -35,7 +32,7 @@ tap('NPDF Form Accessors and Methods', standard => {
             if (!fontObj) {
                 t.fail()
             } else {
-                let fontDict = Dictionary.tryGet(doc, (fontObj as IObj)) as IDictionary
+                let fontDict = resolveDictionary(doc, (fontObj as IObj)) as IDictionary
                 if (!fontDict) {
                     t.fail()
                 } else {

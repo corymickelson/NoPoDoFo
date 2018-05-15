@@ -1,11 +1,11 @@
-import {access, readFile, unlinkSync, writeFileSync} from 'fs'
+import {access, readFile, unlinkSync} from 'fs'
 import {join} from 'path'
 import * as tap from 'tape'
-import {Document, FontEncoding} from './document'
+import {Document, FontEncoding, __mod} from './document'
 import {F_OK} from "constants";
 import {v4} from 'uuid'
 import {Test} from "tape";
-import {Obj} from "./object";
+import {IObj} from "./object";
 
 const filePath = join(__dirname, '../test-documents/test.pdf'),
     pwdDoc = join(__dirname, '../test-documents/pwd.pdf')
@@ -32,14 +32,14 @@ tap('Document Api', sub => {
             })
 
             standard.test('document trailer, catalog, objects', t => {
-                let objs = pdf.getObjects();
+                let objs = pdf.body;
                 t.assert(objs instanceof Array, 'Gets all objects as an array')
-                t.assert(objs[0] instanceof Obj, 'array items instance of Obj')
-                let trailer = pdf.getTrailer(),
-                    catalog = pdf.getCatalog()
-                t.assert(trailer instanceof Obj, 'get trailer')
+                t.assert(objs[0] instanceof __mod.Obj, 'array items instance of Obj')
+                let trailer = pdf.trailer,
+                    catalog = pdf.catalog
+                t.assert(trailer instanceof __mod.Obj, 'get trailer')
                 t.assert(trailer.type === 'Dictionary', 'trailer is a dictionary')
-                t.assert(catalog instanceof Obj, 'get catalog')
+                t.assert(catalog instanceof __mod.Obj, 'get catalog')
                 t.assert(catalog.type === 'Dictionary', 'catalog is a dictionary')
                 t.end()
             })
@@ -53,7 +53,7 @@ tap('Document Api', sub => {
 
             standard.test('document delete page object by index', t => {
                 const beforeCount = pdf.getPageCount()
-                pdf.deletePage(0)
+                pdf.splicePage(0)
                 const afterCount = pdf.getPageCount()
                 t.assert(beforeCount - 1 === afterCount, 'Page removed and page count decremented')
                 end(t)
@@ -131,7 +131,7 @@ tap('Document Api', sub => {
                 outFile = `${v4()}.pdf`
             doc.on('ready', () => {
                 let originalPC = doc.getPageCount()
-                doc.mergeDocument(filePath)
+                doc.appendDocument(filePath)
                     .then(() => {
                         doc.write(outFile, e => {
                             if (e) standard.fail(e.message)

@@ -42,7 +42,6 @@ public:
   Napi::Value GetNumFields(const Napi::CallbackInfo&);
   void SetRotation(const Napi::CallbackInfo&, const Napi::Value&);
   Napi::Value GetField(const Napi::CallbackInfo&);
-  Napi::Value GetFieldsSummary(const Napi::CallbackInfo&);
   Napi::Value GetFieldIndex(const Napi::CallbackInfo&);
   void SetPageWidth(const Napi::CallbackInfo&, const Napi::Value&);
   void SetPageHeight(const Napi::CallbackInfo&, const Napi::Value&);

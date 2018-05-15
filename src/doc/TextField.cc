@@ -31,21 +31,7 @@ FunctionReference TextField::constructor; // NOLINT
 TextField::TextField(const CallbackInfo& info)
   : ObjectWrap(info)
   , field(Field::Unwrap(info[0].As<Object>()))
-//  , text(new PdfTextField(*Field::Unwrap(info[0].As<Object>())->GetField()))
-{
-  //  try {
-  //    auto fieldObj = info[0].As<Object>();
-  //    auto field = Field::Unwrap(fieldObj);
-  //    PdfTextField v(*Field::Unwrap(info[0].As<Object>())->GetField());
-  //    text = &v;
-  //  } catch (PdfError& err) {
-  //    stringstream msg;
-  //    msg << "Failed to instantiate TextField. PoDoFo Error: " <<
-  //    err.GetError()
-  //        << endl;
-  //    throw Napi::Error::New(info.Env(), msg.str());
-  //  }
-}
+{}
 TextField::~TextField()
 {
   cout << "Destructing TextField" << endl;

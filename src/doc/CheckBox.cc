@@ -22,19 +22,19 @@
 namespace NoPoDoFo {
 FunctionReference CheckBox::constructor; // NOLINT
 
-using std::make_unique;
+using std::cout;
+using std::endl;
 
 CheckBox::CheckBox(const CallbackInfo& info)
   : ObjectWrap<CheckBox>(info)
+  , field(Field::Unwrap(info[0].As<Object>()))
+{}
+
+CheckBox::~CheckBox()
 {
-  if (info.Length() == 0) {
-    throw Napi::Error::New(info.Env(),
-                           "Requires a single argument of type Field");
-  }
-  auto fieldObj = info[0].As<Object>();
-  Field* field = Field::Unwrap(fieldObj);
-  PdfCheckBox v(*field->GetField());
-  box = make_unique<PdfCheckBox>(v);
+  cout << "Destructing Checkbox" << endl;
+  HandleScope scope(Env());
+  field = nullptr;
 }
 
 void
@@ -54,7 +54,7 @@ CheckBox::Initialize(Napi::Env& env, Napi::Object& target)
 Napi::Value
 CheckBox::IsChecked(const CallbackInfo& info)
 {
-  return Napi::Boolean::New(info.Env(), box->IsChecked());
+  return Napi::Boolean::New(info.Env(), GetField().IsChecked());
 }
 
 void
@@ -65,6 +65,6 @@ CheckBox::SetChecked(const CallbackInfo& info, const Napi::Value& value)
                                "CheckBox.checked requires boolean value");
   }
   bool checked = value.As<Boolean>();
-  box->SetChecked(checked);
+  GetField().SetChecked(checked);
 }
 }

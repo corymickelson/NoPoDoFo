@@ -55,12 +55,12 @@ Page::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceAccessor("number", &Page::GetPageNumber, nullptr),
       InstanceAccessor("width", &Page::GetPageWidth, &Page::SetPageWidth),
       InstanceAccessor("height", &Page::GetPageHeight, &Page::SetPageHeight),
+      InstanceAccessor("contents", &Page::GetContents, nullptr),
+      InstanceAccessor("resources", &Page::GetResources, nullptr),
+
       InstanceMethod("getField", &Page::GetField),
       InstanceMethod("getNumFields", &Page::GetNumFields),
-      InstanceMethod("getFieldsInfo", &Page::GetFieldsSummary),
       InstanceMethod("getFieldIndex", &Page::GetFieldIndex),
-      InstanceMethod("getContents", &Page::GetContents),
-      InstanceMethod("getResources", &Page::GetResources),
       InstanceMethod("getMediaBox", &Page::GetMediaBox),
       InstanceMethod("getBleedBox", &Page::GetBleedBox),
       InstanceMethod("getArtBox", &Page::GetArtBox),
@@ -86,7 +86,6 @@ Page::GetNumFields(const CallbackInfo& info)
 Napi::Value
 Page::GetField(const CallbackInfo& info)
 {
-  //  EscapableHandleScope scope(info.Env());
   int index = info[0].As<Number>();
   if (index < 0 || index > GetPage()->GetNumFields()) {
     throw RangeError();
@@ -100,122 +99,6 @@ Page::GetField(const CallbackInfo& info)
                                 data = nullptr;
                               }) });
   return instance;
-}
-
-Napi::Value
-Page::GetFieldsSummary(const CallbackInfo& info)
-{
-  try {
-    EscapableHandleScope scope(info.Env());
-    auto fields = Array::New(info.Env());
-    for (size_t i = 0; i < static_cast<size_t>(GetPage()->GetNumFields());
-         ++i) {
-      auto obj = Object::New(info.Env());
-      auto field = GetPage()->GetField(static_cast<int>(i));
-      obj.Set("index", Number::New(info.Env(), i));
-      Page::GetFieldObject(info, obj, field);
-      fields.Set(static_cast<uint32_t>(i), obj);
-    }
-    return scope.Escape(fields);
-  } catch (PdfError& err) {
-    stringstream errMsg;
-    errMsg << "An error occurred in PoDoFo: " << err.GetError() << endl;
-    throw Napi::Error::New(info.Env(), errMsg.str());
-  }
-}
-
-void
-Page::GetFieldObject(const CallbackInfo& info,
-                     Napi::Object& obj,
-                     PoDoFo::PdfField& field)
-{
-  string name = field.GetFieldName().GetStringUtf8();
-  string alternateName = field.GetAlternateName().GetStringUtf8();
-  string mappingName = field.GetMappingName().GetStringUtf8();
-  bool required = field.IsRequired();
-  bool isWritable = field.IsReadOnly();
-  obj.Set("name", name);
-  obj.Set("alternateName", alternateName);
-  obj.Set("mappingName", mappingName);
-  obj.Set("required", required);
-  obj.Set("readOnly", isWritable);
-  switch (field.GetType()) {
-    case ePdfField_TextField: {
-      PdfTextField textField(field);
-      string fieldValue = textField.GetText().GetStringUtf8();
-      long maxLen = textField.GetMaxLen();
-      bool multiLine = textField.IsMultiLine();
-      obj.Set("value", fieldValue);
-      obj.Set("maxLength", static_cast<double>(maxLen));
-      obj.Set("isMultiLine", multiLine);
-      obj.Set("type", "TextField");
-      break;
-    }
-    case ePdfField_CheckBox: {
-      PdfCheckBox checkBox(field);
-      bool checkBoxValue = checkBox.IsChecked();
-      string checkBoxCaption = checkBox.GetCaption().GetStringUtf8();
-      obj.Set("value", checkBoxValue);
-      obj.Set("caption", checkBoxCaption);
-      obj.Set("type", "CheckBox");
-      break;
-    }
-    case ePdfField_ComboBox: {
-      PdfComboBox comboBox(field);
-      int displayIndex = comboBox.GetSelectedItem();
-      string comboValue =
-        displayIndex > -1
-          ? comboBox.GetItem(comboBox.GetSelectedItem()).GetStringUtf8()
-          : "";
-      obj.Set("type", "ComboBox");
-      obj.Set("selected", comboValue);
-      auto items = Array::New(info.Env());
-      for (size_t i = 0; i < comboBox.GetItemCount(); i++) {
-        items.Set(
-          static_cast<uint32_t>(i),
-          comboBox.GetItemDisplayText(static_cast<int>(i)).GetStringUtf8());
-      }
-      obj.Set("items", items);
-      break;
-    }
-    case ePdfField_ListBox: {
-      PdfListBox listBox(field);
-      int selected = listBox.GetSelectedItem();
-      string listValue =
-        selected > -1
-          ? listBox.GetItem(listBox.GetSelectedItem()).GetStringUtf8()
-          : "";
-      obj.Set("type", "ListBox");
-      obj.Set("value", listValue);
-      auto items = Array::New(info.Env());
-      for (size_t i = 0; i < listBox.GetItemCount(); i++) {
-        items.Set(
-          static_cast<uint32_t>(i),
-          listBox.GetItemDisplayText(static_cast<int>(i)).GetStringUtf8());
-      }
-      obj.Set("items", items);
-      break;
-    }
-    case ePdfField_PushButton: {
-      PdfPushButton pushButton(field);
-      string pushCaption = pushButton.GetCaption().GetStringUtf8();
-      obj.Set("type", "PushButton");
-      obj.Set("caption", pushCaption);
-      break;
-    }
-    case ePdfField_RadioButton: {
-      obj.Set("type", "RadioButton");
-      break;
-    }
-    case ePdfField_Signature: {
-      obj.Set("type", "Signature");
-      break;
-    }
-    case ePdfField_Unknown: {
-      obj.Set("type", "Unknown");
-      break;
-    }
-  }
 }
 
 Napi::Object

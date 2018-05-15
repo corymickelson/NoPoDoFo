@@ -34,7 +34,6 @@ FunctionReference Field::constructor; // NOLINT
 Field::Field(const CallbackInfo& info)
   : ObjectWrap(info)
   , field(info[0].As<External<PdfField>>().Data())
-//  , field(make_unique<PdfField>(*info[0].As<External<PdfField>>().Data()))
 {
   fieldName = field->GetFieldName().GetStringUtf8();
   fieldType = TypeString();
@@ -44,8 +43,6 @@ Field::~Field()
 {
   cout << "Destructing Field: " << fieldName << " of type: " << fieldType
        << endl;
-  //  HandleScope scope(Env());
-  //  delete field;
 }
 void
 Field::Initialize(Napi::Env& env, Napi::Object& target)
@@ -55,14 +52,13 @@ Field::Initialize(Napi::Env& env, Napi::Object& target)
     env,
     "Field",
     { InstanceAccessor("readOnly", &Field::IsReadOnly, &Field::SetReadOnly),
-      InstanceMethod("getType", &Field::GetType),
-      InstanceMethod("getFieldName", &Field::GetFieldName),
-      InstanceMethod("getAlternateName", &Field::GetAlternateName),
-      InstanceMethod("getMappingName", &Field::GetMappingName),
-      InstanceMethod("setAlternateName", &Field::SetAlternateName),
-      InstanceMethod("setMappingName", &Field::SetMappingName),
-      InstanceMethod("setRequired", &Field::SetRequired),
-      InstanceMethod("isRequired", &Field::IsRequired) });
+      InstanceAccessor("required", &Field::IsRequired, &Field::SetRequired),
+      InstanceAccessor("type", &Field::GetType, nullptr),
+      InstanceAccessor("fieldName", &Field::GetFieldName, &Field::SetFieldName),
+      InstanceAccessor(
+        "alternateName", &Field::GetAlternateName, &Field::SetAlternateName),
+      InstanceAccessor(
+        "mappingName", &Field::GetMappingName, &Field::SetMappingName) });
   constructor = Napi::Persistent(ctor);
   constructor.SuppressDestruct();
   target.Set("Field", ctor);
@@ -126,27 +122,21 @@ Field::GetMappingName(const CallbackInfo& info)
 }
 
 void
-Field::SetAlternateName(const CallbackInfo& info)
+Field::SetAlternateName(const CallbackInfo&, const Napi::Value& value)
 {
-  AssertFunctionArgs(info, 1, { napi_valuetype::napi_string });
-  PdfString value(info[0].As<String>().Utf8Value().c_str());
-  GetField()->SetAlternateName(value);
+  GetField()->SetAlternateName(value.As<String>().Utf8Value());
 }
 
 void
-Field::SetMappingName(const CallbackInfo& info)
+Field::SetMappingName(const CallbackInfo&, const Napi::Value& value)
 {
-  AssertFunctionArgs(info, 1, { napi_valuetype::napi_string });
-  PdfString value(info[0].As<String>().Utf8Value().c_str());
-  GetField()->SetMappingName(value);
+  GetField()->SetMappingName(value.As<String>().Utf8Value());
 }
 
 void
-Field::SetRequired(const CallbackInfo& info)
+Field::SetRequired(const CallbackInfo&, const Napi::Value& value)
 {
-  AssertFunctionArgs(info, 1, { napi_valuetype::napi_boolean });
-  bool value = info[0].As<Boolean>();
-  GetField()->SetRequired(value);
+  GetField()->SetRequired(value.As<Boolean>());
 }
 
 Napi::Value
@@ -162,7 +152,7 @@ Field::IsReadOnly(const Napi::CallbackInfo& info)
 }
 
 void
-Field::SetReadOnly(const Napi::CallbackInfo& info, const Napi::Value& value)
+Field::SetReadOnly(const Napi::CallbackInfo&, const Napi::Value& value)
 {
   GetField()->SetReadOnly(value.As<Boolean>());
 }

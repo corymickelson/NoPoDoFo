@@ -38,11 +38,12 @@ public:
 
   Napi::Value GetType(const Napi::CallbackInfo&);
   Napi::Value GetFieldName(const Napi::CallbackInfo&);
+  void SetFieldName(const Napi::CallbackInfo&, const Napi::Value&);
   Napi::Value GetAlternateName(const Napi::CallbackInfo&);
   Napi::Value GetMappingName(const Napi::CallbackInfo&);
-  void SetAlternateName(const Napi::CallbackInfo&);
-  void SetMappingName(const Napi::CallbackInfo&);
-  void SetRequired(const Napi::CallbackInfo&);
+  void SetAlternateName(const Napi::CallbackInfo&, const Napi::Value&);
+  void SetMappingName(const Napi::CallbackInfo&, const Napi::Value&);
+  void SetRequired(const Napi::CallbackInfo&, const Napi::Value&);
   Napi::Value IsRequired(const Napi::CallbackInfo&);
   void SetReadOnly(const Napi::CallbackInfo&, const Napi::Value&);
   Napi::Value IsReadOnly(const Napi::CallbackInfo&);
