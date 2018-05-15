@@ -26,8 +26,6 @@
 #include "Font.h"
 #include <iostream>
 
-namespace NoPoDoFo {
-
 using namespace Napi;
 using namespace PoDoFo;
 
@@ -35,6 +33,8 @@ using std::cout;
 using std::endl;
 using std::ostringstream;
 using std::stringstream;
+
+namespace NoPoDoFo {
 
 FunctionReference Form::constructor; // NOLINT
 

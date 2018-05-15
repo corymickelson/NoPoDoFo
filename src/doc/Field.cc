@@ -21,13 +21,13 @@
 #include "Document.h"
 #include "Page.h"
 
-namespace NoPoDoFo {
-
 using namespace Napi;
 using namespace PoDoFo;
 
 using std::cout;
 using std::endl;
+
+namespace NoPoDoFo {
 
 FunctionReference Field::constructor; // NOLINT
 
