@@ -53,15 +53,16 @@ export class Field {
     set readOnly(v:boolean) {
         this._instance.readOnly = v
     }
+    get fieldName(): string {
+        return this._instance.fieldName
+    }
+    set fieldName(v:string) {
+        this._instance.fieldName= v
+    }
+    get type():FieldType {
+        return this._instance.type
+    }
     constructor(private _instance: NPDFInternal) {
-    }
-
-    getType(): FieldType {
-        return this._instance.getType()
-    }
-
-    getFieldName(): string {
-        return this._instance.getFieldName()
     }
 
     getAlternateName(): string {
@@ -94,7 +95,7 @@ export class TextField extends Field {
 
     constructor(field: Field) {
         super((field as any)._instance)
-        if (field.getType() !== 'TextField') {
+        if (field.type !== 'TextField') {
             throw Error('field parameter must be a field of type TextField')
         }
         this._textFieldInstance = new __mod.TextField((field as any)._instance)
@@ -122,7 +123,7 @@ export class CheckBox extends Field {
 
     constructor(field: Field) {
         super((field as any)._instance)
-        if (field.getType() !== 'CheckBox') {
+        if (field.type !== 'CheckBox') {
             throw Error('must be of type CheckBox')
         }
         this._checkboxInstance = new __mod.CheckBox((field as any)._instance)
@@ -151,7 +152,7 @@ export class EnumerableField extends Field {
 
     constructor(field: Field) {
         super((field as any)._instance)
-        const t = field.getType()
+        const t = field.type
         if (t === 'ListBox' || t === 'ComboBox') {
             this._enumerableFieldInstance = new __mod.ListField((field as any)._instance)
         } else {
@@ -177,7 +178,7 @@ export class ListBox extends EnumerableField {
 
     constructor(field: Field) {
         super(field)
-        if (field.getType() !== 'ListBox') {
+        if (field.type !== 'ListBox') {
             throw TypeError('Must be field type ListBox')
         }
         this._listBoxInstance = new __mod.ListBox((field as any)._instance)
@@ -189,7 +190,7 @@ export class ComboBox extends EnumerableField {
 
     constructor(field: Field) {
         super(field)
-        if (field.getType() !== 'ComboBox') {
+        if (field.type !== 'ComboBox') {
             throw TypeError('Must be field type ComboBox')
         }
         this._comboBoxInstance = new __mod.ComboBox((field as any)._instance)

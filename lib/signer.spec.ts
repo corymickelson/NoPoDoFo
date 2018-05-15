@@ -46,7 +46,7 @@ tap('Signer', sub => {
                     if (e instanceof Error) standard.fail(e.message)
                     const signedPage = doc.getPage(1),
                         fields = signedPage.getFields()
-                    let signatureFieldCandidates = fields.filter(i => i.getFieldName() === 'signer.sign')
+                    let signatureFieldCandidates = fields.filter(i => i.fieldName === 'signer.sign')
                     if (!signatureFieldCandidates || signatureFieldCandidates.length === 0) standard.fail("signature field not found")
                     else if (signatureFieldCandidates.length === 1) {
                         standard.pass("signature found")

@@ -77,6 +77,7 @@ Document::Document(const CallbackInfo& info)
 
 Document::~Document()
 {
+  HandleScope scope(Env());
   cout << "Destructing document object." << endl;
   delete document;
   document = nullptr;

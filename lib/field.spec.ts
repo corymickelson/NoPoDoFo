@@ -18,8 +18,8 @@ tap('Fields', sub => {
                 let field = page.getField(0)
                 t.assert(field !== null)
                 t.assert(field instanceof Field)
-                console.log(field.getType())
-                t.assert(field.getType() === 'TextField')
+                console.log(field.type)
+                t.assert(field.type === 'TextField')
                 t.end()
             })
             standard.test('Can instantiate a TextField given a field of type TextField', t => {
@@ -31,7 +31,7 @@ tap('Fields', sub => {
             standard.test('Can instantiate a Checkbox given a field of type CheckBox', t => {
                 let index = -1
                 for (let i = 0; i < fields.length; i++) {
-                    let type = fields[i].getType()
+                    let type = fields[i].type
                     if (type === 'CheckBox') {
                         index = i
                         break
@@ -42,7 +42,7 @@ tap('Fields', sub => {
                     t.end()
                 } else {
                     const field = page.getField(index)
-                    t.assert(field.getType() === 'CheckBox')
+                    t.assert(field.type === 'CheckBox')
                     const checkbox = new CheckBox(field)
                     t.ok(checkbox)
                     t.assert(checkbox.checked === false)
@@ -54,7 +54,7 @@ tap('Fields', sub => {
             standard.test('Can instantiate a ListBox', t => {
                 let index = -1
                 for (let i = 0; i < fields.length; i++) {
-                    let type = fields[i].getType()
+                    let type = fields[i].type
                     if (type === 'ListBox') {
                         index = i
                         break
@@ -65,7 +65,7 @@ tap('Fields', sub => {
                     t.end()
                 } else {
                     const field = page.getField(index)
-                    t.assert(field.getType() === 'ListField')
+                    t.assert(field.type === 'ListField')
                     const list = new ListBox(field)
                     t.ok(list)
                     t.assert(list.selected === -1)
@@ -76,7 +76,7 @@ tap('Fields', sub => {
             standard.test('ComboBox variant', t => {
                 let index = -1
                 for (let i = 0; i < fields.length; i++) {
-                    let type = fields[i].getType()
+                    let type = fields[i].type
                     if (type === 'ComboBox') {
                         index = i
                         break
@@ -87,7 +87,7 @@ tap('Fields', sub => {
                     t.end()
                 } else {
                     const field = page.getField(index)
-                    t.assert(field.getType() === 'ComboBox')
+                    t.assert(field.type === 'ComboBox')
                     const combo = new ComboBox(field)
                     t.ok(combo)
                     t.assert(combo.selected === -1)

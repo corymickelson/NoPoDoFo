@@ -43,11 +43,12 @@ Form::Form(const Napi::CallbackInfo& info)
   , create(info[1].As<Boolean>())
   , doc(Document::Unwrap(info[0].As<Object>()))
 {}
-// Form::~Form()
-//{
-//  cout << "Destructing Form" << endl;
-//  doc = nullptr;
-//}
+Form::~Form()
+{
+  HandleScope scope(Env());
+  cout << "Destructing Form" << endl;
+  doc = nullptr;
+}
 void
 Form::Initialize(Napi::Env& env, Napi::Object& target)
 {

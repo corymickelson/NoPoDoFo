@@ -41,6 +41,7 @@ Field::Field(const CallbackInfo& info)
 
 Field::~Field()
 {
+  HandleScope scope(Env());
   cout << "Destructing Field: " << fieldName << " of type: " << fieldType
        << endl;
 }
@@ -105,6 +106,12 @@ Napi::Value
 Field::GetFieldName(const CallbackInfo& info)
 {
   return Napi::String::New(info.Env(), fieldName);
+}
+
+void
+Field::SetFieldName(const CallbackInfo&, const Napi::Value& value)
+{
+  GetField()->SetFieldName(value.As<String>().Utf8Value());
 }
 
 Napi::Value

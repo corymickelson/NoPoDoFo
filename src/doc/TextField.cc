@@ -19,12 +19,12 @@
 
 #include "TextField.h"
 
-namespace NoPoDoFo {
-
 using namespace Napi;
 using namespace PoDoFo;
 using std::cout;
 using std::endl;
+
+namespace NoPoDoFo {
 
 FunctionReference TextField::constructor; // NOLINT
 
@@ -34,6 +34,7 @@ TextField::TextField(const CallbackInfo& info)
 {}
 TextField::~TextField()
 {
+  HandleScope scope(Env());
   cout << "Destructing TextField" << endl;
   field = nullptr;
 }

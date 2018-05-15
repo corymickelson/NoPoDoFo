@@ -35,11 +35,12 @@ FunctionReference Page::constructor; // NOLINT
 
 Page::Page(const CallbackInfo& info)
   : ObjectWrap(info)
-  , doc(Document::Unwrap(info[0].As<Object>()))
   , n(info[1].As<Number>())
+  , doc(Document::Unwrap(info[0].As<Object>()))
 {}
 Page::~Page()
 {
+  HandleScope scope(Env());
   cout << "Destructing Page" << endl;
   doc = nullptr;
 }
