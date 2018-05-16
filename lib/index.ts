@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import {Data} from './data'
-import {Document, FontEncoding} from './document'
+import {Document, FontEncoding, __mod} from './document'
 import {IObj} from './object'
 import {Page} from './page'
 import {
@@ -99,7 +99,8 @@ export {
     signature,
     IRef,
     Cell,
-    Table
+    Table,
+    __mod
 }
 export const CONVERSION = 0.0028346456693
 
