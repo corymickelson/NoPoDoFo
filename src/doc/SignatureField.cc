@@ -41,7 +41,7 @@ SignatureField::SignatureField(const CallbackInfo& info)
       AssertFunctionArgs(
         info, 2, { napi_valuetype::napi_object, napi_valuetype::napi_object });
       auto annot = Annotation::Unwrap(info[0].As<Object>());
-      auto doc = Document::Unwrap(info[1].As<Object>());
+      doc = Document::Unwrap(info[1].As<Object>());
       field = new PdfSignatureField(&annot->GetAnnotation(),
                                     doc->GetDocument()->GetAcroForm(),
                                     doc->GetDocument());
@@ -91,7 +91,7 @@ SignatureField::SetReason(const CallbackInfo& info)
 {
   AssertFunctionArgs(info, 1, { napi_valuetype::napi_string });
   string reason = info[0].As<String>().Utf8Value();
-  field->SetSignatureReason(PdfString(reason));
+  GetField()->SetSignatureReason(PdfString(reason));
 }
 
 void
@@ -99,7 +99,7 @@ SignatureField::SetLocation(const CallbackInfo& info)
 {
   AssertFunctionArgs(info, 1, { napi_valuetype::napi_string });
   string location = info[0].As<String>().Utf8Value();
-  field->SetSignatureLocation(PdfString(location));
+  GetField()->SetSignatureLocation(PdfString(location));
 }
 
 void
@@ -107,32 +107,37 @@ SignatureField::SetCreator(const CallbackInfo& info)
 {
   AssertFunctionArgs(info, 1, { napi_valuetype::napi_string });
   string creator = info[0].As<String>().Utf8Value();
-  field->SetSignatureCreator(PdfName(creator));
+  GetField()->SetSignatureCreator(PdfName(creator));
 }
 
 void
 SignatureField::SetDate(const CallbackInfo& info)
 {
-  field->SetSignatureDate(PdfDate());
+  if(info.Length() == 1 && info[0].IsString()) {
+    GetField()->SetSignatureDate(PdfDate(PdfString(info[0].As<String>().Utf8Value())));
+  } else {
+    GetField()->SetSignatureDate(PdfDate());
+  }
 }
 
 void
 SignatureField::SetFieldName(const CallbackInfo& info)
 {
   AssertFunctionArgs(info, 1, { napi_valuetype::napi_string });
-  field->SetFieldName(info[0].As<String>().Utf8Value());
+  GetField()->SetFieldName(info[0].As<String>().Utf8Value());
 }
 
 void
 SignatureField::AddCertificateReference(const CallbackInfo& info)
 {
-  throw Error::New(info.Env(), "unimplemented");
+  auto flag = static_cast<PdfSignatureField::EPdfCertPermission>(info[0].As<Number>().Int32Value());
+  GetField()->AddCertificationReference(doc->GetDocument()->GetCatalog(), flag);
 }
 
 Napi::Value
 SignatureField::GetSignatureObject(const CallbackInfo& info)
 {
-  return External<PdfObject>::New(info.Env(), field->GetSignatureObject());
+  return External<PdfObject>::New(info.Env(), GetField()->GetSignatureObject());
 }
 
 Napi::Value
@@ -148,6 +153,7 @@ SignatureField::EnsureSignatureObject(const CallbackInfo& info)
 SignatureField::~SignatureField()
 {
   HandleScope scope(Env());
+  doc = nullptr;
   delete field;
   delete signatureBuffer;
 }

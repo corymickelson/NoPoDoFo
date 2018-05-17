@@ -30,6 +30,7 @@ class ListField : public Napi::ObjectWrap<ListField>
 {
 public:
   explicit ListField(const Napi::CallbackInfo& info);
+  ~ListField();
   static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
   void InsertItem(const Napi::CallbackInfo&);
@@ -38,9 +39,17 @@ public:
   Napi::Value GetItemCount(const Napi::CallbackInfo&);
   void SetSelectedItem(const Napi::CallbackInfo&, const Napi::Value&);
   Napi::Value GetSelectedItem(const Napi::CallbackInfo&);
+  Napi::Value IsComboBox(const Napi::CallbackInfo&);
+  void SetSpellCheckEnabled(const Napi::CallbackInfo&, const Napi::Value&);
+  Napi::Value IsSpellCheckEnabled(const Napi::CallbackInfo&);
+  void SetSorted(const Napi::CallbackInfo&, const Napi::Value&);
+  Napi::Value IsSorted(const Napi::CallbackInfo&);
+  void SetMultiSelect(const Napi::CallbackInfo&, const Napi::Value&);
+  Napi::Value IsMultiSelect(const Napi::CallbackInfo&);
 
+  PoDoFo::PdfListField GetField() { return PoDoFo::PdfListField(*field->GetField()); }
 private:
-  std::unique_ptr<PoDoFo::PdfListField> list;
+  Field* field;
 };
 }
 #endif

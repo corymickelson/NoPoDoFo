@@ -21,12 +21,12 @@
 #include "../ErrorHandler.h"
 #include "../ValidateArguments.h"
 
-namespace NoPoDoFo {
-
 using namespace PoDoFo;
 using namespace Napi;
 
 using std::string;
+
+namespace NoPoDoFo {
 
 FunctionReference Data::constructor; // NOLINT
 

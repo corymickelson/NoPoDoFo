@@ -57,11 +57,10 @@ Document::Initialize(Napi::Env& env, Napi::Object& target)
                   InstanceMethod("getPageCount", &Document::GetPageCount),
                   InstanceMethod("getPage", &Document::GetPage),
                   InstanceMethod("appendDocument", &Document::MergeDocument),
-                  InstanceMethod("splicePage", &Document::DeletePage),
+                  InstanceMethod("splicePages", &Document::DeletePages),
                   InstanceMethod("isLinearized", &Document::IsLinearized),
                   InstanceMethod("getWriteMode", &Document::GetWriteMode),
                   InstanceMethod("write", &Document::Write),
-                  InstanceMethod("writeBuffer", &Document::WriteBuffer),
                   InstanceMethod("getObject", &Document::GetObject),
                   InstanceMethod("isAllowed", &Document::IsAllowed),
                   InstanceMethod("createFont", &Document::CreateFont),
@@ -219,12 +218,16 @@ Document::IsLinearized(const CallbackInfo& info)
 }
 
 void
-Document::DeletePage(const CallbackInfo& info)
+Document::DeletePages(const CallbackInfo &info)
 {
-  AssertFunctionArgs(info, 1, { napi_valuetype::napi_number });
+  AssertFunctionArgs(info, 2, { napi_number, napi_number });
   int pageIndex = info[0].As<Number>();
+  int count = info[1].As<Number>();
+  if(document->GetPageCount() < pageIndex + count) {
+    RangeError::New(info.Env(), "Pages out of range").ThrowAsJavaScriptException();
+  }
   try {
-    document->GetPagesTree()->DeletePage(pageIndex);
+    document->DeletePages(pageIndex, count);
   } catch (PdfError& err) {
     ErrorHandler(err, info);
   }
@@ -233,8 +236,8 @@ Document::DeletePage(const CallbackInfo& info)
 void
 Document::MergeDocument(const CallbackInfo& info)
 {
-  AssertFunctionArgs(info, 1, { napi_valuetype::napi_string });
-  string docPath = info[0].As<String>().Utf8Value();
+  if(info[0].IsString()) {
+   string docPath = info[0].As<String>().Utf8Value();
   PdfMemDocument mergedDoc;
   try {
     mergedDoc.Load(docPath.c_str());
@@ -249,11 +252,16 @@ Document::MergeDocument(const CallbackInfo& info)
       mergedDoc.SetPassword(password);
     }
   }
-  try {
     document->Append(mergedDoc);
-  } catch (PdfError& err) {
-    ErrorHandler(err, info);
+  } else if(info[0].IsObject() && info[0].As<Object>().InstanceOf(Document::constructor.Value())) {
+    try {
+      auto merger = Document::Unwrap(info[0].As<Object>())->document;
+      document->Append(merger);
+    } catch(PdfError& err) {
+      ErrorHandler(err, info);
+    }
   }
+
 }
 
 Napi::Value
@@ -618,29 +626,6 @@ protected:
   }
 };
 
-Napi::Value
-Document::Write(const CallbackInfo& info)
-{
-  try {
-    if (info.Length() == 2 && info[0].IsString() && info[1].IsFunction()) {
-      string arg = info[0].As<String>();
-      auto cb = info[1].As<Function>();
-      DocumentWriteAsync* worker = new DocumentWriteAsync(cb, *this, arg);
-      worker->Queue();
-    } else {
-      throw Error::New(
-        info.Env(),
-        String::New(info.Env(), "Requires at least a callback argument"));
-    }
-  } catch (PdfError& err) {
-    ErrorHandler(err, info);
-  } catch (Napi::Error& err) {
-    ErrorHandler(err, info);
-  }
-
-  return Env().Undefined();
-}
-
 class DocumentLoadAsync : public AsyncWorker
 {
 public:
@@ -772,13 +757,31 @@ protected:
 };
 
 Napi::Value
-Document::WriteBuffer(const CallbackInfo& info)
+Document::Write(const CallbackInfo& info)
 {
-  AssertFunctionArgs(info, 1, { napi_valuetype::napi_function });
-  auto cb = info[0].As<Function>();
-  auto* worker = new DocumentWriteBufferAsync(cb, *this);
-  worker->Queue();
-  return info.Env().Undefined();
+  try {
+    if (info[0].IsFunction()) {
+      auto cb = info[0].As<Function>();
+      auto* worker = new DocumentWriteBufferAsync(cb, *this);
+      worker->Queue();
+      return info.Env().Undefined();
+    } else if (info.Length() == 2 && info[0].IsString() &&
+               info[1].IsFunction()) {
+      string arg = info[0].As<String>();
+      auto cb = info[1].As<Function>();
+      DocumentWriteAsync* worker = new DocumentWriteAsync(cb, *this, arg);
+      worker->Queue();
+    } else {
+      throw Error::New(
+        info.Env(),
+        String::New(info.Env(), "Requires at least a callback argument"));
+    }
+  } catch (PdfError& err) {
+    ErrorHandler(err, info);
+  } catch (Napi::Error& err) {
+    ErrorHandler(err, info);
+  }
+  return Env().Undefined();
 }
 
 class GCAsync : public AsyncWorker

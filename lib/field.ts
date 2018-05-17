@@ -19,6 +19,7 @@
 import {__mod, Document} from './document'
 import {NPDFInternal, IObj} from "./object";
 import {Annotation} from "./annotation";
+import {IListItem} from "../dist/field";
 
 
 export interface IFieldInfo {
@@ -35,7 +36,13 @@ export interface IFieldInfo {
     selected?: string
 }
 
-export type FieldType =
+export enum NPDFCertificatePermission {
+    NoPerms = 1,
+    FormFill = 2,
+    Annotations = 3,
+}
+
+export type NPDFFieldType =
     'TextField'
     | 'CheckBox'
     | 'RadioButton'
@@ -45,6 +52,61 @@ export type FieldType =
     | 'ComboBox'
     | 'ListBox'
 
+export interface IField {
+  readonly: boolean
+  required: boolean
+  type: NPDFFieldType
+  fieldName: string
+  alternateName?: string
+  mappingName?: string
+}
+
+export interface ITextField {
+    text: string
+    maxLen: number
+    multiLine: boolean
+    passwordField: boolean
+    fileField: boolean
+    spellCheckEnabled: boolean
+    scrollEnabled: boolean
+    combs: boolean
+    richText:boolean
+}
+export interface ICheckBox {
+    checked: boolean
+}
+export interface IListField {
+    selected: number
+    length: number
+    spellCheckEnabled: boolean
+    sorted: boolean
+    multiSelect: boolean
+
+    isComboBox(): boolean
+    insertItem(value: string, displayName: string): void
+    removeItem(index:number): void
+    getItem(index: number): IListItem
+}
+export interface IComboBox extends IListField {
+    editable: boolean
+}
+export interface IListBox extends IListField { }
+export enum NPDFAnnotationAppearance {
+    normal,
+    rollover,
+    down
+}
+export interface ISignatureField {
+    setAppearanceStream(xObj: any, appearance: NPDFAnnotationAppearance, name: string): void
+    setReason(reason: string): void
+    setLocation(location: string): void
+    setCreator(creator: string): void
+    setDate(dateTime?:string): void
+    addCertificateReference(perm: NPDFCertificatePermission): void
+    setFieldName(name: string): void
+    getObject(): IObj
+    ensureSignatureObject(): void
+}
 export class Field {
 
     get readOnly():boolean {
@@ -59,7 +121,7 @@ export class Field {
     set fieldName(v:string) {
         this._instance.fieldName= v
     }
-    get type():FieldType {
+    get type():NPDFFieldType {
         return this._instance.type
     }
     constructor(private _instance: NPDFInternal) {

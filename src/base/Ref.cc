@@ -23,12 +23,12 @@
 #include "../doc/Document.h"
 #include "Obj.h"
 
-namespace NoPoDoFo {
-
 using namespace Napi;
 using namespace PoDoFo;
 
 using std::string;
+
+namespace NoPoDoFo {
 
 Napi::FunctionReference Ref::constructor; // NOLINT
 
@@ -125,7 +125,6 @@ Ref::GetObj(const CallbackInfo& info)
     info.Env(), target, [](Napi::Env env, PdfObject* data) {
       HandleScope scope(env);
       delete data;
-      data = nullptr;
     }) });
 }
 Ref::~Ref()

@@ -33,16 +33,8 @@ Napi::FunctionReference Array::constructor; // NOLINT
 
 Array::Array(const CallbackInfo& info)
   : ObjectWrap<Array>(info)
-  , array(new PdfArray(*info[0].As<External<PdfArray>>().Data()))
+  , array(info[0].As<External<PdfArray>>().Data())
 {}
-
-Array::~Array()
-{
-  if (array != nullptr) {
-    HandleScope scope(Env());
-    delete array;
-  }
-}
 
 void
 Array::Initialize(Napi::Env& env, Napi::Object& target)
@@ -56,7 +48,7 @@ Array::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceAccessor("immutable", &Array::GetImmutable, &Array::SetImmutable),
       InstanceMethod("toJS", &Array::ToArray),
       InstanceMethod("at", &Array::At),
-      InstanceMethod("contains", &Array::ContainsString),
+      InstanceMethod("containsString", &Array::ContainsString),
       InstanceMethod("indexOf", &Array::GetStringIndex),
       InstanceMethod("write", &Array::Write),
       InstanceMethod("push", &Array::Push),

@@ -16,16 +16,17 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import { access, constants } from 'fs'
-import { IObj } from './object';
-import { Page } from './page';
-import { EncryptOption, IEncrypt, ProtectionOption } from './encrypt';
-import { EventEmitter } from 'events';
-import { Font, IFont } from "./painter";
-import { Signer } from './signer';
-import { F_OK, R_OK } from "constants";
-import { IRef } from "./reference";
-import { IForm } from "./form";
+import {access, constants} from 'fs'
+import {IObj} from './object';
+import {Page, IPage} from './page';
+import {EncryptOption, IEncrypt, ProtectionOption} from './encrypt';
+import {EventEmitter} from 'events';
+import {Font, IFont} from "./painter";
+import {Signer} from './signer';
+import {F_OK, R_OK} from "constants";
+import {IRef} from "./reference";
+import {IForm} from "./form";
+import {NPDFWriteMode} from "../dist/stream-document";
 
 export const __mod = require('bindings')('npdf')
 export type Callback = (err: Error, data: Buffer | string) => void
@@ -52,6 +53,53 @@ export interface CreateFontOpts {
     fileName?: string
 }
 
+export interface IDocument {
+    password: string
+    encrypt: IEncrypt
+    form: IForm
+    body: IObj[]
+    trailer: IObj
+    catalog: IObj
+    version: number
+
+    load(file: string | Buffer,
+         cb: Callback,
+         forUpdate: boolean,
+         fromBuffer: boolean,
+         password?: string): void
+
+    getPageCount(): number
+
+    getPage(n: number): IPage
+
+    appendDocument(doc: string | IDocument, password?: string): void
+
+    splicePages(startIndex: number, count: number): void
+
+    isLinearized(): boolean
+
+    getWriteMode(): NPDFWriteMode
+
+    write(destination: Callback | string, cb: Callback): void
+
+    getObject(ref: IRef): IObj
+
+    isAllowed(perm: ProtectionOption): boolean
+
+    createFont(opts: CreateFontOpts): IFont
+
+    getFont(name: string): IFont
+}
+
+export const documentGc = (file: string, pwd: string, output: string, cb: Callback) => {
+    access(file, F_OK, err => {
+        if (err) {
+            throw Error('File not found')
+        }
+        __mod.Document.gc(file, pwd, output, cb)
+    })
+}
+
 
 /**
  * @class Document
@@ -70,15 +118,19 @@ export class Document extends EventEmitter {
     get body(): IObj[] {
         return this._instance.body
     }
+
     get trailer(): IObj {
         return this._instance.trailer
     }
+
     get catalog(): IObj {
         return this._instance.catalog
     }
+
     get version(): number {
         return this._instance.version
     }
+
     /**
      * @desc A Document has been read into memory
      * @returns {boolean}

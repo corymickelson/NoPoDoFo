@@ -22,12 +22,12 @@
 #include "../ValidateArguments.h"
 
 
-namespace NoPoDoFo {
-
 using namespace Napi;
 using namespace PoDoFo;
 
 using std::string;
+
+namespace NoPoDoFo {
 
 FunctionReference Stream::constructor; // NOLINT
 
@@ -57,7 +57,7 @@ Napi::Value
 Stream::GetBuffer(const CallbackInfo& info)
 {
   pdf_long bufferLength = stream->GetLength();
-  char* copy = static_cast<char*>(
+  auto * copy = static_cast<char*>(
     malloc(sizeof(char) * static_cast<unsigned long>(bufferLength)));
   stream->GetCopy(&copy, &bufferLength);
   auto value =

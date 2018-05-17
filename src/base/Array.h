@@ -28,7 +28,6 @@ class Array : public Napi::ObjectWrap<Array>
 {
 public:
   explicit Array(const Napi::CallbackInfo&);
-  ~Array();
   static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
 

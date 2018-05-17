@@ -24,16 +24,16 @@ import { __mod, Document } from "./document"
 
 export type NPDFInternal = any
 
-export type CoerceKeyType = 'boolean' | 'long' | 'name' | 'real'
+export type NPDFCoerceKeyType = 'boolean' | 'long' | 'name' | 'real'
 
-export type PDType = 'Boolean' | 'Number' | 'Name' | 'Real' | 'String' | 'Array' |
+export type NPDFDataType = 'Boolean' | 'Number' | 'Name' | 'Real' | 'String' | 'Array' |
     'Dictionary' | 'Reference' | 'RawData'
 
 export interface IObj {
     reference: number
     length: number
     stream: Stream
-    type: PDType
+    type: NPDFDataType
     immutable: boolean
     hasStream(): boolean
     getOffset(key: string): Promise<number>
@@ -63,7 +63,7 @@ export interface IArray {
     write(destination: string): void
 }
 
-export type IDictionaryKeyType = 'boolean' | 'long' | 'name' | 'real'
+export type NPDFDictionaryKeyType = 'boolean' | 'long' | 'name' | 'real'
 export interface IDictionary {
   dirty: boolean
   immutable: boolean
@@ -73,7 +73,7 @@ export interface IDictionary {
   getKeys(): string[]
   hasKey(k: string): boolean
   removeKey(k: string): void
-  getKeyAs(k: string, t: IDictionaryKeyType): string | number
+  getKeyAs(k: string, t: NPDFDictionaryKeyType): string | number
   clear(): void
   write(destination: string, cb: (e: Error, i: string) => void): void
   writeSync(destination: string): void

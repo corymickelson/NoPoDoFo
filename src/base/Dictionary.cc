@@ -23,8 +23,6 @@
 #include "Obj.h"
 #include <algorithm>
 
-namespace NoPoDoFo {
-
 using namespace Napi;
 using namespace PoDoFo;
 
@@ -33,6 +31,8 @@ using std::endl;
 using std::map;
 using std::string;
 using std::vector;
+
+namespace NoPoDoFo {
 
 FunctionReference Dictionary::constructor; // NOLINT
 

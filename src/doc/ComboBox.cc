@@ -21,29 +21,43 @@
 #include "../ValidateArguments.h"
 #include "Field.h"
 
-namespace NoPoDoFo {
-
 using namespace Napi;
 using namespace PoDoFo;
 
-FunctionReference ComboBox::constructor;
+namespace NoPoDoFo {
+
+FunctionReference ComboBox::constructor; // NOLINT
 
 ComboBox::ComboBox(const Napi::CallbackInfo& info)
   : ObjectWrap(info)
+  , field(Field::Unwrap(info[0].As<Object>()))
+{}
+ComboBox::~ComboBox()
 {
-  AssertFunctionArgs(info, 1, { napi_object });
-  Field* nField = Field::Unwrap(info[0].As<Object>());
-  PdfComboBox v(*nField->GetField());
-  self = make_unique<PdfComboBox>(v);
+  HandleScope scope(Env());
+  field = nullptr;
 }
-
 void
 ComboBox::Initialize(Napi::Env& env, Napi::Object& target)
 {
   HandleScope scope(env);
-  auto ctor = DefineClass(env, "ComboBox", {});
+  auto ctor = DefineClass(env,
+                          "ComboBox",
+                          { InstanceAccessor("editable",
+                                             &ComboBox::GetEditable,
+                                             &ComboBox::SetEditable) });
   constructor = Persistent(ctor);
   constructor.SuppressDestruct();
   target.Set("ComboBox", ctor);
+}
+void
+ComboBox::SetEditable(const Napi::CallbackInfo&, const Napi::Value& value)
+{
+  GetField().SetEditable(value.As<Boolean>());
+}
+Napi::Value
+ComboBox::GetEditable(const Napi::CallbackInfo& info)
+{
+  return Boolean::New(info.Env(), GetField().IsEditable());
 }
 }

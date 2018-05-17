@@ -45,7 +45,16 @@ TextField::Initialize(Napi::Env& env, Napi::Object& target)
   Function ctor = DefineClass(
     env,
     "TextField",
-    { InstanceAccessor("text", &TextField::GetText, &TextField::SetText) });
+    { InstanceAccessor("text", &TextField::GetText, &TextField::SetText),
+      InstanceAccessor("maxLen", &TextField::GetMaxLen, &TextField::SetMaxLen),
+      InstanceAccessor("multiLine", &TextField::IsMultiLine, &TextField::SetMultiLine),
+      InstanceAccessor("passwordField", &TextField::IsPasswordField, &TextField::SetPasswordField),
+      InstanceAccessor("fileField", &TextField::IsFileField, &TextField::SetFileField),
+      InstanceAccessor("spellCheckEnabled", &TextField::IsSpellcheckEnabled, &TextField::SetSpellcheckEnabled),
+      InstanceAccessor("scrollEnabled", &TextField::IsScrollEnabled, &TextField::SetScrollEnabled),
+      InstanceAccessor("combs", &TextField::IsCombs, &TextField::SetCombs),
+      InstanceAccessor("richText", &TextField::IsRichText, &TextField::SetRichText)
+    });
   constructor = Napi::Persistent(ctor);
   constructor.SuppressDestruct();
 
@@ -67,5 +76,53 @@ Napi::Value
 TextField::GetText(const CallbackInfo& info)
 {
   return Napi::String::New(info.Env(), GetField().GetText().GetStringUtf8());
+}
+void TextField::SetMaxLen(const Napi::CallbackInfo &info, const Napi::Value &value) {
+ GetField().SetMaxLen(value.As<Number>().Int64Value());
+}
+Napi::Value TextField::GetMaxLen(const Napi::CallbackInfo &info) {
+  return Number::New(info.Env(), GetField().GetMaxLen());
+}
+void TextField::SetMultiLine(const Napi::CallbackInfo &info, const Napi::Value &value) {
+  GetField().SetMultiLine(value.As<Boolean>());
+}
+Napi::Value TextField::IsMultiLine(const Napi::CallbackInfo &info) {
+  return Boolean::New(info.Env(), GetField().IsMultiLine());
+}
+void TextField::SetPasswordField(const Napi::CallbackInfo &, const Napi::Value &value) {
+  GetField().SetPasswordField(value.As<Boolean>());
+}
+Napi::Value TextField::IsPasswordField(const Napi::CallbackInfo &info) {
+  return Boolean::New(info.Env(), GetField().IsPasswordField());
+}
+void TextField::SetFileField(const Napi::CallbackInfo &, const Napi::Value &value) {
+  GetField().SetFileField(value.As<Boolean>());
+}
+Napi::Value TextField::IsFileField(const Napi::CallbackInfo &info) {
+  return Boolean::New(info.Env(), GetField().IsFileField());
+}
+void TextField::SetSpellcheckEnabled(const Napi::CallbackInfo &, const Napi::Value &value) {
+GetField().SetSpellcheckingEnabled(value.As<Boolean>());
+}
+Napi::Value TextField::IsSpellcheckEnabled(const Napi::CallbackInfo &info) {
+  return Boolean::New(info.Env(), GetField().IsSpellcheckingEnabled());
+}
+void TextField::SetScrollEnabled(const Napi::CallbackInfo &, const Napi::Value &value) {
+  GetField().SetScrollBarsEnabled(value.As<Boolean>());
+}
+Napi::Value TextField::IsScrollEnabled(const Napi::CallbackInfo &info) {
+  return Boolean::New(info.Env(), GetField().IsScrollBarsEnabled());
+}
+void TextField::SetCombs(const Napi::CallbackInfo &, const Napi::Value &value) {
+GetField().SetCombs(value.As<Boolean>());
+}
+Napi::Value TextField::IsCombs(const Napi::CallbackInfo &info) {
+  return Boolean::New(info.Env(), GetField().IsCombs());
+}
+void TextField::SetRichText(const Napi::CallbackInfo &, const Napi::Value &value) {
+  GetField().SetRichText(value.As<Boolean>());
+}
+Napi::Value TextField::IsRichText(const Napi::CallbackInfo &info) {
+  return Boolean::New(info.Env(), GetField().IsRichText());
 }
 }

@@ -41,12 +41,11 @@ public:
   Napi::Value GetPageCount(const Napi::CallbackInfo&);
   Napi::Value GetPage(const Napi::CallbackInfo&);
   void MergeDocument(const Napi::CallbackInfo&);
-  void DeletePage(const Napi::CallbackInfo&);
+  void DeletePages(const Napi::CallbackInfo &);
   void SetPassword(const Napi::CallbackInfo&, const Napi::Value&);
   Napi::Value GetVersion(const Napi::CallbackInfo&);
   Napi::Value IsLinearized(const Napi::CallbackInfo&);
   Napi::Value Write(const Napi::CallbackInfo&);
-  Napi::Value WriteBuffer(const Napi::CallbackInfo&);
   Napi::Value GetWriteMode(const Napi::CallbackInfo&);
   void SetEncrypt(const Napi::CallbackInfo&, const Napi::Value&);
   Napi::Value GetObjects(const Napi::CallbackInfo&);

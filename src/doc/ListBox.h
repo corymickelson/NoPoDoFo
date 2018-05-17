@@ -22,17 +22,20 @@
 
 #include <napi.h>
 #include <podofo/podofo.h>
+#include "Field.h"
 
 namespace NoPoDoFo {
 
 class ListBox: public Napi::ObjectWrap<ListBox> {
 public:
   explicit ListBox(const Napi::CallbackInfo &);
+  ~ListBox();
   static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env&, Napi::Object&);
 
+  PoDoFo::PdfListBox GetField() { return  PoDoFo::PdfListBox(*field->GetField()); }
 private:
-  std::unique_ptr<PoDoFo::PdfListBox> self;
+  Field* field;
 };
 
 }

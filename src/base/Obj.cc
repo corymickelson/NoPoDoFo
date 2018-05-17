@@ -260,13 +260,16 @@ Obj::GetName(const CallbackInfo& info)
 Napi::Value
 Obj::GetArray(const CallbackInfo& info)
 {
-  EscapableHandleScope scope(info.Env());
   if (!obj->IsArray()) {
     throw Napi::Error::New(info.Env(), "Obj only accessible as array");
   }
-  auto ptr = External<PdfArray>::New(info.Env(), &obj->GetArray());
+  auto ptr = External<PdfArray>::New(info.Env(),
+                                     new PdfArray(obj->GetArray()),
+                                     [](Napi::Env env, PdfArray* data) {
+                                       HandleScope scope(env);
+                                       delete data;
+                                     });
   auto instance = NoPoDoFo::Array::constructor.New({ ptr });
-  //  return scope.Escape(instance);
   return instance;
 }
 

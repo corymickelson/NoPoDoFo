@@ -20,20 +20,22 @@
 #include "ListBox.h"
 #include "../ValidateArguments.h"
 #include "Field.h"
-namespace NoPoDoFo {
 
 using namespace Napi;
 using namespace PoDoFo;
+
+namespace NoPoDoFo {
 
 FunctionReference ListBox::constructor; // NOLINT
 
 ListBox::ListBox(const Napi::CallbackInfo& info)
   : ObjectWrap(info)
+  , field(Field::Unwrap(info[0].As<Object>()))
 {
-  AssertFunctionArgs(info, 1, { napi_object });
-  Field* nField = Field::Unwrap(info[0].As<Object>());
-  //  PdfListBox v(nField->GetField());
-  self = make_unique<PdfListBox>(*new PdfListBox(*nField->GetField()));
+}
+ListBox::~ListBox() {
+  HandleScope scope(Env());
+  field = nullptr;
 }
 void
 ListBox::Initialize(Napi::Env& env, Napi::Object& target)

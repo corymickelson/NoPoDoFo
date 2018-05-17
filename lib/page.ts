@@ -27,25 +27,22 @@ export interface IPage {
     number: number
     width: number
     height: number
+    contents: IObj
+    resources: IObj
 
-    getNumFields(): number
-    getFieldsInfo(): Array<IFieldInfo>
     getField(index: number): Field
-    getFields(): Array<Field>
+    getNumFields(): number
     getFieldIndex(fieldName: string): number
-    getContents(append: boolean): IObj
-    getResources(): IObj
     getMediaBox(): Rect
     getBleedBox(): Rect
     getArtBox(): Rect
     getNumAnnots(): number
     createAnnotation(type: NPDFAnnotation, rect: Rect): Annotation
     getAnnotation(index: number): Annotation
-    getAnnotations(): Array<Annotation>
     deleteAnnotation(index: number): void
 }
 
-export class Page implements IPage {
+export class Page {
     get trimBox() {
         const trimBoxRect = this._instance.trimBox
         return new Rect([trimBoxRect.left, trimBoxRect.bottom, trimBoxRect.width, trimBoxRect.height])

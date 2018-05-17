@@ -37,6 +37,22 @@ public:
   static void Initialize(Napi::Env& env, Napi::Object& target);
   void SetText(const Napi::CallbackInfo&, const Napi::Value&);
   Napi::Value GetText(const Napi::CallbackInfo&);
+  void SetMaxLen(const Napi::CallbackInfo&, const Napi::Value&);
+  Napi::Value GetMaxLen(const Napi::CallbackInfo&);
+  void SetMultiLine(const Napi::CallbackInfo&, const Napi::Value&);
+  Napi::Value IsMultiLine(const Napi::CallbackInfo&);
+  void SetPasswordField(const Napi::CallbackInfo&, const Napi::Value&);
+  Napi::Value IsPasswordField(const Napi::CallbackInfo&);
+  void SetFileField(const Napi::CallbackInfo&, const Napi::Value&);
+  Napi::Value IsFileField(const Napi::CallbackInfo&);
+  void SetSpellcheckEnabled(const Napi::CallbackInfo&, const Napi::Value&);
+  Napi::Value IsSpellcheckEnabled(const Napi::CallbackInfo&);
+  void SetScrollEnabled(const Napi::CallbackInfo&, const Napi::Value&);
+  Napi::Value IsScrollEnabled(const Napi::CallbackInfo&);
+  void SetCombs(const Napi::CallbackInfo&, const Napi::Value&);
+  Napi::Value IsCombs(const Napi::CallbackInfo&);
+  void SetRichText(const Napi::CallbackInfo&, const Napi::Value&);
+  Napi::Value IsRichText(const Napi::CallbackInfo&);
   PoDoFo::PdfTextField GetField()
   {
     return PoDoFo::PdfTextField(*field->GetField());

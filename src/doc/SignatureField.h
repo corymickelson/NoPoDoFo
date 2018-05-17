@@ -22,6 +22,7 @@
 
 #include <napi.h>
 #include <podofo/podofo.h>
+#include "Document.h"
 namespace NoPoDoFo {
 class SignatureField : public Napi::ObjectWrap<SignatureField>
 {
@@ -47,6 +48,7 @@ public:
 private:
   PoDoFo::PdfSignatureField* field;
   PoDoFo::PdfData* signatureBuffer;
+  Document* doc;
   bool isExternalInstance = false;
 };
 }
