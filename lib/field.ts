@@ -21,6 +21,20 @@ import {NPDFInternal, IObj} from "./object";
 import {Annotation} from "./annotation";
 import {IListItem} from "../dist/field";
 
+export interface NPDFTextFieldOpts {
+    maxLen?: number
+    multiLine?: boolean
+    passwordField?: boolean
+    fileField?: boolean
+    spellCheckEnabled?: boolean
+    scrollEnabled?: boolean
+    /**
+     * @desc Divide text into equal length combs.
+     * @requires NPDFTextFieldOpts#maxLen
+     */
+    combs?: boolean
+    richText?: boolean
+}
 
 export interface IFieldInfo {
     name: string,
@@ -59,9 +73,11 @@ export interface IField {
   fieldName: string
   alternateName?: string
   mappingName?: string
+    exported?: boolean
 }
 
 export interface ITextField {
+    new (field: IField, opts?: NPDFTextFieldOpts): ITextField
     text: string
     maxLen: number
     multiLine: boolean
@@ -155,12 +171,12 @@ export class Field {
 export class TextField extends Field {
     private _textFieldInstance: any
 
-    constructor(field: Field) {
+    constructor(field: Field, opts?: NPDFTextFieldOpts) {
         super((field as any)._instance)
         if (field.type !== 'TextField') {
             throw Error('field parameter must be a field of type TextField')
         }
-        this._textFieldInstance = new __mod.TextField((field as any)._instance)
+        this._textFieldInstance = new __mod.TextField((field as any)._instance, opts)
     }
 
     get text(): string {

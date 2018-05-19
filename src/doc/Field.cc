@@ -39,12 +39,6 @@ Field::Field(const CallbackInfo& info)
   fieldType = TypeString();
 }
 
-Field::~Field()
-{
-  HandleScope scope(Env());
-  cout << "Destructing Field: " << fieldName << " of type: " << fieldType
-       << endl;
-}
 void
 Field::Initialize(Napi::Env& env, Napi::Object& target)
 {
@@ -54,6 +48,7 @@ Field::Initialize(Napi::Env& env, Napi::Object& target)
     "Field",
     { InstanceAccessor("readOnly", &Field::IsReadOnly, &Field::SetReadOnly),
       InstanceAccessor("required", &Field::IsRequired, &Field::SetRequired),
+      InstanceAccessor("exported", &Field::IsExport, &Field::SetExport),
       InstanceAccessor("type", &Field::GetType, nullptr),
       InstanceAccessor("fieldName", &Field::GetFieldName, &Field::SetFieldName),
       InstanceAccessor(
@@ -163,4 +158,80 @@ Field::SetReadOnly(const Napi::CallbackInfo&, const Napi::Value& value)
 {
   GetField()->SetReadOnly(value.As<Boolean>());
 }
+void
+Field::SetExport(const Napi::CallbackInfo&, const Napi::Value& value)
+{
+  GetField()->SetExport(value.As<Boolean>());
+}
+Napi::Value
+Field::IsExport(const Napi::CallbackInfo& info)
+{
+  return Boolean::New(info.Env(), GetField()->IsExport());
+}
+/**
+ * @note (color:Array<number>, transparent?: boolean)
+ * @param info
+ * @return
+ */
+Napi::Value Field::SetBackground(const Napi::CallbackInfo &info) {
+  auto js = info[0].As<Array>();
+  switch (js.Length()) {
+  case 1:
+    auto gray = js.Get(static_cast<uint32_t>(0)).As<Number>().DoubleValue();
+    GetField()->SetBackgroundColor(gray);
+    break;
+  case 3:
+    auto r = js.Get(static_cast<uint32_t>(0)).As<Number>().DoubleValue();
+    auto g = js.Get(static_cast<uint32_t>(1)).As<Number>().DoubleValue();
+    auto b = js.Get(static_cast<uint32_t>(2)).As<Number>().DoubleValue();
+    GetField()->SetBackgroundColor(r,g, b);
+    break;
+  case 4:
+    auto c= js.Get(static_cast<uint32_t>(0)).As<Number>().DoubleValue();
+    auto m= js.Get(static_cast<uint32_t>(1)).As<Number>().DoubleValue();
+    auto y= js.Get(static_cast<uint32_t>(2)).As<Number>().DoubleValue();
+    auto k= js.Get(static_cast<uint32_t>(3)).As<Number>().DoubleValue();
+    GetField()->SetBackgroundColor(c, m, y, k);
+    break;
+  default:
+    TypeError::New(info.Env(), "value must be [grayscale], [r,g,b], [c,m,y,k]").ThrowAsJavaScriptException();
+    break;
+  }
+  return info.Env().Undefined();
+}
+void Field::SetColor(const Napi::Value& value, const std::function<void(const vector<double>)> &fn) {
+  auto js = value.As<Array>();
+  vector<double> values;
+  switch (js.Length()) {
+  case 1:
+    auto gray = js.Get(static_cast<uint32_t>(0)).As<Number>().DoubleValue();
+    values.push_back(gray);
+//    GetField()->SetBackgroundColor(gray);
+    break;
+  case 3:
+    auto r = js.Get(static_cast<uint32_t>(0)).As<Number>().DoubleValue();
+    values.push_back(r);
+    auto g = js.Get(static_cast<uint32_t>(1)).As<Number>().DoubleValue();
+    values.push_back(g);
+    auto b = js.Get(static_cast<uint32_t>(2)).As<Number>().DoubleValue();
+    values.push_back(b);
+//    GetField()->SetBackgroundColor(r,g, b);
+    break;
+  case 4:
+    auto c= js.Get(static_cast<uint32_t>(0)).As<Number>().DoubleValue();
+    values.push_back(c);
+    auto m= js.Get(static_cast<uint32_t>(1)).As<Number>().DoubleValue();
+    values.push_back(m);
+    auto y= js.Get(static_cast<uint32_t>(2)).As<Number>().DoubleValue();
+    values.push_back(y);
+    auto k= js.Get(static_cast<uint32_t>(3)).As<Number>().DoubleValue();
+    values.push_back(k);
+//    GetField()->SetBackgroundColor(c, m, y, k);
+    break;
+  default:
+    break;
+  }
+  fn(values);
+}
+
 }

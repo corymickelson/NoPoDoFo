@@ -91,14 +91,15 @@ Page::GetField(const CallbackInfo& info)
   if (index < 0 || index > GetPage()->GetNumFields()) {
     throw RangeError();
   }
-  auto instance = Field::constructor.New(
-    { External<PdfField>::New(info.Env(),
-                              new PdfField(GetPage()->GetField(index)),
-                              [](Napi::Env env, PdfField* data) {
-                                HandleScope scope(env);
-                                delete data;
-                                data = nullptr;
-                              }) });
+  auto instance = Field::constructor.New({ External<PdfField>::New(
+    info.Env(),
+    new PdfField(GetPage()->GetField(index)),
+    [](Napi::Env env, PdfField* data) {
+      cout << "Finalizing field: " << data->GetFieldName().GetStringUtf8()
+           << endl;
+      HandleScope scope(env);
+      delete data;
+    }) });
   return instance;
 }
 

@@ -32,10 +32,8 @@ class Field : public Napi::ObjectWrap<Field>
 {
 public:
   explicit Field(const Napi::CallbackInfo& info);
-  ~Field();
   static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
-
   Napi::Value GetType(const Napi::CallbackInfo&);
   Napi::Value GetFieldName(const Napi::CallbackInfo&);
   void SetFieldName(const Napi::CallbackInfo&, const Napi::Value&);
@@ -47,8 +45,16 @@ public:
   Napi::Value IsRequired(const Napi::CallbackInfo&);
   void SetReadOnly(const Napi::CallbackInfo&, const Napi::Value&);
   Napi::Value IsReadOnly(const Napi::CallbackInfo&);
+  void SetExport(const Napi::CallbackInfo&, const Napi::Value&);
+  Napi::Value IsExport(const Napi::CallbackInfo&);
+  Napi::Value SetBackground(const Napi::CallbackInfo&);
+  Napi::Value SetBorder(const Napi::CallbackInfo&);
+  Napi::Value SetHighlight(const Napi::CallbackInfo&);
+  Napi::Value SetMouseAction(const Napi::CallbackInfo&);
+  Napi::Value SetPageAction(const Napi::CallbackInfo&);
 
   PoDoFo::PdfField* GetField() { return field; }
+  void SetColor(const Napi::Value&, const std::function<void(const std::vector<double>)>& fn);
 
   string fieldName;
   string fieldType;
