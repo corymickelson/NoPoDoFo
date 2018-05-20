@@ -55,11 +55,12 @@ public:
   Napi::Value IsRichText(const Napi::CallbackInfo&);
   PoDoFo::PdfTextField GetField()
   {
-    return PoDoFo::PdfTextField(*field->GetField());
+    return PoDoFo::PdfTextField(*field);
   }
 
 private:
-  Field* field;
+  std::shared_ptr<PoDoFo::PdfField> field;
+//  Field* field;
 };
 }
 #endif // NPDF_TEXTFIELD_H

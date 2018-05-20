@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import {Data} from './data'
-import {Document, FontEncoding, __mod} from './document'
+import {Document, NPDFFontEncoding, __mod} from './document'
 import {IObj} from './object'
 import {Page} from './page'
 import {
@@ -68,7 +68,7 @@ export {
     Image,
     Data,
     Document,
-    FontEncoding,
+    NPDFFontEncoding,
     IObj,
     Page,
     Annotation,

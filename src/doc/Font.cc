@@ -214,7 +214,6 @@ Font::IsItalic(const Napi::CallbackInfo& info)
 Napi::Value
 Font::StringWidth(const CallbackInfo& info)
 {
-  AssertFunctionArgs(info, 1, { napi_valuetype::napi_string });
   string text = info[0].As<String>().Utf8Value();
   return Number::New(info.Env(),
                      GetFont()->GetFontMetrics()->StringWidth(text));
@@ -236,8 +235,6 @@ Font::GetObject(const CallbackInfo& info)
 void
 Font::WriteToStream(const Napi::CallbackInfo& info)
 {
-  AssertFunctionArgs(
-    info, 2, { napi_valuetype::napi_string, napi_valuetype::napi_object });
   string content = info[0].As<String>().Utf8Value();
   auto streamWrap = info[1].As<Object>();
   if (!streamWrap.InstanceOf(Stream::constructor.Value())) {

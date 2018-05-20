@@ -26,13 +26,13 @@
 #include <podofo/podofo.h>
 #include <string>
 namespace NoPoDoFo {
-class ListField : public Napi::ObjectWrap<ListField>
+class ListField //: public Napi::ObjectWrap<ListField>
 {
 public:
   explicit ListField(const Napi::CallbackInfo& info);
   ~ListField();
-  static Napi::FunctionReference constructor;
-  static void Initialize(Napi::Env& env, Napi::Object& target);
+//  static Napi::FunctionReference constructor;
+//  static void Initialize(Napi::Env& env, Napi::Object& target);
   void InsertItem(const Napi::CallbackInfo&);
   void RemoveItem(const Napi::CallbackInfo&);
   Napi::Value GetItem(const Napi::CallbackInfo&);
@@ -47,9 +47,10 @@ public:
   void SetMultiSelect(const Napi::CallbackInfo&, const Napi::Value&);
   Napi::Value IsMultiSelect(const Napi::CallbackInfo&);
 
-  PoDoFo::PdfListField GetField() { return PoDoFo::PdfListField(*field->GetField()); }
+  PoDoFo::PdfListField GetListField() { return PoDoFo::PdfListField(*field); }
 private:
-  Field* field;
+//  Field* field;
+  std::shared_ptr<PoDoFo::PdfField> field;
 };
 }
 #endif

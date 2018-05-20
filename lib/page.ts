@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import { IFieldInfo, Field } from './field'
+import {IFieldInfo, Field, IField} from './field'
 import {  Rect } from './rect';
 import {  IObj } from './object';
 import { Annotation, NPDFAnnotation } from './annotation';
@@ -30,13 +30,14 @@ export interface IPage {
     contents: IObj
     resources: IObj
 
-    getField(index: number): Field
-    getNumFields(): number
+    getField(index: number): IField
+    getFields(): IField[]
+    fieldsCount(): number
     getFieldIndex(fieldName: string): number
     getMediaBox(): Rect
     getBleedBox(): Rect
     getArtBox(): Rect
-    getNumAnnots(): number
+    annotationsCount(): number
     createAnnotation(type: NPDFAnnotation, rect: Rect): Annotation
     getAnnotation(index: number): Annotation
     deleteAnnotation(index: number): void

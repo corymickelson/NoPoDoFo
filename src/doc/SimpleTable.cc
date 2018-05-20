@@ -34,7 +34,6 @@ FunctionReference SimpleTable::constructor; // NOLINT
 SimpleTable::SimpleTable(const CallbackInfo& info)
   : ObjectWrap(info)
 {
-  AssertFunctionArgs(info, 3, { napi_object, napi_number, napi_number });
   doc = Document::Unwrap(info[0].As<Object>());
   const int cols = info[1].As<Number>();
   const int rows = info[2].As<Number>();
@@ -107,7 +106,6 @@ SimpleTable::Initialize(Napi::Env& env, Napi::Object& target)
 Value
 SimpleTable::GetFont(const CallbackInfo& info)
 {
-  AssertFunctionArgs(info, 2, { napi_number, napi_number });
   const int col = info[0].As<Number>();
   const int row = info[1].As<Number>();
   return Font::constructor.New(
@@ -128,7 +126,6 @@ SimpleTable::SetFont(const CallbackInfo& info, const Napi::Value& value)
 Value
 SimpleTable::GetText(const CallbackInfo& info)
 {
-  AssertFunctionArgs(info, 2, { napi_number, napi_number });
   const int col = info[0].As<Number>();
   const int row = info[1].As<Number>();
   return String::New(info.Env(), model->GetText(col, row).GetStringUtf8());
@@ -158,7 +155,6 @@ SimpleTable::SetBorderWidth(const CallbackInfo& info, const Napi::Value& value)
 Value
 SimpleTable::GetBorderColor(const CallbackInfo& info)
 {
-  AssertFunctionArgs(info, 2, { napi_number, napi_number });
   const int col = info[0].As<Number>();
   const int row = info[1].As<Number>();
   auto color = model->GetBorderColor(col, row);
@@ -183,7 +179,6 @@ SimpleTable::HasBorders(const CallbackInfo& info)
 Value
 SimpleTable::GetImage(const CallbackInfo& info)
 {
-  AssertFunctionArgs(info, 2, { napi_number, napi_number });
   const int col = info[0].As<Number>();
   const int row = info[1].As<Number>();
   auto image = model->GetImage(col, row);
@@ -197,7 +192,6 @@ SimpleTable::GetImage(const CallbackInfo& info)
 Value
 SimpleTable::HasImage(const CallbackInfo& info)
 {
-  AssertFunctionArgs(info, 2, { napi_number, napi_number });
   const int col = info[0].As<Number>();
   const int row = info[1].As<Number>();
   return Boolean::New(info.Env(), model->HasImage(col, row));
@@ -205,7 +199,6 @@ SimpleTable::HasImage(const CallbackInfo& info)
 Value
 SimpleTable::GetForegroundColor(const CallbackInfo& info)
 {
-  AssertFunctionArgs(info, 2, { napi_number, napi_number });
   const int col = info[0].As<Number>();
   const int row = info[1].As<Number>();
   auto color = model->GetForegroundColor(col, row);
@@ -229,7 +222,6 @@ SimpleTable::SetForegroundColor(const CallbackInfo& info,
 Value
 SimpleTable::GetBackgroundColor(const CallbackInfo& info)
 {
-  AssertFunctionArgs(info, 2, { napi_number, napi_number });
   const int col = info[0].As<Number>();
   const int row = info[1].As<Number>();
   auto color = model->GetForegroundColor(col, row).ToArray();
@@ -258,7 +250,6 @@ SimpleTable::SetBackgroundColor(const CallbackInfo& info,
 Value
 SimpleTable::HasBackgroundColor(const CallbackInfo& info)
 {
-  AssertFunctionArgs(info, 2, { napi_number, napi_number });
   const int col = info[0].As<Number>();
   const int row = info[1].As<Number>();
   return Boolean::New(info.Env(), model->HasBackgroundColor(col, row));
@@ -273,7 +264,6 @@ SimpleTable::SetBackgroundEnabled(const CallbackInfo& info)
 Value
 SimpleTable::GetAlignment(const CallbackInfo& info)
 {
-  AssertFunctionArgs(info, 2, { napi_number, napi_number });
   const int col = info[0].As<Number>();
   const int row = info[1].As<Number>();
   const int alignment = model->GetAlignment(col, row);
@@ -315,7 +305,6 @@ SimpleTable::SetAlignment(const CallbackInfo& info, const Napi::Value& value)
 Value
 SimpleTable::GetVerticalAlignment(const CallbackInfo& info)
 {
-  AssertFunctionArgs(info, 2, { napi_number, napi_number });
   const int col = info[0].As<Number>();
   const int row = info[1].As<Number>();
   string i;
@@ -338,7 +327,6 @@ SimpleTable::GetVerticalAlignment(const CallbackInfo& info)
 Value
 SimpleTable::HasWordWrap(const CallbackInfo& info)
 {
-  AssertFunctionArgs(info, 2, { napi_number, napi_number });
   const int col = info[0].As<Number>();
   const int row = info[1].As<Number>();
   return Boolean::New(info.Env(), model->HasWordWrap(col, row));
@@ -354,7 +342,6 @@ SimpleTable::SetWordWrapEnabled(const CallbackInfo& info,
 void
 SimpleTable::Draw(const CallbackInfo& info)
 {
-  AssertFunctionArgs(info, 2, { napi_object, napi_object });
   const Object point = info[0].As<Object>();
   const double posX = point.Get("x").As<Number>();
   const double posY = point.Get("y").As<Number>();
@@ -369,7 +356,6 @@ SimpleTable::Draw(const CallbackInfo& info)
 Value
 SimpleTable::GetWidth(const CallbackInfo& info)
 {
-  AssertFunctionArgs(info, 3, { napi_number, napi_number, napi_object });
   const double posX = info[0].As<Number>();
   const double posY = info[1].As<Number>();
   auto page = Page::Unwrap(info[2].As<Object>());
@@ -386,7 +372,6 @@ SimpleTable::SetTableWidth(const CallbackInfo& info, const Napi::Value& value)
 Value
 SimpleTable::GetHeight(const CallbackInfo& info)
 {
-  AssertFunctionArgs(info, 3, { napi_number, napi_number, napi_object });
   const double posX = info[0].As<Number>();
   const double posY = info[1].As<Number>();
   auto page = Page::Unwrap(info[2].As<Object>());

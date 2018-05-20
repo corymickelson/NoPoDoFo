@@ -62,7 +62,6 @@ Array::Initialize(Napi::Env& env, Napi::Object& target)
 Napi::Value
 Array::Eq(const CallbackInfo& info)
 {
-  AssertFunctionArgs(info, 1, { napi_object });
   auto wrap = info[0].As<Object>();
   if (!wrap.InstanceOf(Array::constructor.Value())) {
     throw Error::New(info.Env(), "Must be an instance of NoPoDoFo Obj");
@@ -93,7 +92,6 @@ Array::Length(const Napi::CallbackInfo& info)
 void
 Array::Write(const CallbackInfo& info)
 {
-  AssertFunctionArgs(info, 1, { napi_valuetype::napi_string });
   string output = info[0].As<String>().Utf8Value();
   PdfOutputDevice device(output.c_str());
   GetArray()->Write(&device, ePdfWriteMode_Default);
@@ -101,7 +99,6 @@ Array::Write(const CallbackInfo& info)
 Napi::Value
 Array::ContainsString(const CallbackInfo& info)
 {
-  AssertFunctionArgs(info, 1, { napi_valuetype::napi_string });
   string searchString = info[0].As<String>().Utf8Value();
   bool match = GetArray()->ContainsString(searchString);
   return Napi::Boolean::New(info.Env(), match);
@@ -109,7 +106,6 @@ Array::ContainsString(const CallbackInfo& info)
 Napi::Value
 Array::GetStringIndex(const CallbackInfo& info)
 {
-  AssertFunctionArgs(info, 1, { napi_valuetype::napi_string });
   string str = info[0].As<String>().Utf8Value();
   return Napi::Number::New(info.Env(), GetArray()->GetStringIndex(str));
 }
@@ -123,7 +119,6 @@ Array::IsDirty(const CallbackInfo& info)
 Napi::Value
 Array::At(const CallbackInfo& info)
 {
-  AssertFunctionArgs(info, 1, { napi_valuetype::napi_number });
   return GetObjAtIndex(info);
 }
 
@@ -139,7 +134,6 @@ Array::SetDirty(const CallbackInfo& info, const Napi::Value& value)
 void
 Array::Push(const CallbackInfo& info)
 {
-  AssertFunctionArgs(info, 1, { napi_valuetype::napi_object });
   auto wrapper = info[0].As<Object>();
   if (!wrapper.InstanceOf(Obj::constructor.Value())) {
     throw Error::New(info.Env(), "must be an instance of Obj");

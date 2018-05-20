@@ -220,7 +220,7 @@ Document::IsLinearized(const CallbackInfo& info)
 void
 Document::DeletePages(const CallbackInfo &info)
 {
-  AssertFunctionArgs(info, 2, { napi_number, napi_number });
+  AssertFunctionArgs(info, 2, {{ napi_number, napi_number }}, nullptr);
   int pageIndex = info[0].As<Number>();
   int count = info[1].As<Number>();
   if(document->GetPageCount() < pageIndex + count) {
@@ -285,7 +285,6 @@ void
 Document::SetEncrypt(const CallbackInfo& info, const Napi::Value& value)
 {
   try {
-    AssertFunctionArgs(info, 1, { napi_valuetype::napi_object });
     if (!value.IsObject()) {
       throw Error::New(info.Env(),
                        "Set encrypt requires a single argument of"
@@ -463,7 +462,6 @@ Document::GetTrailer(const CallbackInfo& info)
     info.Env(), new PdfObject(*ptr), [](Napi::Env env, PdfObject* data) {
       HandleScope scope(env);
       delete data;
-      data = nullptr;
     });
   auto instance = Obj::constructor.New({ initPtr });
   return instance;
@@ -487,7 +485,6 @@ Document::GetCatalog(const CallbackInfo& info)
 Napi::Value
 Document::IsAllowed(const CallbackInfo& info)
 {
-  AssertFunctionArgs(info, 1, { napi_valuetype::napi_string });
   string allowed = info[0].As<String>().Utf8Value();
   bool is;
   if (allowed == "Print") {
@@ -517,7 +514,6 @@ Document::IsAllowed(const CallbackInfo& info)
 Value
 Document::CreateFont(const CallbackInfo& info)
 {
-  AssertFunctionArgs(info, 1, { napi_valuetype::napi_string });
   auto fontName = info[0].As<String>().Utf8Value();
   bool bold = false;
   bool italic = false;

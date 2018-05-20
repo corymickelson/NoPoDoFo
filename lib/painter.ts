@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import {IPage} from './page'
+import {IPage, Page} from './page'
 import {Image} from './image'
 import {Stream} from './stream'
 import {__mod, Document} from './document'
@@ -38,6 +38,13 @@ export enum NPDFStokeStyle {
     DashDotDot
 }
 
+export enum NPDFHighlightingMode {
+    None,           ///< Do no highlighting
+    Invert,         ///< Invert the PdfField
+    InvertOutline,  ///< Invert the fields border
+    Push,           ///< Display the fields down appearance (requires an additional appearance stream to be set)
+    Unknown = 0xff
+}
 export enum NPDFFontType {
     TrueType,
     Type1Pfa,
@@ -94,7 +101,7 @@ export class Painter {
         return this._instance.page
     }
 
-    set page(value: IPage) {
+    set page(value: Page) {
         this._instance.page = (value as any)._instance
     }
 

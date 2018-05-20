@@ -60,14 +60,15 @@ Page::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceAccessor("resources", &Page::GetResources, nullptr),
 
       InstanceMethod("getField", &Page::GetField),
-      InstanceMethod("getNumFields", &Page::GetNumFields),
+      InstanceMethod("getFields", &Page::GetFields),
+      InstanceMethod("fieldsCount", &Page::GetNumFields),
       InstanceMethod("getFieldIndex", &Page::GetFieldIndex),
       InstanceMethod("getMediaBox", &Page::GetMediaBox),
       InstanceMethod("getBleedBox", &Page::GetBleedBox),
       InstanceMethod("getArtBox", &Page::GetArtBox),
       InstanceMethod("createAnnotation", &Page::CreateAnnotation),
       InstanceMethod("getAnnotation", &Page::GetAnnotation),
-      InstanceMethod("getNumAnnots", &Page::GetNumAnnots),
+      InstanceMethod("annotationsCount", &Page::GetNumAnnots),
       InstanceMethod("deleteAnnotation", &Page::DeleteAnnotation) });
   constructor = Persistent(ctor);
   constructor.SuppressDestruct();
@@ -91,16 +92,21 @@ Page::GetField(const CallbackInfo& info)
   if (index < 0 || index > GetPage()->GetNumFields()) {
     throw RangeError();
   }
-  auto instance = Field::constructor.New({ External<PdfField>::New(
-    info.Env(),
-    new PdfField(GetPage()->GetField(index)),
-    [](Napi::Env env, PdfField* data) {
-      cout << "Finalizing field: " << data->GetFieldName().GetStringUtf8()
-           << endl;
-      HandleScope scope(env);
-      delete data;
-    }) });
+  auto instance = Field::constructor.New({ this->Value(),  Number::New(info.Env(), index)});
   return instance;
+}
+
+Napi::Value
+Page::GetFields(const CallbackInfo& info)
+{
+  auto js = Array::New(info.Env());
+  uint32_t n = 0;
+  for (auto i = 0; i < GetPage()->GetNumFields(); ++i) {
+    auto instance = Field::constructor.New({ this->Value(), Number::New(info.Env(), i) });
+    js.Set(n, instance);
+    ++n;
+  }
+  return js;
 }
 
 Napi::Object
@@ -131,7 +137,6 @@ Page::SetRotation(const CallbackInfo& info, const Napi::Value& value)
 Napi::Value
 Page::GetFieldIndex(const CallbackInfo& info)
 {
-  AssertFunctionArgs(info, 1, { napi_valuetype::napi_string });
   string key = info[0].As<String>().Utf8Value();
   int index = -1;
   for (int i = 0; i < GetPage()->GetNumFields(); ++i) {
@@ -219,7 +224,6 @@ Page::GetPageNumber(const CallbackInfo& info)
 Napi::Value
 Page::GetContents(const CallbackInfo& info)
 {
-  AssertFunctionArgs(info, 1, { napi_valuetype::napi_boolean });
   EscapableHandleScope scope(info.Env());
   bool forAppending = info[0].As<Boolean>();
   PdfObject* contentsObj = forAppending ? GetPage()->GetContentsForAppending()
@@ -280,7 +284,6 @@ Page::GetNumAnnots(const CallbackInfo& info)
 void
 Page::DeleteAnnotation(const CallbackInfo& info)
 {
-  AssertFunctionArgs(info, 1, { napi_valuetype::napi_number });
   int index = info[0].As<Number>();
   try {
     GetPage()->DeleteAnnotation(index);
@@ -291,7 +294,6 @@ Page::DeleteAnnotation(const CallbackInfo& info)
 Napi::Value
 Page::GetAnnotation(const CallbackInfo& info)
 {
-  AssertFunctionArgs(info, 1, { napi_valuetype::napi_number });
   EscapableHandleScope scope(info.Env());
   int index = info[0].As<Number>();
   auto ptr = GetPage()->GetAnnotation(index);
@@ -301,8 +303,6 @@ Page::GetAnnotation(const CallbackInfo& info)
 Napi::Value
 Page::CreateAnnotation(const CallbackInfo& info)
 {
-  AssertFunctionArgs(
-    info, 2, { napi_valuetype::napi_number, napi_valuetype::napi_object });
   EscapableHandleScope scope(info.Env());
   int flag = info[0].As<Number>();
   auto type = static_cast<EPdfAnnotation>(flag);

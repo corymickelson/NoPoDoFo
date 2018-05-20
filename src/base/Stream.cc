@@ -34,7 +34,6 @@ FunctionReference Stream::constructor; // NOLINT
 Stream::Stream(const CallbackInfo& info)
   : ObjectWrap(info)
 {
-  AssertFunctionArgs(info, 1, { napi_valuetype::napi_external });
   stream = info[0].As<External<PdfStream>>().Data();
 }
 
@@ -115,8 +114,6 @@ protected:
 Napi::Value
 Stream::Write(const CallbackInfo& info)
 {
-  AssertFunctionArgs(
-    info, 2, { napi_valuetype::napi_string, napi_valuetype::napi_function });
   string output = info[0].As<String>().Utf8Value();
   Function cb = info[1].As<Function>();
   StreamWriteAsync* worker = new StreamWriteAsync(cb, this, output);

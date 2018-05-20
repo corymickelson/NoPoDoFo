@@ -35,7 +35,6 @@ FunctionReference ContentsTokenizer::constructor; // NOLINT
 ContentsTokenizer::ContentsTokenizer(const Napi::CallbackInfo& info)
   : ObjectWrap(info)
 {
-  AssertFunctionArgs(info, 2, { napi_object, napi_object });
   auto wrap = info[0].As<Object>();
   if (!wrap.InstanceOf(Page::constructor.Value())) {
     throw Error::New(info.Env(), "must be an instance of Page");

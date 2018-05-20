@@ -34,7 +34,6 @@ FunctionReference Signer::constructor; // NOLINT
 Signer::Signer(const Napi::CallbackInfo& info)
   : ObjectWrap(info)
 {
-  AssertFunctionArgs(info, 1, { napi_object });
   doc = Document::Unwrap(info[0].As<Object>());
   if (!doc->LoadedForIncrementalUpdates()) {
     throw Napi::Error::New(info.Env(),
@@ -226,7 +225,6 @@ protected:
 Value
 Signer::SignWorker(const CallbackInfo& info)
 {
-  AssertFunctionArgs(info, 2, { napi_function, napi_string });
   string data, output;
   Function cb = info[0].As<Function>();
   data = info[1].As<String>().Utf8Value();

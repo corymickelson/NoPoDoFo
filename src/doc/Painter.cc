@@ -37,7 +37,6 @@ FunctionReference Painter::constructor; // NOLINT
 Painter::Painter(const Napi::CallbackInfo& info)
   : ObjectWrap(info)
 {
-  AssertFunctionArgs(info, 1, { napi_object });
   auto o = info[0].As<Object>();
   if (!o.InstanceOf(Document::constructor.Value())) {
     throw Error::New(
@@ -184,7 +183,6 @@ Painter::GetCanvas(const CallbackInfo& info)
 void
 Painter::SetStrokingGrey(const CallbackInfo& info)
 {
-  AssertFunctionArgs(info, 1, { napi_valuetype::napi_number });
   double value = info[0].As<Number>();
   if (value < 0.0 || value > 1.0) {
     throw Error::New(info.Env(), "value must be between 0.0 and 1.0");
@@ -195,7 +193,6 @@ Painter::SetStrokingGrey(const CallbackInfo& info)
 void
 Painter::SetGrey(const CallbackInfo& info)
 {
-  AssertFunctionArgs(info, 1, { napi_valuetype::napi_number });
   double value = info[0].As<Number>();
   if (value < 0.0 || value > 1.0) {
     throw Error::New(info.Env(), "value must be between 0.0 and 1.0");
@@ -219,7 +216,6 @@ Painter::SetStrokingColorCMYK(const CallbackInfo& info)
 void
 Painter::SetStrokeWidth(const Napi::CallbackInfo& info)
 {
-  AssertFunctionArgs(info, 1, { napi_valuetype::napi_number });
   double value = info[0].As<Number>();
   painter->SetStrokeWidth(value);
 }
@@ -236,8 +232,6 @@ Painter::FinishPage(const CallbackInfo& info)
 void
 Painter::DrawText(const CallbackInfo& info)
 {
-  AssertFunctionArgs(
-    info, 2, { napi_valuetype::napi_object, napi_valuetype::napi_string });
   double x, y;
   string text = info[1].As<String>().Utf8Value();
   auto d = info[0].As<Object>();
@@ -255,15 +249,6 @@ Painter::DrawMultiLineText(const CallbackInfo& info)
 // For some reason windows builds break with unresolved external symbol on
 // podofo's DrawMultiLineText method
 #ifndef WIN32
-
-  AssertFunctionArgs(info,
-                     6,
-                     { napi_object,
-                       napi_string,
-                       napi_number,
-                       napi_number,
-                       napi_boolean,
-                       napi_boolean });
   PdfRect rect = *Rect::Unwrap(info[0].As<Object>())->GetRect();
   string text = info[1].As<String>().Utf8Value();
   EPdfAlignment alignment =
@@ -351,8 +336,6 @@ Painter::SetPrecision(const CallbackInfo& info, const Napi::Value& value)
 void
 Painter::SetStrokeStyle(const Napi::CallbackInfo& info)
 {
-  AssertFunctionArgs(
-    info, 2, { napi_valuetype::napi_number, napi_valuetype::napi_number });
   int styleIndex = info[0].As<Number>();
   auto scale = info[1].As<Number>();
   painter->SetStrokeStyle(
@@ -361,14 +344,12 @@ Painter::SetStrokeStyle(const Napi::CallbackInfo& info)
 void
 Painter::SetLineCapStyle(const Napi::CallbackInfo& info)
 {
-  AssertFunctionArgs(info, 1, { napi_valuetype::napi_number });
   painter->SetLineCapStyle(
     static_cast<EPdfLineCapStyle>(info[0].As<Number>().Int32Value()));
 }
 void
 Painter::SetLineJoinStyle(const Napi::CallbackInfo& info)
 {
-  AssertFunctionArgs(info, 1, { napi_valuetype::napi_number });
   painter->SetLineJoinStyle(
     static_cast<EPdfLineJoinStyle>(info[0].As<Number>().Int32Value()));
 }
@@ -391,7 +372,6 @@ Painter::GetFont(const Napi::CallbackInfo& info)
 void
 Painter::SetClipRect(const Napi::CallbackInfo& info)
 {
-  AssertFunctionArgs(info, 1, { napi_valuetype::napi_object });
   Rect* r = Rect::Unwrap(info[0].As<Object>());
   painter->SetClipRect(*r->GetRect());
 }
@@ -399,7 +379,6 @@ Painter::SetClipRect(const Napi::CallbackInfo& info)
 void
 Painter::SetMiterLimit(const CallbackInfo& info)
 {
-  AssertFunctionArgs(info, 1, { napi_valuetype::napi_number });
   double limit = info[0].As<Number>();
   painter->SetMiterLimit(limit);
 }
@@ -407,7 +386,6 @@ Painter::SetMiterLimit(const CallbackInfo& info)
 void
 Painter::Rectangle(const CallbackInfo& info)
 {
-  AssertFunctionArgs(info, 1, { napi_valuetype::napi_object });
   Rect* r = Rect::Unwrap(info[0].As<Object>());
   try {
     painter->Rectangle(*r->GetRect());
@@ -419,7 +397,6 @@ Painter::Rectangle(const CallbackInfo& info)
 void
 Painter::Ellipse(const CallbackInfo& info)
 {
-  AssertFunctionArgs(info, 1, { napi_valuetype::napi_object });
   auto o = info[0].As<Object>();
   double x, y, width, height;
   x = o.Get("x").As<Number>();
@@ -436,7 +413,6 @@ Painter::Ellipse(const CallbackInfo& info)
 void
 Painter::Circle(const CallbackInfo& info)
 {
-  AssertFunctionArgs(info, 1, { napi_valuetype::napi_object });
   auto o = info[0].As<Object>();
   double x, y, radius;
   x = o.Get("x").As<Number>();
@@ -458,7 +434,6 @@ Painter::ClosePath(const CallbackInfo& info)
 void
 Painter::LineTo(const CallbackInfo& info)
 {
-  AssertFunctionArgs(info, 1, { napi_valuetype::napi_object });
   auto o = info[0].As<Object>();
   double x, y;
   x = o.Get("x").As<Number>();
@@ -473,7 +448,6 @@ Painter::LineTo(const CallbackInfo& info)
 void
 Painter::MoveTo(const CallbackInfo& info)
 {
-  AssertFunctionArgs(info, 1, { napi_valuetype::napi_object });
   double x, y;
   auto o = info[0].As<Object>();
   x = o.Get("x").As<Number>();
@@ -488,11 +462,6 @@ Painter::MoveTo(const CallbackInfo& info)
 void
 Painter::CubicBezierTo(const CallbackInfo& info)
 {
-  AssertFunctionArgs(info,
-                     3,
-                     { napi_valuetype::napi_object,
-                       napi_valuetype::napi_object,
-                       napi_valuetype::napi_object });
   auto d1 = info[0].As<Object>();
   auto d2 = info[1].As<Object>();
   auto d3 = info[2].As<Object>();
@@ -513,7 +482,6 @@ Painter::CubicBezierTo(const CallbackInfo& info)
 void
 Painter::HorizontalLineTo(const CallbackInfo& info)
 {
-  AssertFunctionArgs(info, 1, { napi_valuetype::napi_number });
   double value = info[0].As<Number>();
   try {
     painter->HorizontalLineTo(value);
@@ -525,7 +493,6 @@ Painter::HorizontalLineTo(const CallbackInfo& info)
 void
 Painter::VerticalLineTo(const CallbackInfo& info)
 {
-  AssertFunctionArgs(info, 1, { napi_valuetype::napi_number });
   double value = info[0].As<Number>();
   try {
     painter->VerticalLineTo(value);
@@ -537,8 +504,6 @@ Painter::VerticalLineTo(const CallbackInfo& info)
 void
 Painter::SmoothCurveTo(const CallbackInfo& info)
 {
-  AssertFunctionArgs(
-    info, 2, { napi_valuetype::napi_object, napi_valuetype::napi_object });
   auto d1 = info[0].As<Object>();
   auto d2 = info[1].As<Object>();
   double d1x, d1y, d2x, d2y;
@@ -556,8 +521,6 @@ Painter::SmoothCurveTo(const CallbackInfo& info)
 void
 Painter::QuadCurveTo(const CallbackInfo& info)
 {
-  AssertFunctionArgs(
-    info, 2, { napi_valuetype::napi_object, napi_valuetype::napi_object });
   auto d1 = info[0].As<Object>();
   auto d2 = info[1].As<Object>();
   int d1x, d1y, d2x, d2y;
@@ -575,15 +538,6 @@ Painter::QuadCurveTo(const CallbackInfo& info)
 void
 Painter::ArcTo(const CallbackInfo& info)
 {
-  AssertFunctionArgs(info,
-                     5,
-                     {
-                       napi_valuetype::napi_object,
-                       napi_valuetype::napi_object,
-                       napi_valuetype::napi_number,
-                       napi_valuetype::napi_boolean,
-                       napi_valuetype::napi_boolean,
-                     });
   auto point1 = info[0].As<Object>();
   auto point2 = info[1].As<Object>();
   double rotation = info[2].As<Number>();
@@ -680,7 +634,6 @@ Painter::Restore(const CallbackInfo& info)
 void
 Painter::SetExtGState(const CallbackInfo& info)
 {
-  AssertFunctionArgs(info, 1, { napi_valuetype::napi_object });
   auto wrap = info[0].As<Object>();
   if (!wrap.InstanceOf(ExtGState::constructor.Value())) {
     throw TypeError::New(info.Env(), "must be of type ExtGState");
@@ -719,8 +672,6 @@ Painter::GetCurrentPath(const CallbackInfo& info)
 void
 Painter::DrawLine(const CallbackInfo& info)
 {
-  AssertFunctionArgs(
-    info, 2, { napi_valuetype::napi_object, napi_valuetype::napi_object });
   auto start = info[0].As<Object>();
   auto end = info[1].As<Object>();
   double startX, startY, endX, endY;
@@ -734,11 +685,6 @@ Painter::DrawLine(const CallbackInfo& info)
 void
 Painter::DrawTextAligned(const CallbackInfo& info)
 {
-  AssertFunctionArgs(info,
-                     3,
-                     { napi_valuetype::napi_object,
-                       napi_valuetype::napi_string,
-                       napi_valuetype::napi_number });
   double x, y, width;
   int alignmentIndex = info[2].As<Number>();
   string text = info[1].As<String>().Utf8Value();
@@ -785,7 +731,6 @@ Painter::GetMultiLineText(const CallbackInfo& info)
 void
 Painter::BeginText(const CallbackInfo& info)
 {
-  AssertFunctionArgs(info, 1, { napi_valuetype::napi_object });
   auto point = info[0].As<Object>();
   double x, y;
   x = point.Get("x").As<Number>();
@@ -810,7 +755,6 @@ Painter::EndText(const CallbackInfo& info)
 void
 Painter::AddText(const CallbackInfo& info)
 {
-  AssertFunctionArgs(info, 1, { napi_valuetype::napi_string });
   try {
     painter->AddText(PdfString(info[0].As<String>().Utf8Value()));
   } catch (PdfError& err) {
@@ -821,7 +765,6 @@ Painter::AddText(const CallbackInfo& info)
 void
 Painter::MoveTextPosition(const CallbackInfo& info)
 {
-  AssertFunctionArgs(info, 1, { napi_valuetype::napi_object });
   auto point = info[0].As<Object>();
   double x, y;
   x = point.Get("x").As<Number>();
@@ -836,8 +779,6 @@ Painter::MoveTextPosition(const CallbackInfo& info)
 void
 Painter::DrawGlyph(const CallbackInfo& info)
 {
-  AssertFunctionArgs(
-    info, 2, { napi_valuetype::napi_object, napi_valuetype::napi_string });
   auto point = info[0].As<Object>();
   string glyph = info[1].As<String>().Utf8Value();
   double x, y;

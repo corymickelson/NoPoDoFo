@@ -34,9 +34,8 @@ FunctionReference Encoding::constructor; // NOLINT
 
 Encoding::Encoding(const Napi::CallbackInfo& info)
   : ObjectWrap(info)
+  , encoding(info[0].As<External<PdfEncoding>>().Data())
 {
-  AssertFunctionArgs(info, 1, { napi_valuetype::napi_external });
-  encoding = info[0].As<External<PdfEncoding>>().Data();
 }
 void
 Encoding::Initialize(Napi::Env& env, Napi::Object& target)
@@ -56,7 +55,6 @@ Encoding::Initialize(Napi::Env& env, Napi::Object& target)
 Napi::Value
 Encoding::AddToDictionary(const Napi::CallbackInfo& info)
 {
-  AssertFunctionArgs(info, 1, { napi_valuetype::napi_object });
   auto wrap = info[0].As<Object>();
   Dictionary* d = Dictionary::Unwrap(wrap);
   encoding->AddToDictionary(d->GetDictionary());
@@ -65,8 +63,6 @@ Encoding::AddToDictionary(const Napi::CallbackInfo& info)
 Napi::Value
 Encoding::ConvertToUnicode(const Napi::CallbackInfo& info)
 {
-  AssertFunctionArgs(
-    info, 2, { napi_valuetype::napi_string, napi_valuetype::napi_object });
   string content = info[0].As<String>().Utf8Value();
   Font* font = Font::Unwrap(info[1].As<Object>());
   PdfString buffer =
@@ -76,8 +72,6 @@ Encoding::ConvertToUnicode(const Napi::CallbackInfo& info)
 Napi::Value
 Encoding::ConvertToEncoding(const Napi::CallbackInfo& info)
 {
-  AssertFunctionArgs(
-    info, 2, { napi_valuetype::napi_string, napi_valuetype::napi_object });
   string content = info[0].As<String>().Utf8Value();
   Font* font = Font::Unwrap(info[1].As<Object>());
   PdfRefCountedBuffer buffer =

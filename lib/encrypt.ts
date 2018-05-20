@@ -17,6 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {IDocument} from "./document";
+
 export type ProtectionOption = 'Copy' | 'Print' | 'Edit' | 'EditNotes' | 'FillAndSign' | 'Accessible' | 'DocAssembly' | 'HighPrint'
 export type EncryptOption = {
     userPassword?: string
@@ -39,6 +41,7 @@ export type ProtectionSummary = {
 
 
 export interface IEncrypt {
+    new(doc: IDocument): IEncrypt
     owner: string
     user: string
     encryptionKey: string

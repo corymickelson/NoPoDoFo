@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import {access, constants} from 'fs'
-import {IObj} from './object';
+import {IArray, IDictionary, IObj} from './object';
 import {Page, IPage} from './page';
 import {EncryptOption, IEncrypt, ProtectionOption} from './encrypt';
 import {EventEmitter} from 'events';
@@ -26,12 +26,59 @@ import {Signer} from './signer';
 import {F_OK, R_OK} from "constants";
 import {IRef} from "./reference";
 import {IForm} from "./form";
-import {NPDFWriteMode} from "../dist/stream-document";
+import {ICheckBox, IComboBox, IField, IListBox, IListField, ISignatureField, ITextField} from "./field";
+import {IAction} from "./action";
 
-export const __mod = require('bindings')('npdf')
+export declare enum NPDFVersion {
+    Pdf11 = 0,
+    Pdf12 = 1,
+    Pdf13 = 2,
+    Pdf14 = 3,
+    Pdf15 = 4,
+    Pdf16 = 5,
+    Pdf17 = 6,
+}
+export declare enum NPDFWriteMode {
+    Default = 1,
+    Compact = 2,
+}
+export interface INPDF {
+    Document: IDocument
+    Page: IPage
+    Field: IField
+    TextField: ITextField
+    Image: any
+    Annotation: any
+    Rect: any
+    Painter: any
+    CheckBox: ICheckBox
+    ComboBox: IComboBox
+    ListBox: IListBox
+    Form: IForm
+    Dictionary: IDictionary
+    FileSpec: any
+    Obj: IObj
+    Ref: IRef
+    Array: IArray
+    Stream: any
+    Encrypt: IEncrypt
+    ListField: IListField
+    Font: IFont
+    Encoding: any
+    ExtGState: any
+    Signer: any
+    SignatureField: ISignatureField
+    Vector: any
+    Data: any
+    ContentsTokenizer: any
+    SimpleTable: any
+    Action: IAction
+    signature: Function
+}
+export const __mod: INPDF = require('bindings')('npdf')
 export type Callback = (err: Error, data: Buffer | string) => void
 
-export enum FontEncoding {
+export enum NPDFFontEncoding {
     WinAnsi = 1,
     Standard = 2,
     PdfDoc = 3,
@@ -44,16 +91,17 @@ export enum FontEncoding {
     Identity = 0
 }
 
-export interface CreateFontOpts {
+export interface NPDFCreateFontOpts {
     fontName: string,
     bold?: boolean,
     italic?: boolean,
-    encoding?: FontEncoding,
+    encoding?: NPDFFontEncoding,
     embed?: boolean,
     fileName?: string
 }
 
 export interface IDocument {
+    new(): IDocument
     password: string
     encrypt: IEncrypt
     form: IForm
@@ -86,7 +134,7 @@ export interface IDocument {
 
     isAllowed(perm: ProtectionOption): boolean
 
-    createFont(opts: CreateFontOpts): IFont
+    createFont(opts: NPDFCreateFontOpts): IFont
 
     getFont(name: string): IFont
 }
@@ -96,7 +144,7 @@ export const documentGc = (file: string, pwd: string, output: string, cb: Callba
         if (err) {
             throw Error('File not found')
         }
-        __mod.Document.gc(file, pwd, output, cb)
+        (__mod.Document as any).gc(file, pwd, output, cb) // gc is a static method on Document
     })
 }
 
@@ -171,7 +219,7 @@ export class Document extends EventEmitter {
             if (err) {
                 throw Error('File not found')
             }
-            __mod.Document.gc(file, pwd, output, cb)
+            (__mod.Document as any).gc(file, pwd, output, cb) // gc is a static method on mod.Document
         })
     }
 
@@ -251,7 +299,7 @@ export class Document extends EventEmitter {
      * @returns {IObj}
      */
     getObject(ref: IRef): IObj {
-        if (!ref || (ref as any)._instaance instanceof __mod.Ref === false) {
+        if (!ref || (ref as any)._instaance instanceof (__mod.Ref as any) === false) {
             throw TypeError()
         }
         else if (ref.isIndirect() === false) {
@@ -336,10 +384,10 @@ export class Document extends EventEmitter {
      *      it is up to the user to check that the specified font family exists on the system.
      *      For font management use font-manager
      * @see https://github.com/corymickelson/font-manager
-     * @param {CreateFontOpts & Object} opts
+     * @param {NPDFCreateFontOpts & Object} opts
      * @returns {Font}
      */
-    createFont(opts: CreateFontOpts & Object): IFont {
+    createFont(opts: NPDFCreateFontOpts & Object): IFont {
         return this._instance.createFont(
             opts.fontName,
             opts.hasOwnProperty('bold') ? opts.bold : false,

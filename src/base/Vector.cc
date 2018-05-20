@@ -81,7 +81,6 @@ Vector::SetParentDocument(const Napi::CallbackInfo& info,
 void
 Vector::SetAutoDelete(const Napi::CallbackInfo& info)
 {
-  AssertFunctionArgs(info, 1, { napi_boolean });
   vector->SetAutoDelete(info[0].As<Boolean>());
 }
 void
@@ -120,7 +119,6 @@ Vector::GetObjectCount(const Napi::CallbackInfo& info)
 Napi::Value
 Vector::GetObject(const Napi::CallbackInfo& info)
 {
-  AssertFunctionArgs(info, 1, { napi_number });
   const pdf_objnum i = info[0].As<Number>();
   const pdf_gennum g = static_cast<const pdf_gennum>(
     info.Length() == 2 && info[1].IsNumber() ? info[1].As<Number>() : 0);

@@ -2,7 +2,7 @@
  * This file is part of the NoPoDoFo (R) project.
  * Copyright (c) 2017-2018
  * Authors: Cory Mickelson, et al.
- * 
+ *
  * NoPoDoFo is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -16,10 +16,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import {__mod, Document} from './document'
+import {__mod, Document, IDocument} from './document'
 import {NPDFInternal, IObj} from "./object";
 import {Annotation} from "./annotation";
 import {IListItem} from "../dist/field";
+import {NPDFColor, NPDFHighlightingMode} from "./painter";
+import {IAction, NPDFActions, NPDFMouseEvent, NPDFPageEvent} from "./action";
 
 export interface NPDFTextFieldOpts {
     maxLen?: number
@@ -67,17 +69,28 @@ export type NPDFFieldType =
     | 'ListBox'
 
 export interface IField {
-  readonly: boolean
-  required: boolean
-  type: NPDFFieldType
-  fieldName: string
-  alternateName?: string
-  mappingName?: string
+    readOnly: boolean
+    required: boolean
+    type: NPDFFieldType
+    fieldName: string
+    alternateName?: string
+    mappingName?: string
     exported?: boolean
+
+    setBackgroundColor(color: NPDFColor): void
+
+    setBorderColor(color: NPDFColor): void
+
+    setHighlightingMode(mode: NPDFHighlightingMode): void
+
+    setMouseAction(on: NPDFMouseEvent, action: IAction): void
+
+    setPageAction(on: NPDFPageEvent, action: IAction): void
 }
 
 export interface ITextField {
-    new (field: IField, opts?: NPDFTextFieldOpts): ITextField
+    new(field: IField, opts?: NPDFTextFieldOpts): ITextField
+
     text: string
     maxLen: number
     multiLine: boolean
@@ -86,12 +99,16 @@ export interface ITextField {
     spellCheckEnabled: boolean
     scrollEnabled: boolean
     combs: boolean
-    richText:boolean
+    richText: boolean
 }
+
 export interface ICheckBox {
+    new(field:IField): ICheckBox
     checked: boolean
 }
+
 export interface IListField {
+    new(field:IField): IListField
     selected: number
     length: number
     spellCheckEnabled: boolean
@@ -99,47 +116,72 @@ export interface IListField {
     multiSelect: boolean
 
     isComboBox(): boolean
+
     insertItem(value: string, displayName: string): void
-    removeItem(index:number): void
+
+    removeItem(index: number): void
+
     getItem(index: number): IListItem
 }
+
 export interface IComboBox extends IListField {
+    new(field:IField): IComboBox
     editable: boolean
 }
-export interface IListBox extends IListField { }
+
+export interface IListBox extends IListField {
+    new(field:IField): IListBox
+}
+
 export enum NPDFAnnotationAppearance {
     normal,
     rollover,
     down
 }
+
 export interface ISignatureField {
+    new(annotation: Annotation, doc?: IDocument): ISignatureField
     setAppearanceStream(xObj: any, appearance: NPDFAnnotationAppearance, name: string): void
+
     setReason(reason: string): void
+
     setLocation(location: string): void
+
     setCreator(creator: string): void
-    setDate(dateTime?:string): void
+
+    setDate(dateTime?: string): void
+
     addCertificateReference(perm: NPDFCertificatePermission): void
+
     setFieldName(name: string): void
+
     getObject(): IObj
+
     ensureSignatureObject(): void
 }
+
 export class Field {
 
-    get readOnly():boolean {
+    get readOnly(): boolean {
         return this._instance.readOnly
     }
-    set readOnly(v:boolean) {
+
+    set readOnly(v: boolean) {
         this._instance.readOnly = v
     }
+
     get fieldName(): string {
         return this._instance.fieldName
     }
-    set fieldName(v:string) {
-        this._instance.fieldName= v
+
+    set fieldName(v: string) {
+        this._instance.fieldName = v
     }
-    get type():NPDFFieldType {
+
+    get type(): NPDFFieldType {
         return this._instance.type
     }
+
     constructor(private _instance: NPDFInternal) {
     }
 
@@ -280,7 +322,7 @@ export class SignatureField {
 
     constructor(annot: Annotation | any, doc?: Document) {
         if (doc instanceof Document) {
-            this._instance = new __mod.SignatureField((annot as any)._instance, doc.form, (doc as any)._instance)
+            this._instance = new __mod.SignatureField((annot as any)._instance, (doc as any)._instance)
         }
         else {
             this._instance = new __mod.SignatureField(annot)

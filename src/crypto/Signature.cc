@@ -28,8 +28,6 @@ using std::string;
 Napi::Value
 NPDFSignatureData(const Napi::CallbackInfo& info)
 {
-  AssertFunctionArgs(info, 3, { napi_string, napi_string, napi_string });
-
   auto signerPEMPath = info[0].As<String>().Utf8Value();
   auto privateKeyPemPath = info[1].As<String>().Utf8Value();
   auto pkeyPassword = info[2].As<String>().Utf8Value();

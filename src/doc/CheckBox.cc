@@ -27,14 +27,16 @@ using std::endl;
 
 CheckBox::CheckBox(const CallbackInfo& info)
   : ObjectWrap<CheckBox>(info)
-  , field(Field::Unwrap(info[0].As<Object>()))
-{}
+{
+
+  field = Field::Unwrap(info[0].As<Object>())->GetField();
+}
 
 CheckBox::~CheckBox()
 {
   cout << "Destructing Checkbox" << endl;
-  HandleScope scope(Env());
-  field = nullptr;
+//  HandleScope scope(Env());
+//  field = nullptr;
 }
 
 void

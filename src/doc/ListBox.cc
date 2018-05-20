@@ -24,24 +24,43 @@
 using namespace Napi;
 using namespace PoDoFo;
 
+using std::cout;
+using std::endl;
+
 namespace NoPoDoFo {
 
 FunctionReference ListBox::constructor; // NOLINT
 
 ListBox::ListBox(const Napi::CallbackInfo& info)
   : ObjectWrap(info)
-  , field(Field::Unwrap(info[0].As<Object>()))
+  , ListField(info)
 {
+  field = Field::Unwrap(info[0].As<Object>())->GetField();
 }
-ListBox::~ListBox() {
-  HandleScope scope(Env());
-  field = nullptr;
+ListBox::~ListBox()
+{
+  cout << "Destructing ListBox" << endl;
 }
 void
 ListBox::Initialize(Napi::Env& env, Napi::Object& target)
 {
   HandleScope scope(env);
-  auto ctor = DefineClass(env, "ListBox", {});
+  auto ctor = DefineClass(env, "ListBox", {
+          InstanceAccessor(
+        "selected", &ListField::GetSelectedItem, &ListField::SetSelectedItem),
+      InstanceAccessor("length", &ListField::GetItemCount, nullptr),
+      InstanceAccessor("spellCheckEnabled",
+                       &ListField::IsSpellCheckEnabled,
+                       &ListField::SetSpellCheckEnabled),
+      InstanceAccessor("sorted", &ListField::IsSorted, &ListField::SetSorted),
+      InstanceAccessor(
+        "multiSelect", &ListField::IsMultiSelect, &ListField::SetMultiSelect),
+      InstanceMethod("isComboBox", &ListField::IsComboBox),
+      InstanceMethod("insertItem", &ListField::InsertItem),
+      InstanceMethod("removeItem", &ListField::RemoveItem),
+      InstanceMethod("getItem", &ListField::GetItem)
+
+  });
   constructor = Persistent(ctor);
   constructor.SuppressDestruct();
   target.Set("ListBox", ctor);

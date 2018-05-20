@@ -27,18 +27,6 @@ using std::endl;
 using std::stringstream;
 
 
-/**
- * @note Called with a list of all possible argument configurations, and returns
- * the index of the matching configuration.
- * @example AssertFunctionArgs(info, 1, [[napi_function], [napi_string,
- * napi_function]]) if called with JS whatever('foo', () => {}), than
- * AssertFunctionArgs would return 1, since it's matching the 1st index. An
- * invalid result == -1
- * @param info
- * @param minimumArgCount
- * @param expectedTypes
- * @return
- */
 static int
 AssertFunctionArgs(
   const Napi::CallbackInfo& info,
@@ -65,8 +53,10 @@ AssertFunctionArgs(
       }
     }
   }
-  Napi::Object::IsBuffer();
   if (index == -1) {
+    if(strcmp(msg, "") == 0) {
+      msg = "Validation Error";
+    }
     Napi::Error::New(info.Env(), msg).ThrowAsJavaScriptException();
   }
   return index;

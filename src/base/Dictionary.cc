@@ -107,7 +107,6 @@ Dictionary::Resolve(PdfDocument* doc, PdfObject* candidate)
 Napi::Value
 Dictionary::Eq(const CallbackInfo& info)
 {
-  AssertFunctionArgs(info, 1, { napi_object });
   auto wrap = info[0].As<Object>();
   if (!wrap.InstanceOf(Dictionary::constructor.Value())) {
     throw Error::New(info.Env(), "Must be an instance of NoPoDoFo Obj");
@@ -159,20 +158,41 @@ Dictionary::AddKey(const CallbackInfo& info)
 Napi::Value
 Dictionary::GetKey(const CallbackInfo& info)
 {
-  AssertFunctionArgs(info, 1, { napi_valuetype::napi_string });
   string k = info[0].As<String>().Utf8Value();
+  bool resolveValue = true;
+  if(info.Length() == 2 && info[1].IsBoolean()) {
+    resolveValue = info[1].As<Boolean>();
+  }
   if (!GetDictionary().HasKey(PdfName(k))) {
     throw Napi::Error::New(info.Env(),
                            "Key could not be found, please use "
                            "Dictionary.HasKey before accessing key value");
   }
   try {
-    auto v = new PdfObject(*GetDictionary().GetKey(PdfName(k)));
+    PdfObject* o = GetDictionary().GetKey(PdfName(k));
+    // try and resolve the reference
+    if (o->IsReference() && resolveValue) {
+      if (!o->GetOwner()->GetObject(o->GetReference())) {
+        if (!o->GetOwner()->GetParentDocument()->GetObjects()->GetObject(
+              o->GetReference())) {
+          stringstream msg;
+          msg << "Could not resolve object reference: "
+              << o->GetReference().ObjectNumber() << ", "
+              << o->GetReference().GenerationNumber() << endl;
+          Error::New(info.Env(), msg.str());
+          return info.Env().Undefined();
+        } else {
+          o = o->GetOwner()->GetParentDocument()->GetObjects()->GetObject(
+            o->GetReference());
+        }
+      } else {
+        o = o->GetOwner()->GetObject(o->GetReference());
+      }
+    }
     auto objPtr = Napi::External<PdfObject>::New(
-      info.Env(), v, [](Napi::Env env, PdfObject* data) {
+      info.Env(), new PdfObject(*o), [](Napi::Env env, PdfObject* data) {
         HandleScope scope(env);
         delete data;
-        data = nullptr;
       });
     auto instance = Obj::constructor.New({ objPtr });
     return instance;
@@ -204,7 +224,6 @@ Dictionary::GetKeys(const CallbackInfo& info)
 Napi::Value
 Dictionary::RemoveKey(const CallbackInfo& info)
 {
-  AssertFunctionArgs(info, 1, { napi_string });
   try {
     GetDictionary().RemoveKey(PdfName(info[0].As<String>().Utf8Value()));
   } catch (PdfError& err) {
@@ -245,7 +264,6 @@ Dictionary::GetImmutable(const CallbackInfo& info)
 void
 Dictionary::SetDirty(const CallbackInfo& info, const Napi::Value& value)
 {
-  AssertFunctionArgs(info, 1, { napi_valuetype::napi_boolean });
   GetDictionary().SetDirty(value.As<Boolean>());
 }
 
@@ -258,7 +276,6 @@ Dictionary::GetDirty(const CallbackInfo& info)
 Napi::Value
 Dictionary::GetKeyAs(const CallbackInfo& info)
 {
-  AssertFunctionArgs(info, 2, { napi_valuetype::napi_string });
   string type = info[1].As<String>().Utf8Value();
   string key = info[0].As<String>().Utf8Value();
   vector<string> valid = { "boolean", "long", "name", "real" };
@@ -283,7 +300,6 @@ Dictionary::GetKeyAs(const CallbackInfo& info)
 void
 Dictionary::WriteSync(const CallbackInfo& info)
 {
-  AssertFunctionArgs(info, 1, { napi_valuetype::napi_string });
   try {
     string output = info[0].As<String>().Utf8Value();
     PdfOutputDevice device(output.c_str());
@@ -364,8 +380,6 @@ Napi::Value
 Dictionary::Write(const CallbackInfo& info)
 {
   try {
-    AssertFunctionArgs(
-      info, 2, { napi_valuetype::napi_string, napi_valuetype::napi_function });
     string output = info[0].As<String>().Utf8Value();
     auto cb = info[1].As<Function>();
     DictWriteAsync* worker = new DictWriteAsync(cb, this, output);

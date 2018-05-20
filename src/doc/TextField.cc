@@ -30,8 +30,8 @@ FunctionReference TextField::constructor; // NOLINT
 
 TextField::TextField(const CallbackInfo& info)
   : ObjectWrap(info)
-  , field(Field::Unwrap(info[0].As<Object>()))
 {
+  field = Field::Unwrap(info[0].As<Object>())->GetField();
   if (info.Length() == 2 && info[1].IsObject()) {
     auto opts = info[1].As<Object>();
     if (opts.Has("maxLen")) {
@@ -70,9 +70,9 @@ TextField::TextField(const CallbackInfo& info)
 }
 TextField::~TextField()
 {
-  HandleScope scope(Env());
+//  HandleScope scope(Env());
   cout << "Destructing TextField" << endl;
-  field = nullptr;
+//  field = nullptr;
 }
 void
 TextField::Initialize(Napi::Env& env, Napi::Object& target)

@@ -1,7 +1,7 @@
 import {Painter} from './painter'
 import * as tap from 'tape'
 import {join} from 'path';
-import {Document, FontEncoding} from './document';
+import {Document, NPDFFontEncoding} from './document';
 import {CONVERSION} from "./index";
 import {Rect} from "./rect";
 import {Cell, Table} from "./table";
@@ -15,7 +15,7 @@ tap('Painter Api', sub => {
         if (pdf instanceof Error) throw Error("doc ready error")
         const page = pdf.getPage(0),
             painter = new Painter(doc, page),
-            font = pdf.createFont({fontName: 'monospace', encoding: FontEncoding.Identity})
+            font = pdf.createFont({fontName: 'monospace', encoding: NPDFFontEncoding.Identity})
 
         // TODO: Add correct assertions, will require parsing final doc for contents / resources objects
         sub.test('paint', t => {

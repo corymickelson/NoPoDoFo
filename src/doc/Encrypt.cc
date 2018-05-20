@@ -38,7 +38,6 @@ Napi::FunctionReference Encrypt::constructor; // NOLINT
 Encrypt::Encrypt(const Napi::CallbackInfo& info)
   : ObjectWrap(info)
 {
-  AssertFunctionArgs(info, 1, { napi_object });
   if(!info[0].As<Object>().InstanceOf(Document::constructor.Value())) {
     throw TypeError();
   }
@@ -72,7 +71,6 @@ Encrypt::Initialize(Napi::Env& env, Napi::Object& target)
 Napi::Value
 Encrypt::IsAllowed(const CallbackInfo& info)
 {
-  AssertFunctionArgs(info, 1, { napi_valuetype::napi_string });
   vector<string> candidates = { "Copy",        "Print",       "Edit",
                                 "EditNotes",   "FillAndSign", "Accessible",
                                 "DocAssembly", "HighPrint" };
@@ -114,7 +112,6 @@ Encrypt::IsAllowed(const CallbackInfo& info)
 Napi::Value
 Encrypt::Authenticate(const CallbackInfo& info)
 {
-  AssertFunctionArgs(info, 1, { napi_valuetype::napi_object });
   auto pwdObj = info[0].As<Object>();
   string pwd = nullptr;
   if (pwdObj.Has("userPassword") && pwdObj.Get("userPassword").IsString()) {

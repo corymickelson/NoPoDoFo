@@ -100,7 +100,6 @@ Ref::ToString(const Napi::CallbackInfo& info)
 void
 Ref::Write(const Napi::CallbackInfo& info)
 {
-  AssertFunctionArgs(info, 1, { napi_valuetype::napi_string });
   string output = info[0].As<Napi::String>().Utf8Value();
   try {
     PdfOutputDevice device(output.c_str());
