@@ -2,7 +2,7 @@
  * This file is part of the NoPoDoFo (R) project.
  * Copyright (c) 2017-2018
  * Authors: Cory Mickelson, et al.
- * 
+ *
  * NoPoDoFo is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -23,6 +23,7 @@
 #define CONVERSION_CONSTANT 0.002834645669291339
 
 #include "Document.h"
+#include "Page.h"
 
 #include <napi.h>
 #include <podofo/podofo.h>
@@ -93,12 +94,12 @@ public:
   Napi::Value GetPrecision(const Napi::CallbackInfo&);
   void SetPrecision(const Napi::CallbackInfo&, const Napi::Value&);
 
-  PoDoFo::PdfMemDocument* GetDocument() { return document->GetDocument(); }
-  PoDoFo::PdfPainter* GetPainter() { return painter; }
+
+  PoDoFo::PdfPainter* GetPainter() { return painter.get(); }
 
 private:
-  PoDoFo::PdfPainter* painter;
-  //  PoDoFo::PdfMemDocument* document;
+  std::unique_ptr<PoDoFo::PdfPainter> painter;
+  Page* page;
   Document* document;
   void GetCMYK(Napi::Value&, int* cmyk);
   void GetRGB(Napi::Value&, int* rgb);

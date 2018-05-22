@@ -36,7 +36,7 @@ public:
   void SetNeedAppearances(const Napi::CallbackInfo&, const Napi::Value&);
   Napi::Value GetNeedAppearances(const Napi::CallbackInfo&);
   Napi::Value GetObject(const Napi::CallbackInfo&);
-  PoDoFo::PdfAcroForm* GetForm() { return doc->GetDocument()->GetAcroForm(); }
+  PoDoFo::PdfAcroForm* GetForm() { return doc->GetBaseDocument()->GetAcroForm(); }
 
 private:
   BaseDocument* doc;

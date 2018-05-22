@@ -119,7 +119,7 @@ Napi::Value
 Ref::GetObj(const CallbackInfo& info)
 {
   Document* document = Document::Unwrap(info[0].As<Object>());
-  PdfObject* target = document->GetDocument()->GetObjects().GetObject(GetRef());
+  PdfObject* target = document->GetMemDocument()->GetObjects().GetObject(GetRef());
   return Obj::constructor.New({External<PdfObject>::New(info.Env(), target)});
 }
 Ref::~Ref()

@@ -46,7 +46,7 @@ public:
     //    return make_unique<PoDoFo::PdfEncrypt>(
     //      *PoDoFo::PdfEncrypt::CreatePdfEncrypt(
     //        *document->GetDocument()->GetEncrypt()));
-    return document->GetDocument()->GetEncrypt();
+    return document->GetMemDocument()->GetEncrypt();
   }
 
 private:

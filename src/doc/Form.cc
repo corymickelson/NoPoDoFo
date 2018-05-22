@@ -37,7 +37,7 @@ Form::Form(const Napi::CallbackInfo& info)
   }
   Object docObj = info[0].As<Object>();
   doc = Document::Unwrap(docObj);
-  if (!doc->GetDocument()->GetAcroForm()) {
+  if (!doc->GetBaseDocument()->GetAcroForm()) {
     throw Napi::Error::New(info.Env(), "Null Form");
   }
 }

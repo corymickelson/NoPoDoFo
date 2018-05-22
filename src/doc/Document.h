@@ -45,12 +45,16 @@ public:
   Napi::Value GetCatalog(const Napi::CallbackInfo&);
   static Napi::Value GC(const Napi::CallbackInfo&);
 
-  PoDoFo::PdfMemDocument* GetDocument() { return document; }
+  std::shared_ptr<PoDoFo::PdfMemDocument> GetMemDocument()
+  {
+    auto shared = document;
+    return shared;
+  }
   bool LoadedForIncrementalUpdates() { return loadForIncrementalUpdates; }
 
 private:
   bool loadForIncrementalUpdates = false;
-  PoDoFo::PdfMemDocument* document;
+  std::shared_ptr<PoDoFo::PdfMemDocument> document;
 };
 }
 #endif // NPDF_PDFMEMDOCUMENT_H

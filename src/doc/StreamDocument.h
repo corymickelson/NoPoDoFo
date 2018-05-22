@@ -36,10 +36,14 @@ public:
   ~StreamDocument();
   static void Initialize(Napi::Env& env, Napi::Object& target);
   void Close(const Napi::CallbackInfo&);
-  PoDoFo::PdfStreamedDocument* GetDocument() { return document; }
+  std::shared_ptr<PoDoFo::PdfStreamedDocument> GetStreamedDocument()
+  {
+    auto shared = document;
+    return shared;
+  }
 
 private:
-  PoDoFo::PdfStreamedDocument* document;
+  std::shared_ptr<PoDoFo::PdfStreamedDocument> document;
 };
 };
 #endif

@@ -32,19 +32,29 @@ using namespace PoDoFo;
 
 using std::cout;
 using std::endl;
+using std::make_shared;
 using std::string;
 
 namespace NoPoDoFo {
 
-BaseDocument::BaseDocument()
+BaseDocument::BaseDocument(const Napi::CallbackInfo& info)
 {
-  std::cout << "Constructing Base" << std::endl;
+  if (info.Length() == 2 && info[1].IsBoolean() && info[0].IsString()) {
+    create = info[1].As<Boolean>();
+    output = info[0].As<String>().Utf8Value();
+  }
+  if (create) {
+    document = make_shared<PdfStreamedDocument>(output.c_str());
+    cout << "Creating new StreamedDocument at " << output << endl;
+  } else {
+    document = make_shared<PdfMemDocument>();
+    cout << "Creating new MemDocument" << endl;
+  }
 }
 
 BaseDocument::~BaseDocument()
 {
   std::cout << "Destructing BaseDocument" << std::endl;
-  delete this->document;
 }
 
 Napi::Value
@@ -174,7 +184,7 @@ void
 BaseDocument::AttachFile(const CallbackInfo& info)
 {
   string filepath = info[0].As<String>().Utf8Value();
-  PdfFileSpec attachment(filepath.c_str(), true, document);
+  PdfFileSpec attachment(filepath.c_str(), true, document.get());
   document->AttachFile(attachment);
 }
 
@@ -378,7 +388,7 @@ BaseDocument::InsertExistingPage(const CallbackInfo& info)
   if (document->GetPageCount() < atN) {
     throw RangeError();
   }
-  document->InsertExistingPageAt(memDoc->GetDocument(), memPageN, atN);
+  document->InsertExistingPageAt(memDoc->GetMemDocument().get(), memPageN, atN);
   return Number::New(info.Env(), document->GetPageCount());
 }
 Napi::Value

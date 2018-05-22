@@ -24,7 +24,6 @@
 #include "base/Obj.h"
 #include "base/Ref.h"
 #include "base/Stream.h"
-#include "base/Vector.h"
 #include "crypto/Signature.h"
 #include "doc/Annotation.h"
 #include "doc/CheckBox.h"
@@ -76,7 +75,7 @@ init(Napi::Env env, Napi::Object exports)
   NoPoDoFo::ExtGState::Initialize(env, exports);
   NoPoDoFo::Signer::Initialize(env, exports);
   NoPoDoFo::SignatureField::Initialize(env, exports);
-  NoPoDoFo::Vector::Initialize(env, exports);
+//  NoPoDoFo::Vector::Initialize(env, exports);
   NoPoDoFo::Data::Initialize(env, exports);
   NoPoDoFo::ContentsTokenizer::Initialize(env, exports);
   NoPoDoFo::SimpleTable::Initialize(env, exports);

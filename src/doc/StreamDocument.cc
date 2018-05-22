@@ -22,41 +22,33 @@
 
 #include <iostream>
 
-namespace NoPoDoFo {
 using namespace PoDoFo;
 using namespace Napi;
+
+using std::shared_ptr;
 using std::string;
 
-FunctionReference StreamDocument::constructor;
+namespace NoPoDoFo {
+
+FunctionReference StreamDocument::constructor; // NOLINT
 
 /**
- * @note Javascript args (filename:string, version:number, writeMode:number,
- * encrypt:External)
+ * @note Javascript args (filename:string, create:boolean, optsion: {
+ * version:number, writeMode:number, encrypt:External})
  * @brief StreamDocument::StreamDocument
  * @param info
  */
 StreamDocument::StreamDocument(const CallbackInfo& info)
   : ObjectWrap(info)
-  , BaseDocument()
+  , BaseDocument(info)
 {
-  string filename = info[0].As<String>().Utf8Value();
-  auto version = static_cast<EPdfVersion>(info[1].As<Number>().Int32Value());
-  auto writeMode =
-    static_cast<EPdfWriteMode>(info[2].As<Number>().Int32Value());
-  PdfEncrypt* encrypt = nullptr;
-  if (info.Length() == 3 && info[3].Type() == napi_external) {
-    encrypt = info[3].As<External<PdfEncrypt>>().Data();
-  }
-  document =
-    new PdfStreamedDocument(filename.c_str(), version, encrypt, writeMode);
-  BaseDocument::SetInstance(document);
+  document = std::static_pointer_cast<PdfStreamedDocument>(
+    BaseDocument::GetBaseDocument());
 }
 
 StreamDocument::~StreamDocument()
 {
   std::cout << "Destructing StreamDocument" << std::endl;
-  HandleScope scope(Env());
-  delete document;
 }
 
 void

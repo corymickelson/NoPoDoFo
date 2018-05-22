@@ -23,11 +23,13 @@
 #include <napi.h>
 #include <podofo/podofo.h>
 
+using std::string;
+
 namespace NoPoDoFo {
 class BaseDocument
 {
 public:
-  BaseDocument();
+  explicit BaseDocument(const Napi::CallbackInfo&);
   ~BaseDocument();
   Napi::Value GetPageCount(const Napi::CallbackInfo&);
   Napi::Value GetPage(const Napi::CallbackInfo&);
@@ -63,13 +65,16 @@ public:
   Napi::Value GetAttachment(const Napi::CallbackInfo&);
   void AddNamedDestination(const Napi::CallbackInfo&);
 
-  PoDoFo::PdfDocument* GetDocument() { return document; }
-
-protected:
-  void SetInstance(PoDoFo::PdfDocument* v) { document = v; }
+  std::shared_ptr<PoDoFo::PdfDocument> GetBaseDocument()
+  {
+    auto shared = document;
+    return shared;
+  }
 
 private:
-  PoDoFo::PdfDocument* document = nullptr;
+  bool create = false;
+  string output;
+  std::shared_ptr<PoDoFo::PdfDocument> document;
 };
 }
 #endif

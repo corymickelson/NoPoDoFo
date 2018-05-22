@@ -2,7 +2,7 @@
  * This file is part of the NoPoDoFo (R) project.
  * Copyright (c) 2017-2018
  * Authors: Cory Mickelson, et al.
- * 
+ *
  * NoPoDoFo is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -20,7 +20,6 @@
 #include "Image.h"
 #include "../ErrorHandler.h"
 #include "../ValidateArguments.h"
-
 
 namespace NoPoDoFo {
 
@@ -42,7 +41,7 @@ Image::Image(const CallbackInfo& info)
     }
     auto docObj = info[0].As<Object>();
     _doc = Document::Unwrap(docObj);
-    PdfMemDocument* doc = _doc->GetDocument();
+    PdfMemDocument* doc = _doc->GetMemDocument().get();
     img = new PdfImage(doc);
     if (info.Length() == 2 && info[1].IsString()) {
       string imgFile = info[1].As<String>().Utf8Value();

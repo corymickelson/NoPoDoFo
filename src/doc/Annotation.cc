@@ -19,6 +19,11 @@
 
 #include "Annotation.h"
 #include "../ErrorHandler.h"
+#include "StreamDocument.h"
+
+using std::cout;
+using std::endl;
+using std::make_unique;
 
 namespace NoPoDoFo {
 
@@ -28,15 +33,25 @@ Annotation::Annotation(const CallbackInfo& info)
   : ObjectWrap(info)
   , annot(info[0].As<External<PdfAnnotation>>().Data())
 {
+  auto base = info[0].As<Object>();
+  annot =
+    make_unique<PdfAnnotation>(*info[0].As<External<PdfAnnotation>>().Data());
+  if (base.InstanceOf(Document::constructor.Value())) {
+    doc = Document::Unwrap(base);
+  } else if (base.InstanceOf(StreamDocument::constructor.Value())) {
+    doc = StreamDocument::Unwrap(base);
+  } else {
+    Error::New(info.Env(), "Base Document required but not provided");
+  }
 }
 Annotation::~Annotation()
 {
-  if (annot != nullptr) {
-    HandleScope scope(Env());
-    delete annot;
-    annot = nullptr;
-    doc = nullptr;
-  }
+  //  if (annot != nullptr) {
+  HandleScope scope(Env());
+  //    delete annot;
+  //    annot = nullptr;
+  doc = nullptr;
+  //  }
 }
 void
 Annotation::Initialize(Napi::Env& env, Napi::Object& target)
@@ -177,12 +192,12 @@ Annotation::SetAction(const CallbackInfo& info)
   if (!o.InstanceOf(Document::constructor.Value())) {
     throw Error::New(info.Env(), "Requires instance of Document");
   }
-  auto doc = Document::Unwrap(o)->GetDocument();
+  auto doc = Document::Unwrap(o)->GetMemDocument();
   int type = actionObj.Get("type").As<Number>();
   string uri = actionObj.Get("uri").As<String>().Utf8Value();
   auto flag = static_cast<PoDoFo::EPdfAction>(type);
   try {
-    PdfAction action(flag, doc);
+    PdfAction action(flag, doc.get());
     action.SetURI(uri);
     GetAnnotation().SetAction(action);
   } catch (PdfError& err) {
@@ -413,14 +428,14 @@ Annotation::GetQuadPoints(const CallbackInfo& info)
 void
 Annotation::SetFileAttachment(const CallbackInfo& info)
 {
-  auto filename = info[0].As<String>().Utf8Value();
-  auto embed = info[1].As<Boolean>();
-  PdfFileSpec fileSpec(filename.c_str(), embed, doc->GetDocument());
-  try {
-    GetAnnotation().SetFileAttachement(fileSpec);
-  } catch (PdfError& err) {
-    ErrorHandler(err, info);
-  }
+  //  auto filename = info[0].As<String>().Utf8Value();
+  //  auto embed = info[1].As<Boolean>();
+  //  PdfFileSpec fileSpec(filename.c_str(), embed, doc->GetMemDocument());
+  //  try {
+  //    GetAnnotation().SetFileAttachement(fileSpec);
+  //  } catch (PdfError& err) {
+  //    ErrorHandler(err, info);
+  //  }
 }
 
 Napi::Value

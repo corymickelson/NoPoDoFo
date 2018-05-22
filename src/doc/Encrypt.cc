@@ -262,11 +262,11 @@ Encrypt::Authenticate(const CallbackInfo& info)
     throw Napi::Error::New(
       info.Env(), "must contain property userPassword OR ownerPassword");
   }
-  if (!document->GetDocument()->GetTrailer()->GetDictionary().HasKey(
+  if (!document->GetMemDocument()->GetTrailer()->GetDictionary().HasKey(
         PdfName("ID"))) {
     throw Napi::Error::New(info.Env(), "No document ID found in trailer");
   }
-  string id = document->GetDocument()
+  string id = document->GetMemDocument()
                 ->GetTrailer()
                 ->GetDictionary()
                 .GetKey(PdfName("ID"))

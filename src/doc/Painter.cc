@@ -2,7 +2,7 @@
  * This file is part of the NoPoDoFo (R) project.
  * Copyright (c) 2017-2018
  * Authors: Cory Mickelson, et al.
- * 
+ *
  * NoPoDoFo is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -28,13 +28,18 @@
 #include "Page.h"
 #include "Rect.h"
 
-
-namespace NoPoDoFo {
-
 using namespace Napi;
 using namespace PoDoFo;
 
+using std::cout;
+using std::endl;
+using std::make_unique;
+using std::string;
+
+namespace NoPoDoFo {
+
 FunctionReference Painter::constructor; // NOLINT
+
 Painter::Painter(const Napi::CallbackInfo& info)
   : ObjectWrap(info)
 {
@@ -45,14 +50,15 @@ Painter::Painter(const Napi::CallbackInfo& info)
       info.Env(), "Painter requires an instance of Document for construction");
   }
   document = Document::Unwrap(o);
-  painter = new PdfPainter();
+  painter = make_unique<PdfPainter>();
 }
 
 Painter::~Painter()
 {
   Napi::HandleScope scope(Env());
-  delete painter;
+  //  delete painter;
   document = nullptr;
+  page = nullptr;
 }
 void
 Painter::Initialize(Napi::Env& env, Napi::Object& target)
@@ -123,25 +129,14 @@ Painter::SetPage(const Napi::CallbackInfo& info, const Napi::Value& value)
   if (!value.IsObject()) {
     throw Napi::Error::New(info.Env(), "Page must be an instance of Page.");
   }
-  auto pageObj = value.As<Object>();
-  Page* pagePtr = Page::Unwrap(pageObj);
-  if (!pageObj.InstanceOf(Page::constructor.Value())) {
-    throw Napi::Error::New(info.Env(), "Page must be an instance of Page.");
-  }
-  PoDoFo::PdfPage* page = pagePtr->GetPage();
-  //  document = pagePtr->GetDocument();
-  painter->SetPage(page);
-  pageSize = page->GetPageSize();
+  page = Page::Unwrap(value.As<Object>());
+  painter->SetPage(page->GetPage());
+  pageSize = page->GetPage()->GetPageSize();
 }
 Napi::Value
 Painter::GetPage(const CallbackInfo& info)
 {
-  auto* page = dynamic_cast<PdfPage*>(painter->GetPage());
-  auto pagePtr = Napi::External<PdfPage>::New(info.Env(), page);
-  auto docPtr =
-    Napi::External<PdfMemDocument>::New(info.Env(), document->GetDocument());
-  auto instance = Page::constructor.New({ pagePtr, docPtr });
-  return instance;
+  return page ? page->Value() : info.Env().Null();
 }
 
 void
@@ -845,7 +840,7 @@ Painter::DrawGlyph(const CallbackInfo& info)
   x = point.Get("x").As<Number>();
   y = point.Get("y").As<Number>();
   try {
-    painter->DrawGlyph(document->GetDocument(), x, y, glyph.c_str());
+    painter->DrawGlyph(document->GetMemDocument().get(), x, y, glyph.c_str());
   } catch (PdfError& err) {
     ErrorHandler(err, info);
   }

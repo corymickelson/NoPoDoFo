@@ -2,7 +2,7 @@
  * This file is part of the NoPoDoFo (R) project.
  * Copyright (c) 2017-2018
  * Authors: Cory Mickelson, et al.
- * 
+ *
  * NoPoDoFo is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -23,7 +23,6 @@
 #include "Font.h"
 #include "Page.h"
 #include "Painter.h"
-
 
 namespace NoPoDoFo {
 
@@ -456,7 +455,7 @@ void
 SimpleTable::SetAutoPageBreak(const CallbackInfo& info,
                               const Napi::Value& value)
 {
-  auto* d = static_cast<void*>(doc->GetDocument());
+  auto* d = static_cast<void*>(doc->GetMemDocument().get());
   table->SetAutoPageBreak(
     value.As<Boolean>(),
     [](PdfRect& rect, void* data) -> PdfPage* {

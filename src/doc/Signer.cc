@@ -99,7 +99,7 @@ Signer::Sign(const CallbackInfo& info)
     if (pSignField->GetFieldName().GetStringUtf8().empty()) {
       pSignField->SetFieldName("NoPoDoFo::SignatureField");
     }
-    auto document = doc->GetDocument();
+    auto document = doc->GetMemDocument();
 
     PdfRefCountedBuffer r;
     PdfOutputDevice outputDevice;
@@ -170,7 +170,7 @@ protected:
 
       PdfSignatureField* pSignField = self->field->GetField();
       pSignField->SetFieldName("signer.sign");
-      auto document = self->doc->GetDocument();
+      auto document = self->doc->GetMemDocument();
 
       //    PdfRefCountedBuffer r;
       PdfOutputDevice outputDevice;

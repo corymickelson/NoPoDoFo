@@ -91,18 +91,18 @@ Document::Initialize(Napi::Env& env, Napi::Object& target)
 }
 Document::Document(const CallbackInfo& info)
   : ObjectWrap(info)
-  , BaseDocument()
-  , document(new PdfMemDocument())
+  , BaseDocument(info)
 {
-  BaseDocument::SetInstance(document);
+  document =
+    std::static_pointer_cast<PdfMemDocument>(BaseDocument::GetBaseDocument());
 }
 
 Document::~Document()
 {
-  HandleScope scope(Env());
+  //  HandleScope scope(Env());
   cout << "Destructing document object." << endl;
-  delete document;
-  document = nullptr;
+  //  delete document;
+  //  document = nullptr;
 }
 
 void
@@ -312,7 +312,7 @@ protected:
   {
     try {
       PdfOutputDevice device(arg.c_str());
-      doc.GetDocument()->Write(&device);
+      doc.GetMemDocument()->Write(&device);
     } catch (PdfError& err) {
       SetError(String::New(Env(), ErrorHandler::WriteMsg(err)));
     } catch (Napi::Error& err) {
@@ -380,9 +380,9 @@ protected:
   {
     try {
       if (!useBuffer)
-        doc.GetDocument()->Load(arg.c_str(), update);
+        doc.GetMemDocument()->Load(arg.c_str(), update);
       else {
-        doc.GetDocument()->LoadFromDevice(*refBuffer);
+        doc.GetMemDocument()->LoadFromDevice(*refBuffer);
       }
     } catch (PdfError& e) {
       if (e.GetError() == ePdfError_InvalidPassword) {
@@ -391,7 +391,7 @@ protected:
           SetError("Password required to modify this document");
         else {
           try {
-            doc.GetDocument()->SetPassword(pwd);
+            doc.GetMemDocument()->SetPassword(pwd);
             cout << "password set" << endl;
           } catch (PdfError& err) {
             cout << "Invalid password" << endl;
@@ -464,7 +464,7 @@ protected:
   void Execute() override
   {
     PdfOutputDevice device(&output);
-    doc.GetDocument()->Write(&device);
+    doc.GetMemDocument()->Write(&device);
   }
   void OnOK() override
   {

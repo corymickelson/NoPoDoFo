@@ -47,7 +47,8 @@ FileSpec::FileSpec(const CallbackInfo& info)
     string file = info[0].As<String>().Utf8Value();
     auto docObj = info[1].As<Object>();
     Document* doc = Document::Unwrap(docObj);
-    spec = new PdfFileSpec(file.c_str(), true, doc->GetDocument(), true);
+    spec =
+      new PdfFileSpec(file.c_str(), true, doc->GetMemDocument().get(), true);
   }
 }
 FileSpec::~FileSpec()

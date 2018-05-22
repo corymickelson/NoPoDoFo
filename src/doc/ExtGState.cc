@@ -2,7 +2,7 @@
  * This file is part of the NoPoDoFo (R) project.
  * Copyright (c) 2017-2018
  * Authors: Cory Mickelson, et al.
- * 
+ *
  * NoPoDoFo is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -17,20 +17,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #include "ExtGState.h"
 #include "../ErrorHandler.h"
 #include "../ValidateArguments.h"
 #include <algorithm>
-
 
 namespace NoPoDoFo {
 
 using namespace Napi;
 using namespace PoDoFo;
 
-using std::string;
 using std::find;
+using std::string;
 using std::vector;
 
 FunctionReference ExtGState::constructor; // NOLINT
@@ -45,7 +43,7 @@ ExtGState::ExtGState(const Napi::CallbackInfo& info)
                      "Requires an instance of Document for construction");
   }
   auto d = Document::Unwrap(o);
-  self = new PdfExtGState(d->GetDocument());
+  self = new PdfExtGState(d->GetMemDocument().get());
 }
 
 void
