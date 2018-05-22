@@ -32,7 +32,9 @@ void
 FileSpec::Initialize(Napi::Env& env, Napi::Object& target)
 {
   HandleScope scope(env);
-  Function ctor = DefineClass(env, "FileSpec", {});
+  Function ctor = DefineClass(env, "FileSpec", {
+    InstanceAccessor("name", &FileSpec::GetFileName, nullptr)
+  });
   constructor = Napi::Persistent(ctor);
   constructor.SuppressDestruct();
 
@@ -57,5 +59,8 @@ FileSpec::~FileSpec()
     HandleScope scope(Env());
     delete spec;
   }
+}
+Napi::Value FileSpec::GetFileName(const Napi::CallbackInfo &info) {
+  return String::New(info.Env(), spec->GetFilename(true).GetStringUtf8());
 }
 }

@@ -48,7 +48,7 @@ public:
 private:
   PoDoFo::PdfSignatureField* field;
   PoDoFo::PdfData* signatureBuffer;
-  Document* doc;
+  BaseDocument* doc;
   bool isExternalInstance = false;
 };
 }

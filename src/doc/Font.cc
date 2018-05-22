@@ -24,28 +24,40 @@
 #include "../base/Stream.h"
 #include "Encoding.h"
 
-namespace NoPoDoFo {
-
 using namespace PoDoFo;
 using namespace Napi;
 
 using std::cout;
 using std::endl;
+using std::make_unique;
 using std::string;
+
+namespace NoPoDoFo {
 
 FunctionReference Font::constructor; // NOLINT
 
 Font::Font(const Napi::CallbackInfo& info)
   : ObjectWrap(info)
-  , doc(Document::Unwrap(info[0].As<Object>()))
-  , obj(info[1].As<External<PdfObject>>().Data())
-{}
+//  , doc(Document::Unwrap(info[0].As<Object>()))
+//  , obj(info[1].As<External<PdfObject>>().Data())
+{
+  auto metric = info[0].As<External<PdfFontMetrics>>().Data();
+  auto encoding = info[1].As<External<PdfEncoding>>().Data();
+  auto obj = info[2].As<External<PdfObject>>().Data();
+  font = make_unique<PdfFont>(metric, encoding, obj);
+  if(!encoding->IsAutoDelete()) {
+    this->encoding = encoding;
+  }
+}
 
 Font::~Font()
 {
   cout << "Destructing Font" << endl;
-  Napi::HandleScope scope(Env());
-  doc = nullptr;
+  if (encoding != nullptr) {
+    Napi::HandleScope scope(Env());
+    cout << "Delete Encoding" << endl;
+    delete encoding;
+  }
 }
 void
 Font::Initialize(Napi::Env& env, Napi::Object& target)
@@ -223,8 +235,8 @@ Font::StringWidth(const CallbackInfo& info)
 Napi::Value
 Font::GetObject(const CallbackInfo& info)
 {
-  //  auto i = new PdfObject(*GetFont()->GetObject());
-  auto fObj = new PdfObject(*obj);
+  auto fObj = new PdfObject(*GetFont()->GetObject());
+  //  auto fObj = new PdfObject(*obj);
   return Obj::constructor.New({ External<PdfObject>::New(
     info.Env(), fObj, [](Napi::Env env, PdfObject* data) {
       cout << "Finalizing Object#" << data->Reference().ObjectNumber() << endl;

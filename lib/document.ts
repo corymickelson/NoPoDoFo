@@ -16,30 +16,17 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-<<<<<<< HEAD
 import {access, constants} from 'fs'
 import {IObj} from './object';
-import {Page, IPage} from './page';
+import {IPage} from './page';
 import {EncryptOption, IEncrypt, ProtectionOption} from './encrypt';
-import {EventEmitter} from 'events';
 import {Font, IFont} from "./painter";
 import {Signer} from './signer';
 import {F_OK, R_OK} from "constants";
 import {IRef} from "./reference";
 import {IForm} from "./form";
 import {NPDFWriteMode} from "../dist/stream-document";
-=======
-import { access, constants } from 'fs'
-import { NPDFInternal, Obj } from './object';
-import { Page } from './page';
-import { EncryptOption, IEncrypt, ProtectionOption } from './encrypt';
-import { EventEmitter } from 'events';
-import { Font } from "./painter";
-import { Signer } from './signer';
-import { F_OK, R_OK } from "constants";
-import { Ref } from "./reference";
 import { BaseDocument, __mod } from './base-document'
->>>>>>> feature/base-document
 
 export type Callback = (err: Error, data: Buffer | string) => void
 
@@ -169,36 +156,36 @@ export class Document extends BaseDocument {
         return this._loaded
     }
 
-<<<<<<< HEAD
-    /**
-     * @description If the document has an AcroForm Dictionary return the form as an instance of IForm.
-     *      If there is not an AcroForm Dictionary for the document, doing a get on form will create an new
-     *      empty AcroForm Dictionary.
-     * @todo: Add configuration to disable creation of new form on form getter.
-     */
-    get form(): IForm {
-        return this._instance.form
-    }
-
-    set password(value: string) {
-        this._password = value;
-    }
-
-    get password(): string {
-        throw EvalError('Password is not a retrievable property')
-    }
-
-    get encrypt(): IEncrypt {
-        if (this._encrypt) return this._encrypt
-        else {
-            const encrypt = new __mod.Encrypt(this._instance)
-            this._encrypt = encrypt
-            return encrypt
-        }
-    }
-
-=======
->>>>>>> feature/base-document
+// <<<<<<< HEAD
+//     /**
+//      * @description If the document has an AcroForm Dictionary return the form as an instance of IForm.
+//      *      If there is not an AcroForm Dictionary for the document, doing a get on form will create an new
+//      *      empty AcroForm Dictionary.
+//      * @todo: Add configuration to disable creation of new form on form getter.
+//      */
+//     get form(): IForm {
+//         return this._instance.form
+//     }
+//
+//     set password(value: string) {
+//         this._password = value;
+//     }
+//
+//     get password(): string {
+//         throw EvalError('Password is not a retrievable property')
+//     }
+//
+//     get encrypt(): IEncrypt {
+//         if (this._encrypt) return this._encrypt
+//         else {
+//             const encrypt = new __mod.Encrypt(this._instance)
+//             this._encrypt = encrypt
+//             return encrypt
+//         }
+//     }
+//
+// =======
+// >>>>>>> feature/base-document
     static gc(file: string, pwd: string, output: string, cb: (e: Error, d: string | Buffer) => void): void {
         access(file, F_OK, err => {
             if (err) {
@@ -260,43 +247,43 @@ export class Document extends BaseDocument {
         }
         this._instance.load(file, cb, update, Buffer.isBuffer(file), pwd || '')
     }
-
-<<<<<<< HEAD
-    getPageCount(): number {
-        if (!this._loaded) {
-            throw new Error('load a pdf file before calling this method')
-        }
-        return this._instance.getPageCount()
-    }
-
-    getPage(pageN: number): Page {
-        if (pageN > this.getPageCount() || pageN < 0) {
-            throw new RangeError("pageN out of range")
-        }
-        if (!this._loaded) {
-            throw new Error('load a pdf file before calling this method')
-        }
-        const page: Page = this._instance.getPage(pageN)
-        return new Page(page);
-    }
-
-    /**
-     * @desc Get an NoPoDoFo Obj from an indirect reference
-     * @param {IRef} ref
-     * @returns {IObj}
-     */
-    getObject(ref: IRef): IObj {
-        if (!ref || (ref as any)._instaance instanceof __mod.Ref === false) {
-            throw TypeError()
-        }
-        else if (ref.isIndirect() === false) {
-            throw Error('Document.GetObject is only possible when the object referenced is an indirect object')
-        }
-        return this._instance.getObject((ref as any)._instance)
-    }
-
-=======
->>>>>>> feature/base-document
+//
+// <<<<<<< HEAD
+//     getPageCount(): number {
+//         if (!this._loaded) {
+//             throw new Error('load a pdf file before calling this method')
+//         }
+//         return this._instance.getPageCount()
+//     }
+//
+//     getPage(pageN: number): Page {
+//         if (pageN > this.getPageCount() || pageN < 0) {
+//             throw new RangeError("pageN out of range")
+//         }
+//         if (!this._loaded) {
+//             throw new Error('load a pdf file before calling this method')
+//         }
+//         const page: Page = this._instance.getPage(pageN)
+//         return new Page(page);
+//     }
+//
+//     /**
+//      * @desc Get an NoPoDoFo Obj from an indirect reference
+//      * @param {IRef} ref
+//      * @returns {IObj}
+//      */
+//     getObject(ref: IRef): IObj {
+//         if (!ref || (ref as any)._instaance instanceof __mod.Ref === false) {
+//             throw TypeError()
+//         }
+//         else if (ref.isIndirect() === false) {
+//             throw Error('Document.GetObject is only possible when the object referenced is an indirect object')
+//         }
+//         return this._instance.getObject((ref as any)._instance)
+//     }
+//
+// =======
+// >>>>>>> feature/base-document
     /**
      * @description Append doc to the end of the loaded doc
      * @param {string} doc - pdf file path
@@ -353,27 +340,27 @@ export class Document extends BaseDocument {
         return this._instance.isAllowed(protection)
     }
 
-<<<<<<< HEAD
-    /**
-     * @desc Creates a PdfFont instance for use in NoPoDoFo generated Pdf Document. Note
-     *      it is up to the user to check that the specified font family exists on the system.
-     *      For font management use font-manager
-     * @see https://github.com/corymickelson/font-manager
-     * @param {CreateFontOpts & Object} opts
-     * @returns {Font}
-     */
-    createFont(opts: CreateFontOpts & Object): IFont {
-        return this._instance.createFont(
-            opts.fontName,
-            opts.hasOwnProperty('bold') ? opts.bold : false,
-            opts.hasOwnProperty('italic') ? opts.italic : false,
-            opts.hasOwnProperty('encoding') ? opts.encoding : 1,
-            opts.hasOwnProperty('embed') ? opts.embed : false,
-            opts.hasOwnProperty('fileName') ? opts.fileName : null)
-    }
-
-=======
->>>>>>> feature/base-document
+// <<<<<<< HEAD
+//     /**
+//      * @desc Creates a PdfFont instance for use in NoPoDoFo generated Pdf Document. Note
+//      *      it is up to the user to check that the specified font family exists on the system.
+//      *      For font management use font-manager
+//      * @see https://github.com/corymickelson/font-manager
+//      * @param {CreateFontOpts & Object} opts
+//      * @returns {Font}
+//      */
+//     createFont(opts: CreateFontOpts & Object): IFont {
+//         return this._instance.createFont(
+//             opts.fontName,
+//             opts.hasOwnProperty('bold') ? opts.bold : false,
+//             opts.hasOwnProperty('italic') ? opts.italic : false,
+//             opts.hasOwnProperty('encoding') ? opts.encoding : 1,
+//             opts.hasOwnProperty('embed') ? opts.embed : false,
+//             opts.hasOwnProperty('fileName') ? opts.fileName : null)
+//     }
+//
+// =======
+// >>>>>>> feature/base-document
     writeUpdate(device: string | Signer): void {
         if (device instanceof Signer)
             this._instance.writeUpdate((device as any)._instance)

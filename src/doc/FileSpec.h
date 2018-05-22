@@ -32,6 +32,7 @@ public:
   ~FileSpec();
   static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
+  Napi::Value GetFileName(const Napi::CallbackInfo&);
 
 private:
   PoDoFo::PdfFileSpec* spec;

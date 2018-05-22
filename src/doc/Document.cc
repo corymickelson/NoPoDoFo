@@ -42,17 +42,17 @@ void
 Document::Initialize(Napi::Env& env, Napi::Object& target)
 {
   HandleScope scope(env);
-  Function ctor =
-    DefineClass(env,
-                "Document",
-                { StaticMethod("gc", &Document::GC),
-                  InstanceAccessor("password", nullptr, &Document::SetPassword),
-                  InstanceAccessor("encrypt", nullptr, &Document::SetEncrypt),
-                  InstanceAccessor("form", &Document::GetForm, nullptr),
-                  InstanceAccessor("body", &Document::GetObjects, nullptr),
-                  InstanceAccessor("trailer", &Document::GetTrailer, nullptr),
-                  InstanceAccessor("catalog", &Document::GetCatalog, nullptr),
-                  InstanceAccessor("version", &Document::GetVersion, nullptr),
+  Function ctor = DefineClass(
+    env,
+    "Document",
+    { StaticMethod("gc", &Document::GC),
+      InstanceAccessor("password", nullptr, &Document::SetPassword),
+      InstanceAccessor("encrypt", nullptr, &Document::SetEncrypt),
+      InstanceAccessor("form", &Document::GetForm, nullptr),
+      InstanceAccessor("body", &Document::GetObjects, nullptr),
+      InstanceAccessor("trailer", &Document::GetTrailer, nullptr),
+      InstanceAccessor("catalog", &Document::GetCatalog, nullptr),
+      InstanceAccessor("version", &Document::GetVersion, nullptr),
       InstanceAccessor(
         "pageMode", &Document::GetPageMode, &Document::SetPageMode),
       InstanceAccessor("pageLayout", nullptr, &Document::SetPageLayout),
@@ -60,13 +60,12 @@ Document::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceAccessor("baseURI", nullptr, &Document::SetBaseURI),
       InstanceAccessor("language", nullptr, &Document::SetLanguage),
       InstanceAccessor("info", &Document::GetInfo, nullptr),
-                  InstanceMethod("load", &Document::Load),
-                  InstanceMethod("getPageCount", &Document::GetPageCount),
-                  InstanceMethod("getPage", &Document::GetPage),
-                  InstanceMethod("appendDocument", &Document::MergeDocument),
-                  InstanceMethod("splicePages", &Document::DeletePages),
-                  InstanceMethod("getFont", &Document::GetFont),
 
+      InstanceMethod("load", &Document::Load),
+      InstanceMethod("getPageCount", &Document::GetPageCount),
+      InstanceMethod("getPage", &Document::GetPage),
+      InstanceMethod("splicePages", &Document::DeletePages),
+      InstanceMethod("getFont", &Document::GetFont),
       InstanceMethod("hideToolbar", &Document::SetHideToolbar),
       InstanceMethod("hideMenubar", &Document::SetHideMenubar),
       InstanceMethod("hideWindowUI", &Document::SetHideWindowUI),
@@ -78,12 +77,9 @@ Document::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceMethod("insertExistingPage", &Document::InsertExistingPage),
       InstanceMethod("insertPage", &Document::InsertPage),
       InstanceMethod("append", &Document::Append),
-      InstanceMethod("deletePage", &Document::DeletePage),
-      InstanceMethod("getVersion", &Document::GetVersion),
       InstanceMethod("isLinearized", &Document::IsLinearized),
       InstanceMethod("getWriteMode", &Document::GetWriteMode),
       InstanceMethod("write", &Document::Write),
-      InstanceMethod("writeBuffer", &Document::WriteBuffer),
       InstanceMethod("getObject", &Document::GetObject),
       InstanceMethod("isAllowed", &Document::IsAllowed),
       InstanceMethod("createFont", &Document::CreateFont),
@@ -92,7 +88,8 @@ Document::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceMethod("createPage", &Document::CreatePage),
       InstanceMethod("createPages", &Document::CreatePages),
       InstanceMethod("getAttachment", &Document::GetAttachment),
-      InstanceMethod("addNamedDestination", &Document::AddNamedDestination) });
+      InstanceMethod("addNamedDestination", &Document::AddNamedDestination),
+      InstanceMethod("__ptrCount", &Document::GetSharedPtrCount) });
   constructor = Persistent(ctor);
   constructor.SuppressDestruct();
   target.Set("Document", ctor);
@@ -105,24 +102,32 @@ Document::Document(const CallbackInfo& info)
     std::static_pointer_cast<PdfMemDocument>(BaseDocument::GetBaseDocument());
 }
 
-Document::~Document()
-{
-  //  HandleScope scope(Env());
-  cout << "Destructing document object." << endl;
-  //  delete document;
-  //  document = nullptr;
-}
+// Document::~Document()
+//{
+//  HandleScope scope(Env());
+//  cout << "Destructing document object." << endl;
+//  delete document;
+//  document = nullptr;
+//}
 
-Napi::Value
-Document::GetForm(const CallbackInfo& info)
-{
-  if (!document->GetAcroForm()) {
-    return info.Env().Null();
-  }
-  Napi::Object instance =
-    Form::constructor.New({ this->Value(), Boolean::New(info.Env(), true) });
-  return instance;
-}
+// Napi::Value
+// Document::GetPage(const Napi::CallbackInfo& info)
+//{
+//  int n = info[0].As<Number>();
+//  Napi::Object instance =
+//    Page::constructor.New({ this->Value(), Number::New(info.Env(), n) });
+//  return instance;
+//}
+// Napi::Value
+// Document::GetForm(const CallbackInfo& info)
+//{
+//  if (!document->GetAcroForm()) {
+//    return info.Env().Null();
+//  }
+//  Napi::Object instance =
+//    Form::constructor.New({ this->Value(), Boolean::New(info.Env(), true) });
+//  return instance;
+//}
 
 Value
 Document::GetFont(const CallbackInfo& info)
@@ -190,13 +195,14 @@ Document::SetPassword(const CallbackInfo& info, const Napi::Value& value)
 }
 
 void
-Document::DeletePages(const CallbackInfo &info)
+Document::DeletePages(const CallbackInfo& info)
 {
   AssertFunctionArgs(info, 2, { napi_number, napi_number });
   int pageIndex = info[0].As<Number>();
   int count = info[1].As<Number>();
-  if(document->GetPageCount() < pageIndex + count) {
-    RangeError::New(info.Env(), "Pages out of range").ThrowAsJavaScriptException();
+  if (document->GetPageCount() < pageIndex + count) {
+    RangeError::New(info.Env(), "Pages out of range")
+      .ThrowAsJavaScriptException();
   }
   try {
     document->DeletePages(pageIndex, count);
@@ -631,5 +637,21 @@ Document::GC(const Napi::CallbackInfo& info)
   auto worker = new GCAsync(cb, source, pwd, output);
   worker->Queue();
   return info.Env().Undefined();
+}
+/**
+ * @todo How to return page to user if Page constructor requires an instance of
+ * ObjectWrapped<Document>
+ * @param info
+ * @return
+ */
+Napi::Value
+Document::CreatePage(const Napi::CallbackInfo& info)
+{
+  BaseDocument::CreatePage(info);
+}
+Napi::Value
+Document::GetSharedPtrCount(const Napi::CallbackInfo& info)
+{
+  return Number::New(info.Env(), BaseDocument::GetBaseDocument().use_count());
 }
 }

@@ -57,11 +57,13 @@ public:
   void WriteToStream(const Napi::CallbackInfo&);
   void EmbedFont(const Napi::CallbackInfo&);
 
-  PoDoFo::PdfFont* GetFont() { return doc->GetDocument()->GetFont(obj); }
+  PoDoFo::PdfFont* GetFont() { return font.get(); }
 
 private:
-  Document* doc;
-  PoDoFo::PdfObject* obj;
+  std::unique_ptr<PoDoFo::PdfFont> font;
+  PoDoFo::PdfEncoding* encoding;
+//  BaseDocument* doc;
+//  PoDoFo::PdfObject* obj;
 };
 }
 #endif // NPDF_FONT_H

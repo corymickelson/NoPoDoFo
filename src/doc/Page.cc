@@ -23,26 +23,37 @@
 #include "Annotation.h"
 #include "Field.h"
 
-namespace NoPoDoFo {
-
 using namespace Napi;
 using namespace PoDoFo;
 
 using std::cout;
 using std::endl;
 
+namespace NoPoDoFo {
+
 FunctionReference Page::constructor; // NOLINT
 
 Page::Page(const CallbackInfo& info)
   : ObjectWrap(info)
   , n(info[1].As<Number>())
-  , doc(Document::Unwrap(info[0].As<Object>()))
-{}
+{
+  if (info[0].IsObject() &&
+      info[0].As<Object>().InstanceOf(Document::constructor.Value())) {
+    doc = Document::Unwrap(info[0].As<Object>())->GetBaseDocument();
+  } else if (info[0].Type() == napi_external) {
+    doc = info[0].As<External<BaseDocument>>().Data()->GetBaseDocument();
+  } else {
+    TypeError::New(info.Env(),
+                   "Unknown parameter document. Requires "
+                   "BaseDocument::document (PdfDocument)")
+      .ThrowAsJavaScriptException();
+  }
+}
 Page::~Page()
 {
-  HandleScope scope(Env());
+//  HandleScope scope(Env());
   cout << "Destructing Page" << endl;
-  doc = nullptr;
+//  doc = nullptr;
 }
 void
 Page::Initialize(Napi::Env& env, Napi::Object& target)

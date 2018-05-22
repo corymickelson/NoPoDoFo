@@ -100,7 +100,7 @@ public:
 private:
   std::unique_ptr<PoDoFo::PdfPainter> painter;
   Page* page;
-  Document* document;
+  BaseDocument* document;
   void GetCMYK(Napi::Value&, int* cmyk);
   void GetRGB(Napi::Value&, int* rgb);
 };

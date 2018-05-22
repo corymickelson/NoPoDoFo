@@ -49,11 +49,11 @@ public:
 
   PoDoFo::PdfAcroForm* GetForm()
   {
-    return doc->GetDocument()->GetAcroForm(create);
+    return doc->GetAcroForm(create);
   }
   PoDoFo::PdfDictionary* GetDictionary()
   {
-    return &doc->GetDocument()->GetAcroForm()->GetObject()->GetDictionary();
+    return &doc->GetAcroForm()->GetObject()->GetDictionary();
   }
 
 protected:
@@ -61,7 +61,8 @@ protected:
 
 private:
   bool create = true;
-  Document* doc;
+  bool isMemDoc = false;
+  std::shared_ptr<PoDoFo::PdfDocument> doc;
 };
 }
 #endif

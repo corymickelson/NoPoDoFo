@@ -60,14 +60,11 @@ public:
   Napi::Value GetNumAnnots(const Napi::CallbackInfo&);
   void DeleteAnnotation(const Napi::CallbackInfo&);
 
-  PoDoFo::PdfPage* GetPage() { return doc->GetDocument()->GetPage(n); }
+  PoDoFo::PdfPage* GetPage() { return doc->GetPage(n); }
 
 private:
   int n;
-  Document* doc;
-  void GetFieldObject(const Napi::CallbackInfo& info,
-                      Napi::Object&,
-                      PoDoFo::PdfField&);
+  std::shared_ptr<PoDoFo::PdfDocument> doc;
   Napi::Object ExtractAndApplyRectValues(const Napi::CallbackInfo&,
                                          PoDoFo::PdfRect&);
 };

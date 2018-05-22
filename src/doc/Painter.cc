@@ -28,8 +28,6 @@
 #include "Page.h"
 #include "Rect.h"
 
-namespace NoPoDoFo {
-
 using namespace Napi;
 using namespace PoDoFo;
 
@@ -834,6 +832,11 @@ Painter::MoveTextPosition(const CallbackInfo& info)
 void
 Painter::DrawGlyph(const CallbackInfo& info)
 {
+  if(document->created()) {
+    TypeError::New(info.Env(), "Requires instance of PdfMemDocument").ThrowAsJavaScriptException();
+    return;
+  }
+  auto sharedMemDoc = std::static_pointer_cast<PdfMemDocument>(document->GetBaseDocument());
   AssertFunctionArgs(
     info, 2, { napi_valuetype::napi_object, napi_valuetype::napi_string });
   auto point = info[0].As<Object>();
@@ -842,7 +845,7 @@ Painter::DrawGlyph(const CallbackInfo& info)
   x = point.Get("x").As<Number>();
   y = point.Get("y").As<Number>();
   try {
-    painter->DrawGlyph(document->GetMemDocument().get(), x, y, glyph.c_str());
+    painter->DrawGlyph(sharedMemDoc.get(), x, y, glyph.c_str());
   } catch (PdfError& err) {
     ErrorHandler(err, info);
   }

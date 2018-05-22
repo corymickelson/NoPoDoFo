@@ -43,8 +43,8 @@ SignatureField::SignatureField(const CallbackInfo& info)
       auto annot = Annotation::Unwrap(info[0].As<Object>());
       doc = Document::Unwrap(info[1].As<Object>());
       field = new PdfSignatureField(&annot->GetAnnotation(),
-                                    doc->GetDocument()->GetAcroForm(),
-                                    doc->GetDocument());
+                                    doc->GetBaseDocument()->GetAcroForm(),
+                                    doc->GetBaseDocument().get());
 
     } else if (info.Length() == 1) {
       AssertFunctionArgs(info, 1, { napi_valuetype::napi_external });
@@ -130,8 +130,13 @@ SignatureField::SetFieldName(const CallbackInfo& info)
 void
 SignatureField::AddCertificateReference(const CallbackInfo& info)
 {
+  if(doc->created()) {
+    TypeError::New(info.Env(), "Requires instance of PdfMemDocument").ThrowAsJavaScriptException();
+    return;
+  }
+  auto sharedMemDoc = std::static_pointer_cast<PdfMemDocument>(doc->GetBaseDocument());
   auto flag = static_cast<PdfSignatureField::EPdfCertPermission>(info[0].As<Number>().Int32Value());
-  GetField()->AddCertificationReference(doc->GetDocument()->GetCatalog(), flag);
+  GetField()->AddCertificationReference(sharedMemDoc->GetCatalog(), flag);
 }
 
 Napi::Value

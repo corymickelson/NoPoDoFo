@@ -17,15 +17,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import { EventEmitter } from "events";
-import { NPDFInternal, Obj } from "./object";
-import { IEncrypt } from "./encrypt";
-import { PageMode, PageLayout, CreateFontOpts, Document } from "./document";
-import { Ref } from "./reference";
-import { Page } from "./page";
-import { Font } from "./painter";
+import { NPDFInternal, IObj } from "./object";
+import {IEncrypt, ProtectionOption} from "./encrypt";
+import {PageMode, PageLayout, CreateFontOpts, Document, IDocument, Callback} from "./document";
+import { IRef } from "./reference";
+import {IPage, Page} from "./page";
+import {Font, IFont} from "./painter";
 import { access } from "fs";
 import { R_OK, F_OK } from "constants";
-import { NPDFVersion, NPDFWriteMode, Rect } from ".";
+import {IForm} from "../dist";
+import {NPDFVersion, NPDFWriteMode} from "./stream-document";
+import {Rect} from "./rect";
 export const __mod = require('bindings')('npdf')
 
 export interface NPDFInfo {
@@ -46,6 +48,47 @@ export enum NPDFDestinationFit {
     FitBH,
     FitBV,
     Unknown = 0xFF
+}
+
+export interface IBase {
+    readonly form: IForm
+    readonly body: IObj[]
+    readonly version: NPDFVersion
+    pageMode: PageMode
+    pageLayout: PageLayout
+    printingScale: string
+    baseUri: string
+    language: string
+    readonly info: NPDFInfo
+
+    getPageCount(): number
+    getPage(n: number): IPage
+    hideToolbar(): void
+    hideMenubar(): void
+    hideWindowUI(): void
+    fitWindow(): void
+    centerWindow(): void
+    displayDocTitle(): void
+    useFullScreen(): void
+    attachFile(file:string, document:IBase): void
+    insertExistingPage(memDoc:IDocument, index: number): number
+    insertPage(rect: Rect, index:number): IPage
+    append(doc: string|IDocument): void
+    isLinearized(): boolean
+    getWriteMode():NPDFWriteMode
+    write(destination: string | Callback): void
+    getObject(ref: IRef): IObj
+    isAllowed(perm: ProtectionOption): boolean
+    createFont(opts: CreateFontOpts): IFont
+    getOutlines(): IObj
+    getNames(): IObj
+    createPage(rect: Rect): IPage
+    createPages(rects: Rect[]): number
+    getAttachment(uri: string): IFileSpec
+    addDestination(page:IPage, destination: NPDFDestinationFit, name:string): void
+}
+export interface IFileSpec {
+    readonly name: string
 }
 
 export class BaseDocument extends EventEmitter {
@@ -100,7 +143,7 @@ export class BaseDocument extends EventEmitter {
     }
 
     get info(): NPDFInfo {
-
+        return this._base.info
     }
     get encrypt(): IEncrypt {
         if (this._encrypt) return this._encrypt
@@ -134,25 +177,14 @@ export class BaseDocument extends EventEmitter {
         return new Page(page);
     }
 
-    getObject(ref: Ref): Obj {
-        if (!ref || ref instanceof Ref === false) {
+    getObject(ref: IRef): IObj {
+        if (!ref || ref instanceof (__mod.Ref as any) === false) {
             throw TypeError()
         }
         else if (ref.isIndirect() === false) {
             throw Error('Document.GetObject is only possible when the object referenced is an indirect object')
         }
-        const objInstance = this._base.getObject((ref as any)._base)
-        return new Obj(objInstance)
-    }
-
-    getObjects(): Array<Obj> {
-        const objects: Array<any> = this._base.getObjects()
-        return objects.map(value => {
-            return new Obj(value)
-        })
-    }
-    getVersion(): number {
-        return this._base.getVersion()
+        return this._base.getObject((ref as any)._base)
     }
 
     isLinearized(): boolean {
@@ -196,16 +228,22 @@ export class BaseDocument extends EventEmitter {
         return this.base.getPageCount()
     }
 
-    getOutlines(create:boolean = false):Obj {
-        return new Obj()
+    getOutlines(create:boolean = false):IObj {
+        return this._base.getOutlines()
     }
 
-    getNamesTree(create:boolean = false): Obj {
-        retur new Obj()
+    getNamesTree(create:boolean = false): IObj {
+        return this._base.getNames()
     }
 
-    createPage(opt:Rect):Page {}
-    createPages(opts:Rect[]):number {}
-    insertPage(opt:Rect, at:number):Page {}
+    createPage(opt:Rect):IPage {
+        return this._base.createPage(opt)
+    }
+    createPages(opts:Rect[]):number {
+        return this._base.createPages(opts)
+    }
+    insertPage(opt:Rect, at:number):IPage {
+        return this._base.insertExistingPage(opt, at)
+    }
 
 }

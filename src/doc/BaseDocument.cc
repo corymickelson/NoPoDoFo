@@ -20,11 +20,13 @@
 #include "BaseDocument.h"
 #include "../ErrorHandler.h"
 #include "../ValidateArguments.h"
+#include "../base/Names.h"
 #include "../base/Obj.h"
 #include "../base/Ref.h"
 #include "../doc/Rect.h"
 #include "FileSpec.h"
 #include "Font.h"
+#include "Form.h"
 #include "Page.h"
 
 using namespace Napi;
@@ -54,6 +56,7 @@ BaseDocument::BaseDocument(const Napi::CallbackInfo& info)
 
 BaseDocument::~BaseDocument()
 {
+  cout << "Ptr Count" << document.use_count() << endl;
   std::cout << "Destructing BaseDocument" << std::endl;
 }
 
@@ -67,9 +70,19 @@ Napi::Value
 BaseDocument::GetPage(const CallbackInfo& info)
 {
   int n = info[0].As<Number>();
-  PdfPage* page = document->GetPage(n);
-  auto pagePtr = External<PdfPage>::New(info.Env(), page);
-  auto instance = Page::constructor.New({ pagePtr });
+  //  PdfPage* page = document->GetPage(n);
+  //  auto pagePtr = External<PdfPage>::New(info.Env(), page);
+  auto instance = Page::constructor.New(
+    { External<BaseDocument>::New(
+        info.Env(),
+        this,
+        [](Napi::Env env, BaseDocument* data) {
+          HandleScope scope(env);
+          cout << "Finalizing BaseDocument 'this' passed to Page constructor"
+               << endl;
+          data = nullptr;
+        }),
+      Number::New(info.Env(), n) });
   return instance;
 }
 
@@ -427,8 +440,9 @@ Napi::Value
 BaseDocument::CreatePage(const CallbackInfo& info)
 {
   auto r = Rect::Unwrap(info[0].As<Object>())->GetRect();
-  return Page::constructor.New(
-    { External<PdfPage>::New(info.Env(), document->CreatePage(*r)) });
+  document->CreatePage(*r);
+  //  return Page::constructor.New(
+  //    { External<PdfPage>::New(info.Env(), document->CreatePage(*r)) });
 }
 Napi::Value
 BaseDocument::CreatePages(const Napi::CallbackInfo& info)
@@ -475,6 +489,7 @@ BaseDocument::Append(const Napi::CallbackInfo& info)
   } catch (PdfError& err) {
     ErrorHandler(err, info);
   }
+  return info.Env().Undefined();
 }
 /**
  * @note Javascript args (page::Page, Destination: NPDFDestinationFit,
@@ -497,5 +512,16 @@ BaseDocument::AddNamedDestination(const Napi::CallbackInfo& info)
   string name = info[2].As<String>().Utf8Value();
   PdfDestination destination(page, fit);
   document->AddNamedDestination(destination, name);
+}
+Napi::Value
+BaseDocument::GetForm(const CallbackInfo& info)
+{
+  if (!document->GetAcroForm()) {
+    return info.Env().Null();
+  }
+  Napi::Object instance =
+    Form::constructor.New({ External<BaseDocument>::New(info.Env(), this),
+                            Boolean::New(info.Env(), true) });
+  return instance;
 }
 }

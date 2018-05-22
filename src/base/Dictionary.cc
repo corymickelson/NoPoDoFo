@@ -88,7 +88,7 @@ Dictionary::ResolveDictionary(const CallbackInfo& info)
   auto doc = Document::Unwrap(info[0].As<Object>());
   auto value = Obj::Unwrap(info[1].As<Object>())->GetObject();
   if (value->IsReference()) {
-    value = doc->GetDocument()->GetObjects().GetObject(value->Reference());
+    value = doc->GetMemDocument()->GetObjects().GetObject(value->Reference());
   }
   return Dictionary::constructor.New(
     { External<PdfObject>::New(info.Env(), new PdfObject(*value)) });

@@ -38,17 +38,18 @@ class Document
 public:
   static Napi::FunctionReference constructor;
   explicit Document(const Napi::CallbackInfo& callbackInfo); // constructor
-  ~Document();
   static void Initialize(Napi::Env& env, Napi::Object& target);
   Napi::Value Load(const Napi::CallbackInfo&);
-  void DeletePage(const Napi::CallbackInfo&);
+  Napi::Value CreatePage(const Napi::CallbackInfo&) override;
+  void DeletePages(const Napi::CallbackInfo&);
   void SetPassword(const Napi::CallbackInfo&, const Napi::Value&);
   Napi::Value Write(const Napi::CallbackInfo&);
-  Napi::Value WriteBuffer(const Napi::CallbackInfo&);
+  Napi::Value GetFont(const Napi::CallbackInfo&);
   void SetEncrypt(const Napi::CallbackInfo&, const Napi::Value&);
   Napi::Value GetTrailer(const Napi::CallbackInfo&);
   Napi::Value GetCatalog(const Napi::CallbackInfo&);
   static Napi::Value GC(const Napi::CallbackInfo&);
+  Napi::Value GetSharedPtrCount(const Napi::CallbackInfo&);
 
   std::shared_ptr<PoDoFo::PdfMemDocument> GetMemDocument()
   {
