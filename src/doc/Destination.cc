@@ -1,0 +1,117 @@
+/**
+ * This file is part of the NoPoDoFo (R) project.
+ * Copyright (c) 2017-2018
+ * Authors: Cory Mickelson, et al.
+ *
+ * NoPoDoFo is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * NoPoDoFo is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#include "Destination.h"
+#include "./Page.h"
+using namespace PoDoFo;
+using namespace Napi;
+
+namespace NoPoDoFo {
+
+FunctionReference Destination::constructor; // NOLINT
+
+Destination::Destination(const CallbackInfo& info)
+  : ObjectWrap(info)
+{
+  if (info.Length() == 1 && info[0].Type() == napi_external) {
+    destination = info[0].As<External<PdfDestination>>().Data();
+  } else if (info.Length() == 2 && info[0].IsObject() && info[1].IsNumber()) {
+    auto page = Page::Unwrap(info[0].As<Object>())->GetPage();
+    auto fit =
+      static_cast<EPdfDestinationFit>(info[1].As<Number>().Int32Value());
+    destination = new PdfDestination(page, fit);
+  } else {
+    throw TypeError();
+  }
+}
+Destination::~Destination()
+{
+  HandleScope scope(Env());
+  delete destination;
+}
+void
+Destination::Initialize(Napi::Env& env, Napi::Object& target)
+{
+  HandleScope scope(env);
+  Function ctor = DefineClass(
+    env,
+    "Destination",
+    { InstanceAccessor("page", &Destination::GetPage, nullptr),
+      InstanceAccessor("type", &Destination::GetType, nullptr),
+      InstanceAccessor("zoom", &Destination::GetZoom, nullptr),
+      InstanceAccessor("rect", &Destination::GetRect, nullptr),
+      InstanceAccessor("top", &Destination::GetTop, nullptr),
+      InstanceAccessor("left", &Destination::GetLeft, nullptr),
+      InstanceAccessor("d", &Destination::GetDValue, nullptr),
+      InstanceMethod("getObject", &Destination::GetObject),
+      InstanceMethod("getArray", &Destination::GetArray),
+      InstanceMethod("addToDictionary", &Destination::AddToDictionary) });
+  constructor = Napi::Persistent(ctor);
+  constructor.SuppressDestruct();
+  target.Set("Destination", ctor);
+}
+Napi::Value
+Destination::GetPage(const Napi::CallbackInfo& info)
+{
+  return Value();
+}
+Napi::Value
+Destination::GetType(const Napi::CallbackInfo& info)
+{
+  return Value();
+}
+Napi::Value
+Destination::GetZoom(const Napi::CallbackInfo&)
+{
+  return Value();
+}
+Napi::Value
+Destination::GetRect(const Napi::CallbackInfo&)
+{
+  return Value();
+}
+Napi::Value
+Destination::GetTop(const Napi::CallbackInfo&)
+{
+  return Value();
+}
+Napi::Value
+Destination::GetLeft(const Napi::CallbackInfo&)
+{
+  return Value();
+}
+Napi::Value
+Destination::GetDValue(const Napi::CallbackInfo&)
+{
+  return Value();
+}
+Napi::Value
+Destination::GetObject(const Napi::CallbackInfo&)
+{
+  return Value();
+}
+Napi::Value
+Destination::GetArray(const Napi::CallbackInfo&)
+{
+  return Value();
+}
+void
+Destination::AddToDictionary(const Napi::CallbackInfo&)
+{}
+}

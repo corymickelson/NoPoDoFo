@@ -17,6 +17,12 @@ tap('Document Api', sub => {
         const doc = new Document(filePath)
         doc.on('ready', (pdf: Document) => {
 
+            standard.test('tmp', t => {
+                doc.getPageCount()
+                doc.getPage(0)
+                doc.getObjects()
+                end(t)
+            })
             standard.test('loaded successfully and emitted ready event', t => {
                 if (pdf instanceof Error) t.fail('Failed to load document')
                 t.assert(pdf.loaded === true, 'pdf successfully loaded')

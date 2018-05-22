@@ -2,7 +2,7 @@
  * This file is part of the NoPoDoFo (R) project.
  * Copyright (c) 2017-2018
  * Authors: Cory Mickelson, et al.
- * 
+ *
  * NoPoDoFo is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -17,7 +17,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #include "base/Array.h"
 #include "base/ContentsTokenizer.h"
 #include "base/Data.h"
@@ -25,11 +24,11 @@
 #include "base/Obj.h"
 #include "base/Ref.h"
 #include "base/Stream.h"
-#include "base/Vector.h"
 #include "crypto/Signature.h"
 #include "doc/Annotation.h"
 #include "doc/CheckBox.h"
 #include "doc/ComboBox.h"
+#include "doc/Destination.h"
 #include "doc/Encoding.h"
 #include "doc/Encrypt.h"
 #include "doc/ExtGState.h"
@@ -37,13 +36,15 @@
 #include "doc/Font.h"
 #include "doc/Form.h"
 #include "doc/Image.h"
+#include "doc/ListBox.h"
 #include "doc/ListField.h"
+#include "doc/Outline.h"
 #include "doc/Painter.h"
 #include "doc/SignatureField.h"
 #include "doc/Signer.h"
-#include "doc/TextField.h"
 #include "doc/SimpleTable.h"
-#include "doc/ListBox.h"
+#include "doc/StreamDocument.h"
+#include "doc/TextField.h"
 #include <napi.h>
 
 Napi::Object
@@ -74,10 +75,13 @@ init(Napi::Env env, Napi::Object exports)
   NoPoDoFo::ExtGState::Initialize(env, exports);
   NoPoDoFo::Signer::Initialize(env, exports);
   NoPoDoFo::SignatureField::Initialize(env, exports);
-  NoPoDoFo::Vector::Initialize(env, exports);
+//  NoPoDoFo::Vector::Initialize(env, exports);
   NoPoDoFo::Data::Initialize(env, exports);
   NoPoDoFo::ContentsTokenizer::Initialize(env, exports);
   NoPoDoFo::SimpleTable::Initialize(env, exports);
+  NoPoDoFo::StreamDocument::Initialize(env, exports);
+  NoPoDoFo::Outline::Initialize(env, exports);
+  NoPoDoFo::Destination::Initialize(env, exports);
 
   exports["signature"] = Function::New(env, NPDFSignatureData);
 

@@ -2,7 +2,7 @@
  * This file is part of the NoPoDoFo (R) project.
  * Copyright (c) 2017-2018
  * Authors: Cory Mickelson, et al.
- * 
+ *
  * NoPoDoFo is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -16,25 +16,38 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import { __mod } from "./base-document";
+import { BaseDocument, __mod } from "./base-document";
+import { IEncrypt } from "./encrypt";
 import { NPDFInternal } from "./object";
 
-export class Data {
-    private _instance: any
-    get value(): string {
-        return this._instance.value
+export enum NPDFVersion {
+    Pdf11,
+    Pdf12,
+    Pdf13,
+    Pdf14,
+    Pdf15,
+    Pdf16,
+    Pdf17,
+}
+
+export enum NPDFWriteMode {
+    Default = 0x01,
+    Compact = 0x02
+}
+
+export class StreamDocument extends BaseDocument {
+    private _instance: NPDFInternal
+    constructor(name:string, version: NPDFVersion, writer: NPDFWriteMode, encrypt?: IEncrypt) {
+        super()
+        this._instance = new __mod.StreamDocument(name, version, writer, encrypt || null)
+        this.setInternal(this._instance)
     }
-    constructor(value: string | NPDFInternal) {
-        if (typeof value === 'string') {
-            this._instance = new __mod.Data(value)
-        } else {
-            this._instance = value
-        }
-    }
-    write(output: string): void {
-        if (!output) {
-            throw Error("output must be a valid path")
-        }
-        this._instance.write(output)
+
+    /**
+     * @description Calls PdfStreamedDocument::Close and emits the close event.
+     */
+    close(): void {
+        this._instance.close()
+        this.emit('close')
     }
 }

@@ -17,7 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import { Page } from './page'
-import { Document, __mod } from './document'
+import { Document } from './document'
+import {__mod} from './base-document'
 
 export class Rect {
     private _instance: any

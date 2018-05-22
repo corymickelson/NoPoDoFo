@@ -2,7 +2,7 @@
  * This file is part of the NoPoDoFo (R) project.
  * Copyright (c) 2017-2018
  * Authors: Cory Mickelson, et al.
- * 
+ *
  * NoPoDoFo is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -18,7 +18,6 @@
  */
 
 #include "FileSpec.h"
-
 
 namespace NoPoDoFo {
 
@@ -42,14 +41,15 @@ FileSpec::Initialize(Napi::Env& env, Napi::Object& target)
 FileSpec::FileSpec(const CallbackInfo& info)
   : ObjectWrap<FileSpec>(info)
 {
-  if (info.Length() != 2) {
-    throw Napi::TypeError::New(
-      info.Env(), "FileSpec requires two arguments of type: string, Document");
+  if (info.Length() == 1 && info[0].Type() == napi_external) {
+    spec = info[0].As<External<PdfFileSpec>>().Data();
+  } else if (info.Length() == 2) {
+    string file = info[0].As<String>().Utf8Value();
+    auto docObj = info[1].As<Object>();
+    Document* doc = Document::Unwrap(docObj);
+    spec =
+      new PdfFileSpec(file.c_str(), true, doc->GetMemDocument().get(), true);
   }
-  string file = info[0].As<String>().Utf8Value();
-  auto docObj = info[1].As<Object>();
-  Document* doc = Document::Unwrap(docObj);
-  spec = new PdfFileSpec(file.c_str(), true, doc->GetDocument(), true);
 }
 FileSpec::~FileSpec()
 {

@@ -1,0 +1,211 @@
+/**
+ * This file is part of the NoPoDoFo (R) project.
+ * Copyright (c) 2017-2018
+ * Authors: Cory Mickelson, et al.
+ *
+ * NoPoDoFo is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * NoPoDoFo is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+import { EventEmitter } from "events";
+import { NPDFInternal, Obj } from "./object";
+import { IEncrypt } from "./encrypt";
+import { PageMode, PageLayout, CreateFontOpts, Document } from "./document";
+import { Ref } from "./reference";
+import { Page } from "./page";
+import { Font } from "./painter";
+import { access } from "fs";
+import { R_OK, F_OK } from "constants";
+import { NPDFVersion, NPDFWriteMode, Rect } from ".";
+export const __mod = require('bindings')('npdf')
+
+export interface NPDFInfo {
+    author:string
+    createdAt:Date
+    creator:string
+    keywords:string
+    producer:string
+    subject:string
+    title:string
+}
+
+export enum NPDFDestinationFit {
+    Fit,
+    FitH,
+    FitV,
+    FitB,
+    FitBH,
+    FitBV,
+    Unknown = 0xFF
+}
+
+export class BaseDocument extends EventEmitter {
+    private _base: NPDFInternal
+    private _encrypt?: IEncrypt
+    private _password?: string
+
+    get base(): NPDFInternal {
+        return this._base
+    }
+
+    set password(value: string) {
+        this._password = value;
+    }
+
+    get password(): string {
+        throw EvalError()
+    }
+
+    set pageMode(v: PageMode) {
+        this._base.pageMode = v
+    }
+
+    get pageMode(): PageMode {
+        return this._base.pageMode
+    }
+
+    set pageLayout(v: PageLayout) {
+        this._base.pageLayout = v
+    }
+
+    set printingScale(v: string) {
+        this._base.printingScale = v
+    }
+
+    set baseURI(v: string) {
+        this._base.baseURI = v
+    }
+
+    set language(v: string) {
+        this._base.language = v
+    }
+
+    get writeMode(): NPDFWriteMode {
+        return this.base.writeMode as NPDFWriteMode
+    }
+    /**
+     * @todo: refactor internal implementation to use enum
+     */
+    get version(): NPDFVersion {
+        return this.base.version as NPDFVersion
+    }
+
+    get info(): NPDFInfo {
+
+    }
+    get encrypt(): IEncrypt {
+        if (this._encrypt) return this._encrypt
+        else {
+            const encrypt = new __mod.Encrypt(this._base)
+            this._encrypt = encrypt
+            return encrypt
+        }
+    }
+    constructor() {
+        super()
+    }
+    /**
+     * @todo Fix this, should not have to pass internal to Base Class
+     * @param instance - document instance
+     */
+    setInternal(instance: NPDFInternal): void {
+        this._base = instance
+    }
+    getPageCount(): number {
+
+        return this._base.getPageCount()
+    }
+
+    getPage(pageN: number): Page {
+        if (pageN > this.getPageCount() || pageN < 0) {
+            throw new RangeError("pageN out of range")
+        }
+
+        const page: Page = this._base.getPage(pageN)
+        return new Page(page);
+    }
+
+    getObject(ref: Ref): Obj {
+        if (!ref || ref instanceof Ref === false) {
+            throw TypeError()
+        }
+        else if (ref.isIndirect() === false) {
+            throw Error('Document.GetObject is only possible when the object referenced is an indirect object')
+        }
+        const objInstance = this._base.getObject((ref as any)._base)
+        return new Obj(objInstance)
+    }
+
+    getObjects(): Array<Obj> {
+        const objects: Array<any> = this._base.getObjects()
+        return objects.map(value => {
+            return new Obj(value)
+        })
+    }
+    getVersion(): number {
+        return this._base.getVersion()
+    }
+
+    isLinearized(): boolean {
+        return this._base.isLinearized()
+    }
+    /**
+     * @desc Creates a PdfFont instance for use in NoPoDoFo generated Pdf Document. Note
+     *      it is up to the user to check that the specified font family exists on the system.
+     *      For font management use font-manager
+     * @see https://github.com/corymickelson/font-manager
+     * @param {CreateFontOpts & Object} opts
+     * @returns {Font}
+     */
+    createFont(opts: CreateFontOpts & Object): Font {
+        const instance = this._base.createFont(
+            opts.fontName,
+            opts.hasOwnProperty('bold') ? opts.bold : false,
+            opts.hasOwnProperty('italic') ? opts.italic : false,
+            opts.hasOwnProperty('encoding') ? opts.encoding : 1,
+            opts.hasOwnProperty('embed') ? opts.embed : false,
+            opts.hasOwnProperty('fileName') ? opts.fileName : null)
+        return new Font(instance)
+    }
+
+    attachFile(file: string): Promise<void> {
+        return new Promise((resolve, reject) => {
+            access(file, F_OK | R_OK, err => {
+                if (err) {
+                    return reject('File Not Found')
+                }
+                else {
+                    this._base.attachFile(file)
+                    return resolve()
+                }
+            })
+
+        })
+    }
+
+    insertExistingPage(doc:Document, docIndex:number, atIndex:number):number {
+        return this.base.getPageCount()
+    }
+
+    getOutlines(create:boolean = false):Obj {
+        return new Obj()
+    }
+
+    getNamesTree(create:boolean = false): Obj {
+        retur new Obj()
+    }
+
+    createPage(opt:Rect):Page {}
+    createPages(opts:Rect[]):number {}
+    insertPage(opt:Rect, at:number):Page {}
+
+}

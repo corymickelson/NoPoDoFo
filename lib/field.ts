@@ -16,8 +16,14 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+<<<<<<< HEAD
 import {__mod, Document} from './document'
 import {NPDFInternal, IObj} from "./object";
+=======
+import {__mod} from './base-document'
+import {Document} from './document'
+import {NPDFInternal, Obj} from "./object";
+>>>>>>> feature/base-document
 import {Annotation} from "./annotation";
 import {IListItem} from "../dist/field";
 

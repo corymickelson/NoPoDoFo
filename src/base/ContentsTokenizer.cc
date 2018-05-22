@@ -119,7 +119,7 @@ ContentsTokenizer::ReadAll(const CallbackInfo& info)
           if (!pFont) {
             throw Error::New(info.Env(), "Failed to create font");
           }
-          font = doc->GetDocument()->GetFont(pFont);
+          font = doc->GetMemDocument()->GetFont(pFont);
           if (!font) {
             throw Error::New(info.Env(), "Failed to create font");
           }

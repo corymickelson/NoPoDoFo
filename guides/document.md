@@ -27,11 +27,11 @@ NoPoDoFo will __not__ persist any changes made until the `write` method has been
 
 ``` typescript
 // Write to disk
-doc.write((e:Error) => {
+doc.write('path/to/output.pdf', (e:Error) => {
     if(e instanceof Error) {
-        // handle IO error
+        // handle error
     }
-}, 'path/to/output.pdf')
+})
 // Write to buffer
 doc.write((e:Error, d:Buffer) => {
     if(e) {
@@ -55,7 +55,7 @@ doc.on('ready', () => {
         keyLength: 40
     }
     doc.createEncrypt(encrypt) // Creates a PdfEncrypt object and sets document encrypt to this object.
-    doc.write((e:Error) => {}, 'output/path/doc.pdf') // write the document with new/updated encryption
+    doc.write('output/path/doc.pdf', (e:Error) => {}) // write the document with new/updated encryption
 })
     .on('error', e => {
         if(e.message.includes('Password required')) {

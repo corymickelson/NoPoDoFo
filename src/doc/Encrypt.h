@@ -22,7 +22,6 @@
 
 #include "Document.h"
 
-
 namespace NoPoDoFo {
 class Encrypt : public Napi::ObjectWrap<Encrypt>
 {
@@ -32,12 +31,12 @@ public:
 
   static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
-
+  static Napi::Value CreateEncrypt(const Napi::CallbackInfo&);
   Napi::Value IsAllowed(const Napi::CallbackInfo&);
   Napi::Value Authenticate(const Napi::CallbackInfo&);
   Napi::Value GetOwnerValue(const Napi::CallbackInfo&);
   Napi::Value GetUserValue(const Napi::CallbackInfo&);
-  Napi::Value GetProtectionsValue(const Napi::CallbackInfo &);
+  Napi::Value GetProtectionsValue(const Napi::CallbackInfo&);
   Napi::Value GetEncryptionKey(const Napi::CallbackInfo&);
   Napi::Value GetKeyLength(const Napi::CallbackInfo&);
 
@@ -47,7 +46,7 @@ public:
     //    return make_unique<PoDoFo::PdfEncrypt>(
     //      *PoDoFo::PdfEncrypt::CreatePdfEncrypt(
     //        *document->GetDocument()->GetEncrypt()));
-    return document->GetDocument()->GetEncrypt();
+    return document->GetMemDocument()->GetEncrypt();
   }
 
 private:

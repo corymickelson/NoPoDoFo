@@ -16,7 +16,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+<<<<<<< HEAD
 import { IRef } from "./reference";
+=======
+import { __mod } from "./base-document";
+import { Ref } from "./reference";
+>>>>>>> feature/base-document
 import { Stream } from "stream";
 import { IDictionary } from "./object";
 import { IObj } from "./object"

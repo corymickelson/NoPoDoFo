@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-import {Document, __mod} from './document'
+import {__mod} from './base-document'
+import {Document} from './document'
 
 export class Image {
     private _instance:any

@@ -1,3 +1,5 @@
+import { NPDFInternal } from "./object";
+
 /**
  * This file is part of the NoPoDoFo (R) project.
  * Copyright (c) 2017-2018
@@ -39,6 +41,7 @@ export type ProtectionSummary = {
 
 
 export interface IEncrypt {
+    createEncrypt(opts: EncryptOption): NPDFInternal
     owner: string
     user: string
     encryptionKey: string

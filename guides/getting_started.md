@@ -105,7 +105,7 @@ find_path(PODOFO_INCLUDE_DIR podofo/podofo.h PATHS /usr/include /usr/local/inclu
 find_library(PODOFO_LIBRARY NAMES podofo PATHS /usr/lib64 /usr/lib /usr/local/lib /* Here */)
 `
  - Clone NoPoDoFo from git or npm
-   -  `npm i -S nopodofo` 
+   - `npm i -S nopodofo` 
    - `git clone https://github.com/corymickelson/NoPoDoFo.git nopodofo`
  - `cd nopodofo`
  - `npm run compile`

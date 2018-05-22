@@ -19,7 +19,8 @@
 import {IPage} from './page'
 import {Image} from './image'
 import {Stream} from './stream'
-import {__mod, Document} from './document'
+import {Document} from './document'
+import {__mod} from './base-document'
 import {Rect} from "./rect";
 import {NPDFPoint} from "./painter";
 import { IObj } from './object';

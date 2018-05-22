@@ -2,7 +2,7 @@
  * This file is part of the NoPoDoFo (R) project.
  * Copyright (c) 2017-2018
  * Authors: Cory Mickelson, et al.
- * 
+ *
  * NoPoDoFo is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -16,27 +16,34 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-<<<<<<< HEAD
-import { IDictionary } from './object';
-import { Font, IFont } from './painter';
-=======
-import {__mod} from './base-document'
-import {Document} from './document'
-import {Obj} from "./object";
->>>>>>> feature/base-document
 
-export enum ISigFlags {
-    SignatureExists = 1,
-    AppendOnly = 2,
-    SignatureExistsAppendOnly = 3
-}
-export interface IForm {
-    needAppearances: boolean
-    dictionary: IDictionary
-    DA?: string
-    DR?: IDictionary
-    Fonts?: IFont[]
-    SigFlags?: ISigFlags
-}
+#ifndef NPDF_STREAMDOCUMENT_H
+#define NPDF_STREAMDOCUMENT_H
 
+#include "BaseDocument.h"
 
+#include <napi.h>
+#include <podofo/podofo.h>
+
+namespace NoPoDoFo {
+class StreamDocument
+  : public Napi::ObjectWrap<StreamDocument>
+  , public BaseDocument
+{
+public:
+  static Napi::FunctionReference constructor;
+  explicit StreamDocument(const Napi::CallbackInfo&);
+  ~StreamDocument();
+  static void Initialize(Napi::Env& env, Napi::Object& target);
+  void Close(const Napi::CallbackInfo&);
+  std::shared_ptr<PoDoFo::PdfStreamedDocument> GetStreamedDocument()
+  {
+    auto shared = document;
+    return shared;
+  }
+
+private:
+  std::shared_ptr<PoDoFo::PdfStreamedDocument> document;
+};
+};
+#endif

@@ -16,6 +16,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+<<<<<<< HEAD
 import {access, constants} from 'fs'
 import {IObj} from './object';
 import {Page, IPage} from './page';
@@ -27,8 +28,19 @@ import {F_OK, R_OK} from "constants";
 import {IRef} from "./reference";
 import {IForm} from "./form";
 import {NPDFWriteMode} from "../dist/stream-document";
+=======
+import { access, constants } from 'fs'
+import { NPDFInternal, Obj } from './object';
+import { Page } from './page';
+import { EncryptOption, IEncrypt, ProtectionOption } from './encrypt';
+import { EventEmitter } from 'events';
+import { Font } from "./painter";
+import { Signer } from './signer';
+import { F_OK, R_OK } from "constants";
+import { Ref } from "./reference";
+import { BaseDocument, __mod } from './base-document'
+>>>>>>> feature/base-document
 
-export const __mod = require('bindings')('npdf')
 export type Callback = (err: Error, data: Buffer | string) => void
 
 export enum FontEncoding {
@@ -42,6 +54,27 @@ export enum FontEncoding {
     Win1250 = 8,
     Iso88592 = 9,
     Identity = 0
+}
+
+export enum PageMode {
+    DontCare,
+    FullScreen,
+    UseAttachments,
+    UseBookmarks,
+    UseNone,
+    UseOC,
+    UseThumbs
+}
+
+export enum PageLayout {
+    Ignore,
+    Default,
+    SinglePage,
+    OneColumn,
+    TwoColumnLeft,
+    TwoColumnRight,
+    TwoPageLeft,
+    TwoPageRight
 }
 
 export interface CreateFontOpts {
@@ -108,12 +141,9 @@ export const documentGc = (file: string, pwd: string, output: string, cb: Callba
  * Document was designed to allow easy access to the object structure of a PDF file.
  * Document should be used whenever you want to change the object structure of a PDF file.
  */
-export class Document extends EventEmitter {
-
+export class Document extends BaseDocument {
     private readonly _instance: any
     private _loaded: boolean = false;
-    private _password: string | undefined = undefined
-    private _encrypt: any
 
     get body(): IObj[] {
         return this._instance.body
@@ -139,6 +169,7 @@ export class Document extends EventEmitter {
         return this._loaded
     }
 
+<<<<<<< HEAD
     /**
      * @description If the document has an AcroForm Dictionary return the form as an instance of IForm.
      *      If there is not an AcroForm Dictionary for the document, doing a get on form will create an new
@@ -166,6 +197,8 @@ export class Document extends EventEmitter {
         }
     }
 
+=======
+>>>>>>> feature/base-document
     static gc(file: string, pwd: string, output: string, cb: (e: Error, d: string | Buffer) => void): void {
         access(file, F_OK, err => {
             if (err) {
@@ -186,6 +219,7 @@ export class Document extends EventEmitter {
     constructor(file: string | Buffer, update: boolean = false, pwd?: string) {
         super()
         this._instance = new __mod.Document()
+        this.setInternal(this._instance)
         if (Buffer.isBuffer(file)) {
             this.load(file, update, pwd || '')
         } else {
@@ -227,6 +261,7 @@ export class Document extends EventEmitter {
         this._instance.load(file, cb, update, Buffer.isBuffer(file), pwd || '')
     }
 
+<<<<<<< HEAD
     getPageCount(): number {
         if (!this._loaded) {
             throw new Error('load a pdf file before calling this method')
@@ -260,6 +295,8 @@ export class Document extends EventEmitter {
         return this._instance.getObject((ref as any)._instance)
     }
 
+=======
+>>>>>>> feature/base-document
     /**
      * @description Append doc to the end of the loaded doc
      * @param {string} doc - pdf file path
@@ -296,21 +333,6 @@ export class Document extends EventEmitter {
         this._instance.splicePage(pageIndex)
     }
 
-    getVersion(): number {
-        if (!this._loaded) {
-            throw new Error('load a pdf file before calling this method')
-        }
-        return this._instance.getVersion()
-    }
-
-    isLinearized(): boolean {
-        if (!this._loaded) {
-            throw new Error('load a pdf file before calling this method')
-        }
-        return this._instance.isLinearized()
-    }
-
-
     /**
      * Persist changes and write to disk or if no arguments provided returns Buffer
      * @param {string|Function} output - optional, if provided, will try to write to file
@@ -331,6 +353,7 @@ export class Document extends EventEmitter {
         return this._instance.isAllowed(protection)
     }
 
+<<<<<<< HEAD
     /**
      * @desc Creates a PdfFont instance for use in NoPoDoFo generated Pdf Document. Note
      *      it is up to the user to check that the specified font family exists on the system.
@@ -349,6 +372,8 @@ export class Document extends EventEmitter {
             opts.hasOwnProperty('fileName') ? opts.fileName : null)
     }
 
+=======
+>>>>>>> feature/base-document
     writeUpdate(device: string | Signer): void {
         if (device instanceof Signer)
             this._instance.writeUpdate((device as any)._instance)

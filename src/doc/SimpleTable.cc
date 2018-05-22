@@ -455,7 +455,7 @@ void
 SimpleTable::SetAutoPageBreak(const CallbackInfo& info,
                               const Napi::Value& value)
 {
-  auto* d = static_cast<void*>(doc->GetDocument());
+  auto* d = static_cast<void*>(doc->GetMemDocument().get());
   table->SetAutoPageBreak(
     value.As<Boolean>(),
     [](PdfRect& rect, void* data) -> PdfPage* {
