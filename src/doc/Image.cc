@@ -168,7 +168,6 @@ Image::IsLoaded(const CallbackInfo& info)
 void
 Image::SetInterpolate(const CallbackInfo& info)
 {
-  AssertFunctionArgs(info, 1, { napi_valuetype::napi_boolean });
   img->SetInterpolate(info[0].As<Boolean>());
 }
 Image::~Image()

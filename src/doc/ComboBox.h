@@ -21,11 +21,12 @@
 #define NPDF_COMBOBOX_H
 
 #include "Field.h"
+#include "ListField.h"
 #include <napi.h>
 #include <podofo/podofo.h>
 
 namespace NoPoDoFo {
-class ComboBox : public Napi::ObjectWrap<ComboBox>
+class ComboBox : public Napi::ObjectWrap<ComboBox>, public ListField
 {
 public:
   explicit ComboBox(const Napi::CallbackInfo&);
@@ -35,13 +36,10 @@ public:
   void SetEditable(const Napi::CallbackInfo&, const Napi::Value&);
   Napi::Value GetEditable(const Napi::CallbackInfo&);
 
-  PoDoFo::PdfComboBox GetField()
-  {
-    return PoDoFo::PdfComboBox(*field->GetField());
-  }
+  PoDoFo::PdfComboBox GetField() { return PoDoFo::PdfComboBox(*field); }
 
 private:
-  Field* field;
+  std::shared_ptr<PoDoFo::PdfField> field;
 };
 }
 

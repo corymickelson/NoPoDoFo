@@ -18,6 +18,7 @@
  */
 
 #include "Field.h"
+#include "Action.h"
 #include "Document.h"
 #include "Page.h"
 
@@ -26,6 +27,7 @@ using namespace PoDoFo;
 
 using std::cout;
 using std::endl;
+using std::make_unique;
 
 namespace NoPoDoFo {
 
@@ -33,17 +35,17 @@ FunctionReference Field::constructor; // NOLINT
 
 Field::Field(const CallbackInfo& info)
   : ObjectWrap(info)
-  , field(info[0].As<External<PdfField>>().Data())
+  , index(info[1].As<Number>())
 {
-  fieldName = field->GetFieldName().GetStringUtf8();
+  auto page = Page::Unwrap(info[0].As<Object>())->GetPage();
+  field = make_shared<PdfField>(page->GetField(index));
+  fieldName = field.get()->GetFieldName().GetStringUtf8();
   fieldType = TypeString();
 }
 
 Field::~Field()
 {
-  HandleScope scope(Env());
-  cout << "Destructing Field: " << fieldName << " of type: " << fieldType
-       << endl;
+  cout << "Destructing Field " << fieldName << endl;
 }
 void
 Field::Initialize(Napi::Env& env, Napi::Object& target)
@@ -54,12 +56,18 @@ Field::Initialize(Napi::Env& env, Napi::Object& target)
     "Field",
     { InstanceAccessor("readOnly", &Field::IsReadOnly, &Field::SetReadOnly),
       InstanceAccessor("required", &Field::IsRequired, &Field::SetRequired),
+      InstanceAccessor("exported", &Field::IsExport, &Field::SetExport),
       InstanceAccessor("type", &Field::GetType, nullptr),
       InstanceAccessor("fieldName", &Field::GetFieldName, &Field::SetFieldName),
       InstanceAccessor(
         "alternateName", &Field::GetAlternateName, &Field::SetAlternateName),
       InstanceAccessor(
-        "mappingName", &Field::GetMappingName, &Field::SetMappingName) });
+        "mappingName", &Field::GetMappingName, &Field::SetMappingName),
+      InstanceMethod("setBackgroundColor", &Field::SetBackground),
+      InstanceMethod("setBorderColor", &Field::SetBorder),
+      InstanceMethod("setMouseAction", &Field::SetMouseAction),
+      InstanceMethod("setPageAction", &Field::SetPageAction),
+      InstanceMethod("setHighlightingMode", &Field::SetHighlightingMode) });
   constructor = Napi::Persistent(ctor);
   constructor.SuppressDestruct();
   target.Set("Field", ctor);
@@ -69,7 +77,7 @@ string
 Field::TypeString()
 {
   string typeStr;
-  switch (GetField()->GetType()) {
+  switch (field.get()->GetType()) {
     case PoDoFo::EPdfField::ePdfField_CheckBox:
       typeStr = "CheckBox";
       break;
@@ -111,56 +119,180 @@ Field::GetFieldName(const CallbackInfo& info)
 void
 Field::SetFieldName(const CallbackInfo&, const Napi::Value& value)
 {
-  GetField()->SetFieldName(value.As<String>().Utf8Value());
+  field.get()->SetFieldName(value.As<String>().Utf8Value());
 }
 
 Napi::Value
 Field::GetAlternateName(const CallbackInfo& info)
 {
   return Napi::String::New(info.Env(),
-                           GetField()->GetAlternateName().GetStringUtf8());
+                           field.get()->GetAlternateName().GetStringUtf8());
 }
 
 Napi::Value
 Field::GetMappingName(const CallbackInfo& info)
 {
   return Napi::String::New(info.Env(),
-                           GetField()->GetMappingName().GetStringUtf8());
+                           field.get()->GetMappingName().GetStringUtf8());
 }
 
 void
 Field::SetAlternateName(const CallbackInfo&, const Napi::Value& value)
 {
-  GetField()->SetAlternateName(value.As<String>().Utf8Value());
+  field.get()->SetAlternateName(value.As<String>().Utf8Value());
 }
 
 void
 Field::SetMappingName(const CallbackInfo&, const Napi::Value& value)
 {
-  GetField()->SetMappingName(value.As<String>().Utf8Value());
+  field.get()->SetMappingName(value.As<String>().Utf8Value());
 }
 
 void
 Field::SetRequired(const CallbackInfo&, const Napi::Value& value)
 {
-  GetField()->SetRequired(value.As<Boolean>());
+  field.get()->SetRequired(value.As<Boolean>());
 }
 
 Napi::Value
 Field::IsRequired(const CallbackInfo& info)
 {
-  return Napi::Boolean::New(info.Env(), GetField()->IsRequired());
+  return Napi::Boolean::New(info.Env(), field.get()->IsRequired());
 }
 
 Napi::Value
 Field::IsReadOnly(const Napi::CallbackInfo& info)
 {
-  return Boolean::New(info.Env(), GetField()->IsReadOnly());
+  return Boolean::New(info.Env(), field.get()->IsReadOnly());
 }
 
 void
 Field::SetReadOnly(const Napi::CallbackInfo&, const Napi::Value& value)
 {
-  GetField()->SetReadOnly(value.As<Boolean>());
+  field.get()->SetReadOnly(value.As<Boolean>());
+}
+void
+Field::SetExport(const Napi::CallbackInfo&, const Napi::Value& value)
+{
+  field.get()->SetExport(value.As<Boolean>());
+}
+Napi::Value
+Field::IsExport(const Napi::CallbackInfo& info)
+{
+  return Boolean::New(info.Env(), field.get()->IsExport());
+}
+/**
+ * @note (color:Array<number>, transparent?: boolean)
+ * @param info
+ * @return
+ */
+Napi::Value
+Field::SetBackground(const Napi::CallbackInfo& info)
+{
+  auto js = info[0].As<Array>();
+  if (js.Length() == 1) {
+    double gray = js.Get(static_cast<uint32_t>(0)).As<Number>().DoubleValue();
+    field.get()->SetBackgroundColor(gray);
+  } else if (js.Length() == 3) {
+    double r = js.Get(static_cast<uint32_t>(0)).As<Number>().DoubleValue();
+    double g = js.Get(static_cast<uint32_t>(1)).As<Number>().DoubleValue();
+    double b = js.Get(static_cast<uint32_t>(2)).As<Number>().DoubleValue();
+    field.get()->SetBackgroundColor(r, g, b);
+  } else if (js.Length() == 4) {
+    double c = js.Get(static_cast<uint32_t>(0)).As<Number>().DoubleValue();
+    double m = js.Get(static_cast<uint32_t>(1)).As<Number>().DoubleValue();
+    double y = js.Get(static_cast<uint32_t>(2)).As<Number>().DoubleValue();
+    double k = js.Get(static_cast<uint32_t>(3)).As<Number>().DoubleValue();
+    field.get()->SetBackgroundColor(c, m, y, k);
+  } else {
+    TypeError::New(info.Env(), "value must be [grayscale], [r,g,b], [c,m,y,k]")
+      .ThrowAsJavaScriptException();
+  }
+  return info.Env().Undefined();
+}
+Napi::Value
+Field::SetBorder(const Napi::CallbackInfo& info)
+{
+  auto js = info[0].As<Array>();
+  if (js.Length() == 1) {
+    double gray = js.Get(static_cast<uint32_t>(0)).As<Number>().DoubleValue();
+    field.get()->SetBorderColor(gray);
+  } else if (js.Length() == 3) {
+    double r = js.Get(static_cast<uint32_t>(0)).As<Number>().DoubleValue();
+    double g = js.Get(static_cast<uint32_t>(1)).As<Number>().DoubleValue();
+    double b = js.Get(static_cast<uint32_t>(2)).As<Number>().DoubleValue();
+    field.get()->SetBorderColor(r, g, b);
+  } else if (js.Length() == 4) {
+    double c = js.Get(static_cast<uint32_t>(0)).As<Number>().DoubleValue();
+    double m = js.Get(static_cast<uint32_t>(1)).As<Number>().DoubleValue();
+    double y = js.Get(static_cast<uint32_t>(2)).As<Number>().DoubleValue();
+    double k = js.Get(static_cast<uint32_t>(3)).As<Number>().DoubleValue();
+    field.get()->SetBorderColor(c, m, y, k);
+  } else {
+    TypeError::New(info.Env(), "value must be [grayscale], [r,g,b], [c,m,y,k]")
+      .ThrowAsJavaScriptException();
+  }
+  return info.Env().Undefined();
+}
+Napi::Value
+Field::SetHighlightingMode(const Napi::CallbackInfo& info)
+{
+  EPdfHighlightingMode mode =
+    static_cast<EPdfHighlightingMode>(info[0].As<Number>().Uint32Value());
+  field.get()->SetHighlightingMode(mode);
+  return info.Env().Undefined();
+}
+/**
+ * @note (type: NPDFMouseActionEnum: 'up'|'down'|'enter'|'exit', action:
+ * NPDFAction)
+ * @return
+ */
+Napi::Value
+Field::SetMouseAction(const Napi::CallbackInfo& info)
+{
+  int onMouse = info[0].As<Number>();
+  PdfAction* action = Action::Unwrap(info[1].As<Object>())->GetAction();
+  switch (onMouse) {
+    case 0: // up
+      field.get()->SetMouseUpAction(*action);
+      break;
+    case 1: // down
+      field.get()->SetMouseDownAction(*action);
+      break;
+    case 2: // enter
+      field.get()->SetMouseEnterAction(*action);
+      break;
+    case 3: // exit
+      field.get()->SetMouseLeaveAction(*action);
+      break;
+    default:
+      TypeError::New(info.Env(), "Unknown mouse action. See NPDFMouseEvents")
+        .ThrowAsJavaScriptException();
+  }
+  return info.Env().Undefined();
+}
+Napi::Value
+Field::SetPageAction(const Napi::CallbackInfo& info)
+{
+  int onMouse = info[0].As<Number>();
+  PdfAction* action = Action::Unwrap(info[1].As<Object>())->GetAction();
+  switch (onMouse) {
+    case 0: // open
+      field.get()->SetPageOpenAction(*action);
+      break;
+    case 1: // close
+      field.get()->SetPageCloseAction(*action);
+      break;
+    case 2: // visible
+      field.get()->SetPageVisibleAction(*action);
+      break;
+    case 3: // invisible
+      field.get()->SetPageInvisibleAction(*action);
+      break;
+    default:
+      TypeError::New(info.Env(), "Unknown mouse action. See NPDFMouseEvents")
+        .ThrowAsJavaScriptException();
+  }
+  return info.Env().Undefined();
 }
 }

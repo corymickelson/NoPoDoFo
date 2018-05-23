@@ -17,20 +17,68 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import {access, constants} from 'fs'
-import {IObj} from './object';
-import {IPage} from './page';
+import {IArray, IDictionary, IObj} from './object';
+import {Page, IPage} from './page';
 import {EncryptOption, IEncrypt, ProtectionOption} from './encrypt';
 import {Font, IFont} from "./painter";
 import {Signer} from './signer';
 import {F_OK, R_OK} from "constants";
 import {IRef} from "./reference";
 import {IForm} from "./form";
-import {NPDFWriteMode} from "./stream-document";
-import { BaseDocument, __mod, IBase } from './base-document'
+import { BaseDocument, IBase } from './base-document'
+import {ICheckBox, IComboBox, IField, IListBox, IListField, ISignatureField, ITextField} from "./field";
+import {IAction} from "./action";
 
+export declare enum NPDFVersion {
+    Pdf11 = 0,
+    Pdf12 = 1,
+    Pdf13 = 2,
+    Pdf14 = 3,
+    Pdf15 = 4,
+    Pdf16 = 5,
+    Pdf17 = 6,
+}
+export declare enum NPDFWriteMode {
+    Default = 1,
+    Compact = 2,
+}
+export interface INPDF {
+    Document: IDocument
+    Page: IPage
+    Field: IField
+    TextField: ITextField
+    Image: any
+    Annotation: any
+    Rect: any
+    Painter: any
+    CheckBox: ICheckBox
+    ComboBox: IComboBox
+    ListBox: IListBox
+    Form: IForm
+    Dictionary: IDictionary
+    FileSpec: any
+    Obj: IObj
+    Ref: IRef
+    Array: IArray
+    Stream: any
+    Encrypt: IEncrypt
+    ListField: IListField
+    Font: IFont
+    Encoding: any
+    ExtGState: any
+    Signer: any
+    SignatureField: ISignatureField
+    Vector: any
+    Data: any
+    ContentsTokenizer: any
+    SimpleTable: any
+    Action: IAction
+    signature: Function
+}
+export const __mod: INPDF = require('bindings')('npdf')
 export type Callback = (err: Error, data: Buffer | string) => void
 
-export enum FontEncoding {
+export enum NPDFFontEncoding {
     WinAnsi = 1,
     Standard = 2,
     PdfDoc = 3,
@@ -64,16 +112,17 @@ export enum PageLayout {
     TwoPageRight
 }
 
-export interface CreateFontOpts {
+export interface NPDFCreateFontOpts {
     fontName: string,
     bold?: boolean,
     italic?: boolean,
-    encoding?: FontEncoding,
+    encoding?: NPDFFontEncoding,
     embed?: boolean,
     fileName?: string
 }
 
 export interface IDocument extends IBase {
+    new(): IDocument
     password: string
     encrypt: IEncrypt
     trailer: IObj
@@ -95,7 +144,7 @@ export const documentGc = (file: string, pwd: string, output: string, cb: Callba
         if (err) {
             throw Error('File not found')
         }
-        __mod.Document.gc(file, pwd, output, cb)
+        (__mod.Document as any).gc(file, pwd, output, cb) // gc is a static method on Document
     })
 }
 
@@ -170,7 +219,7 @@ export class Document extends BaseDocument {
             if (err) {
                 throw Error('File not found')
             }
-            __mod.Document.gc(file, pwd, output, cb)
+            (__mod.Document as any).gc(file, pwd, output, cb) // gc is a static method on mod.Document
         })
     }
 

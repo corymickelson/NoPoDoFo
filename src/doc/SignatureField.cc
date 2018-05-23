@@ -38,8 +38,6 @@ SignatureField::SignatureField(const CallbackInfo& info)
 {
   try {
     if (info.Length() == 2) {
-      AssertFunctionArgs(
-        info, 2, { napi_valuetype::napi_object, napi_valuetype::napi_object });
       auto annot = Annotation::Unwrap(info[0].As<Object>());
       doc = Document::Unwrap(info[1].As<Object>());
       field = new PdfSignatureField(&annot->GetAnnotation(),
@@ -47,7 +45,6 @@ SignatureField::SignatureField(const CallbackInfo& info)
                                     doc->GetBaseDocument().get());
 
     } else if (info.Length() == 1) {
-      AssertFunctionArgs(info, 1, { napi_valuetype::napi_external });
       field = info[0].As<External<PdfSignatureField>>().Data();
     }
   } catch (PdfError& err) {
@@ -89,7 +86,6 @@ SignatureField::SetAppearanceStream(const CallbackInfo& info)
 void
 SignatureField::SetReason(const CallbackInfo& info)
 {
-  AssertFunctionArgs(info, 1, { napi_valuetype::napi_string });
   string reason = info[0].As<String>().Utf8Value();
   GetField()->SetSignatureReason(PdfString(reason));
 }
@@ -97,7 +93,6 @@ SignatureField::SetReason(const CallbackInfo& info)
 void
 SignatureField::SetLocation(const CallbackInfo& info)
 {
-  AssertFunctionArgs(info, 1, { napi_valuetype::napi_string });
   string location = info[0].As<String>().Utf8Value();
   GetField()->SetSignatureLocation(PdfString(location));
 }
@@ -105,7 +100,6 @@ SignatureField::SetLocation(const CallbackInfo& info)
 void
 SignatureField::SetCreator(const CallbackInfo& info)
 {
-  AssertFunctionArgs(info, 1, { napi_valuetype::napi_string });
   string creator = info[0].As<String>().Utf8Value();
   GetField()->SetSignatureCreator(PdfName(creator));
 }
@@ -123,7 +117,6 @@ SignatureField::SetDate(const CallbackInfo& info)
 void
 SignatureField::SetFieldName(const CallbackInfo& info)
 {
-  AssertFunctionArgs(info, 1, { napi_valuetype::napi_string });
   GetField()->SetFieldName(info[0].As<String>().Utf8Value());
 }
 

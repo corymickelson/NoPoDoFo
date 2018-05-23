@@ -16,14 +16,11 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-<<<<<<< HEAD
 import { IDictionary } from './object';
-import { Font, IFont } from './painter';
-=======
-import {__mod} from './base-document'
-import {Document} from './document'
-import {Obj} from "./object";
->>>>>>> feature/base-document
+import { __mod } from './base-document'
+import { Document } from './document'
+import { IObj } from "./object";
+import { IFont } from './painter';
 
 export enum ISigFlags {
     SignatureExists = 1,

@@ -23,75 +23,76 @@
 using namespace PoDoFo;
 using namespace Napi;
 
+using std::cout;
+using std::endl;
+using std::make_shared;
+
 namespace NoPoDoFo {
 
-FunctionReference ListField::constructor; // NOLINT
+//FunctionReference ListField::constructor; // NOLINT
 
 ListField::ListField(const CallbackInfo& info)
-  : ObjectWrap(info)
-  , field(Field::Unwrap(info[0].As<Object>()))
-{}
+//  : ObjectWrap(info)
+{
+  field = Field::Unwrap(info[0].As<Object>())->GetField();
+}
 ListField::~ListField()
 {
-  HandleScope scope(Env());
-  field = nullptr;
+  cout << "Destructing ListField" << endl;
 }
-void
-ListField::Initialize(Napi::Env& env, Napi::Object& target)
-{
-  HandleScope scope(env);
-  Function ctor = DefineClass(
-    env,
-    "ListField",
-    { InstanceAccessor(
-        "selected", &ListField::GetSelectedItem, &ListField::SetSelectedItem),
-      InstanceAccessor("length", &ListField::GetItemCount, nullptr),
-      InstanceAccessor("spellCheckEnabled",
-                       &ListField::IsSpellCheckEnabled,
-                       &ListField::SetSpellCheckEnabled),
-      InstanceAccessor("sorted", &ListField::IsSorted, &ListField::SetSorted),
-      InstanceAccessor(
-        "multiSelect", &ListField::IsMultiSelect, &ListField::SetMultiSelect),
-      InstanceMethod("isComboBox", &ListField::IsComboBox),
-      InstanceMethod("insertItem", &ListField::InsertItem),
-      InstanceMethod("removeItem", &ListField::RemoveItem),
-      InstanceMethod("getItem", &ListField::GetItem) });
-  constructor = Napi::Persistent(ctor);
-  constructor.SuppressDestruct();
-
-  target.Set("ListField", ctor);
-}
+//void
+//ListField::Initialize(Napi::Env& env, Napi::Object& target)
+//{
+//  HandleScope scope(env);
+//  Function ctor = DefineClass(
+//    env,
+//    "ListField",
+//    { InstanceAccessor(
+//        "selected", &ListField::GetSelectedItem, &ListField::SetSelectedItem),
+//      InstanceAccessor("length", &ListField::GetItemCount, nullptr),
+//      InstanceAccessor("spellCheckEnabled",
+//                       &ListField::IsSpellCheckEnabled,
+//                       &ListField::SetSpellCheckEnabled),
+//      InstanceAccessor("sorted", &ListField::IsSorted, &ListField::SetSorted),
+//      InstanceAccessor(
+//        "multiSelect", &ListField::IsMultiSelect, &ListField::SetMultiSelect),
+//      InstanceMethod("isComboBox", &ListField::IsComboBox),
+//      InstanceMethod("insertItem", &ListField::InsertItem),
+//      InstanceMethod("removeItem", &ListField::RemoveItem),
+//      InstanceMethod("getItem", &ListField::GetItem) });
+//  constructor = Napi::Persistent(ctor);
+//  constructor.SuppressDestruct();
+//
+//  target.Set("ListField", ctor);
+//}
 
 void
 ListField::InsertItem(const CallbackInfo& info)
 {
-  AssertFunctionArgs(
-    info, 2, { napi_valuetype::napi_string, napi_valuetype::napi_string });
   string value = info[0].As<String>().Utf8Value();
   string display = info[1].As<String>().Utf8Value();
-  GetField().InsertItem(PdfString(value), PdfString(display));
+  GetListField().InsertItem(PdfString(value), PdfString(display));
 }
 
 void
 ListField::RemoveItem(const CallbackInfo& info)
 {
-  AssertFunctionArgs(info, 1, { napi_valuetype::napi_number });
   int index = info[0].As<Number>();
-  if (static_cast<size_t>(index) > GetField().GetItemCount() || index < 0) {
+  if (static_cast<size_t>(index) > GetListField().GetItemCount() || index < 0) {
     throw Napi::Error::New(info.Env(), "index out of range");
   }
-  GetField().RemoveItem(index);
+  GetListField().RemoveItem(index);
 }
 
 Napi::Value
 ListField::GetItem(const CallbackInfo& info)
 {
-  AssertFunctionArgs(info, 1, { napi_valuetype::napi_number });
   int index = info[0].As<Number>();
   Object item = Object::New(info.Env());
-  string value = GetField().GetItem(index).GetString();
-  string display = GetField().GetItemDisplayText(index).GetString();
-  item.Set(String::New(info.Env(), "value"), String::New(info.Env(), value));
+  string value = GetListField().GetItem(index).GetStringUtf8();
+  string display = GetListField().GetItemDisplayText(index).GetStringUtf8();
+  item.Set(String::New(info.Env(), "value"),
+           String::New(info.Env(), value));
   item.Set(String::New(info.Env(), "display"),
            String::New(info.Env(), display));
   return item;
@@ -100,7 +101,7 @@ ListField::GetItem(const CallbackInfo& info)
 Napi::Value
 ListField::GetItemCount(const CallbackInfo& info)
 {
-  return Number::New(info.Env(), GetField().GetItemCount());
+  return Number::New(info.Env(), GetListField().GetItemCount());
 }
 
 void
@@ -109,49 +110,49 @@ ListField::SetSelectedItem(const CallbackInfo& info, const Napi::Value& value)
   if (!value.IsNumber()) {
     throw Napi::Error::New(info.Env(), "index must be of type number");
   }
-  GetField().SetSelectedItem(value.As<Number>());
+  GetListField().SetSelectedItem(value.As<Number>());
 }
 
 Napi::Value
 ListField::GetSelectedItem(const CallbackInfo& info)
 {
-  int index = GetField().GetSelectedItem();
+  int index = GetListField().GetSelectedItem();
   return Number::New(info.Env(), index);
 }
 Napi::Value
 ListField::IsComboBox(const Napi::CallbackInfo& info)
 {
-  return Boolean::New(info.Env(), GetField().IsComboBox());
+  return Boolean::New(info.Env(), GetListField().IsComboBox());
 }
 void
 ListField::SetSpellCheckEnabled(const Napi::CallbackInfo&,
                                 const Napi::Value& value)
 {
-  GetField().SetSpellcheckingEnabled(value.As<Boolean>());
+  GetListField().SetSpellcheckingEnabled(value.As<Boolean>());
 }
 Napi::Value
 ListField::IsSpellCheckEnabled(const Napi::CallbackInfo& info)
 {
-  return Boolean::New(info.Env(), GetField().IsSpellcheckingEnabled());
+  return Boolean::New(info.Env(), GetListField().IsSpellcheckingEnabled());
 }
 void
 ListField::SetSorted(const Napi::CallbackInfo&, const Napi::Value& value)
 {
-  GetField().SetSorted(value.As<Boolean>());
+  GetListField().SetSorted(value.As<Boolean>());
 }
 Napi::Value
 ListField::IsSorted(const Napi::CallbackInfo& info)
 {
-  return Boolean::New(info.Env(), GetField().IsSorted());
+  return Boolean::New(info.Env(), GetListField().IsSorted());
 }
 void
 ListField::SetMultiSelect(const Napi::CallbackInfo&, const Napi::Value& value)
 {
-  GetField().SetMultiSelect(value.As<Boolean>());
+  GetListField().SetMultiSelect(value.As<Boolean>());
 }
 Napi::Value
 ListField::IsMultiSelect(const Napi::CallbackInfo& info)
 {
-  return Boolean::New(info.Env(), GetField().IsMultiSelect());
+  return Boolean::New(info.Env(), GetListField().IsMultiSelect());
 }
 }

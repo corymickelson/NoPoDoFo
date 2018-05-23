@@ -170,7 +170,6 @@ Obj::GetDataType(const CallbackInfo& info)
 Napi::Value
 Obj::Eq(const CallbackInfo& info)
 {
-  AssertFunctionArgs(info, 1, { napi_object });
   auto wrap = info[0].As<Object>();
   if (!wrap.InstanceOf(Obj::constructor.Value())) {
     throw Error::New(info.Env(), "Must be an instance of NoPoDoFo Obj");
@@ -348,8 +347,7 @@ private:
 Napi::Value
 Obj::GetByteOffset(const CallbackInfo& info)
 {
-  AssertFunctionArgs(
-    info, 2, { napi_valuetype::napi_string, napi_valuetype::napi_function });
+
   string arg = info[0].As<String>().Utf8Value();
   auto cb = info[1].As<Function>();
   ObjOffsetAsync* worker = new ObjOffsetAsync(cb, this, arg);
@@ -392,8 +390,6 @@ private:
 Napi::Value
 Obj::Write(const CallbackInfo& info)
 {
-  AssertFunctionArgs(
-    info, 2, { napi_valuetype::napi_string, napi_valuetype::napi_function });
   auto cb = info[1].As<Function>();
   ObjWriteAsync* worker =
     new ObjWriteAsync(cb, this, info[0].As<String>().Utf8Value());

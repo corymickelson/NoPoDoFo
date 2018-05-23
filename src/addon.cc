@@ -45,6 +45,7 @@
 #include "doc/SimpleTable.h"
 #include "doc/StreamDocument.h"
 #include "doc/TextField.h"
+#include "doc/Action.h"
 #include <napi.h>
 
 Napi::Object
@@ -69,19 +70,18 @@ init(Napi::Env env, Napi::Object exports)
   NoPoDoFo::Array::Initialize(env, exports);
   NoPoDoFo::Stream::Initialize(env, exports);
   NoPoDoFo::Encrypt::Initialize(env, exports);
-  NoPoDoFo::ListField::Initialize(env, exports);
   NoPoDoFo::Font::Initialize(env, exports);
   NoPoDoFo::Encoding::Initialize(env, exports);
   NoPoDoFo::ExtGState::Initialize(env, exports);
   NoPoDoFo::Signer::Initialize(env, exports);
   NoPoDoFo::SignatureField::Initialize(env, exports);
-//  NoPoDoFo::Vector::Initialize(env, exports);
   NoPoDoFo::Data::Initialize(env, exports);
   NoPoDoFo::ContentsTokenizer::Initialize(env, exports);
   NoPoDoFo::SimpleTable::Initialize(env, exports);
   NoPoDoFo::StreamDocument::Initialize(env, exports);
   NoPoDoFo::Outline::Initialize(env, exports);
   NoPoDoFo::Destination::Initialize(env, exports);
+  NoPoDoFo::Action::Initialize(env, exports);
 
   exports["signature"] = Function::New(env, NPDFSignatureData);
 

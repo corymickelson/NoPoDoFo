@@ -24,40 +24,62 @@
 using namespace Napi;
 using namespace PoDoFo;
 
+using std::cout;
+using std::endl;
+
 namespace NoPoDoFo {
 
 FunctionReference ComboBox::constructor; // NOLINT
 
 ComboBox::ComboBox(const Napi::CallbackInfo& info)
   : ObjectWrap(info)
-  , field(Field::Unwrap(info[0].As<Object>()))
-{}
+  , ListField(info)
+{
+  field = Field::Unwrap(info[0].As<Napi::Object>())->GetField();
+}
 ComboBox::~ComboBox()
 {
-  HandleScope scope(Env());
-  field = nullptr;
+  cout << "Destructing ComboBox" << endl;
+  //  HandleScope scope(Env());
+  //  field = nullptr;
 }
 void
 ComboBox::Initialize(Napi::Env& env, Napi::Object& target)
 {
   HandleScope scope(env);
-  auto ctor = DefineClass(env,
-                          "ComboBox",
-                          { InstanceAccessor("editable",
-                                             &ComboBox::GetEditable,
-                                             &ComboBox::SetEditable) });
-  constructor = Persistent(ctor);
+  auto ctor = DefineClass(
+    env,
+    "ComboBox",
+    { InstanceAccessor(
+        "editable", &ComboBox::GetEditable, &ComboBox::SetEditable),
+
+      InstanceAccessor(
+        "selected", &ListField::GetSelectedItem, &ListField::SetSelectedItem),
+      InstanceAccessor("length", &ListField::GetItemCount, nullptr),
+      InstanceAccessor("spellCheckEnabled",
+                       &ListField::IsSpellCheckEnabled,
+                       &ListField::SetSpellCheckEnabled),
+      InstanceAccessor("sorted", &ListField::IsSorted, &ListField::SetSorted),
+      InstanceAccessor(
+        "multiSelect", &ListField::IsMultiSelect, &ListField::SetMultiSelect),
+      InstanceMethod("isComboBox", &ListField::IsComboBox),
+      InstanceMethod("insertItem", &ListField::InsertItem),
+      InstanceMethod("removeItem", &ListField::RemoveItem),
+      InstanceMethod("getItem", &ListField::GetItem)
+
+    });
+  constructor = Napi::Persistent(ctor);
   constructor.SuppressDestruct();
   target.Set("ComboBox", ctor);
 }
 void
 ComboBox::SetEditable(const Napi::CallbackInfo&, const Napi::Value& value)
 {
-  GetField().SetEditable(value.As<Boolean>());
+  GetField().SetEditable(value.As<Napi::Boolean>());
 }
 Napi::Value
 ComboBox::GetEditable(const Napi::CallbackInfo& info)
 {
-  return Boolean::New(info.Env(), GetField().IsEditable());
+  return Napi::Boolean::New(info.Env(), GetField().IsEditable());
 }
 }

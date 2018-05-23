@@ -1,8 +1,8 @@
-import { NPDFName as name, NPDFName } from './names'
-import { Document, __mod, FontEncoding } from './document'
-import { join } from 'path'
+import {NPDFName as name, NPDFName} from './names'
+import {Document, __mod, NPDFFontEncoding} from './document'
+import {join} from 'path'
 import * as tap from 'tape'
-import { IDictionary, IObj, resolveDictionary } from './object';
+import {IDictionary, IObj} from './object';
 
 const filePath = join(__dirname, '../test-documents/test.pdf')
 
@@ -19,7 +19,7 @@ tap('NPDF Form Accessors and Methods', standard => {
                     .every(i => acroformKeys.includes(i)),
                 'AcroForm Dictionary contains all expected keys')
             t.assert((doc.form.DA as string).includes('Helv'), 'test.pdf DA should be set to Helv')
-            t.assert((doc.form.DR as any) instanceof __mod.Dictionary)
+            t.assert((doc.form.DR as any) instanceof (__mod.Dictionary as any))
             t.assert((doc.form.Fonts as Array<any>).length > 0, 'Fonts contains at least one font')
             t.assert(doc.form.needAppearances === false)
             t.end()
@@ -27,28 +27,21 @@ tap('NPDF Form Accessors and Methods', standard => {
         })
         standard.test('Creating Default Appearance', t => {
             let dr = doc.form.DR as IDictionary
-            let font = doc.createFont({ fontName: 'Helvetica', encoding: FontEncoding.WinAnsi })
+            let font = doc.createFont({fontName: 'Helvetica', encoding: NPDFFontEncoding.WinAnsi})
             let fontObj = dr.hasKey(NPDFName.FONT) ? dr.getKey(NPDFName.FONT) : null
-            if (!fontObj) {
-                t.fail()
-            } else {
-                let fontDict = resolveDictionary(doc, (fontObj as IObj)) as IDictionary
-                if (!fontDict) {
-                    t.fail()
-                } else {
-                    // let f = doc.getFont('Helvetica') as IFont
-                    // console.log(JSON.stringify(f.getMetrics()))
-                    if (!fontDict.getKeys().includes(font.identifier)) {
-                        fontDict.addKey(font.identifier, font.object)
-                        t.assert(fontDict.getKeys().includes(font.identifier), 'font added to dictionary')
-                        t.ok((doc.form.Fonts as Array<any>)[0].identifier, 'get font via form.Fonts')
-                        let da = `0 0 0 rg /${font.identifier} ${font.size} Tf`
-                        doc.form.DA = da
-                        t.assert(doc.form.DA === da, 'DA set')
-                        t.end()
-                    }
-                }
+            let fontDict: IDictionary
+            if (!fontObj) t.fail()
+            else {
+                fontDict = fontObj.getDictionary()
+                fontDict.addKey(font.identifier, font.object)
+                t.assert(fontDict.getKeys().includes(font.identifier), 'font added to dictionary')
+                t.ok((doc.form.Fonts as Array<any>)[0].identifier, 'get font via form.Fonts')
+                let da = `0 0 0 rg /${font.identifier} ${font.size} Tf`
+                doc.form.DA = da
+                t.assert(doc.form.DA === da, 'DA set')
+                t.end()
             }
+
             global.gc()
         })
     })

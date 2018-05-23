@@ -1,7 +1,7 @@
 import {access, readFile, unlinkSync} from 'fs'
 import {join} from 'path'
 import * as tap from 'tape'
-import {Document, FontEncoding, __mod} from './document'
+import {Document, NPDFFontEncoding, __mod} from './document'
 import {F_OK} from "constants";
 import {v4} from 'uuid'
 import {Test} from "tape";
@@ -40,18 +40,18 @@ tap('Document Api', sub => {
             standard.test('document trailer, catalog, objects', t => {
                 let objs = pdf.body;
                 t.assert(objs instanceof Array, 'Gets all objects as an array')
-                t.assert(objs[0] instanceof __mod.Obj, 'array items instance of Obj')
+                t.assert(objs[0] instanceof (__mod.Obj as any), 'array items instance of Obj')
                 let trailer = pdf.trailer,
                     catalog = pdf.catalog
-                t.assert(trailer instanceof __mod.Obj, 'get trailer')
+                t.assert(trailer instanceof (__mod.Obj as any), 'get trailer')
                 t.assert(trailer.type === 'Dictionary', 'trailer is a dictionary')
-                t.assert(catalog instanceof __mod.Obj, 'get catalog')
+                t.assert(catalog instanceof (__mod.Obj as any), 'get catalog')
                 t.assert(catalog.type === 'Dictionary', 'catalog is a dictionary')
                 t.end()
             })
 
             standard.test('document create font', t => {
-                let font = pdf.createFont({fontName: 'monospace', encoding: FontEncoding.WinAnsi})
+                let font = pdf.createFont({fontName: 'monospace', encoding: NPDFFontEncoding.WinAnsi})
                 const m = font.getMetrics()
                 t.ok(m)
                 end(t)

@@ -2,7 +2,7 @@
  * This file is part of the NoPoDoFo (R) project.
  * Copyright (c) 2017-2018
  * Authors: Cory Mickelson, et al.
- * 
+ *
  * NoPoDoFo is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -19,35 +19,47 @@
 #ifndef NPDF_VALIDATEARGUMENTS_H
 #define NPDF_VALIDATEARGUMENTS_H
 
-#include <napi.h>
 #include <iostream>
+#include <napi.h>
 #include <sstream>
 
 using std::endl;
 using std::stringstream;
 
-static void
-AssertFunctionArgs(const Napi::CallbackInfo& info,
-                   int expectedCount,
-                   const std::vector<napi_valuetype>& expectedTypes)
+
+static int
+AssertFunctionArgs(
+  const Napi::CallbackInfo& info,
+  size_t minimumArgCount,
+  const std::vector<std::vector<napi_valuetype>>& expectedTypes,
+  const char* msg)
 {
   stringstream eMsg;
-  if (info.Length() < static_cast<size_t>(expectedCount)) {
-    eMsg << "Expected " << expectedCount << " but received " << info.Length()
+  int index = -1;
+  if (info.Length() < minimumArgCount) {
+    eMsg << "Expected " << minimumArgCount << " but received " << info.Length()
          << endl;
-    throw Napi::Error::New(info.Env(), eMsg.str());
-  }
-  for (size_t i = 0; i < info.Length(); ++i) {
-    if (expectedTypes.size() - 1 == i)
-      break;
-    napi_valuetype expected = expectedTypes[i];
-    napi_valuetype actual = info[i].Type();
-    if (actual != expected) {
-      eMsg << "Expected parameter[" << i << "] to be of type: " << expected
-           << " but received: " << actual << endl;
-      throw Napi::Error::New(info.Env(), eMsg.str());
+    msg = eMsg.str().c_str();
+  } else {
+    for (const auto& opt : expectedTypes) {
+      for (size_t i = 0; i < opt.size(); ++i) {
+        if (info[i].Type() != opt[i]) {
+          break;
+        } else {
+          if (i == info.Length() - 1) { // last iteration
+            index = static_cast<int>(i);
+          }
+        }
+      }
     }
   }
+  if (index == -1) {
+    if(strcmp(msg, "") == 0) {
+      msg = "Validation Error";
+    }
+    Napi::Error::New(info.Env(), msg).ThrowAsJavaScriptException();
+  }
+  return index;
 }
 
 #endif // NPDF_VALIDATEARGUMENTS_H

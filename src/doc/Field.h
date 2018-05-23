@@ -35,7 +35,6 @@ public:
   ~Field();
   static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
-
   Napi::Value GetType(const Napi::CallbackInfo&);
   Napi::Value GetFieldName(const Napi::CallbackInfo&);
   void SetFieldName(const Napi::CallbackInfo&, const Napi::Value&);
@@ -47,8 +46,19 @@ public:
   Napi::Value IsRequired(const Napi::CallbackInfo&);
   void SetReadOnly(const Napi::CallbackInfo&, const Napi::Value&);
   Napi::Value IsReadOnly(const Napi::CallbackInfo&);
+  void SetExport(const Napi::CallbackInfo&, const Napi::Value&);
+  Napi::Value IsExport(const Napi::CallbackInfo&);
+  Napi::Value SetBackground(const Napi::CallbackInfo&);
+  Napi::Value SetBorder(const Napi::CallbackInfo&);
+  Napi::Value SetHighlightingMode(const Napi::CallbackInfo&);
+  Napi::Value SetMouseAction(const Napi::CallbackInfo&);
+  Napi::Value SetPageAction(const Napi::CallbackInfo&);
 
-  PoDoFo::PdfField* GetField() { return field; }
+  std::shared_ptr<PoDoFo::PdfField> GetField()
+  {
+    auto shared = field;
+    return shared;
+  }
 
   string fieldName;
   string fieldType;
@@ -57,7 +67,8 @@ protected:
   string TypeString();
 
 private:
-  PoDoFo::PdfField* field;
+  int index;
+  std::shared_ptr<PoDoFo::PdfField> field;
 };
 }
 #endif // NPDF_PDFFIELD_H

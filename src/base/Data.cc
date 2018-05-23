@@ -83,7 +83,6 @@ Data::Initialize(Napi::Env& env, Napi::Object& target)
 void
 Data::Write(const CallbackInfo& info)
 {
-  AssertFunctionArgs(info, 1, { napi_string });
   string output = info[0].As<String>().Utf8Value();
   if (output.empty() || output.empty()) {
     throw Error::New(info.Env(), "output must be valid path");

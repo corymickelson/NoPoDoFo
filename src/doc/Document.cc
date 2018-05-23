@@ -197,7 +197,7 @@ Document::SetPassword(const CallbackInfo& info, const Napi::Value& value)
 void
 Document::DeletePages(const CallbackInfo& info)
 {
-  AssertFunctionArgs(info, 2, { napi_number, napi_number });
+  AssertFunctionArgs(info, 2, {{ napi_number, napi_number }}, nullptr);
   int pageIndex = info[0].As<Number>();
   int count = info[1].As<Number>();
   if (document->GetPageCount() < pageIndex + count) {
@@ -360,7 +360,6 @@ Document::GetTrailer(const CallbackInfo& info)
     info.Env(), new PdfObject(*ptr), [](Napi::Env env, PdfObject* data) {
       HandleScope scope(env);
       delete data;
-      data = nullptr;
     });
   auto instance = Obj::constructor.New({ initPtr });
   return instance;

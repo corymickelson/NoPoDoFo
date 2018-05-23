@@ -1,10 +1,82 @@
 import {join} from 'path'
 import * as tap from 'tape'
-import {Document} from './document'
-import {CheckBox, ComboBox, Field, ListBox, TextField} from './field'
+import {Document, __mod} from './document'
+import {CheckBox, ComboBox, Field, IField, ListBox, TextField} from './field'
+import {unlinkSync} from "fs";
 
 const filePath = join(__dirname, '../test-documents/iss.16.checkbox-field-state-options.pdf')
-tap('Fields', sub => {
+tap('IField', t => {
+    const doc = new __mod.Document()
+    doc.load(filePath, (e: Error) => {
+        if (e) t.fail(e.message)
+        else {
+            const page = doc.getPage(0)
+            const fields = page.getFields()
+            fields.forEach(field => {
+                t.ok(field)
+                t.ok(field.type)
+                t.ok(field.fieldName)
+                t.ok(typeof field.exported === 'boolean')
+                t.ok(typeof field.readOnly === 'boolean')
+                t.ok(typeof field.required === 'boolean')
+                switch (field.type) {
+                    case 'TextField':
+                        new __mod.TextField(field).text = 'TEST'
+                        break
+                    case 'CheckBox':
+                        new __mod.CheckBox(field).checked = true
+                        break
+                    case 'ComboBox':
+                        let cb = new __mod.ComboBox(field)
+                        let lf = new __mod.ListField(field)
+                        lf.selected = 0 // set to first value
+                        break
+                    case 'ListBox':
+                        break
+                    default:
+                        break
+                }
+            })
+            t.test('fields persist', t => {
+
+                let outfile = '/tmp/npdf.values.test.pdf'
+                doc.write(outfile, (err, data) => {
+                    if (err) t.fail(err.message)
+                    else {
+                        let fieldsDoc = new __mod.Document()
+                        fieldsDoc.load(outfile, () => {
+                            let tPage = fieldsDoc.getPage(0)
+                            tPage.getFields().forEach(field => {
+                                switch (field.type) {
+                                    case 'TextField':
+                                        let text = new __mod.TextField(field)
+                                        t.assert(text.text === 'TEST')
+                                        break
+                                    case 'CheckBox':
+                                        let check = new __mod.CheckBox(field)
+                                        t.true(check.checked)
+                                        break
+                                    case 'ComboBox':
+                                        let lf = new __mod.ListField(field)
+                                        t.assert(lf.selected === 0)
+                                        break
+                                    case 'ListBox':
+                                        break
+                                    default:
+                                        break
+                                }
+                            })
+                            t.end()
+                            // unlinkSync(outfile)
+                        }, false, false, '')
+                    }
+                })
+            })
+            t.end()
+        }
+    }, false, false, '')
+})
+tap.skip('Fields', sub => {
     const doc = new Document(filePath)
     doc.on('ready', e => {
         if (e instanceof Error) sub.fail()

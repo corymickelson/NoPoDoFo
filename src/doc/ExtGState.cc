@@ -36,7 +36,6 @@ FunctionReference ExtGState::constructor; // NOLINT
 ExtGState::ExtGState(const Napi::CallbackInfo& info)
   : ObjectWrap(info)
 {
-  AssertFunctionArgs(info, 1, { napi_object });
   auto o = info[0].As<Object>();
   if (!o.InstanceOf(Document::constructor.Value())) {
     throw Error::New(info.Env(),
@@ -70,7 +69,6 @@ ExtGState::Initialize(Napi::Env& env, Object& target)
 void
 ExtGState::SetFillOpacity(const CallbackInfo& info)
 {
-  AssertFunctionArgs(info, 1, { napi_valuetype::napi_number });
   float value = info[0].As<Number>().FloatValue();
   self->SetFillOpacity(value);
 }
@@ -78,7 +76,6 @@ ExtGState::SetFillOpacity(const CallbackInfo& info)
 void
 ExtGState::SetStrokeOpacity(const CallbackInfo& info)
 {
-  AssertFunctionArgs(info, 1, { napi_valuetype::napi_number });
   float value = info[0].As<Number>().FloatValue();
   self->SetStrokeOpacity(value);
 }
@@ -87,7 +84,6 @@ ExtGState::SetStrokeOpacity(const CallbackInfo& info)
 void
 ExtGState::SetBlendMode(const CallbackInfo& info)
 {
-  AssertFunctionArgs(info, 1, { napi_valuetype::napi_string });
   string value = info[0].As<String>().Utf8Value();
   vector<string> candidateValues = { "Normal",     "Multiply",   "Screen",
                                      "Overlay",    "Darken",     "Lighten",
@@ -107,35 +103,30 @@ ExtGState::SetBlendMode(const CallbackInfo& info)
 void
 ExtGState::SetOverprint(const CallbackInfo& info)
 {
-  AssertFunctionArgs(info, 1, { napi_valuetype::napi_boolean });
   self->SetOverprint(info[0].As<Boolean>());
 }
 
 void
 ExtGState::SetFillOverprint(const CallbackInfo& info)
 {
-  AssertFunctionArgs(info, 1, { napi_valuetype::napi_boolean });
   self->SetFillOverprint(info[0].As<Boolean>());
 }
 
 void
 ExtGState::SetStrokeOverprint(const CallbackInfo& info)
 {
-  AssertFunctionArgs(info, 1, { napi_valuetype::napi_boolean });
   self->SetStrokeOverprint(info[0].As<Boolean>());
 }
 
 void
 ExtGState::SetNonZeroOverprint(const CallbackInfo& info)
 {
-  AssertFunctionArgs(info, 1, { napi_valuetype::napi_boolean });
   self->SetNonZeroOverprint(info[0].As<Boolean>());
 }
 
 void
 ExtGState::SetRenderingIntent(const CallbackInfo& info)
 {
-  AssertFunctionArgs(info, 1, { napi_valuetype::napi_string });
   string v = info[0].As<String>().Utf8Value();
   vector<string> candidateValues = {
     "AbsoluteColorimetric", "RelativeColorimetric", "Perceptual", "Saturation"
@@ -152,7 +143,6 @@ ExtGState::SetRenderingIntent(const CallbackInfo& info)
 void
 ExtGState::SetFrequency(const CallbackInfo& info)
 {
-  AssertFunctionArgs(info, 1, { napi_valuetype::napi_number });
   double v = info[0].As<Number>();
   self->SetFrequency(v);
 }

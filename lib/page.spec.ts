@@ -6,7 +6,7 @@ import { IObj } from "./object";
 import { Field } from './field';
 import { Painter } from "./painter";
 import { Image } from "./image";
-import { Page } from "./page";
+import {IPage, Page} from "./page";
 
 
 const filePath = join(__dirname, '../test-documents/test.pdf'),
@@ -124,7 +124,7 @@ function pageGetAnnot() {
 function pageContents() {
     test('page contents', t => {
         const contents = page.getContents(false)
-        t.assert(contents instanceof __mod.Obj, 'is an instance of Obj')
+        t.assert(contents instanceof (__mod.Obj as any), 'is an instance of Obj')
         t.assert(contents.length > 0, 'content is not null or empty')
         t.end()
     })
@@ -133,7 +133,7 @@ function pageContents() {
 function pageResources() {
     test('page resources', t => {
         const resources = page.getResources()
-        t.assert(resources instanceof __mod.Obj, 'is instance ob Obj')
+        t.assert(resources instanceof (__mod.Obj as any), 'is instance ob Obj')
         t.assert(resources.length > 0, 'is not null or empty')
         t.end()
     })

@@ -2,7 +2,7 @@
  * This file is part of the NoPoDoFo (R) project.
  * Copyright (c) 2017-2018
  * Authors: Cory Mickelson, et al.
- * 
+ *
  * NoPoDoFo is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -21,7 +21,7 @@ import { Stream } from "stream";
 import { IDictionary } from "./object";
 import { IObj } from "./object"
 import { Document } from "./document"
-import {__mod} from "./base-document";
+import { __mod } from "./base-document";
 
 export type NPDFInternal = any
 
@@ -36,51 +36,90 @@ export interface IObj {
     stream: Stream
     type: NPDFDataType
     immutable: boolean
+
     hasStream(): boolean
+
     getOffset(key: string): Promise<number>
+
     write(output: string, cb: Function): void
+
     flateCompressStream(): void
+
     delayedStreamLoad(): void
+
     getBool(): boolean
+
     getDictionary(): IDictionary
+
     getString(): string
+
     getName(): string
+
     getReal(): number
+
     getNumber(): number
+
     getArray(): IArray
+
     getReference(): IRef
+
     getBuffer(): Buffer
+
     clear(): void
 }
+
 export interface IArray {
     dirty: boolean
     length: number
     immutable: boolean
+
     toJS(): Array<any>
+
     at(i: number): IObj
+
     pop(): IObj
+
     clear(): void
+
     push(v: Object): void
+
     write(destination: string): void
 }
 
 export type NPDFDictionaryKeyType = 'boolean' | 'long' | 'name' | 'real'
+
 export interface IDictionary {
-  dirty: boolean
-  immutable: boolean
-  tryGet(doc: Document, candidate: IObj): IDictionary | null
-  getKey(k: string): IObj
-  addKey(prop: string, value: boolean | number | string | IObj): void
-  getKeys(): string[]
-  hasKey(k: string): boolean
-  removeKey(k: string): void
-  getKeyAs(k: string, t: NPDFDictionaryKeyType): string | number
-  clear(): void
-  write(destination: string, cb: (e: Error, i: string) => void): void
-  writeSync(destination: string): void
+    dirty: boolean
+    immutable: boolean
+
+    tryGet(doc: Document, candidate: IObj): IDictionary | null
+
+    /**
+     * @param {string} k
+     * @param {boolean} resolveValue - If value is a reference try to resolve the reference, defaults to true
+     * @returns {IObj}
+     */
+    getKey(k: string, resolveValue?: boolean): IObj
+
+    addKey(prop: string, value: boolean | number | string | IObj): void
+
+    getKeys(): string[]
+
+    hasKey(k: string): boolean
+
+    removeKey(k: string): void
+
+    getKeyAs(k: string, t: NPDFDictionaryKeyType): string | number
+
+    clear(): void
+
+    write(destination: string, cb: (e: Error, i: string) => void): void
+
+    writeSync(destination: string): void
 }
-export const resolveDictionary = (doc: Document, candidate: IObj): IDictionary | null  => {
-     if(candidate instanceof __mod.Obj)
-      return __mod.Dictionary.tryGetDictionary((doc as any)._instance, candidate)
-    else return null
-}
+
+// export const resolveDictionary = (doc: Document, candidate: IObj): IDictionary | null => {
+//     if (candidate instanceof (__mod.Obj as any))
+//         return __mod.Dictionary.tryGetDictionary((doc as any)._instance, candidate)
+//     else return null
+// }

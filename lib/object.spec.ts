@@ -12,14 +12,14 @@ test('document objects instance of nopodofo.Obj', t => {
         if (body[1].type === 'Dictionary') {
             let nObj = body[1].getDictionary(),
                 ks   = nObj.getKeys()
-            t.assert((nObj as any)[ks[0]] instanceof __mod.Obj)
+            t.assert((nObj as any)[ks[0]] instanceof (__mod.Obj as any))
             ks.forEach((key:string) => {
                 let x = nObj.getKey(key)
-                t.assert(x instanceof __mod.Obj)
+                t.assert(x instanceof (__mod.Obj as any))
             })
             for (let key in nObj) {
                 let x = (nObj as any)[key]
-                t.assert((nObj as any)[key] instanceof __mod.Obj, "object values are instance of Object")
+                t.assert((nObj as any)[key] instanceof (__mod.Obj as any), "object values are instance of Object")
             }
         }
         let streams = body.filter((i: any) => i.hasStream())
@@ -35,7 +35,7 @@ test('document objects instance of nopodofo.Obj', t => {
                         let ref = dictObj.getKey(key).getReference()
                         if(ref.isIndirect()) {
                             console.log('reference')
-                            t.assert(ref instanceof __mod.Ref)
+                            t.assert(ref instanceof (__mod.Ref as any))
                         }
                     }
                 })
@@ -48,7 +48,7 @@ test('document objects instance of nopodofo.Obj', t => {
                     let ref = (refs[0] as IObj).getReference()
                     if (!ref.isIndirect()) continue
                     let refObj = doc.getObject(ref)
-                    t.assert(refObj instanceof __mod.Obj, "Object ref types can dereference to object")
+                    t.assert(refObj instanceof (__mod.Obj as any), "Object ref types can dereference to object")
                     found = true
                     break
                 }
@@ -60,7 +60,7 @@ test('document objects instance of nopodofo.Obj', t => {
             arr  = arrs[0].getArray()
         t.throws(() => arr.pop(), "This operation should fail since the underlying PdfArray is immutable")
         let arrObj = arr.at(0)
-        t.assert(arrObj instanceof __mod.Obj, "Should return an Obj via array bracket getter notation")
+        t.assert(arrObj instanceof (__mod.Obj as any), "Should return an Obj via array bracket getter notation")
 
         t.end()
     })
