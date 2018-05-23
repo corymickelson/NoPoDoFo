@@ -1,5 +1,6 @@
 import {IDocument} from "./document"
 import {IDictionary, IObj} from "./object";
+import {IPage} from "../dist/page";
 
 export enum NPDFActions {
     GoTo = 0,
@@ -34,6 +35,23 @@ export enum NPDFPageEvent {
     close,
     visible,
     invisible
+}
+export enum NPDFDestinationType {
+    XYZ,
+    Fit,
+    FitH,
+    FitV,
+    FitR,
+    FitB,
+    FitBH,
+    FitBV,
+    Unknown = 0xFF
+}
+export interface IDestination {
+    new(): IDestination
+    readonly page: IPage
+    readonly type: NPDFDestinationType
+
 }
 export interface IAction {
     new(type:NPDFActions, doc:IDocument): void

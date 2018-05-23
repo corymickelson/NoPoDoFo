@@ -17,6 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <iostream>
 #include "ListField.h"
 #include "Field.h"
 
@@ -29,42 +30,10 @@ using std::make_shared;
 
 namespace NoPoDoFo {
 
-//FunctionReference ListField::constructor; // NOLINT
-
 ListField::ListField(const CallbackInfo& info)
-//  : ObjectWrap(info)
 {
   field = Field::Unwrap(info[0].As<Object>())->GetField();
 }
-ListField::~ListField()
-{
-  cout << "Destructing ListField" << endl;
-}
-//void
-//ListField::Initialize(Napi::Env& env, Napi::Object& target)
-//{
-//  HandleScope scope(env);
-//  Function ctor = DefineClass(
-//    env,
-//    "ListField",
-//    { InstanceAccessor(
-//        "selected", &ListField::GetSelectedItem, &ListField::SetSelectedItem),
-//      InstanceAccessor("length", &ListField::GetItemCount, nullptr),
-//      InstanceAccessor("spellCheckEnabled",
-//                       &ListField::IsSpellCheckEnabled,
-//                       &ListField::SetSpellCheckEnabled),
-//      InstanceAccessor("sorted", &ListField::IsSorted, &ListField::SetSorted),
-//      InstanceAccessor(
-//        "multiSelect", &ListField::IsMultiSelect, &ListField::SetMultiSelect),
-//      InstanceMethod("isComboBox", &ListField::IsComboBox),
-//      InstanceMethod("insertItem", &ListField::InsertItem),
-//      InstanceMethod("removeItem", &ListField::RemoveItem),
-//      InstanceMethod("getItem", &ListField::GetItem) });
-//  constructor = Napi::Persistent(ctor);
-//  constructor.SuppressDestruct();
-//
-//  target.Set("ListField", ctor);
-//}
 
 void
 ListField::InsertItem(const CallbackInfo& info)

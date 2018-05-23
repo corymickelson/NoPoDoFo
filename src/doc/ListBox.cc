@@ -37,10 +37,7 @@ ListBox::ListBox(const Napi::CallbackInfo& info)
 {
   field = Field::Unwrap(info[0].As<Object>())->GetField();
 }
-ListBox::~ListBox()
-{
-  cout << "Destructing ListBox" << endl;
-}
+
 void
 ListBox::Initialize(Napi::Env& env, Napi::Object& target)
 {

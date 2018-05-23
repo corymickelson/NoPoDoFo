@@ -293,7 +293,6 @@ BaseDocument::GetObject(const CallbackInfo& info)
 Napi::Value
 BaseDocument::IsAllowed(const CallbackInfo& info)
 {
-  AssertFunctionArgs(info, 1, { napi_valuetype::napi_string });
   string allowed = info[0].As<String>().Utf8Value();
   bool is;
   if (allowed == "Print") {
@@ -323,7 +322,6 @@ BaseDocument::IsAllowed(const CallbackInfo& info)
 Napi::Value
 BaseDocument::CreateFont(const CallbackInfo& info)
 {
-  AssertFunctionArgs(info, 1, { napi_valuetype::napi_string });
   auto fontName = info[0].As<String>().Utf8Value();
   bool bold = false;
   bool italic = false;
@@ -468,7 +466,6 @@ BaseDocument::InsertPage(const Napi::CallbackInfo& info)
 Napi::Value
 BaseDocument::Append(const Napi::CallbackInfo& info)
 {
-  AssertFunctionArgs(info, 1, { napi_valuetype::napi_string });
   string docPath = info[0].As<String>().Utf8Value();
   PdfMemDocument mergedDoc;
   try {

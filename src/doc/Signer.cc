@@ -20,34 +20,58 @@
 #include "Signer.h"
 #include "../ErrorHandler.h"
 #include "../ValidateArguments.h"
-
-
-namespace NoPoDoFo {
+#include "Document.h"
+#include "SignatureField.h"
+#include "StreamDocument.h"
 
 using namespace Napi;
 using namespace PoDoFo;
 
+using std::make_shared;
+using std::make_unique;
+using std::shared_ptr;
+using std::static_pointer_cast;
 using std::string;
+using std::unique_ptr;
+
+namespace NoPoDoFo {
 
 FunctionReference Signer::constructor; // NOLINT
 
+/**
+ * @note JS new Signer(doc: IDocument, output?: string)
+ * @param info
+ */
 Signer::Signer(const Napi::CallbackInfo& info)
   : ObjectWrap(info)
 {
-  doc = Document::Unwrap(info[0].As<Object>());
-  if (!doc->LoadedForIncrementalUpdates()) {
-    throw Napi::Error::New(info.Env(),
-                           "Please reload Document with forUpdates = true.");
+  if (info.Length() < 1) {
+    Error::New(info.Env(), "Document required to construct Signer")
+      .ThrowAsJavaScriptException();
+    return;
   }
-}
-
-Signer::~Signer()
-{
-  HandleScope scope(Env());
-  if (doc != nullptr)
-    doc = nullptr;
-  if (field != nullptr)
-    field = nullptr;
+  if (!info[0].IsObject()) {
+    TypeError::New(info.Env(), "Requires Document to construct Signer")
+      .ThrowAsJavaScriptException();
+    return;
+  }
+  auto nObj = info[0].As<Object>();
+  if (nObj.InstanceOf(Document::constructor.Value())) {
+    doc = Document::Unwrap(nObj)->GetMemDocument();
+  } else if (nObj.InstanceOf(StreamDocument::constructor.Value())) {
+    TypeError::New(
+      info.Env(),
+      "StreamDocument is not currently supported in Signing operations")
+      .ThrowAsJavaScriptException();
+    return;
+  } else {
+    TypeError::New(info.Env(), "Requires Document to construct Signer")
+      .ThrowAsJavaScriptException();
+    return;
+  }
+  if (info.Length() >= 2 && info[1].IsString()) {
+    output = info[1].As<String>().Utf8Value();
+  }
 }
 
 void
@@ -69,9 +93,9 @@ Signer::Initialize(Napi::Env& env, Napi::Object& target)
 void
 Signer::SetField(const CallbackInfo& info)
 {
-  field = SignatureField::Unwrap(info[0].As<Object>());
+  field = SignatureField::Unwrap(info[0].As<Object>())->GetField();
   try {
-    field->GetField()->EnsureSignatureObject();
+    field->EnsureSignatureObject();
   } catch (PdfError& err) {
     ErrorHandler(err, info);
   }
@@ -81,7 +105,7 @@ Value
 Signer::GetField(const CallbackInfo& info)
 {
   return SignatureField::constructor.New(
-    { External<PdfSignatureField>::New(info.Env(), field->GetField()) });
+    { External<PdfSignatureField>::New(info.Env(), field.get()) });
 }
 
 Napi::Value
@@ -93,12 +117,9 @@ Signer::Sign(const CallbackInfo& info)
     string sigStr = info[0].As<String>().Utf8Value();
     pdf_long sigStrLength = static_cast<pdf_long>(sigStr.size());
 
-    PdfSignatureField* pSignField = field->GetField();
-
-    if (pSignField->GetFieldName().GetStringUtf8().empty()) {
-      pSignField->SetFieldName("NoPoDoFo::SignatureField");
+    if (field->GetFieldName().GetStringUtf8().empty()) {
+      field->SetFieldName("NoPoDoFo::SignatureField");
     }
-    auto document = doc->GetMemDocument();
 
     PdfRefCountedBuffer r;
     PdfOutputDevice outputDevice;
@@ -111,9 +132,10 @@ Signer::Sign(const CallbackInfo& info)
     PdfSignOutputDevice signer(&outputDevice);
     signer.SetSignatureSize(static_cast<size_t>(sigStrLength));
 
-    pSignField->SetSignatureDate(PdfDate());
-    pSignField->SetSignature(*signer.GetSignatureBeacon());
-    document->WriteUpdate(&signer, true);
+    field->SetSignatureDate(PdfDate());
+    field->SetSignature(*signer.GetSignatureBeacon());
+    auto writable = static_pointer_cast<PdfMemDocument>(doc);
+    writable->WriteUpdate(&signer, true);
 
     if (!signer.HasSignaturePosition())
       throw Error::New(info.Env(),
@@ -136,54 +158,40 @@ Signer::Sign(const CallbackInfo& info)
 class SignAsync : public AsyncWorker
 {
 public:
-  SignAsync(Function& cb, Signer* self, string data, string output)
+  SignAsync(Function& cb, Signer* self, string data)
     : AsyncWorker(cb)
     , self(self)
     , signature(std::move(data))
-    , output(std::move(output))
-  {
-  }
-  ~SignAsync()
-  {
-    HandleScope scope(Env());
-    if (self != nullptr) {
-      self = nullptr;
-    }
-    delete buffer;
-  }
+  {}
+  //  ~SignAsync()
+  //  {
+  //    HandleScope scope(Env());
+  //    self = nullptr;
+  //    delete buffer;
+  //  }
 
 private:
   Signer* self;
   string signature;
   string output;
-  PdfRefCountedBuffer* buffer;
+  PdfRefCountedBuffer buffer;
 
   // AsyncWorker interface
 protected:
   void Execute() override
   {
     try {
-
-      string output;
-      pdf_long sigStrLength = static_cast<pdf_long>(signature.size());
-
-      PdfSignatureField* pSignField = self->field->GetField();
-      pSignField->SetFieldName("signer.sign");
-      auto document = self->doc->GetMemDocument();
-
-      //    PdfRefCountedBuffer r;
-      PdfOutputDevice outputDevice;
-      if (!output.empty()) {
-        outputDevice = *new PdfOutputDevice(output.c_str(), true);
-      } else {
-        outputDevice = *new PdfOutputDevice(buffer);
-      }
+      auto sigStrLength = static_cast<pdf_long>(signature.size());
+      self->field->SetFieldName("signer.sign");
+      PdfOutputDevice outputDevice =
+        self->output.empty() ? PdfOutputDevice(&buffer)
+                             : PdfOutputDevice(self->output.c_str(), true);
       PdfSignOutputDevice signer(&outputDevice);
       signer.SetSignatureSize(static_cast<size_t>(sigStrLength));
 
-      pSignField->SetSignatureDate(PdfDate());
-      pSignField->SetSignature(*signer.GetSignatureBeacon());
-      document->WriteUpdate(&signer, true);
+      self->field->SetSignatureDate(PdfDate());
+      self->field->SetSignature(*signer.GetSignatureBeacon());
+      self->doc->WriteUpdate(&signer, true);
 
       if (!signer.HasSignaturePosition())
         throw Error::New(Env(),
@@ -214,27 +222,26 @@ protected:
             << endl;
         Callback().Call({ String::New(Env(), msg.str()) });
       }
-    } else if (buffer != nullptr && buffer->GetSize() > 0) {
+    } else {
       Callback().Call(
         { Env().Undefined(),
-          Buffer<char>::Copy(Env(), buffer->GetBuffer(), buffer->GetSize()) });
+          Buffer<char>::Copy(Env(), buffer.GetBuffer(), buffer.GetSize()) });
     }
   }
 };
 
+/**
+ * @note JS sign(signature:string|Buffer, cb: Function)
+ * @param info
+ * @return
+ */
 Value
 Signer::SignWorker(const CallbackInfo& info)
 {
   string data, output;
-  Function cb = info[0].As<Function>();
-  data = info[1].As<String>().Utf8Value();
-  if (info.Length() == 3 && info[2].IsString() &&
-      info[2].As<String>().Utf8Value().size() > 0) {
-    output = info[2].As<String>().Utf8Value();
-  } else {
-    output = string().empty();
-  }
-  SignAsync* worker = new SignAsync(cb, this, data, output);
+  Function cb = info[1].As<Function>();
+  data = info[0].As<String>().Utf8Value();
+  SignAsync* worker = new SignAsync(cb, this, data);
   worker->Queue();
   return info.Env().Undefined();
 }

@@ -17,6 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <iostream>
 #include "Field.h"
 #include "Action.h"
 #include "Document.h"
@@ -37,16 +38,12 @@ Field::Field(const CallbackInfo& info)
   : ObjectWrap(info)
   , index(info[1].As<Number>())
 {
-  auto page = Page::Unwrap(info[0].As<Object>())->GetPage();
-  field = make_shared<PdfField>(page->GetField(index));
+  auto page =  Page::Unwrap(info[0].As<Object>());
+  field = make_shared<PdfField>(page->GetPage()->GetField(index));
   fieldName = field.get()->GetFieldName().GetStringUtf8();
   fieldType = TypeString();
 }
 
-Field::~Field()
-{
-  cout << "Destructing Field " << fieldName << endl;
-}
 void
 Field::Initialize(Napi::Env& env, Napi::Object& target)
 {

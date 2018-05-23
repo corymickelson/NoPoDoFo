@@ -28,7 +28,6 @@ class Ref : public Napi::ObjectWrap<Ref>
 {
 public:
   explicit Ref(const Napi::CallbackInfo&);
-  ~Ref();
   static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
 
@@ -45,7 +44,7 @@ public:
   PoDoFo::PdfReference GetRef() { return *ref; }
 
 private:
-  PoDoFo::PdfReference* ref;
+  std::shared_ptr<PoDoFo::PdfReference> ref;
 };
 }
 #endif

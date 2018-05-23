@@ -37,12 +37,7 @@ ComboBox::ComboBox(const Napi::CallbackInfo& info)
 {
   field = Field::Unwrap(info[0].As<Napi::Object>())->GetField();
 }
-ComboBox::~ComboBox()
-{
-  cout << "Destructing ComboBox" << endl;
-  //  HandleScope scope(Env());
-  //  field = nullptr;
-}
+
 void
 ComboBox::Initialize(Napi::Env& env, Napi::Object& target)
 {

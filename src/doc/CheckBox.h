@@ -20,7 +20,6 @@
 #ifndef NPDF_CHECKBOX_H
 #define NPDF_CHECKBOX_H
 
-#include "Field.h"
 #include <napi.h>
 #include <podofo/podofo.h>
 
@@ -32,7 +31,6 @@ class CheckBox : public ObjectWrap<CheckBox>
 {
 public:
   explicit CheckBox(const CallbackInfo& callbackInfo);
-  ~CheckBox();
   static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
   Napi::Value IsChecked(const CallbackInfo&);

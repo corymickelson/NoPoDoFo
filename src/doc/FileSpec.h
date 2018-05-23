@@ -33,9 +33,10 @@ public:
   static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
   Napi::Value GetFileName(const Napi::CallbackInfo&);
+  Napi::Value Data(const Napi::CallbackInfo&);
 
 private:
-  PoDoFo::PdfFileSpec* spec;
+  std::unique_ptr<PoDoFo::PdfFileSpec> spec;
 };
 }
 #endif // NPDF_FILESPEC_H

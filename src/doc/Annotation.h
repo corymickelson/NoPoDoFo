@@ -36,8 +36,6 @@ class Annotation : public ObjectWrap<Annotation>
 {
 public:
   explicit Annotation(const CallbackInfo& callbackInfo);
-  ~Annotation();
-
   static FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
   Napi::Value HasAppearanceStream(const CallbackInfo&);
@@ -50,10 +48,8 @@ public:
   Napi::Value GetContent(const CallbackInfo&);
   void SetDestination(const CallbackInfo&, const Napi::Value&);
   Napi::Value GetDestination(const CallbackInfo&);
-  Napi::Value HasDestination(const CallbackInfo&);
-  void SetAction(const CallbackInfo&);
+  void SetAction(const CallbackInfo&, const Napi::Value&);
   Napi::Value GetAction(const CallbackInfo&);
-  Napi::Value HasAction(const CallbackInfo&);
   void SetOpen(const CallbackInfo&, const Napi::Value&);
   Napi::Value GetOpen(const CallbackInfo&);
   void SetColor(const CallbackInfo&, const Napi::Value&);
@@ -61,15 +57,14 @@ public:
   Napi::Value GetType(const CallbackInfo&);
   void SetQuadPoints(const CallbackInfo&, const Napi::Value&);
   Napi::Value GetQuadPoints(const CallbackInfo&);
-  void SetFileAttachment(const CallbackInfo&);
-  Napi::Value HasFileAttachment(const CallbackInfo&);
+  Napi::Value GetAttachment(const CallbackInfo&);
+  void SetAttachment(const CallbackInfo&, const Napi::Value&);
 
   PdfAnnotation& GetAnnotation() { return *annot; }
 
 private:
   std::unique_ptr<PdfAnnotation> annot;
-  //  Document* doc;
-  BaseDocument* doc;
+  std::shared_ptr<PoDoFo::PdfDocument> doc;
 };
 }
 #endif // NPDF_ANNOTATION_H

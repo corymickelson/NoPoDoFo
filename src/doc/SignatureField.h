@@ -22,14 +22,12 @@
 
 #include <napi.h>
 #include <podofo/podofo.h>
-#include "Document.h"
+
 namespace NoPoDoFo {
 class SignatureField : public Napi::ObjectWrap<SignatureField>
 {
 public:
   explicit SignatureField(const Napi::CallbackInfo&);
-  ~SignatureField();
-
   static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
   void SetAppearanceStream(const Napi::CallbackInfo&);
@@ -41,15 +39,14 @@ public:
   void AddCertificateReference(const Napi::CallbackInfo&);
   Napi::Value GetSignatureObject(const Napi::CallbackInfo&);
   Napi::Value EnsureSignatureObject(const Napi::CallbackInfo&);
-
-  PoDoFo::PdfSignatureField* GetField() { return field; }
-  PoDoFo::PdfData* GetSignatureData() { return signatureBuffer; }
+  PoDoFo::PdfData* GetSignatureData() { return signatureBuffer.get(); }
+  std::shared_ptr<PoDoFo::PdfSignatureField> GetField() { return field; }
 
 private:
-  PoDoFo::PdfSignatureField* field;
-  PoDoFo::PdfData* signatureBuffer;
-  BaseDocument* doc;
-  bool isExternalInstance = false;
+  bool isMemDoc = false;
+  std::shared_ptr<PoDoFo::PdfSignatureField> field;
+  std::unique_ptr<PoDoFo::PdfData> signatureBuffer;
+  std::shared_ptr<PoDoFo::PdfDocument> doc;
 };
 }
 #endif

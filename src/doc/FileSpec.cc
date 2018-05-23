@@ -18,13 +18,17 @@
  */
 
 #include "FileSpec.h"
-
-namespace NoPoDoFo {
+#include "../base/Names.h"
+#include "../base/Obj.h"
+#include "StreamDocument.h"
 
 using namespace Napi;
 using namespace PoDoFo;
 
+using std::make_unique;
 using std::string;
+
+namespace NoPoDoFo {
 
 FunctionReference FileSpec::constructor; // NOLINT
 
@@ -32,9 +36,11 @@ void
 FileSpec::Initialize(Napi::Env& env, Napi::Object& target)
 {
   HandleScope scope(env);
-  Function ctor = DefineClass(env, "FileSpec", {
-    InstanceAccessor("name", &FileSpec::GetFileName, nullptr)
-  });
+  Function ctor =
+    DefineClass(env,
+                "FileSpec",
+                { InstanceAccessor("name", &FileSpec::GetFileName, nullptr),
+                  InstanceMethod("getContents", &FileSpec::Data) });
   constructor = Napi::Persistent(ctor);
   constructor.SuppressDestruct();
 
@@ -43,24 +49,93 @@ FileSpec::Initialize(Napi::Env& env, Napi::Object& target)
 FileSpec::FileSpec(const CallbackInfo& info)
   : ObjectWrap<FileSpec>(info)
 {
-  if (info.Length() == 1 && info[0].Type() == napi_external) {
-    spec = info[0].As<External<PdfFileSpec>>().Data();
-  } else if (info.Length() == 2) {
+  if (info.Length() == 1 && info[0].IsObject() &&
+      info[0].As<Object>().InstanceOf(Obj::constructor.Value())) {
+    spec = make_unique<PdfFileSpec>(
+      Obj::Unwrap(info[0].As<Object>())->GetObject().get());
+  } else if (info.Length() == 1 && info[0].Type() == napi_external) {
+    auto pObj = info[0].As<External<PdfObject>>().Data();
+    spec = make_unique<PdfFileSpec>(pObj);
+  } else if (info.Length() >= 2) {
     string file = info[0].As<String>().Utf8Value();
     auto docObj = info[1].As<Object>();
-    Document* doc = Document::Unwrap(docObj);
-    spec =
-      new PdfFileSpec(file.c_str(), true, doc->GetMemDocument().get(), true);
+    PdfDocument* doc;
+    if (docObj.InstanceOf(Document::constructor.Value()))
+      doc = Document::Unwrap(docObj)->GetBaseDocument().get();
+    else if (docObj.InstanceOf(StreamDocument::constructor.Value()))
+      doc = StreamDocument::Unwrap(docObj)->GetBaseDocument().get();
+    else {
+      TypeError::New(
+        info.Env(),
+        "Unknown Document type. Requires a Document or StreamDocument")
+        .ThrowAsJavaScriptException();
+    }
+    bool embed = true;
+    if(info.Length() >= 3 && info[2].IsBuffer()) {
+      embed = info[2].As<Boolean>();
+    }
+    spec = make_unique<PdfFileSpec>(file.c_str(), embed, doc, true);
+  } else {
+    TypeError::New(info.Env(),
+                   "Valid constructor args: [ [Obj], [External<PdfObject>], "
+                   "[string, BaseDocument] ]")
+      .ThrowAsJavaScriptException();
   }
 }
-FileSpec::~FileSpec()
+
+Napi::Value
+FileSpec::GetFileName(const Napi::CallbackInfo& info)
 {
-  if (spec != nullptr) {
-    HandleScope scope(Env());
-    delete spec;
-  }
-}
-Napi::Value FileSpec::GetFileName(const Napi::CallbackInfo &info) {
   return String::New(info.Env(), spec->GetFilename(true).GetStringUtf8());
+}
+/**
+ * @todo: update to handle unicode
+ * @param info
+ * @return
+ */
+Napi::Value
+FileSpec::Data(const Napi::CallbackInfo& info)
+{
+  if (!spec->GetObject()->GetDictionary().HasKey(Name::EF)) {
+    return info.Env().Null();
+  } else {
+    auto ef = spec->GetObject()->GetDictionary().GetKey(Name::EF);
+    if (ef->IsReference()) {
+      auto efr = ef->GetOwner()->GetObject(ef->GetReference());
+      if (!efr->IsDictionary()) {
+        Error::New(info.Env(),
+                   "Failed to parse fileSpec for EmbeddedFile dictionary")
+          .ThrowAsJavaScriptException();
+        return info.Env().Undefined();
+      } else {
+        if (!ef->IsDictionary()) {
+          Error::New(info.Env(), "EmbeddedFile expected dictionary")
+            .ThrowAsJavaScriptException();
+          return info.Env().Undefined();
+        } else {
+          auto efd = ef->GetDictionary();
+          if (!efd.HasKey(Name::F)) {
+            Error::New(info.Env(), "Missing File Key")
+              .ThrowAsJavaScriptException();
+            return info.Env().Undefined();
+          } else {
+            PdfObject* data;
+            auto fd = efd.GetKey(Name::F);
+            if (fd->IsReference()) {
+              data = fd->GetOwner()->GetObject(fd->GetReference());
+            } else {
+              data = fd;
+            }
+            auto pStream = dynamic_cast<PdfMemStream*>(data->GetStream());
+            const char* stream = pStream->Get();
+            pdf_long length = pStream->GetLength();
+            auto value = Buffer<char>::Copy(
+              info.Env(), stream, static_cast<size_t>(length));
+            return value;
+          }
+        }
+      }
+    }
+  }
 }
 }

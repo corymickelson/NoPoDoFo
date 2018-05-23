@@ -21,6 +21,7 @@
 #define NPDF_DICTIONARY_H
 
 #include "../doc/Document.h"
+#include "Obj.h"
 #include <napi.h>
 #include <podofo/podofo.h>
 #include <string>
@@ -30,13 +31,8 @@ class Dictionary : public Napi::ObjectWrap<Dictionary>
 {
 public:
   explicit Dictionary(const Napi::CallbackInfo&);
-  //  ~Dictionary();
   static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
-
-  //  static Napi::Value ResolveDictionary(const Napi::CallbackInfo&);
-  //  static PoDoFo::PdfDictionary& Resolve(PoDoFo::PdfDocument*,
-  //                                        PoDoFo::PdfObject*);
   void AddKey(const Napi::CallbackInfo&);
   Napi::Value GetKey(const Napi::CallbackInfo&);
   Napi::Value GetKeys(const Napi::CallbackInfo&);
@@ -51,12 +47,12 @@ public:
   Napi::Value Write(const Napi::CallbackInfo&);
   void WriteSync(const Napi::CallbackInfo&);
   Napi::Value Eq(const Napi::CallbackInfo&);
+//  Napi::Value GetObject(const Napi::CallbackInfo&) { return nObj; }
   PoDoFo::PdfDictionary& GetDictionary() { return obj->GetDictionary(); }
 
 private:
-  //  Document* doc;
   std::shared_ptr<PoDoFo::PdfObject> obj;
-  //  PoDoFo::PdfDictionary* dict;
+//  Napi::Value nObj;
 };
 }
 #endif

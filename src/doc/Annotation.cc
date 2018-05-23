@@ -19,6 +19,9 @@
 
 #include "Annotation.h"
 #include "../ErrorHandler.h"
+#include "Action.h"
+#include "Destination.h"
+#include "FileSpec.h"
 #include "StreamDocument.h"
 
 using std::cout;
@@ -37,22 +40,14 @@ Annotation::Annotation(const CallbackInfo& info)
   annot =
     make_unique<PdfAnnotation>(*info[0].As<External<PdfAnnotation>>().Data());
   if (base.InstanceOf(Document::constructor.Value())) {
-    doc = Document::Unwrap(base);
+    doc = Document::Unwrap(base)->GetBaseDocument();
   } else if (base.InstanceOf(StreamDocument::constructor.Value())) {
-    doc = StreamDocument::Unwrap(base);
+    doc = StreamDocument::Unwrap(base)->GetBaseDocument();
   } else {
     Error::New(info.Env(), "Base Document required but not provided");
   }
 }
-Annotation::~Annotation()
-{
-  //  if (annot != nullptr) {
-  HandleScope scope(Env());
-  //    delete annot;
-  //    annot = nullptr;
-  doc = nullptr;
-  //  }
-}
+
 void
 Annotation::Initialize(Napi::Env& env, Napi::Object& target)
 {
@@ -60,26 +55,27 @@ Annotation::Initialize(Napi::Env& env, Napi::Object& target)
   Function ctor = DefineClass(
     env,
     "Annotation",
-    { InstanceAccessor("flags", &Annotation::GetFlags, &Annotation::SetFlags),
-      InstanceMethod("hasAppearanceStream", &Annotation::HasAppearanceStream),
-      InstanceMethod("setBorderStyle", &Annotation::SetBorderStyle),
+    {
+      InstanceAccessor("flags", &Annotation::GetFlags, &Annotation::SetFlags),
+      InstanceAccessor(
+        "action", &Annotation::GetAction, &Annotation::SetAction),
+      InstanceAccessor("open", &Annotation::GetOpen, &Annotation::SetOpen),
       InstanceAccessor("title", &Annotation::GetTitle, &Annotation::SetTitle),
       InstanceAccessor(
         "content", &Annotation::GetContent, &Annotation::SetContent),
       InstanceAccessor("destination",
                        &Annotation::GetDestination,
                        &Annotation::SetDestination),
-      InstanceMethod("hasDestination", &Annotation::HasDestination),
-      InstanceMethod("hasAction", &Annotation::HasAction),
-      InstanceMethod("setAction", &Annotation::SetAction),
-      InstanceMethod("getAction", &Annotation::GetAction),
-      InstanceAccessor("open", &Annotation::GetOpen, &Annotation::SetOpen),
-      InstanceMethod("getType", &Annotation::GetType),
-      InstanceAccessor("color", &Annotation::GetColor, &Annotation::SetColor),
       InstanceAccessor(
         "quadPoints", &Annotation::GetQuadPoints, &Annotation::SetQuadPoints),
-      InstanceMethod("setFileAttachment", &Annotation::SetFileAttachment),
-      InstanceMethod("hasFileAttachment", &Annotation::HasFileAttachment) });
+      InstanceAccessor("color", &Annotation::GetColor, &Annotation::SetColor),
+      InstanceAccessor(
+        "attachment", &Annotation::GetAttachment, &Annotation::SetAttachment),
+
+      InstanceMethod("hasAppearanceStream", &Annotation::HasAppearanceStream),
+      InstanceMethod("setBorderStyle", &Annotation::SetBorderStyle),
+      InstanceMethod("getType", &Annotation::GetType),
+    });
 
   constructor = Persistent(ctor);
   constructor.SuppressDestruct();
@@ -112,16 +108,18 @@ Annotation::HasAppearanceStream(const CallbackInfo& info)
 void
 Annotation::SetBorderStyle(const CallbackInfo& info)
 {
-  if (info.Length() != 3) {
-    throw Napi::Error::New(info.Env(),
-                           "Border requires three arguments of type number."
-                           "Number - horizontal corner radius"
-                           "Number - vertical corner radius"
-                           "Number - width");
+  if (info.Length() < 1 || !info[0].IsObject()) {
+    Error::New(info.Env(),
+               "Border requires three arguments of type number."
+               "Number - horizontal corner radius"
+               "Number - vertical corner radius"
+               "Number - width")
+      .ThrowAsJavaScriptException();
+    return;
   }
-  double horizontal = info[0].As<Number>();
-  double vertical = info[1].As<Number>();
-  double width = info[2].As<Number>();
+  double horizontal = info[0].As<Object>().Get("horizontal").As<Number>();
+  double vertical = info[0].As<Object>().Get("vertical").As<Number>();
+  double width = info[0].As<Object>().Get("width").As<Number>();
   GetAnnotation().SetBorderStyle(horizontal, vertical, width);
 }
 
@@ -169,45 +167,41 @@ Annotation::GetContent(const CallbackInfo& info)
 void
 Annotation::SetDestination(const CallbackInfo& info, const Napi::Value& value)
 {
-  throw Napi::Error::New(info.Env(), "Not implemented.");
+  if (value.As<Object>().InstanceOf(Destination::constructor.Value())) {
+    auto destination = Destination::Unwrap(value.As<Object>());
+    annot->SetDestination(*destination->GetDestinationPtr());
+  } else {
+    TypeError::New(info.Env(), "Requires instance of Destination")
+      .ThrowAsJavaScriptException();
+  }
 }
 
 Napi::Value
 Annotation::GetDestination(const CallbackInfo& info)
 {
-  throw Napi::Error::New(info.Env(), "Not implemented.");
-}
-
-Value
-Annotation::HasDestination(const CallbackInfo& info)
-{
-  throw Napi::Error::New(info.Env(), "Not implemented.");
+  PdfDestination d = annot->GetDestination(doc.get());
+  return Destination::constructor.New(
+    { External<PdfDestination>::New(info.Env(), &d) });
 }
 
 void
-Annotation::SetAction(const CallbackInfo& info)
+Annotation::SetAction(const CallbackInfo& info, const Napi::Value& value)
 {
-  auto actionObj = info[0].As<Object>();
-  auto o = info[1].As<Object>();
-  if (!o.InstanceOf(Document::constructor.Value())) {
-    throw Error::New(info.Env(), "Requires instance of Document");
+  if (!value.As<Object>().InstanceOf(Action::constructor.Value())) {
+    TypeError::New(info.Env(), "Requires instance of Action")
+      .ThrowAsJavaScriptException();
+    return;
   }
-  auto doc = Document::Unwrap(o)->GetMemDocument();
-  int type = actionObj.Get("type").As<Number>();
-  string uri = actionObj.Get("uri").As<String>().Utf8Value();
-  auto flag = static_cast<PoDoFo::EPdfAction>(type);
-  try {
-    PdfAction action(flag, doc.get());
-    action.SetURI(uri);
-    GetAnnotation().SetAction(action);
-  } catch (PdfError& err) {
-    ErrorHandler(err, info);
-  }
+  auto action = Action::Unwrap(value.As<Object>());
+  annot->SetAction(*action->GetAction());
 }
 
 Napi::Value
 Annotation::GetAction(const CallbackInfo& info)
 {
+  if (!annot->HasAction()) {
+    return info.Env().Null();
+  }
   PdfAction* currentAction = GetAnnotation().GetAction();
   if (currentAction->HasScript()) {
     return Napi::String::New(info.Env(),
@@ -217,12 +211,6 @@ Annotation::GetAction(const CallbackInfo& info)
   } else {
     throw Napi::Error::New(info.Env(), "Action not set");
   }
-}
-
-Napi::Value
-Annotation::HasAction(const CallbackInfo& info)
-{
-  return Napi::Boolean::New(info.Env(), GetAnnotation().HasAction());
 }
 
 void
@@ -424,23 +412,20 @@ Annotation::GetQuadPoints(const CallbackInfo& info)
   }
   return jsArray;
 }
-
-void
-Annotation::SetFileAttachment(const CallbackInfo& info)
-{
-  //  auto filename = info[0].As<String>().Utf8Value();
-  //  auto embed = info[1].As<Boolean>();
-  //  PdfFileSpec fileSpec(filename.c_str(), embed, doc->GetMemDocument());
-  //  try {
-  //    GetAnnotation().SetFileAttachement(fileSpec);
-  //  } catch (PdfError& err) {
-  //    ErrorHandler(err, info);
-  //  }
-}
-
 Napi::Value
-Annotation::HasFileAttachment(const CallbackInfo& info)
+Annotation::GetAttachment(const CallbackInfo& info)
 {
-  return Napi::Boolean::New(info.Env(), GetAnnotation().HasFileAttachement());
+  if (!annot->HasFileAttachement()) {
+    return info.Env().Null();
+  }
+  auto file = annot->GetFileAttachement()->GetObject();
+  return FileSpec::constructor.New({ External<PdfObject>::New(
+    info.Env(), new PdfObject(*file), [](Napi::Env env, PdfObject* data) {
+      HandleScope scope(env);
+      delete data;
+    }) });
 }
+void
+Annotation::SetAttachment(const CallbackInfo& info, const Napi::Value& value)
+{}
 }

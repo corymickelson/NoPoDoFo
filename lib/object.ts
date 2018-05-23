@@ -31,10 +31,10 @@ export type NPDFDataType = 'Boolean' | 'Number' | 'Name' | 'Real' | 'String' | '
     'Dictionary' | 'Reference' | 'RawData'
 
 export interface IObj {
-    reference: number
-    length: number
-    stream: Stream
-    type: NPDFDataType
+    readonly reference: number
+    readonly length: number
+    readonly stream: Stream
+    readonly type: NPDFDataType
     immutable: boolean
 
     hasStream(): boolean
@@ -70,7 +70,7 @@ export interface IObj {
 
 export interface IArray {
     dirty: boolean
-    length: number
+    readonly length: number
     immutable: boolean
 
     toJS(): Array<any>

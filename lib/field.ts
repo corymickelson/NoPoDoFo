@@ -142,7 +142,7 @@ export enum NPDFAnnotationAppearance {
 }
 
 export interface ISignatureField {
-    new(annotation: Annotation, doc?: IDocument): ISignatureField
+    new(annotation: Annotation, doc: IDocument): ISignatureField
     setAppearanceStream(xObj: any, appearance: NPDFAnnotationAppearance, name: string): void
 
     setReason(reason: string): void

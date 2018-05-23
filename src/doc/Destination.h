@@ -30,7 +30,6 @@ public:
   static Napi::FunctionReference constructor;
   explicit Destination(const Napi::CallbackInfo &info);
   static void Initialize(Napi::Env& env, Napi::Object& target);
-  ~Destination();
   Napi::Value GetPage(const Napi::CallbackInfo&);
   Napi::Value GetType(const Napi::CallbackInfo&);
   Napi::Value GetZoom(const Napi::CallbackInfo&);
@@ -41,8 +40,9 @@ public:
   Napi::Value GetObject(const Napi::CallbackInfo&);
   Napi::Value GetArray(const Napi::CallbackInfo&);
   void AddToDictionary(const Napi::CallbackInfo&);
+  PoDoFo::PdfDestination* GetDestinationPtr() { return destination.get(); }
 private:
-  PoDoFo::PdfDestination* destination;
+  std::unique_ptr<PoDoFo::PdfDestination> destination;
 
 };
 

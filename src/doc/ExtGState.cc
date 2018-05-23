@@ -20,6 +20,8 @@
 #include "ExtGState.h"
 #include "../ErrorHandler.h"
 #include "../ValidateArguments.h"
+#include "Document.h"
+#include "StreamDocument.h"
 #include <algorithm>
 
 namespace NoPoDoFo {
@@ -28,6 +30,7 @@ using namespace Napi;
 using namespace PoDoFo;
 
 using std::find;
+using std::make_unique;
 using std::string;
 using std::vector;
 
@@ -37,12 +40,19 @@ ExtGState::ExtGState(const Napi::CallbackInfo& info)
   : ObjectWrap(info)
 {
   auto o = info[0].As<Object>();
-  if (!o.InstanceOf(Document::constructor.Value())) {
-    throw Error::New(info.Env(),
-                     "Requires an instance of Document for construction");
+  if (o.InstanceOf(Document::constructor.Value())) {
+    auto d = Document::Unwrap(o);
+    self = make_unique<PdfExtGState>(d->GetMemDocument().get());
+  } else if(o.InstanceOf(StreamDocument::constructor.Value())) {
+    auto d = StreamDocument::Unwrap(o);
+    self = make_unique<PdfExtGState>(d->GetBaseDocument().get());
   }
-  auto d = Document::Unwrap(o);
-  self = new PdfExtGState(d->GetMemDocument().get());
+  else {
+    Error::New(
+      info.Env(),
+      "Requires an instance of StreamDocument or Document for construction")
+      .ThrowAsJavaScriptException();
+  }
 }
 
 void
@@ -146,11 +156,4 @@ ExtGState::SetFrequency(const CallbackInfo& info)
   double v = info[0].As<Number>();
   self->SetFrequency(v);
 }
-ExtGState::~ExtGState()
-{
-  if (self != nullptr) {
-    HandleScope scope(Env());
-    delete self;
-  }
-};
 }

@@ -22,20 +22,17 @@
 
 #define CONVERSION_CONSTANT 0.002834645669291339
 
-#include "Document.h"
-#include "Field.h"
 #include <napi.h>
 #include <podofo/podofo.h>
 
-namespace NoPoDoFo {
-
 using namespace std;
+
+namespace NoPoDoFo {
 
 class Page : public Napi::ObjectWrap<Page>
 {
 public:
   explicit Page(const Napi::CallbackInfo& callbackInfo);
-  ~Page();
 
   static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);

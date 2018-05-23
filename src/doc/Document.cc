@@ -26,6 +26,7 @@
 #include "Font.h"
 #include "Form.h"
 #include "Page.h"
+#include <iostream>
 
 using namespace Napi;
 using namespace PoDoFo;
@@ -102,33 +103,6 @@ Document::Document(const CallbackInfo& info)
     std::static_pointer_cast<PdfMemDocument>(BaseDocument::GetBaseDocument());
 }
 
-// Document::~Document()
-//{
-//  HandleScope scope(Env());
-//  cout << "Destructing document object." << endl;
-//  delete document;
-//  document = nullptr;
-//}
-
-// Napi::Value
-// Document::GetPage(const Napi::CallbackInfo& info)
-//{
-//  int n = info[0].As<Number>();
-//  Napi::Object instance =
-//    Page::constructor.New({ this->Value(), Number::New(info.Env(), n) });
-//  return instance;
-//}
-// Napi::Value
-// Document::GetForm(const CallbackInfo& info)
-//{
-//  if (!document->GetAcroForm()) {
-//    return info.Env().Null();
-//  }
-//  Napi::Object instance =
-//    Form::constructor.New({ this->Value(), Boolean::New(info.Env(), true) });
-//  return instance;
-//}
-
 Value
 Document::GetFont(const CallbackInfo& info)
 {
@@ -197,7 +171,7 @@ Document::SetPassword(const CallbackInfo& info, const Napi::Value& value)
 void
 Document::DeletePages(const CallbackInfo& info)
 {
-  AssertFunctionArgs(info, 2, {{ napi_number, napi_number }}, nullptr);
+  AssertFunctionArgs(info, 2, { { napi_number, napi_number } }, nullptr);
   int pageIndex = info[0].As<Number>();
   int count = info[1].As<Number>();
   if (document->GetPageCount() < pageIndex + count) {
@@ -214,136 +188,17 @@ Document::DeletePages(const CallbackInfo& info)
 void
 Document::SetEncrypt(const CallbackInfo& info, const Napi::Value& value)
 {
-  AssertFunctionArgs(info, 1, { napi_external });
+  if (!value.IsExternal()) {
+    TypeError::New(
+      info.Env(),
+      "Requires an External<PdfEncrypt> please see the docs for more info.")
+      .ThrowAsJavaScriptException();
+    return;
+  }
   try {
     const PdfEncrypt* e = value.As<External<PdfEncrypt>>().Data();
     document->SetEncrypted(*e);
   }
-  //  try {
-  //    AssertFunctionArgs(info, 1, { napi_valuetype::napi_object });
-  //    if (!value.IsObject()) {
-  //      throw Error::New(info.Env(),
-  //                       "Set encrypt requires a single argument of"
-  //                       " type Object<{userPassword:string,"
-  //                       " ownerPassword:string, protection:Array<string>,"
-  //                       " algorithm: string, keyLength: int");
-  //    }
-  //    auto encryption = value.As<Object>();
-  //    string ownerPwd;
-  //    string userPwd;
-  //    int nperm = 0;
-  //    int algoParameter = 0;
-  //    int key = 0;
-  //    if (!encryption.Has("ownerPassword") || !encryption.Has("keyLength") ||
-  //        !encryption.Has("protection") || !encryption.Has("algorithm")) {
-  //      throw Error::New(info.Env(), "something is not right");
-  //    }
-  //    try {
-  //      if (encryption.Has("ownerPassword")) {
-  //        ownerPwd = encryption.Get("ownerPassword").As<String>().Utf8Value();
-  //      }
-  //      if (encryption.Has("userPassword")) {
-  //        userPwd = encryption.Get("userPassword").As<String>().Utf8Value();
-  //      }
-  //      if (encryption.Has("protection")) {
-  //        if (encryption.Get("protection").IsArray()) {
-  //          auto permissions = encryption.Get("protection").As<Array>();
-  //          if (!permissions.IsEmpty()) {
-  //            for (uint32_t i = 0; i < permissions.Length(); ++i) {
-  //              if (permissions.Get(i).IsString()) {
-  //                string permission =
-  //                permissions.Get(i).As<String>().Utf8Value(); if (permission
-  //                == "Copy")
-  //                  nperm |= 0x00000010;
-  //                else if (permission == "Print")
-  //                  nperm |= 0x00000004;
-  //                else if (permission == "Edit")
-  //                  nperm |= 0x00000008;
-  //                else if (permission == "EditNotes")
-  //                  nperm |= 0x00000020;
-  //                else if (permission == "FillAndSign")
-  //                  nperm |= 0x00000100;
-  //                else if (permission == "Accessible")
-  //                  nperm |= 0x00000200;
-  //                else if (permission == "DocAssembly")
-  //                  nperm |= 0x00000400;
-  //                else if (permission == "HighPrint")
-  //                  nperm |= 0x00000800;
-  //                else {
-  //                  stringstream msg;
-  //                  msg << "Unknown permission parameter: " << permission
-  //                      << ". Permission must be one or more of: "
-  //                      << "[Copy, Print, Edit, EditNotes, FillAndSign, "
-  //                         "Accessible, DocAssembly, HighPrint]"
-  //                      << endl;
-  //                  throw Error::New(info.Env(), msg.str());
-  //                }
-  //              }
-  //            }
-  //          }
-  //        } else {
-  //          throw Error::New(info.Env(), "shit");
-  //        }
-  //      }
-  //      if (encryption.Has("algorithm")) {
-  //        // rc4v1 =1 rc4v2 = 2 aesv2 = 4 aesv3 = 8
-  //        Napi::Value algoProp = encryption.Get("algorithm");
-  //        string algo;
-  //        if (algoProp.IsString()) {
-  //          algo = algoProp.As<String>().Utf8Value();
-  //          if (algo == "rc4v1")
-  //            algoParameter = 1;
-  //          else if (algo == "rc4v2")
-  //            algoParameter = 2;
-  //          else if (algo == "aesv2")
-  //            algoParameter = 4;
-  //          else if (algo == "aesv3")
-  //            algoParameter = 8;
-  //          else {
-  //            stringstream msg;
-  //            msg << "Unknown permission parameter: " << algo
-  //                << ". Permission must be one or more of: [rc4v1, rc4v2,
-  //                aesv2, "
-  //                   "aesv3]"
-  //                << endl;
-  //            throw Error::New(info.Env(), msg.str());
-  //          }
-  //        }
-  //      }
-  //      if (encryption.Has("keyLength")) {
-  //        // 40 56 80 96 128 256
-  //        int keyValues[6] = { 40, 56, 80, 96, 128, 256 };
-  //        Napi::Value keyProp = encryption.Get("keyLength");
-  //        if (keyProp.IsNumber()) {
-  //          key = keyProp.As<Number>();
-  //          for (int i = 0; i < 6; ++i) {
-  //            if (keyValues[i] == key)
-  //              break;
-  //            if (keyValues[i] != key && i == 6) {
-  //              stringstream msg;
-  //              msg
-  //                << "Unknown permission parameter: " << key
-  //                << ". Permission must be one or more of: [40, 56, 80, 96,
-  //                128, "
-  //                   "256]"
-  //                << endl;
-  //              throw Error::New(info.Env(), msg.str());
-  //            }
-  //          }
-  //        }
-  //      }
-  //    } catch (PdfError& err) {
-  //      stringstream msg;
-  //      msg << "Parse Encrypt Object failed with error: " << err.GetError()
-  //          << endl;
-  //      throw Error::New(info.Env(), msg.str());
-  //    }
-  //    document->SetEncrypted(
-  //      userPwd,
-  //      ownerPwd,
-  //      nperm,
-  //      static_cast<PdfEncrypt::EPdfEncryptAlgorithm>(algoParameter),
-  //      static_cast<PdfEncrypt::EPdfKeyLength>(key));
   catch (PdfError& err) {
     stringstream msg;
     msg << "PdfMemDocument::SetEncrypt failed with error: " << err.GetError()

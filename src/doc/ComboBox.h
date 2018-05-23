@@ -30,7 +30,6 @@ class ComboBox : public Napi::ObjectWrap<ComboBox>, public ListField
 {
 public:
   explicit ComboBox(const Napi::CallbackInfo&);
-  ~ComboBox();
   static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env&, Napi::Object&);
   void SetEditable(const Napi::CallbackInfo&, const Napi::Value&);

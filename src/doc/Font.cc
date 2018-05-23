@@ -17,6 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <iostream>
 #include "Font.h"
 #include "../ErrorHandler.h"
 #include "../ValidateArguments.h"
@@ -38,8 +39,6 @@ FunctionReference Font::constructor; // NOLINT
 
 Font::Font(const Napi::CallbackInfo& info)
   : ObjectWrap(info)
-//  , doc(Document::Unwrap(info[0].As<Object>()))
-//  , obj(info[1].As<External<PdfObject>>().Data())
 {
   auto metric = info[0].As<External<PdfFontMetrics>>().Data();
   auto encoding = info[1].As<External<PdfEncoding>>().Data();

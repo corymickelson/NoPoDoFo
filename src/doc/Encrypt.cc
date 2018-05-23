@@ -37,7 +37,6 @@ Napi::FunctionReference Encrypt::constructor; // NOLINT
 Encrypt::Encrypt(const Napi::CallbackInfo& info)
   : ObjectWrap(info)
 {
-  AssertFunctionArgs(info, 1, { napi_object });
   if (!info[0].As<Object>().InstanceOf(Document::constructor.Value())) {
     throw TypeError();
   }
@@ -74,7 +73,6 @@ Encrypt::CreateEncrypt(const CallbackInfo& info)
 {
   auto value = info[0].As<Object>();
   try {
-    AssertFunctionArgs(info, 1, { napi_valuetype::napi_object });
     if (!value.IsObject()) {
       throw Error::New(info.Env(),
                        "Set encrypt requires a single argument of"

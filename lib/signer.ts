@@ -17,10 +17,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import {__mod} from "./base-document";
-import { Document } from './document'
-import { SignatureField } from "./field";
+import {Callback, Document, IDocument} from './document'
+import {ISignatureField, SignatureField} from "./field";
 import {access} from "fs";
 import {F_OK, R_OK} from 'constants'
+
+export interface ISigner {
+    new(doc: IDocument, output?: string): ISigner
+    setField(field: ISignatureField): void
+    sign(signature: string, cb: Callback): void
+}
 
 /**
  * The Signer class binds PoDoFo::PdfSignOutputDevice

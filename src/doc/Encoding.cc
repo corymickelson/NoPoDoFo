@@ -23,19 +23,25 @@
 #include "../base/Dictionary.h"
 #include "Font.h"
 
-namespace NoPoDoFo {
-
 using namespace PoDoFo;
 using namespace Napi;
 
 using std::string;
+
+namespace NoPoDoFo {
 
 FunctionReference Encoding::constructor; // NOLINT
 
 Encoding::Encoding(const Napi::CallbackInfo& info)
   : ObjectWrap(info)
   , encoding(info[0].As<External<PdfEncoding>>().Data())
+{}
+Encoding::~Encoding()
 {
+  HandleScope scope(Env());
+  if (!encoding->IsAutoDelete()) {
+    delete encoding;
+  }
 }
 void
 Encoding::Initialize(Napi::Env& env, Napi::Object& target)
@@ -82,12 +88,5 @@ Napi::Value
 Encoding::GetData(const Napi::CallbackInfo& info)
 {
   return info.Env().Undefined();
-}
-Encoding::~Encoding()
-{
-  if (encoding != nullptr) {
-    HandleScope scope(Env());
-    delete encoding;
-  }
 }
 }

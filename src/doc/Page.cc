@@ -49,12 +49,7 @@ Page::Page(const CallbackInfo& info)
       .ThrowAsJavaScriptException();
   }
 }
-Page::~Page()
-{
-//  HandleScope scope(Env());
-  cout << "Destructing Page" << endl;
-//  doc = nullptr;
-}
+
 void
 Page::Initialize(Napi::Env& env, Napi::Object& target)
 {

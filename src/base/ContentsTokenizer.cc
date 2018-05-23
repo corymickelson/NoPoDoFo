@@ -21,6 +21,7 @@
 #include "../ValidateArguments.h"
 #include "../doc/Page.h"
 #include "../doc/StreamDocument.h"
+#include "../doc/Document.h"
 #include <iostream>
 #include <stack>
 
@@ -52,16 +53,6 @@ ContentsTokenizer::ContentsTokenizer(const Napi::CallbackInfo& info)
 
   self = make_unique<PdfContentsTokenizer>(doc->GetPage(pIndex));
 }
-
-// ContentsTokenizer::~ContentsTokenizer()
-//{
-//  if (self != nullptr) {
-//    HandleScope scope(Env());
-//    delete self;
-//    page = nullptr;
-//    doc = nullptr;
-//  }
-//}
 
 void
 ContentsTokenizer::Initialize(Napi::Env& env, Napi::Object& target)

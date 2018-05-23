@@ -25,10 +25,10 @@
 using namespace Napi;
 using namespace PoDoFo;
 
-using std::string;
 using std::make_unique;
-using std::unique_ptr;
 using std::shared_ptr;
+using std::string;
+using std::unique_ptr;
 
 namespace NoPoDoFo {
 
@@ -37,8 +37,18 @@ Napi::FunctionReference Array::constructor; // NOLINT
 Array::Array(const CallbackInfo& info)
   : ObjectWrap<Array>(info)
 {
-  shared_ptr<PdfObject> obj = Obj::Unwrap(info[0].As<Object>())->GetObject();
-  array = make_unique<PdfArray>(*obj.get());
+  if (info[0].IsObject() &&
+      info[0].As<Object>().InstanceOf(Obj::constructor.Value())) {
+    shared_ptr<PdfObject> obj = Obj::Unwrap(info[0].As<Object>())->GetObject();
+    array = make_unique<PdfArray>(*obj.get());
+  } else if (info[0].IsExternal()) {
+    array = make_unique<PdfArray>(*info[0].As<External<PdfArray>>().Data());
+  } else {
+    TypeError::New(
+      info.Env(),
+      "Constructor requires instance of Obj, or an external PdfArray ptr")
+      .ThrowAsJavaScriptException();
+  }
 }
 
 void
@@ -167,12 +177,14 @@ Array::GetObjAtIndex(const CallbackInfo& info)
   if (index > GetArray()->size()) {
     throw Napi::RangeError();
   }
-  auto item = new PdfObject(GetArray()[index]);
+  PdfObject item(GetArray()[index]);
+  if (item.IsReference()) {
+    item = *item.GetOwner()->GetObject(item.GetReference());
+  }
   auto initPtr = Napi::External<PdfObject>::New(
-    info.Env(), item, [](Napi::Env env, PdfObject* data) {
+    info.Env(), new PdfObject(item), [](Napi::Env env, PdfObject* data) {
       HandleScope scope(env);
       delete data;
-      data = nullptr;
     });
   auto instance = Obj::constructor.New({ initPtr });
   return instance;
@@ -185,8 +197,14 @@ Array::ToArray(const Napi::CallbackInfo& info)
   try {
     uint32_t counter = 0;
     for (auto& it : *GetArray()) {
-      const auto initPtr = External<PdfObject>::New(
-        Env(), new PdfObject(it), [](Napi::Env env, PdfObject* data) {
+      PdfObject* item;
+      if (it.IsReference()) {
+        item = it.GetOwner()->GetObject(it.GetReference());
+      } else {
+        item = &it;
+      }
+      auto initPtr = Napi::External<PdfObject>::New(
+        info.Env(), new PdfObject(*item), [](Napi::Env env, PdfObject* data) {
           HandleScope scope(env);
           delete data;
           data = nullptr;

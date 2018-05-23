@@ -20,16 +20,14 @@
 #ifndef NPDF_RECT_H
 #define NPDF_RECT_H
 
-#include "../ValidateArguments.h"
-#include "Page.h"
 #include <napi.h>
 #include <podofo/podofo.h>
+
 namespace NoPoDoFo {
 class Rect : public Napi::ObjectWrap<Rect>
 {
 public:
   explicit Rect(const Napi::CallbackInfo& callbackInfo);
-  ~Rect();
   static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
 
@@ -42,10 +40,10 @@ public:
   void SetBottom(const Napi::CallbackInfo&, const Napi::Value&);
   Napi::Value GetLeft(const Napi::CallbackInfo&);
   void SetLeft(const Napi::CallbackInfo&, const Napi::Value&);
-  PoDoFo::PdfRect* GetRect() { return rect; }
+  PoDoFo::PdfRect* GetRect() { return rect.get(); }
 
 private:
-  PoDoFo::PdfRect* rect = new PoDoFo::PdfRect();
+  std::shared_ptr<PoDoFo::PdfRect> rect;
 };
 }
 #endif // NPDF_RECT_H
