@@ -2,7 +2,7 @@
  * This file is part of the NoPoDoFo (R) project.
  * Copyright (c) 2017-2018
  * Authors: Cory Mickelson, et al.
- * 
+ *
  * NoPoDoFo is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -16,9 +16,10 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import { NPDFrgb } from './painter';
+import {NPDFColor, NPDFrgb} from './painter';
 import {access} from "fs";
 import {F_OK, R_OK} from "constants";
+import {IAction, IDestination} from "./action";
 
 export enum NPDFAnnotationType {
     Text = 'Text',
@@ -49,6 +50,7 @@ export enum NPDFAnnotationType {
     RichMedia = 'RichMedia',
     WebMedia = 'WebMedia'
 }
+
 export enum NPDFAnnotation {
     Text = 0,                   // - supported
     Link,                       // - supported
@@ -78,6 +80,7 @@ export enum NPDFAnnotation {
     RichMedia,      // PDF 1.7 ADBE ExtensionLevel 3 ALX: Petr P. Petrov
     WebMedia,       // PDF 1.7 IPDF ExtensionLevel 3
 }
+
 export enum NPDFAnnotationFlag {
     Invisible = 0x0001,
     Hidden = 0x0002,
@@ -90,6 +93,7 @@ export enum NPDFAnnotationFlag {
     ToggleNoView = 0x0100,
     LockedContents = 0x0200
 }
+
 export enum NPDFAction {
     GoTo = 0,
     GoToR,
@@ -111,6 +115,24 @@ export enum NPDFAction {
     GoTo3DView,
     RichMediaExecute,
 }
+
+export interface IAnnotation {
+    flags: NPDFAnnotationFlag
+    title: string
+    content: string
+    destination: IDestination
+    action: IAction
+    open: boolean
+    quadPoints: number[]
+    color: NPDFColor
+
+    setBorderStyle(v: NPDFAnnotationBorderStyle): void
+    hasAppearanceStream(): boolean
+    getType(): NPDFAnnotationType
+}
+
+export type NPDFAnnotationBorderStyle = { horizontal: number, vertical: number, width: number }
+
 /**
  * @desc Red, Green, Blue
  */
@@ -118,24 +140,31 @@ export class Annotation {
     get quadPoints(): Array<number> {
         return this._instance.quadPoints
     }
-    set quadPoints(value:Array<number>) {
+
+    set quadPoints(value: Array<number>) {
         this._instance.quadPoints = value
     }
+
     get title() {
         return this._instance.title
     }
-    set title(value:string) {
+
+    set title(value: string) {
         this._instance.title = value
     }
+
     get flag(): NPDFAnnotationFlag {
         return this._instance.flag
     }
+
     set flag(value: NPDFAnnotationFlag) {
         this._instance.flag = value
     }
+
     get color() {
         return this._instance.color
     }
+
     set color(value: NPDFrgb) {
         let rgbErr = Error("RGB value must be an integer >= 0 || <= 256")
         if (value.length !== 3) {
@@ -152,29 +181,36 @@ export class Annotation {
         this._instance.color = value
     }
 
-    constructor(private _instance:any) {}
+    constructor(private _instance: any) {
+    }
 
     hasAppearanceStream(): boolean {
         return this._instance.hasAppearanceStream()
     }
+
     setBorderStyle(horizontalRadius: number, verticalRadius: number, width: number): void {
         return this._instance.setBorderStyle(horizontalRadius, verticalRadius, width)
     }
+
     hasDestination(): boolean {
         return this._instance.hasDestination()
     }
+
     hasAction(): boolean {
         return this._instance.hasAction()
     }
+
     getType(): NPDFAnnotationType {
         return this._instance.getType()
     }
-    setFileAttachment(filename:string, embed:boolean = true): void {
+
+    setFileAttachment(filename: string, embed: boolean = true): void {
         access(filename, F_OK | R_OK, err => {
-            if(err) throw Error("File not found")
+            if (err) throw Error("File not found")
             this._instance.setFileAttachment(filename, embed)
         })
     }
+
     hasFileAttachment(): boolean {
         return this._instance.hasFileAttachment()
     }

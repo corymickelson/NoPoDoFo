@@ -7,14 +7,12 @@
 
 #include <napi.h>
 #include <podofo/podofo.h>
-#include "Document.h"
 
 namespace NoPoDoFo {
 
 class Action: public Napi::ObjectWrap<Action> {
 public:
   explicit Action(const Napi::CallbackInfo &info);
-  ~Action();
   static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
   Napi::Value GetUri(const Napi::CallbackInfo&);
@@ -29,7 +27,7 @@ public:
 
 private:
   std::unique_ptr<PoDoFo::PdfAction> action;
-  Document* doc;
+  std::shared_ptr<PoDoFo::PdfDocument> doc;
 };
 }
 #endif //NPDF_ACTION_H

@@ -2,7 +2,7 @@
  * This file is part of the NoPoDoFo (R) project.
  * Copyright (c) 2017-2018
  * Authors: Cory Mickelson, et al.
- * 
+ *
  * NoPoDoFo is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -19,8 +19,6 @@
 #ifndef NPDF_CONTENTSTOKENIZER_H
 #define NPDF_CONTENTSTOKENIZER_H
 
-#include "../doc/Document.h"
-#include "../doc/Page.h"
 #include <napi.h>
 #include <podofo/podofo.h>
 
@@ -29,7 +27,6 @@ class ContentsTokenizer : public Napi::ObjectWrap<ContentsTokenizer>
 {
 public:
   explicit ContentsTokenizer(const Napi::CallbackInfo&);
-//  ~ContentsTokenizer();
   static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
   Napi::Value ReadAll(const Napi::CallbackInfo&);
@@ -38,8 +35,6 @@ private:
   std::unique_ptr<PoDoFo::PdfContentsTokenizer> self;
   std::shared_ptr<PoDoFo::PdfMemDocument> doc;
 
-//  Page* page;
-//  Document* doc;
   int pIndex;
   void AddText(PoDoFo::PdfFont*, const PoDoFo::PdfString&, Napi::Array& out);
 };

@@ -22,9 +22,6 @@
 
 #define CONVERSION_CONSTANT 0.002834645669291339
 
-#include "Document.h"
-#include "Page.h"
-
 #include <napi.h>
 #include <podofo/podofo.h>
 
@@ -33,14 +30,11 @@ class Painter : public Napi::ObjectWrap<Painter>
 {
 public:
   explicit Painter(const Napi::CallbackInfo& callbackInfo);
-  ~Painter();
-
   PoDoFo::PdfRect pageSize;
   static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
-  void SetPage(const Napi::CallbackInfo&, const Napi::Value&);
-  Napi::Value GetPage(const Napi::CallbackInfo&);
 
+  void SetPage(const Napi::CallbackInfo&);
   void SetColor(const Napi::CallbackInfo&);
   void SetColorCMYK(const Napi::CallbackInfo&);
   Napi::Value GetCanvas(const Napi::CallbackInfo&);
@@ -94,13 +88,12 @@ public:
   Napi::Value GetPrecision(const Napi::CallbackInfo&);
   void SetPrecision(const Napi::CallbackInfo&, const Napi::Value&);
 
-
   PoDoFo::PdfPainter* GetPainter() { return painter.get(); }
 
 private:
+  bool isMemDoc = false;
   std::unique_ptr<PoDoFo::PdfPainter> painter;
-  Page* page;
-  BaseDocument* document;
+  std::shared_ptr<PoDoFo::PdfDocument> document;
   void GetCMYK(Napi::Value&, int* cmyk);
   void GetRGB(Napi::Value&, int* rgb);
 };

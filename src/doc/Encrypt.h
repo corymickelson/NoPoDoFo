@@ -20,6 +20,8 @@
 #ifndef NPDF_ENCRYPT_H
 #define NPDF_ENCRYPT_H
 
+#include <napi.h>
+#include <podofo/podofo.h>
 #include "Document.h"
 
 namespace NoPoDoFo {

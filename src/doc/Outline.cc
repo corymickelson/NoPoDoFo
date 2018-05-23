@@ -18,8 +18,12 @@
  */
 
 #include "Outline.h"
+#include "../base/Obj.h"
+
 using namespace Napi;
 using namespace PoDoFo;
+
+using std::make_unique;
 
 namespace NoPoDoFo {
 
@@ -28,13 +32,25 @@ FunctionReference Outline::constructor; // NOLINT
 Outline::Outline(const CallbackInfo& info)
   : ObjectWrap(info)
 {
-  outlines = info[0].As<External<PdfOutlines>>().Data();
+  if (info.Length() < 1) {
+    Error::New(info.Env(), "Outlines requires one of: Obj, External<PdfObject>")
+      .ThrowAsJavaScriptException();
+    return;
+  } else if (info[0].IsExternal()) {
+    outlines =
+      make_unique<PdfOutlines>(info[0].As<External<PdfObject>>().Data());
+  } else if (info[0].IsObject() &&
+             info[0].As<Object>().InstanceOf(Obj::constructor.Value())) {
+    outlines = make_unique<PdfOutlines>(
+      Obj::Unwrap(info[0].As<Object>())->GetObject().get());
+  } else {
+    TypeError::New(info.Env(),
+                   "Outlines requires one of: Obj, External<PdfObject>")
+      .ThrowAsJavaScriptException();
+    return;
+  }
 }
-Outline::~Outline()
-{
-  HandleScope scope(Env());
-  delete outlines;
-}
+
 void
 Outline::Initialize(Napi::Env& env, Napi::Object& target)
 {

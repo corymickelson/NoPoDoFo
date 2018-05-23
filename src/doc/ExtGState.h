@@ -21,8 +21,6 @@
 #ifndef EXTGSTATE_H
 #define EXTGSTATE_H
 
-#include "Document.h"
-
 #include <napi.h>
 #include <podofo/podofo.h>
 
@@ -31,7 +29,6 @@ class ExtGState : public Napi::ObjectWrap<ExtGState>
 {
 public:
   explicit ExtGState(const Napi::CallbackInfo& info);
-  ~ExtGState();
 
   static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
@@ -45,11 +42,10 @@ public:
   void SetRenderingIntent(const Napi::CallbackInfo& info);
   void SetFrequency(const Napi::CallbackInfo& info);
 
-  PoDoFo::PdfExtGState* GetExtGState() { return self; }
+  PoDoFo::PdfExtGState* GetExtGState() { return self.get(); }
 
 private:
-  PoDoFo::PdfExtGState* self;
-  //  Document* doc;
+  std::unique_ptr<PoDoFo::PdfExtGState> self;
 };
 }
 #endif

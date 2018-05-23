@@ -33,7 +33,7 @@ namespace NoPoDoFo {
 FunctionReference StreamDocument::constructor; // NOLINT
 
 /**
- * @note Javascript args (filename:string, create:boolean, optsion: {
+ * @note Javascript args (filename:string, create:boolean, options: {
  * version:number, writeMode:number, encrypt:External})
  * @brief StreamDocument::StreamDocument
  * @param info

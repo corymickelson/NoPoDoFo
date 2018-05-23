@@ -20,8 +20,6 @@
 #ifndef NPDF_SIGNER_H
 #define NPDF_SIGNER_H
 
-#include "Document.h"
-#include "SignatureField.h"
 #include <napi.h>
 #include <podofo/podofo.h>
 
@@ -31,16 +29,15 @@ class Signer : public Napi::ObjectWrap<Signer>
 public:
   static Napi::FunctionReference constructor;
   explicit Signer(const Napi::CallbackInfo&);
-  ~Signer();
   static void Initialize(Napi::Env& env, Napi::Object& target);
   void SetField(const Napi::CallbackInfo&);
   Napi::Value GetField(const Napi::CallbackInfo&);
   Napi::Value Sign(const Napi::CallbackInfo&);
   Napi::Value SignWorker(const Napi::CallbackInfo&);
 
-  Document* doc;
-  SignatureField* field;
-
+  std::shared_ptr<PoDoFo::PdfMemDocument> doc;
+  std::shared_ptr<PoDoFo::PdfSignatureField> field;
+  std::string output;
 private:
   bool hasSigned = false;
 };

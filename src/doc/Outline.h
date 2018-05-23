@@ -20,7 +20,6 @@
 #ifndef NPDF_OUTLINE_H
 #define NPDF_OUTLINE_H
 
-#include "BaseDocument.h"
 #include <napi.h>
 #include <podofo/podofo.h>
 
@@ -34,7 +33,6 @@ class Outline : public Napi::ObjectWrap<Outline>
 {
 public:
   explicit Outline(const Napi::CallbackInfo& info);
-  ~Outline();
   static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
   Napi::Value CreateChild(const Napi::CallbackInfo&);
@@ -56,10 +54,10 @@ public:
   void SetTextFormat(const Napi::CallbackInfo&, const Napi::Value&);
   Napi::Value GetTextColor(const Napi::CallbackInfo&);
   void SetTextColor(const Napi::CallbackInfo&, const Napi::Value&);
-  PoDoFo::PdfOutlines* GetOutline() { return outlines; }
+  PoDoFo::PdfOutlines* GetOutline() { return outlines.get(); }
 
 private:
-  PoDoFo::PdfOutlines* outlines = nullptr;
+  std::unique_ptr<PoDoFo::PdfOutlines> outlines;
 };
 }
 #endif // NPDF_OUTLINE_H

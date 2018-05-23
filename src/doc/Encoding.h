@@ -38,7 +38,7 @@ public:
   Napi::Value GetData(const Napi::CallbackInfo &);
 
 private:
-  PoDoFo::PdfEncoding *encoding;
+  PoDoFo::PdfEncoding* encoding;
 };
 }
 #endif //NPDF_ENCODING_H

@@ -54,12 +54,7 @@ Form::Form(const Napi::CallbackInfo& info)
     doc = base->GetBaseDocument();
   }
 }
-Form::~Form()
-{
-  //  HandleScope scope(Env());
-  cout << "Destructing Form" << endl;
-  //  doc = nullptr;
-}
+
 void
 Form::Initialize(Napi::Env& env, Napi::Object& target)
 {

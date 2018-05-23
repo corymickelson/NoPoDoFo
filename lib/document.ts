@@ -25,9 +25,15 @@ import {Signer} from './signer';
 import {F_OK, R_OK} from "constants";
 import {IRef} from "./reference";
 import {IForm} from "./form";
-import { BaseDocument, IBase } from './base-document'
+import {BaseDocument, IBase} from './base-document'
 import {ICheckBox, IComboBox, IField, IListBox, IListField, ISignatureField, ITextField} from "./field";
 import {IAction} from "./action";
+import {IStreamDocument} from "./stream-document";
+import {IImage} from "./image";
+import {IAnnotation} from "./annotation";
+import {IFileSpec} from "./file-spec";
+import {IContentsTokenizer} from "./parser";
+import {IRect} from "./rect";
 
 export declare enum NPDFVersion {
     Pdf11 = 0,
@@ -38,25 +44,28 @@ export declare enum NPDFVersion {
     Pdf16 = 5,
     Pdf17 = 6,
 }
+
 export declare enum NPDFWriteMode {
     Default = 1,
     Compact = 2,
 }
+
 export interface INPDF {
     Document: IDocument
+    StreamDocument: IStreamDocument
     Page: IPage
     Field: IField
     TextField: ITextField
-    Image: any
-    Annotation: any
-    Rect: any
+    Image: IImage
+    Annotation: IAnnotation
+    Rect: IRect
     Painter: any
     CheckBox: ICheckBox
     ComboBox: IComboBox
     ListBox: IListBox
     Form: IForm
     Dictionary: IDictionary
-    FileSpec: any
+    FileSpec: IFileSpec
     Obj: IObj
     Ref: IRef
     Array: IArray
@@ -68,13 +77,13 @@ export interface INPDF {
     ExtGState: any
     Signer: any
     SignatureField: ISignatureField
-    Vector: any
     Data: any
-    ContentsTokenizer: any
+    ContentsTokenizer: IContentsTokenizer
     SimpleTable: any
     Action: IAction
     signature: Function
 }
+
 export const __mod: INPDF = require('bindings')('npdf')
 export type Callback = (err: Error, data: Buffer | string) => void
 
@@ -123,19 +132,24 @@ export interface NPDFCreateFontOpts {
 
 export interface IDocument extends IBase {
     new(): IDocument
+
     password: string
     encrypt: IEncrypt
-    trailer: IObj
-    catalog: IObj
+    readonly trailer: IObj
+    readonly catalog: IObj
 
     load(file: string | Buffer,
-         cb: Callback,
-         forUpdate: boolean,
-         fromBuffer: boolean,
-         password?: string): void
+         opts: {
+             forUpdate?: boolean,
+             fromBuffer?: boolean,
+             password?: string
+         } | Callback,
+         cb?: Callback): void
 
     splicePages(startIndex: number, count: number): void
+
     write(destination: Callback | string, cb: Callback): void
+
     getFont(name: string): IFont
 }
 
@@ -202,6 +216,7 @@ export class Document extends BaseDocument {
     get password(): string {
         throw EvalError('Password is not a retrievable property')
     }
+
 //
 //     get encrypt(): IEncrypt {
 //         if (this._encrypt) return this._encrypt
@@ -275,6 +290,7 @@ export class Document extends BaseDocument {
         }
         this._instance.load(file, cb, update, Buffer.isBuffer(file), pwd || '')
     }
+
 //
 // <<<<<<< HEAD
 //     getPageCount(): number {

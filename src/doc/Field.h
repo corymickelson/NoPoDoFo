@@ -20,8 +20,6 @@
 #ifndef NPDF_PDFFIELD_H
 #define NPDF_PDFFIELD_H
 
-#include "../ValidateArguments.h"
-#include "Page.h"
 #include <napi.h>
 #include <podofo/podofo.h>
 

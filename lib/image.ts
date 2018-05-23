@@ -17,8 +17,30 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {__mod} from './base-document'
+import {__mod, IBase} from './base-document'
 import {Document} from './document'
+
+export enum NPDFImageFormat {
+    data,
+    png,
+    tiff,
+    jpeg,
+}
+
+export interface IImage {
+    /**
+     *
+     * @param {IBase} doc
+     * @param {string | Buffer} source
+     * @param {NPDFImageFormat} [format] - defaults to data
+     * @returns {IImage}
+     */
+    new(doc: IBase, source: string | Buffer, format?:NPDFImageFormat): IImage
+    readonly width: number
+    readonly height: number
+
+    setInterpolate(v: boolean): void
+}
 
 export class Image {
     private _instance:any

@@ -16,18 +16,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-<<<<<<< HEAD
-import {Data} from './data'
-import {Document, NPDFFontEncoding, __mod} from './document'
-import {IObj} from './object'
-import {Page} from './page'
-=======
 import { Data } from './data'
-import { Document, FontEncoding, PageLayout, PageMode } from './document'
+import { Document, NPDFFontEncoding, PageLayout, PageMode } from './document'
+import {__mod as mod} from './base-document'
 import { StreamDocument, NPDFWriteMode, NPDFVersion } from './stream-document'
-import { Obj } from './object'
+import { IObj } from './object'
 import { Page } from './page'
->>>>>>> feature/base-document
 import {
     Annotation,
     NPDFAction,
@@ -59,23 +53,13 @@ import {
     NPDFTextRenderingMode,
     NPDFVerticalAlignment
 } from './painter'
-<<<<<<< HEAD
-import {Rect} from './rect'
-import {Signer, signature} from './signer'
-import {Stream} from './stream'
-import {IForm} from './form'
-import {ContentsTokenizer} from './parser'
-import {IRef} from './reference'
-import {Cell, Table} from './table'
-=======
 import { Rect } from './rect'
 import { Signer, signature } from './signer'
 import { Stream } from './stream'
-import { Form } from './form'
+import { IForm } from './form'
 import { ContentsTokenizer } from './parser'
-import { Ref } from './reference'
+import { IRef } from './reference'
 import { Cell, Table } from './table'
->>>>>>> feature/base-document
 
 
 export {
@@ -118,16 +102,15 @@ export {
     IRef,
     Cell,
     Table,
-<<<<<<< HEAD
-    __mod
-=======
+    mod,
     PageLayout,
     PageMode,
     StreamDocument,
     NPDFWriteMode,
     NPDFVersion
->>>>>>> feature/base-document
 }
 export const CONVERSION = 0.0028346456693
+export type NPDFExternal<T> = any
+
 
 

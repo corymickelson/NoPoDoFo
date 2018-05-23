@@ -20,7 +20,6 @@
 #ifndef NPDF_FONT_H
 #define NPDF_FONT_H
 
-#include "../doc/Document.h"
 #include <napi.h>
 #include <podofo/podofo.h>
 
@@ -62,8 +61,6 @@ public:
 private:
   std::unique_ptr<PoDoFo::PdfFont> font;
   PoDoFo::PdfEncoding* encoding;
-//  BaseDocument* doc;
-//  PoDoFo::PdfObject* obj;
 };
 }
 #endif // NPDF_FONT_H

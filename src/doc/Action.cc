@@ -3,8 +3,10 @@
 //
 
 #include "Action.h"
-#include "../base/Obj.h"
 #include "../base/Dictionary.h"
+#include "../base/Obj.h"
+#include "StreamDocument.h"
+#include "Document.h"
 
 using namespace PoDoFo;
 using namespace Napi;
@@ -18,16 +20,21 @@ FunctionReference Action::constructor; // NOLINT
 
 Action::Action(const Napi::CallbackInfo& info)
   : ObjectWrap(info)
-  , doc(Document::Unwrap(info[1].As<Object>()))
 {
+  if (info[0].As<Object>().InstanceOf(Document::constructor.Value())) {
+    doc = Document::Unwrap(info[0].As<Object>())->GetBaseDocument();
+  } else if (info[0].As<Object>().InstanceOf(
+               StreamDocument::constructor.Value())) {
+    doc = StreamDocument::Unwrap(info[0].As<Object>())->GetBaseDocument();
+  } else {
+    TypeError::New(info.Env(), "Instance of BaseDocument required")
+      .ThrowAsJavaScriptException();
+    return;
+  }
   EPdfAction t = static_cast<EPdfAction>(info[0].As<Number>().Uint32Value());
-  action = make_unique<PdfAction>(t, doc->GetDocument());
+  action = make_unique<PdfAction>(t, doc.get());
 }
-Action::~Action()
-{
-  HandleScope scope(Env());
-  doc = nullptr;
-}
+
 void
 Action::Initialize(Napi::Env& env, Napi::Object& target)
 {
@@ -82,7 +89,7 @@ Action::GetObject(const Napi::CallbackInfo& info)
 {
   PdfObject* o = GetAction()->GetObject();
   if (GetAction()->GetObject()->IsReference()) {
-    o = doc->GetDocument()->GetObjects().GetObject(
+    o = doc->GetObjects()->GetObject(
       GetAction()->GetObject()->GetReference());
   }
   return Obj::constructor.New({ External<PdfObject>::New(
@@ -91,7 +98,9 @@ Action::GetObject(const Napi::CallbackInfo& info)
       delete data;
     }) });
 }
-void Action::AddToDictionary(const Napi::CallbackInfo &info) {
+void
+Action::AddToDictionary(const Napi::CallbackInfo& info)
+{
   auto dictionary = Dictionary::Unwrap(info[0].As<Object>())->GetDictionary();
   GetAction()->AddToDictionary(dictionary);
 }

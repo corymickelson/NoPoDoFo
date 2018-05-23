@@ -18,12 +18,14 @@
  */
 
 #include "Rect.h"
-
-
-namespace NoPoDoFo {
+#include "Page.h"
 
 using namespace Napi;
 using namespace PoDoFo;
+using std::make_shared;
+using std::shared_ptr;
+
+namespace NoPoDoFo {
 
 FunctionReference Rect::constructor; // NOLINT
 
@@ -31,7 +33,7 @@ Rect::Rect(const CallbackInfo& info)
   : ObjectWrap(info)
 {
   if (info.Length() == 0) {
-    rect = new PoDoFo::PdfRect();
+    rect = make_shared<PdfRect>();
   }
   if (info.Length() == 1) {
     if (!info[0].IsObject()) {
@@ -44,7 +46,7 @@ Rect::Rect(const CallbackInfo& info)
                        "Rect requires Page as constructor parameter");
     }
     Page* page = Page::Unwrap(pageObj);
-    rect = new PdfRect(page->GetPage()->GetPageSize());
+    rect = make_shared<PdfRect>(page->GetPage()->GetPageSize());
   }
   if (info.Length() == 4) {
     double left, bottom, width, height;
@@ -59,17 +61,10 @@ Rect::Rect(const CallbackInfo& info)
     bottom = info[1].As<Number>();
     width = info[2].As<Number>();
     height = info[3].As<Number>();
-    rect = new PoDoFo::PdfRect(left, bottom, width, height);
+    rect = make_shared<PdfRect>(left, bottom, width, height);
   }
 }
 
-Rect::~Rect()
-{
-  if (rect != nullptr) {
-    HandleScope scope(Env());
-    delete rect;
-  }
-}
 void
 Rect::Initialize(Napi::Env& env, Napi::Object& target)
 {
@@ -82,7 +77,6 @@ Rect::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceAccessor("width", &Rect::GetWidth, &Rect::SetWidth),
       InstanceAccessor("height", &Rect::GetHeight, &Rect::SetHeight),
       InstanceMethod("intersect", &Rect::Intersect)
-
     });
   constructor = Napi::Persistent(ctor);
   constructor.SuppressDestruct();

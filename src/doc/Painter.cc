@@ -27,6 +27,7 @@
 #include "Image.h"
 #include "Page.h"
 #include "Rect.h"
+#include "StreamDocument.h"
 
 using namespace Napi;
 using namespace PoDoFo;
@@ -44,21 +45,19 @@ Painter::Painter(const Napi::CallbackInfo& info)
   : ObjectWrap(info)
 {
   auto o = info[0].As<Object>();
-  if (!o.InstanceOf(Document::constructor.Value())) {
-    throw Error::New(
-      info.Env(), "Painter requires an instance of Document for construction");
+  if (o.InstanceOf(Document::constructor.Value())) {
+    isMemDoc = true;
+    document = Document::Unwrap(o)->GetBaseDocument();
+  } else if(o.InstanceOf(StreamDocument::constructor.Value())) {
+    isMemDoc = false;
+    document = StreamDocument::Unwrap(o)->GetBaseDocument();
+  } else {
+    TypeError::New(info.Env(), "requires an instance of BaseDocument").ThrowAsJavaScriptException();
+    return;
   }
-  document = Document::Unwrap(o);
   painter = make_unique<PdfPainter>();
 }
 
-Painter::~Painter()
-{
-  Napi::HandleScope scope(Env());
-  //  delete painter;
-  document = nullptr;
-  page = nullptr;
-}
 void
 Painter::Initialize(Napi::Env& env, Napi::Object& target)
 {
@@ -66,13 +65,14 @@ Painter::Initialize(Napi::Env& env, Napi::Object& target)
   Napi::Function ctor = DefineClass(
     env,
     "Painter",
-    { InstanceAccessor("page", &Painter::GetPage, &Painter::SetPage),
+    {
       InstanceAccessor(
         "tabWidth", &Painter::GetTabWidth, &Painter::SetTabWidth),
       InstanceAccessor(
         "precision", &Painter::GetPrecision, &Painter::SetPrecision),
       InstanceAccessor("canvas", &Painter::GetCanvas, nullptr),
       InstanceAccessor("font", &Painter::GetFont, &Painter::SetFont),
+      InstanceMethod("setPage", &Painter::SetPage),
       InstanceMethod("finishPage", &Painter::FinishPage),
       InstanceMethod("setColor", &Painter::SetColor),
       InstanceMethod("setStrokeWidth", &Painter::SetStrokeWidth),
@@ -123,19 +123,14 @@ Painter::Initialize(Napi::Env& env, Napi::Object& target)
   target.Set("Painter", ctor);
 }
 void
-Painter::SetPage(const Napi::CallbackInfo& info, const Napi::Value& value)
+Painter::SetPage(const Napi::CallbackInfo& info)
 {
-  if (!value.IsObject()) {
+  if (!info[0].IsObject()) {
     throw Napi::Error::New(info.Env(), "Page must be an instance of Page.");
   }
-  page = Page::Unwrap(value.As<Object>());
+  auto page = Page::Unwrap(info[0].As<Object>());
   painter->SetPage(page->GetPage());
   pageSize = page->GetPage()->GetPageSize();
-}
-Napi::Value
-Painter::GetPage(const CallbackInfo& info)
-{
-  return page ? page->Value() : info.Env().Null();
 }
 
 void
@@ -775,13 +770,11 @@ Painter::MoveTextPosition(const CallbackInfo& info)
 void
 Painter::DrawGlyph(const CallbackInfo& info)
 {
-  if(document->created()) {
+  if(!isMemDoc) {
     TypeError::New(info.Env(), "Requires instance of PdfMemDocument").ThrowAsJavaScriptException();
     return;
   }
-  auto sharedMemDoc = std::static_pointer_cast<PdfMemDocument>(document->GetBaseDocument());
-  AssertFunctionArgs(
-    info, 2, { napi_valuetype::napi_object, napi_valuetype::napi_string });
+  auto sharedMemDoc = std::static_pointer_cast<PdfMemDocument>(document);
   auto point = info[0].As<Object>();
   string glyph = info[1].As<String>().Utf8Value();
   double x, y;

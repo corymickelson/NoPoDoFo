@@ -31,6 +31,8 @@ using std::endl;
 using std::map;
 using std::string;
 using std::vector;
+using std::make_shared;
+using std::shared_ptr;
 
 namespace NoPoDoFo {
 
@@ -44,23 +46,20 @@ FunctionReference Dictionary::constructor; // NOLINT
 Dictionary::Dictionary(const CallbackInfo& info)
   : ObjectWrap(info)
 {
-  if (!info[0].As<Object>().InstanceOf(Obj::constructor.Value())) {
+  if (info[0].IsExternal()) {
+    auto iObj = info[0].As<External<PdfObject>>();
+//    nObj = Obj::constructor.New( { iObj });
+//    obj = Obj::Unwrap(nObj.As<Object>())->GetObject();
+    obj = make_shared<PdfObject>(*iObj.Data());
+  }
+  if (info[0].As<Object>().InstanceOf(Obj::constructor.Value())) {
+    obj = Obj::Unwrap(info[0].As<Object>())->GetObject();
+  } else {
     TypeError::New(info.Env(), "requires Obj as parameter to constructor")
       .ThrowAsJavaScriptException();
     cout << "Obj required" << endl;
-    return;
-  } else {
-    obj = Obj::Unwrap(info[0].As<Object>())->GetObject();
   }
 }
-
-// Dictionary::~Dictionary()
-//{
-//  HandleScope scope(Env());
-//  cout << "Destructing Dictionary" << endl;
-//  delete obj;
-//  obj = nullptr;
-//}
 
 void
 Dictionary::Initialize(Napi::Env& env, Napi::Object& target)
@@ -70,6 +69,7 @@ Dictionary::Initialize(Napi::Env& env, Napi::Object& target)
     env,
     "Dictionary",
     { // StaticMethod("tryGetDictionary", &Dictionary::ResolveDictionary),
+//      InstanceAccessor("object", &Dictionary::GetObject, nullptr),
       InstanceMethod("getKey", &Dictionary::GetKey),
       InstanceMethod("getKeys", &Dictionary::GetKeys),
       InstanceMethod("hasKey", &Dictionary::HasKey),
@@ -167,7 +167,7 @@ Dictionary::GetKey(const CallbackInfo& info)
 {
   string k = info[0].As<String>().Utf8Value();
   bool resolveValue = true;
-  if(info.Length() == 2 && info[1].IsBoolean()) {
+  if (info.Length() == 2 && info[1].IsBoolean()) {
     resolveValue = info[1].As<Boolean>();
   }
   if (!GetDictionary().HasKey(PdfName(k))) {

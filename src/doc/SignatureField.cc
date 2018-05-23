@@ -25,27 +25,50 @@
 #include "../doc/Document.h"
 #include "../doc/Form.h"
 #include "Signer.h"
-
-namespace NoPoDoFo {
+#include "StreamDocument.h"
 
 using namespace Napi;
 using namespace PoDoFo;
+using std::make_unique;
+using std::make_shared;
+
+namespace NoPoDoFo {
 
 FunctionReference SignatureField::constructor; // NOLINT
 
+/**
+ * @note JS new SignatureField(annotation: IAnnotation, doc: IBase)
+ * @param info
+ */
 SignatureField::SignatureField(const CallbackInfo& info)
   : ObjectWrap<SignatureField>(info)
 {
   try {
     if (info.Length() == 2) {
       auto annot = Annotation::Unwrap(info[0].As<Object>());
-      doc = Document::Unwrap(info[1].As<Object>());
-      field = new PdfSignatureField(&annot->GetAnnotation(),
-                                    doc->GetBaseDocument()->GetAcroForm(),
-                                    doc->GetBaseDocument().get());
-
-    } else if (info.Length() == 1) {
-      field = info[0].As<External<PdfSignatureField>>().Data();
+      auto nObj = info[1].As<Object>();
+      if (nObj.InstanceOf(Document::constructor.Value())) {
+        doc = Document::Unwrap(nObj)->GetBaseDocument();
+        isMemDoc = true;
+      } else if (nObj.InstanceOf(StreamDocument::constructor.Value())) {
+        doc = StreamDocument::Unwrap(nObj)->GetBaseDocument();
+        isMemDoc = false;
+      } else {
+        TypeError::New(info.Env(), "IBase required")
+          .ThrowAsJavaScriptException();
+        return;
+      }
+      field = make_shared<PdfSignatureField>(
+        &annot->GetAnnotation(), doc->GetAcroForm(), doc.get());
+    } else if (info.Length() == 1 && info[0].IsExternal()) {
+      field =
+        make_shared<PdfSignatureField>(info[0]
+                                         .As<External<PdfSignatureField>>()
+                                         .Data()
+                                         ->GetWidgetAnnotation());
+    } else {
+      Error::New(info.Env(), "Invalid constructor args").ThrowAsJavaScriptException();
+      return;
     }
   } catch (PdfError& err) {
     ErrorHandler(err, info);
@@ -107,8 +130,9 @@ SignatureField::SetCreator(const CallbackInfo& info)
 void
 SignatureField::SetDate(const CallbackInfo& info)
 {
-  if(info.Length() == 1 && info[0].IsString()) {
-    GetField()->SetSignatureDate(PdfDate(PdfString(info[0].As<String>().Utf8Value())));
+  if (info.Length() == 1 && info[0].IsString()) {
+    GetField()->SetSignatureDate(
+      PdfDate(PdfString(info[0].As<String>().Utf8Value())));
   } else {
     GetField()->SetSignatureDate(PdfDate());
   }
@@ -123,12 +147,15 @@ SignatureField::SetFieldName(const CallbackInfo& info)
 void
 SignatureField::AddCertificateReference(const CallbackInfo& info)
 {
-  if(doc->created()) {
-    TypeError::New(info.Env(), "Requires instance of PdfMemDocument").ThrowAsJavaScriptException();
+  if (!isMemDoc) {
+    TypeError::New(info.Env(), "Requires instance of PdfMemDocument")
+      .ThrowAsJavaScriptException();
     return;
   }
-  auto sharedMemDoc = std::static_pointer_cast<PdfMemDocument>(doc->GetBaseDocument());
-  auto flag = static_cast<PdfSignatureField::EPdfCertPermission>(info[0].As<Number>().Int32Value());
+  auto sharedMemDoc =
+    std::static_pointer_cast<PdfMemDocument>(doc);
+  auto flag = static_cast<PdfSignatureField::EPdfCertPermission>(
+    info[0].As<Number>().Int32Value());
   GetField()->AddCertificationReference(sharedMemDoc->GetCatalog(), flag);
 }
 
@@ -148,11 +175,5 @@ SignatureField::EnsureSignatureObject(const CallbackInfo& info)
   }
   return info.Env().Undefined();
 }
-SignatureField::~SignatureField()
-{
-  HandleScope scope(Env());
-  doc = nullptr;
-  delete field;
-  delete signatureBuffer;
-}
+
 }

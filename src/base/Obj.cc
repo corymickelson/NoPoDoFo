@@ -72,8 +72,7 @@ Obj::Initialize(Napi::Env& env, Napi::Object& target)
 Obj::Obj(const Napi::CallbackInfo& info)
   : ObjectWrap<Obj>(info)
 {
-  auto objRef = info[0].As<External<PdfObject>>().Data();
-  obj = make_shared<PdfObject>(*objRef);
+  obj = make_shared<PdfObject>(*info[0].As<External<PdfObject>>().Data());
 }
 
 void

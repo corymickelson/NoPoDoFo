@@ -27,6 +27,7 @@ using namespace Napi;
 using namespace PoDoFo;
 
 using std::string;
+using std::make_shared;
 
 namespace NoPoDoFo {
 
@@ -35,12 +36,14 @@ Napi::FunctionReference Ref::constructor; // NOLINT
 Ref::Ref(const Napi::CallbackInfo& info)
   : ObjectWrap(info)
 {
+  PdfReference* r;
   if (info.Length() == 1 && info[0].IsNumber()) {
     const pdf_objnum i = info[0].As<Number>();
-    ref = new PdfReference(i, 0);
+    r = new PdfReference(i, 0);
   } else if (info.Length() == 1 && info[0].Type() == napi_external) {
-    ref = info[0].As<Napi::External<PdfReference>>().Data();
+    r = info[0].As<Napi::External<PdfReference>>().Data();
   }
+  ref = make_shared<PdfReference>(*r);
 }
 
 void
@@ -126,11 +129,5 @@ Ref::GetObj(const CallbackInfo& info)
       delete data;
     }) });
 }
-Ref::~Ref()
-{
-  if (ref != nullptr) {
-    HandleScope scope(Env());
-    delete ref;
-  }
-}
+
 }

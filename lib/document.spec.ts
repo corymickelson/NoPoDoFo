@@ -1,7 +1,7 @@
 import {access, readFile, unlinkSync} from 'fs'
 import {join} from 'path'
 import * as tap from 'tape'
-import {Document, NPDFFontEncoding, __mod} from './document'
+import {Document, NPDFFontEncoding, __mod as mod} from './document'
 import {F_OK} from "constants";
 import {v4} from 'uuid'
 import {Test} from "tape";
@@ -12,6 +12,19 @@ const filePath = join(__dirname, '../test-documents/test.pdf'),
 
 export const end = (...tests: Test[]) => tests.forEach(t => t.end())
 
+tap('IDocument', t => {
+    const doc = new mod.Document()
+    doc.load(filePath, e => {
+        if(e) t.fail(e.message)
+        t.comment("Document instance accessors [GET]")
+        t.assert(doc.getPage(0) instanceof (mod.Page as any), "Get Page returns a Page")
+        t.assert(doc.form instanceof (mod.Form as any), "Get Form returns an AcroForm")
+        t.assert(doc.catalog instanceof (mod.Obj as any), "Catalog as Obj")
+        t.assert(doc.trailer instanceof (mod.Obj as any), "Catalog as Obj")
+        t.comment("Document instance methods")
+
+    })
+})
 tap('Document Api', sub => {
     sub.test('unprotected documents', standard => {
         const doc = new Document(filePath)

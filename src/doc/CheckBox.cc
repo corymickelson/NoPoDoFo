@@ -17,7 +17,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <iostream>
 #include "CheckBox.h"
+#include "Field.h"
 
 namespace NoPoDoFo {
 FunctionReference CheckBox::constructor; // NOLINT
@@ -28,16 +30,9 @@ using std::endl;
 CheckBox::CheckBox(const CallbackInfo& info)
   : ObjectWrap<CheckBox>(info)
 {
-
   field = Field::Unwrap(info[0].As<Object>())->GetField();
 }
 
-CheckBox::~CheckBox()
-{
-  cout << "Destructing Checkbox" << endl;
-//  HandleScope scope(Env());
-//  field = nullptr;
-}
 
 void
 CheckBox::Initialize(Napi::Env& env, Napi::Object& target)
