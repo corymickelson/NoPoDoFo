@@ -55,10 +55,11 @@ public:
   void Clear(const Napi::CallbackInfo&);
   Napi::Value Eq(const Napi::CallbackInfo&);
 
-  PoDoFo::PdfObject* GetObject() { return obj; }
+  std::shared_ptr<PoDoFo::PdfObject> GetObject() { return obj; }
+  // PoDoFo::PdfObject* GetObject() { return obj.get(); }
 
 private:
-  PoDoFo::PdfObject* obj;
+  std::shared_ptr<PoDoFo::PdfObject> obj;
 };
 }
 #endif

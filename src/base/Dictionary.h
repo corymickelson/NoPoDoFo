@@ -30,13 +30,13 @@ class Dictionary : public Napi::ObjectWrap<Dictionary>
 {
 public:
   explicit Dictionary(const Napi::CallbackInfo&);
-  ~Dictionary();
+  //  ~Dictionary();
   static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
 
-  static Napi::Value ResolveDictionary(const Napi::CallbackInfo&);
-  static PoDoFo::PdfDictionary& Resolve(PoDoFo::PdfDocument*,
-                                        PoDoFo::PdfObject*);
+  //  static Napi::Value ResolveDictionary(const Napi::CallbackInfo&);
+  //  static PoDoFo::PdfDictionary& Resolve(PoDoFo::PdfDocument*,
+  //                                        PoDoFo::PdfObject*);
   void AddKey(const Napi::CallbackInfo&);
   Napi::Value GetKey(const Napi::CallbackInfo&);
   Napi::Value GetKeys(const Napi::CallbackInfo&);
@@ -50,13 +50,12 @@ public:
   Napi::Value GetKeyAs(const Napi::CallbackInfo&);
   Napi::Value Write(const Napi::CallbackInfo&);
   void WriteSync(const Napi::CallbackInfo&);
-  Napi::Value ToObject(const Napi::CallbackInfo&);
   Napi::Value Eq(const Napi::CallbackInfo&);
   PoDoFo::PdfDictionary& GetDictionary() { return obj->GetDictionary(); }
 
 private:
   //  Document* doc;
-  PoDoFo::PdfObject* obj;
+  std::shared_ptr<PoDoFo::PdfObject> obj;
   //  PoDoFo::PdfDictionary* dict;
 };
 }

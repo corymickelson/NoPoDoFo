@@ -25,8 +25,8 @@ import {Signer} from './signer';
 import {F_OK, R_OK} from "constants";
 import {IRef} from "./reference";
 import {IForm} from "./form";
-import {NPDFWriteMode} from "../dist/stream-document";
-import { BaseDocument, __mod } from './base-document'
+import {NPDFWriteMode} from "./stream-document";
+import { BaseDocument, __mod, IBase } from './base-document'
 
 export type Callback = (err: Error, data: Buffer | string) => void
 
@@ -73,14 +73,11 @@ export interface CreateFontOpts {
     fileName?: string
 }
 
-export interface IDocument {
+export interface IDocument extends IBase {
     password: string
     encrypt: IEncrypt
-    form: IForm
-    body: IObj[]
     trailer: IObj
     catalog: IObj
-    version: number
 
     load(file: string | Buffer,
          cb: Callback,
@@ -88,26 +85,8 @@ export interface IDocument {
          fromBuffer: boolean,
          password?: string): void
 
-    getPageCount(): number
-
-    getPage(n: number): IPage
-
-    appendDocument(doc: string | IDocument, password?: string): void
-
     splicePages(startIndex: number, count: number): void
-
-    isLinearized(): boolean
-
-    getWriteMode(): NPDFWriteMode
-
     write(destination: Callback | string, cb: Callback): void
-
-    getObject(ref: IRef): IObj
-
-    isAllowed(perm: ProtectionOption): boolean
-
-    createFont(opts: CreateFontOpts): IFont
-
     getFont(name: string): IFont
 }
 
@@ -167,13 +146,13 @@ export class Document extends BaseDocument {
 //         return this._instance.form
 //     }
 //
-//     set password(value: string) {
-//         this._password = value;
-//     }
-//
-//     get password(): string {
-//         throw EvalError('Password is not a retrievable property')
-//     }
+    set password(value: string) {
+        this._instance.password = value
+    }
+
+    get password(): string {
+        throw EvalError('Password is not a retrievable property')
+    }
 //
 //     get encrypt(): IEncrypt {
 //         if (this._encrypt) return this._encrypt
@@ -204,9 +183,9 @@ export class Document extends BaseDocument {
      * @returns void
      */
     constructor(file: string | Buffer, update: boolean = false, pwd?: string) {
-        super()
-        this._instance = new __mod.Document()
-        this.setInternal(this._instance)
+        super(undefined, false)
+        // this._instance = new __mod.Document()
+        // this.setInternal(this._instance)
         if (Buffer.isBuffer(file)) {
             this.load(file, update, pwd || '')
         } else {

@@ -22,19 +22,24 @@
 #include "../ValidateArguments.h"
 #include "Obj.h"
 
-namespace NoPoDoFo {
-
 using namespace Napi;
 using namespace PoDoFo;
 
 using std::string;
+using std::make_unique;
+using std::unique_ptr;
+using std::shared_ptr;
+
+namespace NoPoDoFo {
 
 Napi::FunctionReference Array::constructor; // NOLINT
 
 Array::Array(const CallbackInfo& info)
   : ObjectWrap<Array>(info)
-  , array(info[0].As<External<PdfArray>>().Data())
-{}
+{
+  shared_ptr<PdfObject> obj = Obj::Unwrap(info[0].As<Object>())->GetObject();
+  array = make_unique<PdfArray>(*obj.get());
+}
 
 void
 Array::Initialize(Napi::Env& env, Napi::Object& target)

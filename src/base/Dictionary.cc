@@ -43,16 +43,24 @@ FunctionReference Dictionary::constructor; // NOLINT
  */
 Dictionary::Dictionary(const CallbackInfo& info)
   : ObjectWrap(info)
-  , obj(info[0].As<External<PdfObject>>().Data())
-{}
-
-Dictionary::~Dictionary()
 {
-  HandleScope scope(Env());
-  cout << "Destructing Dictionary" << endl;
-  delete obj;
-  obj = nullptr;
+  if (!info[0].As<Object>().InstanceOf(Obj::constructor.Value())) {
+    TypeError::New(info.Env(), "requires Obj as parameter to constructor")
+      .ThrowAsJavaScriptException();
+    cout << "Obj required" << endl;
+    return;
+  } else {
+    obj = Obj::Unwrap(info[0].As<Object>())->GetObject();
+  }
 }
+
+// Dictionary::~Dictionary()
+//{
+//  HandleScope scope(Env());
+//  cout << "Destructing Dictionary" << endl;
+//  delete obj;
+//  obj = nullptr;
+//}
 
 void
 Dictionary::Initialize(Napi::Env& env, Napi::Object& target)
@@ -61,7 +69,7 @@ Dictionary::Initialize(Napi::Env& env, Napi::Object& target)
   Function ctor = DefineClass(
     env,
     "Dictionary",
-    { StaticMethod("tryGetDictionary", &Dictionary::ResolveDictionary),
+    { // StaticMethod("tryGetDictionary", &Dictionary::ResolveDictionary),
       InstanceMethod("getKey", &Dictionary::GetKey),
       InstanceMethod("getKeys", &Dictionary::GetKeys),
       InstanceMethod("hasKey", &Dictionary::HasKey),
@@ -74,7 +82,6 @@ Dictionary::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceMethod("clear", &Dictionary::Clear),
       InstanceMethod("write", &Dictionary::Write),
       InstanceMethod("writeSync", &Dictionary::WriteSync),
-      //      InstanceMethod("toObject", &Dictionary::ToObject),
       InstanceMethod("eq", &Dictionary::Eq) });
   constructor = Napi::Persistent(ctor);
   constructor.SuppressDestruct();
@@ -82,28 +89,28 @@ Dictionary::Initialize(Napi::Env& env, Napi::Object& target)
   target.Set("Dictionary", ctor);
 }
 
-Value
-Dictionary::ResolveDictionary(const CallbackInfo& info)
-{
-  auto doc = Document::Unwrap(info[0].As<Object>());
-  auto value = Obj::Unwrap(info[1].As<Object>())->GetObject();
-  if (value->IsReference()) {
-    value = doc->GetMemDocument()->GetObjects().GetObject(value->Reference());
-  }
-  return Dictionary::constructor.New(
-    { External<PdfObject>::New(info.Env(), new PdfObject(*value)) });
-}
+// Value
+// Dictionary::ResolveDictionary(const CallbackInfo& info)
+//{
+//  auto doc = Document::Unwrap(info[0].As<Object>());
+//  auto value = Obj::Unwrap(info[1].As<Object>())->GetObject();
+//  if (value->IsReference()) {
+//    value = doc->GetMemDocument()->GetObjects().GetObject(value->Reference());
+//  }
+//  return Dictionary::constructor.New(
+//    { External<PdfObject>::New(info.Env(), new PdfObject(*value)) });
+//}
 
-PdfDictionary&
-Dictionary::Resolve(PdfDocument* doc, PdfObject* candidate)
-{
-  if (candidate->IsDictionary()) {
-    return candidate->GetDictionary();
-  } else if (candidate->IsReference()) {
-    return Resolve(doc,
-                   doc->GetObjects()->GetObject(candidate->GetReference()));
-  }
-}
+// PdfDictionary&
+// Dictionary::Resolve(PdfDocument* doc, PdfObject* candidate)
+//{
+//  if (candidate->IsDictionary()) {
+//    return candidate->GetDictionary();
+//  } else if (candidate->IsReference()) {
+//    return Resolve(doc,
+//                   doc->GetObjects()->GetObject(candidate->GetReference()));
+//  }
+//}
 Napi::Value
 Dictionary::Eq(const CallbackInfo& info)
 {
@@ -136,7 +143,7 @@ Dictionary::AddKey(const CallbackInfo& info)
     } else if (v.IsObject() &&
                v.As<Object>().InstanceOf(Obj::constructor.Value())) {
       auto objWrap = info[1].As<Object>();
-      PdfObject* obj = Obj::Unwrap(objWrap)->GetObject();
+      PdfObject* obj = Obj::Unwrap(objWrap)->GetObject().get();
       if (obj->IsDictionary()) {
         GetDictionary().AddKey(key, obj->Reference());
         cout << "Adding key: " << key.GetName() << " as reference#"

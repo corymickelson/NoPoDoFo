@@ -29,15 +29,18 @@ class ContentsTokenizer : public Napi::ObjectWrap<ContentsTokenizer>
 {
 public:
   explicit ContentsTokenizer(const Napi::CallbackInfo&);
-  ~ContentsTokenizer();
+//  ~ContentsTokenizer();
   static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
   Napi::Value ReadAll(const Napi::CallbackInfo&);
 
 private:
-  PoDoFo::PdfContentsTokenizer* self;
-  Page* page;
-  Document* doc;
+  std::unique_ptr<PoDoFo::PdfContentsTokenizer> self;
+  std::shared_ptr<PoDoFo::PdfMemDocument> doc;
+
+//  Page* page;
+//  Document* doc;
+  int pIndex;
   void AddText(PoDoFo::PdfFont*, const PoDoFo::PdfString&, Napi::Array& out);
 };
 }

@@ -45,10 +45,10 @@ public:
   Napi::Value Pop(const Napi::CallbackInfo&);
   void Clear(const Napi::CallbackInfo&);
   Napi::Value Eq(const Napi::CallbackInfo&);
-  PoDoFo::PdfArray* GetArray() { return array; }
+  PoDoFo::PdfArray* GetArray() { return array.get(); }
 
 private:
-  PoDoFo::PdfArray* array;
+  std::unique_ptr<PoDoFo::PdfArray> array;
   Napi::Value GetObjAtIndex(const Napi::CallbackInfo&);
 };
 }

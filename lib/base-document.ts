@@ -76,7 +76,6 @@ export interface IBase {
     append(doc: string|IDocument): void
     isLinearized(): boolean
     getWriteMode():NPDFWriteMode
-    write(destination: string | Callback): void
     getObject(ref: IRef): IObj
     isAllowed(perm: ProtectionOption): boolean
     createFont(opts: CreateFontOpts): IFont
@@ -86,6 +85,9 @@ export interface IBase {
     createPages(rects: Rect[]): number
     getAttachment(uri: string): IFileSpec
     addDestination(page:IPage, destination: NPDFDestinationFit, name:string): void
+     
+    // debugging helper functions
+    __ptrCount(): number // Get the number of shared_ptr<PdfDocument> in use.
 }
 export interface IFileSpec {
     readonly name: string
@@ -153,7 +155,7 @@ export class BaseDocument extends EventEmitter {
             return encrypt
         }
     }
-    constructor() {
+    constructor(file?: string, createStream: boolean = false) {
         super()
     }
     /**

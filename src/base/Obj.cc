@@ -24,14 +24,15 @@
 #include "Dictionary.h"
 #include "Ref.h"
 
-namespace NoPoDoFo {
-
 using namespace Napi;
 using namespace PoDoFo;
 
 using std::cout;
 using std::endl;
+using std::make_shared;
 using std::string;
+
+namespace NoPoDoFo {
 
 FunctionReference Obj::constructor; // NOLINT
 
@@ -70,8 +71,10 @@ Obj::Initialize(Napi::Env& env, Napi::Object& target)
 
 Obj::Obj(const Napi::CallbackInfo& info)
   : ObjectWrap<Obj>(info)
-  , obj(info[0].As<External<PdfObject>>().Data())
-{}
+{
+  auto objRef = info[0].As<External<PdfObject>>().Data();
+  obj = make_shared<PdfObject>(*objRef);
+}
 
 void
 Obj::Clear(const Napi::CallbackInfo& info)
@@ -263,13 +266,7 @@ Obj::GetArray(const CallbackInfo& info)
   if (!obj->IsArray()) {
     throw Napi::Error::New(info.Env(), "Obj only accessible as array");
   }
-  auto ptr = External<PdfArray>::New(info.Env(),
-                                     new PdfArray(obj->GetArray()),
-                                     [](Napi::Env env, PdfArray* data) {
-                                       HandleScope scope(env);
-                                       delete data;
-                                     });
-  auto instance = NoPoDoFo::Array::constructor.New({ ptr });
+  auto instance = Array::constructor.New({ this->Value() });
   return instance;
 }
 
@@ -302,8 +299,7 @@ Obj::GetDictionary(const CallbackInfo& info)
   if (!obj->IsDictionary()) {
     throw Napi::Error::New(info.Env(), "Obj only accessible as Dictionary");
   }
-  return Dictionary::constructor.New(
-    { External<PdfObject>::New(info.Env(), new PdfObject(*obj)) });
+  return Dictionary::constructor.New({ this->Value() });
 }
 
 Napi::Value

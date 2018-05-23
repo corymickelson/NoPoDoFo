@@ -2,7 +2,7 @@
  * This file is part of the NoPoDoFo (R) project.
  * Copyright (c) 2017-2018
  * Authors: Cory Mickelson, et al.
- * 
+ *
  * NoPoDoFo is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -20,44 +20,48 @@
 #include "ContentsTokenizer.h"
 #include "../ValidateArguments.h"
 #include "../doc/Page.h"
+#include "../doc/StreamDocument.h"
 #include <iostream>
 #include <stack>
 
-
+using namespace Napi;
+using namespace PoDoFo;
+using std::make_unique;
+using std::unique_ptr;
 
 namespace NoPoDoFo {
 
-using namespace Napi;
-using namespace PoDoFo;
-
 FunctionReference ContentsTokenizer::constructor; // NOLINT
 
+/**
+ * @note JS new ContentsTokenizer(doc: IBase, pageIndex: number)
+ * @param info
+ */
 ContentsTokenizer::ContentsTokenizer(const Napi::CallbackInfo& info)
   : ObjectWrap(info)
+  , pIndex(info[1].As<Number>().Int32Value())
 {
-  AssertFunctionArgs(info, 2, { napi_object, napi_object });
-  auto wrap = info[0].As<Object>();
-  if (!wrap.InstanceOf(Page::constructor.Value())) {
-    throw Error::New(info.Env(), "must be an instance of Page");
+  auto dWrap = info[0].As<Object>();
+  if (dWrap.InstanceOf(Document::constructor.Value())) {
+    doc = Document::Unwrap(dWrap)->GetMemDocument();
+  } else {
+    throw Error::New(info.Env(),
+                     "must be an instance of Document. This class does not "
+                     "work with StreamDocument currently.");
   }
-  auto dWrap = info[1].As<Object>();
-  if (!dWrap.InstanceOf(Document::constructor.Value())) {
-    throw Error::New(info.Env(), "must be an instance of Document");
-  }
-  doc = Document::Unwrap(dWrap);
-  page = Page::Unwrap(wrap);
-  self = new PdfContentsTokenizer(Page::Unwrap(wrap)->GetPage());
+
+  self = make_unique<PdfContentsTokenizer>(doc->GetPage(pIndex));
 }
 
-ContentsTokenizer::~ContentsTokenizer()
-{
-  if (self != nullptr) {
-    HandleScope scope(Env());
-    delete self;
-    page = nullptr;
-    doc = nullptr;
-  }
-}
+// ContentsTokenizer::~ContentsTokenizer()
+//{
+//  if (self != nullptr) {
+//    HandleScope scope(Env());
+//    delete self;
+//    page = nullptr;
+//    doc = nullptr;
+//  }
+//}
 
 void
 ContentsTokenizer::Initialize(Napi::Env& env, Napi::Object& target)
@@ -115,11 +119,11 @@ ContentsTokenizer::ReadAll(const CallbackInfo& info)
           stack.pop();
           PdfName fontName = stack.top().GetName();
           PdfObject* pFont =
-            page->GetPage()->GetFromResources(PdfName("Font"), fontName);
+            doc->GetPage(pIndex)->GetFromResources(PdfName("Font"), fontName);
           if (!pFont) {
             throw Error::New(info.Env(), "Failed to create font");
           }
-          font = doc->GetMemDocument()->GetFont(pFont);
+          font = doc->GetFont(pFont);
           if (!font) {
             throw Error::New(info.Env(), "Failed to create font");
           }

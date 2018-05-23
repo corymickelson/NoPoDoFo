@@ -17,8 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import { Page } from "./page";
-import  {__mod} from "./base-document";
+import {__mod, IBase} from "./base-document";
 import {Document } from "./document";
+
+export interface IContentsTokenizer {
+    new(doc: IBase, pageIndex: number): IContentsTokenizer
+    readAll(): string
+}
 
 /**
  * This class is a parser for content streams in PDF documents.

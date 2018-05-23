@@ -28,16 +28,16 @@ class Data : public Napi::ObjectWrap<Data>
 {
 public:
   explicit Data(const Napi::CallbackInfo&);
-  ~Data();
+//  ~Data();
   static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
   void Write(const Napi::CallbackInfo&);
   Napi::Value Value(const Napi::CallbackInfo&);
 
-  PoDoFo::PdfData* GetData() { return self; }
+//  PoDoFo::PdfData* GetData() { return self; }
 
 private:
-  PoDoFo::PdfData* self;
+  std::unique_ptr<PoDoFo::PdfData> self;
 };
 }
 #endif

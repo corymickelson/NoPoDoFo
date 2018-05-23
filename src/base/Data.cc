@@ -2,7 +2,7 @@
  * This file is part of the NoPoDoFo (R) project.
  * Copyright (c) 2017-2018
  * Authors: Cory Mickelson, et al.
- * 
+ *
  * NoPoDoFo is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -25,32 +25,46 @@ using namespace PoDoFo;
 using namespace Napi;
 
 using std::string;
+using std::make_unique;
+using std::unique_ptr;
 
 namespace NoPoDoFo {
 
 FunctionReference Data::constructor; // NOLINT
 
+/**
+ * @note JS new Data(data:string|Buffer)
+ * @param info
+ */
 Data::Data(const Napi::CallbackInfo& info)
   : ObjectWrap(info)
 {
-  if (info.Length() == 1 && info[0].Type() == napi_external) {
-    self = info[0].As<External<PdfData>>().Data();
-  } else if (info.Length() == 1 && info[0].IsString()) {
-    string strData = info[0].As<String>().Utf8Value();
-    self = new PdfData(strData.c_str());
+  if (info.Length() != 1) {
+    TypeError::New(info.Env(), "Requires a string or Buffer")
+      .ThrowAsJavaScriptException();
+    return;
   } else {
-    throw Napi::TypeError::New(info.Env(),
-                               "Data requires parameter of string or external");
+    if (info[0].IsString()) {
+    string strData = info[0].As<String>().Utf8Value();
+    self = make_unique<PdfData>(strData.c_str());
+    } else if (info[0].IsBuffer()) {
+      auto bData = info[0].As<Buffer<char>>().Data();
+      self = make_unique<PdfData>(bData);
+    } else {
+      TypeError::New(info.Env(), "Requires a string or Buffer")
+        .ThrowAsJavaScriptException();
+      return;
+    }
   }
 }
 
-Data::~Data()
-{
-  if (self != nullptr) {
-    HandleScope scope(Env());
-    delete self;
-  }
-}
+//Data::~Data()
+//{
+//  if (self != nullptr) {
+//    HandleScope scope(Env());
+//    delete self;
+//  }
+//}
 
 void
 Data::Initialize(Napi::Env& env, Napi::Object& target)
