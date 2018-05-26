@@ -16,8 +16,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import {__mod} from "./base-document";
-import {Callback, Document, IDocument} from './document'
+import {Callback, __mod, IDocument} from './document'
 import {ISignatureField, SignatureField} from "./field";
 import {access} from "fs";
 import {F_OK, R_OK} from 'constants'
@@ -33,7 +32,7 @@ export interface ISigner {
  */
 export class Signer {
     private _instance: any
-    constructor(doc: Document, output?: string) {
+    constructor(doc: IDocument, output?: string) {
         if (output) {
             this._instance = new __mod.Signer((doc as any)._instance, output)
 

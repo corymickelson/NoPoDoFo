@@ -24,10 +24,13 @@
 #include "Page.h"
 #include "Painter.h"
 
-namespace NoPoDoFo {
-
 using namespace PoDoFo;
 using namespace Napi;
+
+using std::cout;
+using std::endl;
+
+namespace NoPoDoFo {
 
 FunctionReference SimpleTable::constructor; // NOLINT
 

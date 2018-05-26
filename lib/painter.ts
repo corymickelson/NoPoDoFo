@@ -16,12 +16,11 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import {IPage, Page} from './page'
-import {Image} from './image'
+import {IPage} from './page'
+import {IImage} from './image'
 import {Stream} from './stream'
-import {Document} from './document'
-import {__mod} from './base-document'
-import {Rect} from "./rect";
+import {IBase} from './base-document'
+import {IRect} from "./rect";
 import {NPDFPoint} from "./painter";
 import { IObj } from './object';
 
@@ -95,235 +94,56 @@ export enum NPDFAlignment {
     Bottom
 }
 
-export class Painter {
-    private _instance: any
-
-    get page() {
-        return this._instance.page
-    }
-
-    set page(value: Page) {
-        this._instance.page = (value as any)._instance
-    }
-
-    get tabWidth(): number {
-        return this._instance.tabWidth
-    }
-
-    set tabWidth(value:number) {
-        this._instance.tabWidth = value
-    }
-
-    get canvas(): Stream {
-        return this._instance.canvas
-    }
-
-    get font(): Font {
-        const instance = this._instance.font
-        return new Font(instance)
-    }
-
-    set font(font:Font) {
-        this._instance.font = (font as any)._instance
-    }
-
-    get precision():number {
-        return this._instance.precision
-    }
-
-    set precision(value:number) {
-        this._instance.precision = value
-    }
-
-    constructor(doc:Document, page?: IPage) {
-        this._instance = new __mod.Painter((doc as any)._instance)
-        if (page)
-            this._instance.page = (page as any)._instance
-    }
-
-    setColor(rgb:NPDFrgb):void {
-        this._instance.setColor(rgb)
-    }
-
-    setStrokeWidth(w:number):void {
-        this._instance.setStrokeWidth(w)
-    }
-
-    setGrey(v:number): void {
-        if(v < 0.0 || v >1.0) {
-            throw RangeError('grey value must be between 0 and 1')
-        }
-        this._instance.setGrey(v)
-    }
-
-    setStrokingGrey(v:number): void {
-        if(v < 0.0 || v >1.0) {
-            throw RangeError('grey value must be between 0 and 1')
-        }
-        this._instance.setStrokingGrey(v)
-    }
-
-    setColorCMYK(cmyk: NPDFcmyk):void {
-        this._instance.setColorCMYK(cmyk)
-    }
-
-    setStrokingColorCMYK(cmyk:NPDFcmyk): void {
-        this._instance.setStrokingColorCMYK(cmyk)
-    }
-
-    setStrokeStyle(style: NPDFStokeStyle): void {
-        this._instance.setStrokeStyle(style)
-    }
-
-    setLineCapStyle(style: NPDFLineCapStyle): void {
-        this._instance.setLineCapStyle(style)
-    }
-
-    setLineJoinStyle(style:NPDFLineJoinStyle): void {
-        this._instance.setLineJoinStyle(style)
-    }
-
-    setClipRect(rect:Rect): void {
-        if(rect instanceof Rect) {
-            this._instance.setClipRect((rect as any)._instance)
-        }
-        else throw TypeError('clip rect requires argument type Rect')
-    }
-
-    setMiterLimit(v:number): void {
-        this._instance.setMiterLimit(v)
-    }
-
-    rectangle(rect:Rect): void {
-         if(rect instanceof Rect) {
-            this._instance.rectangle((rect as any)._instance)
-        }
-        else throw TypeError('rectangle requires argument type Rect')
-    }
-
-    ellipse(points:NPDFPoint & {width:number, height:number}): void {
-        this._instance.ellipse(points)
-    }
-
-    circle(points:NPDFPoint & {radius: number}): void {
-        this._instance.circle(points)
-    }
-
-    closePath(): void {
-        this._instance.closePath()
-    }
-
-    lineTo(point:NPDFPoint): void {
-        this._instance.lineTo(point)
-    }
-
-    moveTo(point:NPDFPoint): void {
-        this._instance.moveTo(point)
-    }
-
-    cubicBezierTo(p1:NPDFPoint, p2:NPDFPoint, p3:NPDFPoint): void {
-        this._instance.cubicBezierTo(p1, p2, p3)
-    }
-
-    horizontalLineTo(v:number): void {
-        this._instance.horizontalLineTo(v)
-    }
-
-    verticalLineTo(v:number): void {
-        this._instance.verticalLineTo(v)
-    }
-    smoothCurveTo(p1:NPDFPoint, p2:NPDFPoint): void {
-        this._instance.smoothCurveTo(p1, p2)
-    }
-
-    quadCurveTo(p1:NPDFPoint, p2:NPDFPoint): void {
-        this._instance.quadCurveTo(p1, p2)
-    }
-
-    arcTo(p1:NPDFPoint, p2:NPDFPoint, rotation:number, large:boolean = false, sweep:boolean = false): void {
-        this._instance.arcTo(p1, p2, rotation, large, sweep)
-    }
-
-    close(): void {
-        this._instance.close()
-    }
-
-    stroke(): void {
-        this._instance.stroke()
-    }
-
-    fill(): void {
-        this._instance.fill()
-    }
-
-    strokeAndFill(): void {
-        this._instance.strokeAndFill()
-    }
-
-    endPath(): void {
-        this._instance.endPath()
-    }
-
-    clip(): void {
-        this._instance.clip()
-    }
-
-    save():void {
-        this._instance.save()
-    }
-
-    restore(): void {
-        this._instance.restore()
-    }
-
-    setExtGState(state:ExtGState): void {
-        this._instance.setExtGState(state)
-    }
-
-    getCurrentPath(): string {
-        return this._instance.getCurrentPath()
-    }
-
-    drawLine(p1:NPDFPoint, p2:NPDFPoint): void {
-        this._instance.drawLine(p1, p2)
-    }
-
-    drawText(point:NPDFPoint, text:string): void {
-        this._instance.drawText(point, text)
-    }
-
-    drawTextAligned(point:NPDFPoint, text:string, alignment:NPDFAlignment): void {
-        this._instance.drawTextAligned(point, text, alignment)
-    }
-
-    getMultiLineText(width:number, text:string, skipSpaces:boolean = false):Array<string> {
-        return this._instance.getMultiLineText(width, text, skipSpaces)
-    }
-
-    bt(point:NPDFPoint): void {
-        this._instance.beginText(point)
-    }
-
-    et(): void {
-        this._instance.endText()
-    }
-
-    addText(text:string): void {
-        this._instance.addText(text)
-    }
-
-    moveTextPosition(point:NPDFPoint): void {
-        this._instance.moveTextPosition(point)
-    }
-
-    drawGlyph(point:NPDFPoint, glyph:string): void {
-        this._instance.drawGlyph(point, glyph)
-    }
-
-    finishPage(): void {
-        this._instance.finishPage()
-    }
-
+export interface IPainter {
+    tabWidth: number
+    readonly canvas: Stream
+    font?: IFont
+    precision: number
+    new(doc:IBase):IPainter
+    setPage(page: IPage): void
+    setColor(rgb:NPDFrgb):void
+    setStrokeWidth(w:number):void
+    setGrey(v:number): void
+    setStrokingGrey(v:number): void
+    setColorCMYK(cmyk: NPDFcmyk):void
+    setStrokingColorCMYK(cmyk:NPDFcmyk): void
+    setStrokeStyle(style: NPDFStokeStyle): void
+    setLineCapStyle(style: NPDFLineCapStyle): void
+    setLineJoinStyle(style:NPDFLineJoinStyle): void
+    setClipRect(rect:IRect): void
+    setMiterLimit(v:number): void
+    rectangle(rect:IRect): void
+    ellipse(points:NPDFPoint & {width:number, height:number}): void
+    circle(points:NPDFPoint & {radius: number}): void
+    closePath(): void
+    lineTo(point:NPDFPoint): void
+    moveTo(point:NPDFPoint): void
+    cubicBezierTo(p1:NPDFPoint, p2:NPDFPoint, p3:NPDFPoint): void
+    horizontalLineTo(v:number): void
+    verticalLineTo(v:number): void
+    smoothCurveTo(p1:NPDFPoint, p2:NPDFPoint): void
+    quadCurveTo(p1:NPDFPoint, p2:NPDFPoint): void
+    arcTo(p1:NPDFPoint, p2:NPDFPoint, rotation:number, large?:boolean, sweep?:boolean): void
+    close(): void
+    stroke(): void
+    fill(): void
+    strokeAndFill(): void
+    endPath(): void
+    clip(): void
+    save():void
+    restore(): void
+    setExtGState(state:IExtGState): void
+    getCurrentPath(): string
+    drawLine(p1:NPDFPoint, p2:NPDFPoint): void
+    drawText(point:NPDFPoint, text:string): void
+    drawTextAligned(point:NPDFPoint, text:string, alignment:NPDFAlignment): void
+    getMultiLineText(width:number, text:string, skipSpaces?:boolean):Array<string>
+    bt(point:NPDFPoint): void
+    et(): void
+    addText(text:string): void
+    moveTextPosition(point:NPDFPoint): void
+    drawGlyph(point:NPDFPoint, glyph:string): void
+    finishPage(): void
     /**
      *
      * @param {Image} img - an instance of Image
@@ -331,15 +151,11 @@ export class Painter {
      * @param {number} y - y coordinate (bottom position of image)
      * @param {{width:number, heigth:number}} scale - optional scaling
      */
-    drawImage(img: Image, x: number, y: number, scale?: { width: number, height: number }): void {
-        scale ?
-            this._instance.drawImage((img as any)._instance, x, y, scale.width, scale.height) :
-            this._instance.drawImage((img as any)._instance, x, y)
-    }
+    drawImage(img: IImage, x: number, y: number, scale?: { width: number, height: number }): void
 
 }
 
-export interface FontMetrics {
+export interface NPDFFontMetrics {
     lineSpacing: number
     underlineThickness: number
     underlinePosition: number
@@ -366,116 +182,17 @@ export interface IFont {
     identifier: string
     isBold(): boolean
     isItalic(): boolean
-    getEncoding(): Encoding
-    getMetrics(): FontMetrics
+    getEncoding(): IEncoding
+    getMetrics(): NPDFFontMetrics
     stringWidth(v:string): number
     write(content: string, stream: Stream): void
     embed(): void
 }
-export class Font {
-    public get object() {
-        return this._instance.object
-    }
-    public get size() {
-        return this._instance.size
-    }
-
-    public set size(value: number) {
-        this._instance.size = value
-    }
-
-    public get scale() {
-        return this._instance.scale
-    }
-
-    public set scale(value: number) {
-        this._instance.scale = value
-    }
-
-    public get charSpace() {
-        return this._instance.charSpace
-    }
-
-    public set(value: number) {
-        this._instance.charSpace = value
-    }
-
-    public get wordSpace() {
-        return this._instance.wordSpace
-    }
-
-    public set wordSpace(value: number) {
-        this._instance.wordSpace = value
-    }
-
-    public get underline() {
-        return this._instance.underline
-    }
-
-    public set underline(value: boolean) {
-        this._instance.underline = value
-    }
-
-    public get strikeOut() {
-        return this._instance.strikeOut
-    }
-
-    public set strikeOut(value: boolean) {
-        this._instance.strikeOut = value
-    }
-
-    constructor(private _instance: any) {
-    }
-
-    isBold(): boolean {
-        return this._instance.isBold()
-    }
-
-    isItalic(): boolean {
-        return this._instance.isItalic()
-    }
-
-    getIdentifier(): string {
-        return this._instance.getIdentifier()
-    }
-
-    getEncoding(): Encoding {
-        const instance = this._instance.getEncoding()
-        return new Encoding(instance)
-    }
-
-    getMetrics(): FontMetrics {
-        return this._instance.getMetrics()
-    }
-
-    stringWidth(v:string): number {
-        return this._instance.stringWidth(v)
-    }
-
-    write(content: string, stream: Stream): void {
-        this._instance.write(content, (stream as any)._instance)
-    }
-
-    embed(): void {
-        this._instance.embed()
-    }
-}
-
-export class Encoding {
-    constructor(private _instance: any) {
-    }
-
-    addToDictionary(target: {[key:string]: IObj}): void {
-        this._instance.addToDictionary(target)
-    }
-
-    convertToUnicode(content: string, font: Font): string {
-        return this._instance.convertToUnicode(content, (font as any)._instance)
-    }
-
-    convertToEncoding(content: string, font: Font): Buffer {
-        return this._instance.convertToEncoding(content, (font as any)._instance)
-    }
+export interface IEncoding {
+    new(): IEncoding
+    addToDictionary(target:IObj): void
+    convertToUnicode(content:string, font: IFont): string
+    convertToEncoding(content: string, font: IFont): Buffer
 }
 
 export enum NPDFBlendMode {
@@ -502,35 +219,16 @@ export enum NPDFRenderingIntent {
     Perceptual = "Perceptual",
     Saturation = "Saturation"
 }
-export class ExtGState {
-    constructor(private _instance:any) {}
-
-    setFillOpacity(v:number):void {
-        this._instance.setFillOpacity(v)
-    }
-    setBlendMode(mode:NPDFBlendMode):void {
-        this._instance.setBlendMode(mode)
-    }
-    setOverprint(v: boolean):void {
-        this._instance.setOverprint(v)
-    }
-    setFillOverprint(v:boolean):void {
-        this._instance.setFillOverprint(v)
-    }
-    setStrokeOpacity(v:number): void {
-        this._instance.setStrokeOpacity(v)
-    }
-    setStrokeOverprint(v:boolean):void {
-        this._instance.setStrokeOverprint(v)
-    }
-    setNonZeroOverprint(v:boolean):void {
-        this._instance.setNonZeroOverprint(v)
-    }
-    setRenderingIntent(intent:NPDFRenderingIntent): void {
-        this._instance.setRenderingIntent(intent)
-    }
-    setFrequency(v:number):void {
-        this._instance.setFrequency(v)
-    }
+export interface IExtGState {
+    new(): IExtGState
+    setFillOpacity(v:number):void
+    setBlendMode(mode:NPDFBlendMode):void
+    setOverprint(v: boolean):void
+    setFillOverprint(v:boolean):void
+    setStrokeOpacity(v:number): void
+    setStrokeOverprint(v:boolean):void
+    setNonZeroOverprint(v:boolean):void
+    setRenderingIntent(intent:NPDFRenderingIntent): void
+    setFrequency(v:number):void
 
 }

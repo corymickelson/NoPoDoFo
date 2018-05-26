@@ -22,7 +22,6 @@
 #include "../ValidateArguments.h"
 #include "../base/Names.h"
 #include "../base/Obj.h"
-#include "../base/Ref.h"
 #include "../doc/Rect.h"
 #include "Encrypt.h"
 #include "FileSpec.h"
@@ -40,18 +39,24 @@ using std::string;
 
 namespace NoPoDoFo {
 
+/**
+ * @note JS Derived class instantiate new BaseDocument<T>(string: filePath,
+ * opts: {version, writeMode, encrypt})
+ * @brief BaseDocument::BaseDocument
+ * @param info
+ */
 BaseDocument::BaseDocument(const Napi::CallbackInfo& info)
 {
-  if (info.Length() == 2 && info[1].IsBoolean() && info[0].IsString()) {
-    create = info[1].As<Boolean>();
+  if (info.Length() >= 1 && info[0].IsString()) {
+    create = true;
     output = info[0].As<String>().Utf8Value();
   }
   if (create) {
     EPdfVersion version = ePdfVersion_1_7;
     EPdfWriteMode writeMode = ePdfWriteMode_Default;
     PdfEncrypt* encrypt = nullptr;
-    if (info.Length() >= 3 && info[2].IsObject()) {
-      auto nObj = info[2].As<Object>();
+    if (info.Length() >= 2 && info[1].IsObject()) {
+      auto nObj = info[1].As<Object>();
       if (nObj.Has("version")) {
         version = static_cast<EPdfVersion>(
           nObj.Get("version").As<Number>().Uint32Value());
@@ -62,8 +67,7 @@ BaseDocument::BaseDocument(const Napi::CallbackInfo& info)
       }
       if (nObj.Has("encrypt")) {
         auto nEncObj = Encrypt::Unwrap(nObj.Get("encrypt").As<Object>());
-        encrypt =
-            const_cast<PdfEncrypt*>(nEncObj->encrypt);
+        encrypt = const_cast<PdfEncrypt*>(nEncObj->encrypt);
       }
     }
     document = make_shared<PdfStreamedDocument>(
@@ -207,8 +211,8 @@ BaseDocument::SetLanguage(const CallbackInfo&, const Napi::Value& value)
 void
 BaseDocument::AttachFile(const CallbackInfo& info)
 {
-  string filepath = info[0].As<String>().Utf8Value();
-  PdfFileSpec attachment(filepath.c_str(), true, document.get());
+  auto value = info[0].As<String>().Utf8Value();
+  PdfFileSpec attachment(value.c_str(), true, document.get());
   document->AttachFile(attachment);
 }
 
@@ -280,6 +284,9 @@ BaseDocument::GetObjects(const CallbackInfo& info)
     auto js = Array::New(info.Env());
     uint32_t count = 0;
     for (auto item : *document->GetObjects()) {
+      if(item->IsReference()) {
+        item = item->GetOwner()->GetObject(item->GetReference());
+      }
       auto instance = External<PdfObject>::New(info.Env(), item);
       js[count] = Obj::constructor.New({ instance });
       ++count;
@@ -296,8 +303,8 @@ BaseDocument::GetObjects(const CallbackInfo& info)
 Napi::Value
 BaseDocument::GetObject(const CallbackInfo& info)
 {
-  auto ref = Ref::Unwrap(info[0].As<Object>());
-  PdfObject* target = document->GetObjects()->GetObject(ref->GetRef());
+  auto ref = Obj::Unwrap(info[0].As<Object>())->GetObject();
+  PdfObject* target = document->GetObjects()->GetObject(ref->GetReference());
   return Obj::constructor.New({ External<PdfObject>::New(info.Env(), target) });
 }
 
@@ -333,18 +340,18 @@ BaseDocument::IsAllowed(const CallbackInfo& info)
 Napi::Value
 BaseDocument::CreateFont(const CallbackInfo& info)
 {
-  auto fontName = info[0].As<String>().Utf8Value();
-  bool bold = false;
-  bool italic = false;
-  const PdfEncoding* encoding = nullptr;
-  bool embed = false;
-  const char* filename = nullptr;
-  if (info.Length() >= 2 && info[1].IsBoolean())
-    bold = info[1].As<Boolean>();
-  if (info.Length() >= 3 && info[2].IsBoolean())
-    italic = info[2].As<Boolean>();
-  if (info.Length() >= 4 && info[3].IsNumber()) {
-    int n = info[3].As<Number>();
+  auto opts = info[0].As<Object>();
+  if(!opts.Has("fontName")) {
+    TypeError::New(info.Env(), "Requires fontName").ThrowAsJavaScriptException();
+    return info.Env().Undefined();
+  }
+  auto fontName = opts.Get("fontName").As<String>().Utf8Value();
+  bool bold = opts.Has("bold") ? opts.Get("bold").As<Boolean>() : false;
+  bool italic = opts.Has("italic") ? opts.Get("italic").As<Boolean>() : false;
+  bool embed = opts.Has("embed") ? opts.Get("embed").As<Boolean>() : false;
+  const PdfEncoding* encoding =  nullptr;
+  string filename = opts.Has("fileName") ? opts.Get("fileName").As<String>().Utf8Value() : "";
+  int n = opts.Has("encoding") ? opts.Get("encoding").As<Number>() : 1;
     switch (n) {
       case 1:
         encoding = new PdfWinAnsiEncoding();
@@ -376,11 +383,6 @@ BaseDocument::CreateFont(const CallbackInfo& info)
       default:
         encoding = new PdfIdentityEncoding(0, 0xffff, true);
     }
-  }
-  if (info.Length() >= 5 && info[4].IsBoolean())
-    embed = info[4].As<Boolean>();
-  if (info.Length() >= 6 && info[5].IsString())
-    filename = info[5].As<String>().Utf8Value().c_str();
   try {
     PdfFont* font =
       document->CreateFont(fontName.c_str(),
@@ -390,11 +392,12 @@ BaseDocument::CreateFont(const CallbackInfo& info)
                            encoding,
                            PdfFontCache::eFontCreationFlags_AutoSelectBase14,
                            embed,
-                           filename);
+                           filename.empty() ? nullptr : filename.c_str());
     return Font::constructor.New({ External<PdfFont>::New(info.Env(), font) });
   } catch (PdfError& err) {
     ErrorHandler(err, info);
   }
+  return info.Env().Undefined();
 }
 /**
  * @note Javascript args (doc:Document, pageN:number, atN:number)
@@ -449,9 +452,8 @@ Napi::Value
 BaseDocument::CreatePage(const CallbackInfo& info)
 {
   auto r = Rect::Unwrap(info[0].As<Object>())->GetRect();
-  document->CreatePage(*r);
-  //  return Page::constructor.New(
-  //    { External<PdfPage>::New(info.Env(), document->CreatePage(*r)) });
+  auto page = document->CreatePage(*r);
+  return Page::constructor.New({ External<PdfPage>::New(info.Env(), page) });
 }
 Napi::Value
 BaseDocument::CreatePages(const Napi::CallbackInfo& info)

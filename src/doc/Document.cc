@@ -22,7 +22,6 @@
 #include "../ValidateArguments.h"
 #include "../base/Names.h"
 #include "../base/Obj.h"
-#include "../base/Ref.h"
 #include "Encrypt.h"
 #include "Font.h"
 #include "Form.h"
@@ -78,6 +77,7 @@ Document::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceMethod("attachFile", &Document::AttachFile),
       InstanceMethod("insertExistingPage", &Document::InsertExistingPage),
       InstanceMethod("insertPage", &Document::InsertPage),
+      InstanceMethod("insertPages", &Document::InsertPages),
       InstanceMethod("append", &Document::Append),
       InstanceMethod("isLinearized", &Document::IsLinearized),
       InstanceMethod("getWriteMode", &Document::GetWriteMode),
@@ -160,6 +160,7 @@ Document::GetFont(const CallbackInfo& info)
   } catch (PdfError& err) {
     ErrorHandler(err, info);
   }
+  return info.Env().Undefined();
 }
 
 void
@@ -221,10 +222,7 @@ Document::GetTrailer(const CallbackInfo& info)
   const PdfObject* trailerPdObject = document->GetTrailer();
   auto ptr = const_cast<PdfObject*>(trailerPdObject);
   auto initPtr = Napi::External<PdfObject>::New(
-    info.Env(), new PdfObject(*ptr), [](Napi::Env env, PdfObject* data) {
-      HandleScope scope(env);
-      delete data;
-    });
+    info.Env(), ptr);
   auto instance = Obj::constructor.New({ initPtr });
   return instance;
 }
@@ -235,10 +233,7 @@ Document::GetCatalog(const CallbackInfo& info)
   const PdfObject* catalog = document->GetCatalog();
   auto ptr = const_cast<PdfObject*>(catalog);
   auto initPtr = Napi::External<PdfObject>::New(
-    info.Env(), new PdfObject(*ptr), [](Napi::Env env, PdfObject* data) {
-      HandleScope scope(env);
-      delete data;
-    });
+    info.Env(), ptr);
   auto instance = Obj::constructor.New({ initPtr });
   return instance;
 }
@@ -517,16 +512,11 @@ Document::GC(const Napi::CallbackInfo& info)
   worker->Queue();
   return info.Env().Undefined();
 }
-/**
- * @todo How to return page to user if Page constructor requires an instance of
- * ObjectWrapped<Document>
- * @param info
- * @return
- */
+
 Napi::Value
 Document::CreatePage(const Napi::CallbackInfo& info)
 {
-  BaseDocument::CreatePage(info);
+  return BaseDocument::CreatePage(info);
 }
 Napi::Value
 Document::GetSharedPtrCount(const Napi::CallbackInfo& info)
@@ -537,10 +527,35 @@ Napi::Value
 Document::GetEncrypt(const Napi::CallbackInfo& info)
 {
   auto enc = document->GetEncrypt();
-  if(!enc) {
+  if (!enc) {
     return info.Env().Null();
   }
-  return Encrypt::constructor.New({ External<PdfEncrypt>::New(
-    info.Env(), const_cast<PdfEncrypt*>(enc)) });
+  return Encrypt::constructor.New(
+    { External<PdfEncrypt>::New(info.Env(), const_cast<PdfEncrypt*>(enc)) });
+}
+Napi::Value
+Document::InsertPages(const Napi::CallbackInfo& info)
+{
+  if (info.Length() < 3) {
+    Error::New(info.Env(), "Expected args: IDocument, number, number")
+      .ThrowAsJavaScriptException();
+    return info.Env().Undefined();
+  }
+  if (!info[0].IsObject() ||
+      !info[0].As<Object>().InstanceOf(Document::constructor.Value())) {
+    TypeError::New(info.Env(), "Requires an instance of Document")
+      .ThrowAsJavaScriptException();
+    return info.Env().Undefined();
+  }
+  if (!info[1].IsNumber() || !info[2].IsNumber()) {
+    TypeError::New(info.Env(), "Requires a start and end range")
+      .ThrowAsJavaScriptException();
+    return info.Env().Undefined();
+  }
+  auto pagesDoc = Document::Unwrap(info[0].As<Object>())->GetMemDocument();
+  int start = info[1].As<Number>();
+  int end = info[2].As<Number>();
+  document->InsertPages(pagesDoc.get(), start, end);
+  return Number::New(info.Env(), document->GetPageCount());
 }
 }

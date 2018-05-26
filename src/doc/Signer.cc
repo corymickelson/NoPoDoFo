@@ -115,7 +115,7 @@ Signer::Sign(const CallbackInfo& info)
 
     string data, output;
     string sigStr = info[0].As<String>().Utf8Value();
-    pdf_long sigStrLength = static_cast<pdf_long>(sigStr.size());
+    auto sigStrLength = static_cast<pdf_long>(sigStr.size());
 
     if (field->GetFieldName().GetStringUtf8().empty()) {
       field->SetFieldName("NoPoDoFo::SignatureField");
@@ -153,6 +153,7 @@ Signer::Sign(const CallbackInfo& info)
   } catch (Error& err) {
     ErrorHandler(err, info);
   }
+  return info.Env().Undefined();
 }
 
 class SignAsync : public AsyncWorker

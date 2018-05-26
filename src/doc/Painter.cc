@@ -48,11 +48,12 @@ Painter::Painter(const Napi::CallbackInfo& info)
   if (o.InstanceOf(Document::constructor.Value())) {
     isMemDoc = true;
     document = Document::Unwrap(o)->GetBaseDocument();
-  } else if(o.InstanceOf(StreamDocument::constructor.Value())) {
+  } else if (o.InstanceOf(StreamDocument::constructor.Value())) {
     isMemDoc = false;
     document = StreamDocument::Unwrap(o)->GetBaseDocument();
   } else {
-    TypeError::New(info.Env(), "requires an instance of BaseDocument").ThrowAsJavaScriptException();
+    TypeError::New(info.Env(), "requires an instance of BaseDocument")
+      .ThrowAsJavaScriptException();
     return;
   }
   painter = make_unique<PdfPainter>();
@@ -65,8 +66,7 @@ Painter::Initialize(Napi::Env& env, Napi::Object& target)
   Napi::Function ctor = DefineClass(
     env,
     "Painter",
-    {
-      InstanceAccessor(
+    { InstanceAccessor(
         "tabWidth", &Painter::GetTabWidth, &Painter::SetTabWidth),
       InstanceAccessor(
         "precision", &Painter::GetPrecision, &Painter::SetPrecision),
@@ -130,7 +130,6 @@ Painter::SetPage(const Napi::CallbackInfo& info)
   }
   auto page = Page::Unwrap(info[0].As<Object>());
   painter->SetPage(page->GetPage());
-  pageSize = page->GetPage()->GetPageSize();
 }
 
 void
@@ -357,6 +356,9 @@ Painter::SetFont(const Napi::CallbackInfo& info, const Napi::Value& value)
 Napi::Value
 Painter::GetFont(const Napi::CallbackInfo& info)
 {
+  if (!painter->GetFont()) {
+    return info.Env().Null();
+  }
   return Font::constructor.New(
     { External<PdfFont>::New(info.Env(), painter->GetFont()) });
 }
@@ -770,8 +772,9 @@ Painter::MoveTextPosition(const CallbackInfo& info)
 void
 Painter::DrawGlyph(const CallbackInfo& info)
 {
-  if(!isMemDoc) {
-    TypeError::New(info.Env(), "Requires instance of PdfMemDocument").ThrowAsJavaScriptException();
+  if (!isMemDoc) {
+    TypeError::New(info.Env(), "Requires instance of PdfMemDocument")
+      .ThrowAsJavaScriptException();
     return;
   }
   auto sharedMemDoc = std::static_pointer_cast<PdfMemDocument>(document);

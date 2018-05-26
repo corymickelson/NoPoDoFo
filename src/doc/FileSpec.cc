@@ -137,5 +137,6 @@ FileSpec::Data(const Napi::CallbackInfo& info)
       }
     }
   }
+  return info.Env().Undefined();
 }
 }

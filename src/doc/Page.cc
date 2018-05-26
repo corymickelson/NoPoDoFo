@@ -28,6 +28,7 @@ using namespace PoDoFo;
 
 using std::cout;
 using std::endl;
+using std::make_shared;
 
 namespace NoPoDoFo {
 
@@ -35,13 +36,19 @@ FunctionReference Page::constructor; // NOLINT
 
 Page::Page(const CallbackInfo& info)
   : ObjectWrap(info)
-  , n(info[1].As<Number>())
 {
   if (info[0].IsObject() &&
-      info[0].As<Object>().InstanceOf(Document::constructor.Value())) {
+      info[0].As<Object>().InstanceOf(Document::constructor.Value()) &&
+      info[1].IsNumber()) {
     doc = Document::Unwrap(info[0].As<Object>())->GetBaseDocument();
-  } else if (info[0].Type() == napi_external) {
+    n = info[1].As<Number>();
+    page = make_shared<PdfPage>(*doc->GetPage(n));
+  } else if (info[0].IsExternal() && info.Length() >= 2 && info[1].IsNumber()) {
     doc = info[0].As<External<BaseDocument>>().Data()->GetBaseDocument();
+    n = info[1].As<Number>();
+    page = make_shared<PdfPage>(*doc->GetPage(n));
+  } else if (info[0].IsExternal() && info.Length() == 1) {
+    page = make_shared<PdfPage>(*info[0].As<External<PdfPage>>().Data());
   } else {
     TypeError::New(info.Env(),
                    "Unknown parameter document. Requires "
@@ -98,7 +105,8 @@ Page::GetField(const CallbackInfo& info)
   if (index < 0 || index > GetPage()->GetNumFields()) {
     throw RangeError();
   }
-  auto instance = Field::constructor.New({ this->Value(),  Number::New(info.Env(), index)});
+  auto instance =
+    Field::constructor.New({ this->Value(), Number::New(info.Env(), index) });
   return instance;
 }
 
@@ -108,7 +116,8 @@ Page::GetFields(const CallbackInfo& info)
   auto js = Array::New(info.Env());
   uint32_t n = 0;
   for (auto i = 0; i < GetPage()->GetNumFields(); ++i) {
-    auto instance = Field::constructor.New({ this->Value(), Number::New(info.Env(), i) });
+    auto instance =
+      Field::constructor.New({ this->Value(), Number::New(info.Env(), i) });
     js.Set(n, instance);
     ++n;
   }
@@ -234,13 +243,7 @@ Page::GetContents(const CallbackInfo& info)
   bool forAppending = info[0].As<Boolean>();
   PdfObject* contentsObj = forAppending ? GetPage()->GetContentsForAppending()
                                         : GetPage()->GetContents();
-  auto objPtr = External<PdfObject>::New(info.Env(),
-                                         new PdfObject(*contentsObj),
-                                         [](Napi::Env env, PdfObject* data) {
-                                           HandleScope scope(env);
-                                           delete data;
-                                           data = nullptr;
-                                         });
+  auto objPtr = External<PdfObject>::New(info.Env(), contentsObj );
   auto instance = Obj::constructor.New({ objPtr });
   return instance;
 }
@@ -251,11 +254,7 @@ Page::GetResources(const CallbackInfo& info)
   EscapableHandleScope scope(info.Env());
   PdfObject* resources = GetPage()->GetResources();
   auto objPtr = External<PdfObject>::New(
-    info.Env(), new PdfObject(*resources), [](Napi::Env env, PdfObject* data) {
-      HandleScope scope(env);
-      delete data;
-      data = nullptr;
-    });
+    info.Env(), resources);
   auto instance = Obj::constructor.New({ objPtr });
   return instance;
 }

@@ -16,12 +16,10 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import { IRef } from "./reference";
 import { Stream } from "stream";
 import { IDictionary } from "./object";
 import { IObj } from "./object"
-import { Document } from "./document"
-import { __mod } from "./base-document";
+import { IDocument } from "./document"
 
 export type NPDFInternal = any
 
@@ -31,7 +29,7 @@ export type NPDFDataType = 'Boolean' | 'Number' | 'Name' | 'Real' | 'String' | '
     'Dictionary' | 'Reference' | 'RawData'
 
 export interface IObj {
-    readonly reference: number
+    readonly reference: {object:number, generation:number}
     readonly length: number
     readonly stream: Stream
     readonly type: NPDFDataType
@@ -60,8 +58,6 @@ export interface IObj {
     getNumber(): number
 
     getArray(): IArray
-
-    getReference(): IRef
 
     getBuffer(): Buffer
 
@@ -92,7 +88,7 @@ export interface IDictionary {
     dirty: boolean
     immutable: boolean
 
-    tryGet(doc: Document, candidate: IObj): IDictionary | null
+    tryGet(doc: IDocument, candidate: IObj): IDictionary | null
 
     /**
      * @param {string} k

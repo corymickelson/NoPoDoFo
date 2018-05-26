@@ -22,7 +22,6 @@
 #include "base/Data.h"
 #include "base/Dictionary.h"
 #include "base/Obj.h"
-#include "base/Ref.h"
 #include "base/Stream.h"
 #include "crypto/Signature.h"
 #include "doc/Annotation.h"
@@ -66,7 +65,6 @@ init(Napi::Env env, Napi::Object exports)
   NoPoDoFo::Dictionary::Initialize(env, exports);
   NoPoDoFo::FileSpec::Initialize(env, exports);
   NoPoDoFo::Obj::Initialize(env, exports);
-  NoPoDoFo::Ref::Initialize(env, exports);
   NoPoDoFo::Array::Initialize(env, exports);
   NoPoDoFo::Stream::Initialize(env, exports);
   NoPoDoFo::Encrypt::Initialize(env, exports);

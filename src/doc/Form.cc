@@ -231,14 +231,9 @@ Form::GetCalculationOrder(const CallbackInfo& info)
       auto arr = co->GetArray();
       for (const auto& item : arr) {
         if (item.IsReference()) {
-          auto value =
-            new PdfObject(*doc->GetObjects()->GetObject(item.GetReference()));
+          auto value = doc->GetObjects()->GetObject(item.GetReference());
           auto nObj = Obj::constructor.New({ External<PdfObject>::New(
-            info.Env(), value, [](Napi::Env env, PdfObject* data) {
-              cout << "Finalizing Obj PdfObject from Form CO" << endl;
-              HandleScope scope(env);
-              delete data;
-            }) });
+            info.Env(), value) });
           if (!value->IsDictionary()) {
             js.Set(n, nObj);
             n++;

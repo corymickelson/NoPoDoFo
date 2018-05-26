@@ -1,231 +1,78 @@
-import {access, readFile, unlinkSync} from 'fs'
 import {join} from 'path'
 import * as tap from 'tape'
-import {Document, NPDFFontEncoding, __mod as mod} from './document'
-import {F_OK} from "constants";
-import {v4} from 'uuid'
+import {IDocument, __mod as npdf, NPDFPageMode} from './document'
 import {Test} from "tape";
-import {IObj} from "./object";
-import {EncryptOption} from "./encrypt";
+import {NPDFVersion} from '.';
 
 const filePath = join(__dirname, '../test-documents/test.pdf'),
     pwdDoc = join(__dirname, '../test-documents/pwd.pdf')
 
 export const end = (...tests: Test[]) => tests.forEach(t => t.end())
 
-tap('IDocument', t => {
-    const doc = new mod.Document()
-    doc.load(filePath, e => {
-        if(e) t.fail(e.message)
-        t.comment("Document instance accessors [GET]")
-        t.assert(doc.getPage(0) instanceof (mod.Page as any), "Get Page returns a Page")
-        t.assert(doc.form instanceof (mod.Form as any), "Get Form returns an AcroForm")
-        t.assert(doc.catalog instanceof (mod.Obj as any), "Catalog as Obj")
-        t.assert(doc.trailer instanceof (mod.Obj as any), "Catalog as Obj")
-        t.comment("Document instance accessors [SET]")
-        let encryptOpts: EncryptOption = {
-                ownerPassword: 'secret',
-                userPassword: 'secret',
-                keyLength: 40,
-                protection: ['Edit', 'FillAndSign'],
-                algorithm: 'aesv3'
-            }
-        let encrypt = mod.Encrypt.createEncrypt(encryptOpts)
-        t.doesNotThrow(() => { doc.encrypt = encrypt })
-        t.comment("Document instance methods")
-        t.assert(doc.getFont('PoDoFoFt31') instanceof (mod.Font as any))
-
-    })
+tap('IStreamDocument', t => {
+    const doc = new npdf.StreamDocument('/tmp/npdf.streamdoc.pdf')
+    t.comment('StreamDocument default values')
+    t.assert(doc.version === NPDFVersion.Pdf17, 'default to pdf version 1.7')
+    t.assert(doc.info.producer === 'PoDoFo - http://podofo.sf.net', 'Produced by PoDoFo')
+    t.assert(doc.getPageCount() === 0, 'StreamDocument instantiated with 0')
+    t.assert(doc.pageMode === NPDFPageMode.UseNone, 'defaults to \'UseNone\'')
+    t.end()
 })
-tap.skip('Document Api', sub => {
-    sub.test('unprotected documents', standard => {
-        const doc = new Document(filePath)
-        doc.on('ready', (pdf: Document) => {
-
-            standard.test('tmp', t => {
-                doc.getPageCount()
-                doc.getPage(0)
-                doc.getObjects()
-                end(t)
-            })
-            standard.test('loaded successfully and emitted ready event', t => {
-                if (pdf instanceof Error) t.fail('Failed to load document')
-                t.assert(pdf.loaded === true, 'pdf successfully loaded')
-                end(t)
-            })
-
-            standard.test('document properties getter/setter (s)', t => {
-                t.assert(pdf.getPageCount() > 0, 'Page count exists')
-                t.throws(() => pdf.password, 'Passwords are kept secret')
-                t.doesNotThrow(() => pdf.encrypt, 'Encrypt should not throw, if not exits return null')
-                t.throws(() => pdf.getPage(10), 'Range Error')
-                end(t)
-            })
-
-            standard.test('document trailer, catalog, objects', t => {
-                let objs = pdf.body;
-                t.assert(objs instanceof Array, 'Gets all objects as an array')
-                t.assert(objs[0] instanceof (__mod.Obj as any), 'array items instance of Obj')
-                let trailer = pdf.trailer,
-                    catalog = pdf.catalog
-                t.assert(trailer instanceof (__mod.Obj as any), 'get trailer')
-                t.assert(trailer.type === 'Dictionary', 'trailer is a dictionary')
-                t.assert(catalog instanceof (__mod.Obj as any), 'get catalog')
-                t.assert(catalog.type === 'Dictionary', 'catalog is a dictionary')
-                t.end()
-            })
-
-            standard.test('document create font', t => {
-                let font = pdf.createFont({fontName: 'monospace', encoding: NPDFFontEncoding.WinAnsi})
-                const m = font.getMetrics()
-                t.ok(m)
-                end(t)
-            })
-
-            standard.test('document delete page object by index', t => {
-                const beforeCount = pdf.getPageCount()
-                pdf.splicePage(0)
-                const afterCount = pdf.getPageCount()
-                t.assert(beforeCount - 1 === afterCount, 'Page removed and page count decremented')
-                end(t)
-            })
-
-            standard.test('document information', t => {
-                t.false(pdf.isLinearized(), 'test.pdf is a non-linearized document')
-                t.true(pdf.getVersion() === 1.7, 'test.pdf PDF version is 1.7')
-                end(t)
-            })
-
-            standard.test('can write', t => {
-                const outFile = `${v4()}.pdf`
-                pdf.write(outFile, (e, v) => {
-                    if (e instanceof Error) t.fail('Failed to write document')
-                    access(outFile, F_OK, err => {
-                        if (err) t.fail('Failed to write document')
-                        else {
-                            unlinkSync(outFile)
-                            t.pass("Modified file written successfully")
-                            end(t)
-                        }
-                    })
-                })
-            })
-            standard.test('is allowed', t => {
-                t.ok(pdf.isAllowed('Copy'), 'Copy protection not defined. Can get ProtectionProperties')
-                t.end()
-            })
+tap('IDocument', t => {
+    const doc = new npdf.Document()
+    doc.load(filePath, e => {
+        if (e) t.fail(e.message)
+        t.comment("Document instance accessors [GET]")
+        t.assert(doc.getPage(0) instanceof (npdf.Page as any), "Get Page returns a Page")
+        t.assert(doc.form instanceof (npdf.Form as any), "Get Form returns an AcroForm")
+        t.assert(doc.catalog instanceof (npdf.Obj as any), "Catalog as Obj")
+        t.assert(doc.trailer instanceof (npdf.Obj as any), "Catalog as Obj")
+        t.assert(Array.isArray(doc.body)
+            && doc.body.filter(i => i.type === 'Reference').length === 0,
+            'document body returns an array of objects')
+        t.comment("Document instance accessors [SET]")
+        t.comment('Can create an encrypt instance and set to Document')
+        let encrypt = npdf.Encrypt.createEncrypt({
+            ownerPassword: 'secret',
+            userPassword: 'secret',
+            keyLength: 40,
+            protection: ['Edit', 'FillAndSign'],
+            algorithm: 'aesv3'
         })
-
-        sub.test('document exceptions', standard => {
-            standard.test('password required, password setter', t => {
-                t.plan(1)
-                const doc = new Document(pwdDoc)
-                doc.on('ready', () => {
-                    t.fail('Should have thrown password required error')
-                })
-                    .on('error', e => {
-                        if (e.message === "Password required to modify this document") {
-                            try {
-                                doc.password = 'secret'
-                                t.pass('password required and password set')
-                            } catch (pwdErr) {
-                                t.fail(pwdErr.message)
-                            }
-                        }
-                    })
-            })
-            standard.test('password required', t => {
-                const doc = new Document(pwdDoc)
-                doc.on('ready', () => {
-                    t.fail('Should have thrown password required error')
-                })
-                    .on('error', e => {
-                        t.ok(e instanceof Error, 'should bubble up error')
-                        t.assert(e.message === "Password required to modify this document")
-                        end(t)
-                    })
-            })
-            standard.test('file not found', t => {
-                let doc = new Document('/bad/path')
-                doc.on('ready', e => {
-                    t.fail('should have thrown "file not found" error.')
-                })
-                    .on('error', (e: Error) => {
-                        t.assert(e.message === 'file not found')
-                        end(t)
-                    })
-            })
-        })
-
-        sub.test('document merger', standard => {
-            const doc = new Document(filePath),
-                outFile = `${v4()}.pdf`
-            doc.on('ready', () => {
-                let originalPC = doc.getPageCount()
-                doc.appendDocument(filePath)
-                    .then(() => {
-                        doc.write(outFile, e => {
-                            if (e) standard.fail(e.message)
-                            const doc2 = new Document(outFile)
-                            doc2.on('ready', () => {
-                                let doc2PC = doc2.getPageCount()
-                                standard.assert(originalPC * 2 === doc2PC, "merged document")
-                                unlinkSync(outFile)
-                                standard.end()
-                            })
-                        })
-                    })
-                    .catch(e => standard.fail(e.message))
-
-            })
-        })
-
-        sub.test('write buffer', standard => {
-            const doc = new Document(filePath)
-            doc.on('ready', (pdf: Document) => {
-                pdf.write((e, d) => {
-                    if (e) standard.fail(e.message)
+        t.doesNotThrow(() => {
+            doc.encrypt = encrypt
+        }, 'Can set the Document Encrypt instance from CreateEncrypt value')
+        t.comment("Document instance methods")
+        t.assert(doc.getFont('PoDoFoFt31') instanceof (npdf.Font as any))
+        doc.splicePages(0, 1)
+        t.assert(doc.getPageCount() === 3)
+        let font = doc.createFont({italic: true, embed: false, fontName: 'serif'})
+        t.assert(font.getMetrics().fontSize === 12, 'Default font size is 12')
+        doc.write((err, data) => {
+            if (err) t.fail(err.message)
+            else {
+                t.assert(Buffer.isBuffer(data), 'Persists document to new Buffer')
+                t.comment('Loading document from a node Buffer')
+                let childDoc = new npdf.Document()
+                childDoc.load(data, {fromBuffer: true}, e => {
+                    if (e) t.fail(e.message)
                     else {
-                        standard.ok(d)
-                        standard.assert(d instanceof Buffer)
-                        standard.assert((d as Buffer).length > 0)
-                        end(standard)
+                        t.comment('Child document reflects changes from parent')
+                        t.assert(childDoc.getPageCount() === 3, 'Spliced page persists')
+                        t.end()
                     }
                 })
-            })
-        })
-
-        sub.test('load buffer', standard => {
-            standard.plan(1)
-            readFile('./test-documents/default_wab.pdf', (err, data) => {
-                if (err) standard.fail()
-                else {
-                    const document = new Document(data)
-                    document.on('ready', pdf => {
-                        if (pdf instanceof Error) standard.fail()
-                        else standard.pass()
-                    })
-                        .on('error', e => {
-                            standard.fail(e)
-                        })
-                }
-            })
-        })
-        sub.test('gc', standard => {
-            const output = `/tmp/${v4()}.pdf`
-            Document.gc(filePath, "", output, e => {
-                if (e instanceof Error) standard.fail()
-                else {
-                    access(output, F_OK, err => {
-                        if (err) standard.fail()
-                        else {
-                            standard.pass('Gc doc written to output location')
-                            standard.end()
-                        }
-                    })
-                }
-            })
+            }
         })
     })
-
+})
+tap('IDocument password protected', t => {
+    let doc = new npdf.Document()
+    doc.load(pwdDoc, {password: 'secret'}, e => {
+        if(e) t.fail(e.message)
+        else {
+            t.pass('Loaded password protected document (provided a valid password on load)')
+            t.end()
+        }
+    })
 })

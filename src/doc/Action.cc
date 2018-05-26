@@ -93,10 +93,7 @@ Action::GetObject(const Napi::CallbackInfo& info)
       GetAction()->GetObject()->GetReference());
   }
   return Obj::constructor.New({ External<PdfObject>::New(
-    info.Env(), new PdfObject(*o), [](Napi::Env env, PdfObject* data) {
-      HandleScope scope(env);
-      delete data;
-    }) });
+    info.Env(), o) });
 }
 void
 Action::AddToDictionary(const Napi::CallbackInfo& info)

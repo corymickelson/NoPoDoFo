@@ -56,7 +56,49 @@ StreamDocument::Initialize(Napi::Env& env, Napi::Object& target)
 {
   HandleScope scope(env);
   Function ctor = DefineClass(
-    env, "StreamDocument", { InstanceMethod("close", &StreamDocument::Close) });
+    env,
+    "StreamDocument",
+    { InstanceMethod("close", &StreamDocument::Close),
+
+      InstanceAccessor("form", &StreamDocument::GetForm, nullptr),
+      InstanceAccessor("body", &StreamDocument::GetObjects, nullptr),
+      InstanceAccessor("version", &StreamDocument::GetVersion, nullptr),
+      InstanceAccessor(
+        "pageMode", &StreamDocument::GetPageMode, &StreamDocument::SetPageMode),
+      InstanceAccessor("pageLayout", nullptr, &StreamDocument::SetPageLayout),
+      InstanceAccessor(
+        "printingScale", nullptr, &StreamDocument::SetPrintingScale),
+      InstanceAccessor("baseURI", nullptr, &StreamDocument::SetBaseURI),
+      InstanceAccessor("language", nullptr, &StreamDocument::SetLanguage),
+      InstanceAccessor("info", &StreamDocument::GetInfo, nullptr),
+
+      InstanceMethod("getPageCount", &StreamDocument::GetPageCount),
+      InstanceMethod("getPage", &StreamDocument::GetPage),
+      InstanceMethod("hideToolbar", &StreamDocument::SetHideToolbar),
+      InstanceMethod("hideMenubar", &StreamDocument::SetHideMenubar),
+      InstanceMethod("hideWindowUI", &StreamDocument::SetHideWindowUI),
+      InstanceMethod("fitWindow", &StreamDocument::SetFitWindow),
+      InstanceMethod("centerWindow", &StreamDocument::SetCenterWindow),
+      InstanceMethod("displayDocTitle", &StreamDocument::SetDisplayDocTitle),
+      InstanceMethod("useFullScreen", &StreamDocument::SetUseFullScreen),
+      InstanceMethod("attachFile", &StreamDocument::AttachFile),
+      InstanceMethod("insertExistingPage", &StreamDocument::InsertExistingPage),
+      InstanceMethod("insertPage", &StreamDocument::InsertPage),
+      InstanceMethod("append", &StreamDocument::Append),
+      InstanceMethod("isLinearized", &StreamDocument::IsLinearized),
+      InstanceMethod("getWriteMode", &StreamDocument::GetWriteMode),
+      InstanceMethod("getObject", &StreamDocument::GetObject),
+      InstanceMethod("isAllowed", &StreamDocument::IsAllowed),
+      InstanceMethod("createFont", &StreamDocument::CreateFont),
+      InstanceMethod("getOutlines", &StreamDocument::GetOutlines),
+      InstanceMethod("getNames", &StreamDocument::GetNamesTree),
+      InstanceMethod("createPage", &StreamDocument::CreatePage),
+      InstanceMethod("createPages", &StreamDocument::CreatePages),
+      InstanceMethod("getAttachment", &StreamDocument::GetAttachment),
+      InstanceMethod("addNamedDestination",
+                     &StreamDocument::AddNamedDestination)
+
+    });
   constructor = Persistent(ctor);
   constructor.SuppressDestruct();
   target.Set("StreamDocument", ctor);

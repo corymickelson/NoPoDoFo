@@ -30,7 +30,6 @@ class Painter : public Napi::ObjectWrap<Painter>
 {
 public:
   explicit Painter(const Napi::CallbackInfo& callbackInfo);
-  PoDoFo::PdfRect pageSize;
   static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
 

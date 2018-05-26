@@ -16,10 +16,9 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import {__mod} from './base-document'
-import { Document} from "./document";
-import {Font, NPDFAlignment, NPDFColor, NPDFPoint, NPDFVerticalAlignment, Painter} from "./painter";
-import {Page} from "./page";
+import { IDocument, __mod} from "./document";
+import {IFont, NPDFAlignment, NPDFColor, NPDFPoint, NPDFVerticalAlignment, IPainter} from "./painter";
+import {IPage} from "./page";
 
 export class Cell {
     /**

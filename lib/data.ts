@@ -16,25 +16,9 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import { __mod } from "./base-document";
-import { NPDFInternal } from "./object";
 
-export class Data {
-    private _instance: any
-    get value(): string {
-        return this._instance.value
-    }
-    constructor(value: string | NPDFInternal) {
-        if (typeof value === 'string') {
-            this._instance = new __mod.Data(value)
-        } else {
-            this._instance = value
-        }
-    }
-    write(output: string): void {
-        if (!output) {
-            throw Error("output must be a valid path")
-        }
-        this._instance.write(output)
-    }
+export interface IData {
+    new(value: string|Buffer): IData
+    readonly value: string
+    write(output: string): void
 }

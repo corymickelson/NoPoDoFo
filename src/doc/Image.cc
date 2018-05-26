@@ -62,11 +62,9 @@ Image::Image(const CallbackInfo& info)
   size_t bufLen = 0;
   if (info[1].IsString()) {
     file = info[1].As<String>().Utf8Value();
-    //    img->LoadFromFile(file.c_str());
   } else if (info[1].IsBuffer()) {
     buffer = info[1].As<Buffer<unsigned char>>().Data();
     size_t len = info[1].As<Buffer<unsigned char>>().Length();
-    //    img->LoadFromData(file, len);
   }
   // data = 0, png =1, tiff =2, jpeg=3
   switch (format) {
@@ -122,57 +120,6 @@ Image::Initialize(Napi::Env& env, Napi::Object& target)
 
   target.Set("Image", ctor);
 }
-//void
-//Image::LoadFromFile(const CallbackInfo& info)
-//{
-//
-//#ifdef PODOFO_HAVE_JPEG_LIB
-//  try {
-//    if (info[0].IsString()) {
-//      string file = info[0].As<String>().Utf8Value();
-//      img->LoadFromFile(file.c_str());
-//    } else {
-//      throw Napi::Error::New(
-//        info.Env(), "LoadFromFile takes a single argument of type string.");
-//    }
-//  } catch (PdfError& err) {
-//    stringstream msg;
-//    msg << "PoDoFo fail code: " << err.GetError() << endl;
-//    throw Napi::Error::New(info.Env(), msg.str());
-//  }
-//#else
-//  throw Napi::Error::New(info.Env(),
-//                         "NPdf PoDoFo requires libjpeg for images.");
-//#endif
-//}
-//
-//void
-//Image::LoadFromBuffer(const CallbackInfo& info)
-//{
-//#ifdef PODOFO_HAVE_JPEG_LIB
-//  try {
-//    if (info.Length() < 1 || !info[0].IsBuffer()) {
-//      throw Napi::Error::New(
-//        info.Env(), "LoadFromBuffer requires a single argument of type Buffer");
-//    }
-//    string jsValue = info[0].As<String>().Utf8Value();
-//    auto* value = new unsigned char[jsValue.length()];
-//    strcpy(reinterpret_cast<char*>(value), jsValue.c_str());
-//    img->LoadFromData(value, static_cast<long>(jsValue.length()));
-//  } catch (PdfError& err) {
-//    stringstream msg;
-//    msg << "PoDoFo error. Code= " << err.GetError() << endl;
-//    throw Napi::Error::New(info.Env(), msg.str());
-//  } catch (Error& err) {
-//    stringstream msg;
-//    msg << "JS error: " << err.Message() << endl;
-//    throw Napi::Error::New(info.Env(), msg.str());
-//  }
-//#else
-//  throw Napi::Error::New(info.Env(),
-//                         "NPdf PoDoFo requires libjpeg for images.");
-//#endif
-//}
 
 Napi::Value
 Image::GetHeight(const CallbackInfo& info)

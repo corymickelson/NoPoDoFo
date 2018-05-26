@@ -182,10 +182,7 @@ Array::GetObjAtIndex(const CallbackInfo& info)
     item = *item.GetOwner()->GetObject(item.GetReference());
   }
   auto initPtr = Napi::External<PdfObject>::New(
-    info.Env(), new PdfObject(item), [](Napi::Env env, PdfObject* data) {
-      HandleScope scope(env);
-      delete data;
-    });
+    info.Env(), &item);
   auto instance = Obj::constructor.New({ initPtr });
   return instance;
 }
@@ -204,11 +201,7 @@ Array::ToArray(const Napi::CallbackInfo& info)
         item = &it;
       }
       auto initPtr = Napi::External<PdfObject>::New(
-        info.Env(), new PdfObject(*item), [](Napi::Env env, PdfObject* data) {
-          HandleScope scope(env);
-          delete data;
-          data = nullptr;
-        });
+        info.Env(), item);
       const auto instance = Obj::constructor.New({ initPtr });
       js.Set(counter, instance);
       counter++;

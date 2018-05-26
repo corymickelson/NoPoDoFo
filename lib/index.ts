@@ -16,32 +16,32 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import { Data } from './data'
-import { Document, NPDFFontEncoding, PageLayout, PageMode } from './document'
-import {__mod as mod} from './base-document'
-import { StreamDocument, NPDFWriteMode, NPDFVersion } from './stream-document'
+import { IData } from './data'
+import { IDocument, NPDFFontEncoding, NPDFPageLayout, NPDFPageMode } from './document'
+import {__mod as npdf} from './document'
+import {IPage} from './page'
+import { IStreamDocument, NPDFWriteMode, NPDFVersion } from './stream-document'
 import { IObj } from './object'
-import { Page } from './page'
 import {
-    Annotation,
+    IAnnotation,
     NPDFAction,
     NPDFAnnotation,
     NPDFAnnotationFlag,
     NPDFAnnotationType
 } from './annotation'
 import {
-    CheckBox,
-    Field,
-    TextField,
-    ListBox,
-    ComboBox
+    ICheckBox,
+    IField,
+    ITextField,
+    IListBox,
+    IComboBox
 } from './field'
-import { Image } from './image'
+import { IImage } from './image'
 import {
-    Painter,
-    Encoding,
-    ExtGState,
-    Font,
+    IPainter,
+    IEncoding,
+    IExtGState,
+    IFont,
     NPDFAlignment,
     NPDFBlendMode,
     NPDFColorSpace,
@@ -53,40 +53,39 @@ import {
     NPDFTextRenderingMode,
     NPDFVerticalAlignment
 } from './painter'
-import { Rect } from './rect'
-import { Signer, signature } from './signer'
+import { IRect } from './rect'
+import { ISigner, signature } from './signer'
 import { Stream } from './stream'
 import { IForm } from './form'
-import { ContentsTokenizer } from './parser'
-import { IRef } from './reference'
+import { IContentsTokenizer } from './parser'
 import { Cell, Table } from './table'
 
 
 export {
-    ContentsTokenizer,
+    IContentsTokenizer,
     IForm,
     Stream,
-    Rect,
-    Image,
-    Data,
-    Document,
+    IRect,
+    IImage,
+    IData,
+    IDocument,
     NPDFFontEncoding,
     IObj,
-    Page,
-    Annotation,
+    IPage,
+    IAnnotation,
     NPDFAction,
     NPDFAnnotation,
     NPDFAnnotationFlag,
     NPDFAnnotationType,
-    CheckBox,
-    Field,
-    TextField,
-    ListBox,
-    ComboBox,
-    Painter,
-    Encoding,
-    ExtGState,
-    Font,
+    ICheckBox,
+    IField,
+    ITextField,
+    IListBox,
+    IComboBox,
+    IPainter,
+    IEncoding,
+    IExtGState,
+    IFont,
     NPDFAlignment,
     NPDFBlendMode,
     NPDFColorSpace,
@@ -97,20 +96,19 @@ export {
     NPDFStokeStyle,
     NPDFTextRenderingMode,
     NPDFVerticalAlignment,
-    Signer,
+    ISigner,
     signature,
-    IRef,
     Cell,
     Table,
-    mod,
-    PageLayout,
-    PageMode,
-    StreamDocument,
+    npdf,
+    NPDFPageLayout,
+    NPDFPageMode,
+    IStreamDocument,
     NPDFWriteMode,
     NPDFVersion
 }
 export const CONVERSION = 0.0028346456693
-export type NPDFExternal<T> = any
+export type NPDFExternal<T> = Object
 
 
 

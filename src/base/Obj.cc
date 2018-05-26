@@ -22,7 +22,6 @@
 #include "../ValidateArguments.h"
 #include "Array.h"
 #include "Dictionary.h"
-#include "Ref.h"
 
 using namespace Napi;
 using namespace PoDoFo;
@@ -60,7 +59,6 @@ Obj::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceMethod("getString", &Obj::GetString),
       InstanceMethod("getName", &Obj::GetName),
       InstanceMethod("getArray", &Obj::GetArray),
-      InstanceMethod("getReference", &Obj::GetReference),
       InstanceMethod("getRawData", &Obj::GetRawData),
       InstanceMethod("clear", &Obj::Clear),
       InstanceMethod("eq", &Obj::Eq) });
@@ -180,16 +178,11 @@ Obj::Eq(const CallbackInfo& info)
 Napi::Value
 Obj::Reference(const CallbackInfo& info)
 {
-  try {
-    PdfReference init = obj->Reference();
-    auto initPtr = Napi::External<PdfReference>::New(info.Env(), &init);
-    return Ref::constructor.New({ initPtr });
-  } catch (PdfError& err) {
-    ErrorHandler(err, info);
-  } catch (Napi::Error& err) {
-    ErrorHandler(err, info);
-  }
-  return info.Env().Undefined();
+  Object js = Object::New(info.Env());
+  js.Set("object", Number::New(info.Env(), obj->Reference().ObjectNumber()));
+  js.Set("generation",
+         Number::New(info.Env(), obj->Reference().GenerationNumber()));
+  return js;
 }
 
 void
@@ -275,20 +268,6 @@ Obj::GetBool(const CallbackInfo& info)
     throw Napi::Error::New(info.Env(), "Obj not accessible as a boolean");
   }
   return Boolean::New(info.Env(), obj->GetBool());
-}
-
-Napi::Value
-Obj::GetReference(const CallbackInfo& info)
-{
-  if (!obj->IsReference()) {
-    throw Napi::Error::New(info.Env(), "Obj only accessible as Ref");
-  }
-  EscapableHandleScope scope(info.Env());
-  auto init = obj->GetReference();
-  auto ptr = External<PdfReference>::New(info.Env(), &init);
-  auto instance = Ref::constructor.New({ ptr });
-  //  return scope.Escape(instance);
-  return instance;
 }
 
 Napi::Value

@@ -16,30 +16,14 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import { Page } from "./page";
-import {__mod, IBase} from "./base-document";
-import {Document } from "./document";
-
-export interface IContentsTokenizer {
-    new(doc: IBase, pageIndex: number): IContentsTokenizer
-    readAll(): string
-}
+import {IBase} from "./base-document";
 
 /**
  * This class is a parser for content streams in PDF documents.
  * PoDoFo::PdfContentsTokenizer is currently a work in progress.
  */
-export class ContentsTokenizer {
-    private _instance:any
-    constructor(page:Page, doc:Document) {
-        this._instance = new __mod.ContentsTokenizer((page as any)._instance, (doc as any)._instance)
-    }
-
-    /**
-     * Read all text content from the page.
-     * @returns {Array<string>}
-     */
-    readAllContent(): Array<string> {
-        return this._instance.readAll()
-    }
+export interface IContentsTokenizer {
+    new(doc: IBase, pageIndex: number): IContentsTokenizer
+    readAll(): string
 }
+

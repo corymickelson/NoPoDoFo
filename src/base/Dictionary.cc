@@ -197,10 +197,7 @@ Dictionary::GetKey(const CallbackInfo& info)
       }
     }
     auto objPtr = Napi::External<PdfObject>::New(
-      info.Env(), new PdfObject(*o), [](Napi::Env env, PdfObject* data) {
-        HandleScope scope(env);
-        delete data;
-      });
+      info.Env(), o);
     auto instance = Obj::constructor.New({ objPtr });
     return instance;
   } catch (PdfError& err) {
