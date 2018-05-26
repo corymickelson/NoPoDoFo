@@ -229,7 +229,6 @@ Document::GetCatalog(const CallbackInfo& info)
     info.Env(), new PdfObject(*ptr), [](Napi::Env env, PdfObject* data) {
       HandleScope scope(env);
       delete data;
-      data = nullptr;
     });
   auto instance = Obj::constructor.New({ initPtr });
   return instance;
@@ -332,8 +331,8 @@ protected:
 };
 
 /**
- * @details Javascript parameters: (file: string|Buffer, cb:Function, update:
- * boolean = false, isBuffer, pwd?: string)
+ * @details Javascript parameters: (file: string|Buffer, opts: {update: boolean
+ * = false, isBuffer, pwd?: string}, cb:Function)
  * @param info
  * @return
  */
@@ -341,16 +340,38 @@ Napi::Value
 Document::Load(const CallbackInfo& info)
 {
   Function cb;
-  bool forUpdate, useBuffer = false;
-  string source, pwd;
+  bool forUpdate = false, useBuffer = false;
+  string source = "", pwd = "";
   PdfRefCountedInputDevice* inputDevice = nullptr;
-
-  cb = info[1].As<Function>();
-  forUpdate = info[2].As<Boolean>();
-  pwd = info[4].As<String>().Utf8Value();
-  if (info[3].As<Boolean>()) {
+  //  cout << info.Length() << endl;
+  //  auto t1 = info[0].Type();
+  //  auto t2 = info[1].Type();
+  //  auto t3 = info[2].Type();
+  if (info[1].IsObject()) {
+    auto opts = info[1].As<Object>();
+    if (opts.Has("forUpdate")) {
+      forUpdate = opts.Get("forUpdate").As<Boolean>();
+    }
+    if (opts.Has("isBuffer")) {
+      useBuffer = opts.Get("isBuffer").As<Boolean>();
+    }
+    if (opts.Has("pwd")) {
+      pwd = opts.Get("pwd").As<String>().Utf8Value();
+    }
+  } else if (info[1].IsFunction()) {
+    cb = info[1].As<Function>();
+  } else {
+    TypeError::New(
+      info.Env(),
+      "Expected an options object or callback function be received neither")
+      .ThrowAsJavaScriptException();
+    return info.Env().Undefined();
+  }
+  if (info.Length() == 3 && info[2].IsFunction()) {
+    cb = info[2].As<Function>();
+  }
+  if (useBuffer) {
     auto buffer = info[0].As<Buffer<char>>();
-    useBuffer = true;
     inputDevice = new PdfRefCountedInputDevice(buffer.Data(), buffer.Length());
   } else {
     source = info[0].As<String>().Utf8Value();

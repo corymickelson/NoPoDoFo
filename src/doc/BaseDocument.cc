@@ -24,6 +24,7 @@
 #include "../base/Obj.h"
 #include "../base/Ref.h"
 #include "../doc/Rect.h"
+#include "Encrypt.h"
 #include "FileSpec.h"
 #include "Font.h"
 #include "Form.h"
@@ -46,7 +47,26 @@ BaseDocument::BaseDocument(const Napi::CallbackInfo& info)
     output = info[0].As<String>().Utf8Value();
   }
   if (create) {
-    document = make_shared<PdfStreamedDocument>(output.c_str());
+    EPdfVersion version = ePdfVersion_1_7;
+    EPdfWriteMode writeMode = ePdfWriteMode_Default;
+    PdfEncrypt* encrypt = nullptr;
+    if (info.Length() >= 3 && info[2].IsObject()) {
+      auto nObj = info[2].As<Object>();
+      if (nObj.Has("version")) {
+        version = static_cast<EPdfVersion>(
+          nObj.Get("version").As<Number>().Uint32Value());
+      }
+      if (nObj.Has("writeMode")) {
+        writeMode = static_cast<EPdfWriteMode>(
+          nObj.Get("writeMode").As<Number>().Uint32Value());
+      }
+      if (nObj.Has("encrypt")) {
+        encrypt =
+            const_cast<PdfEncrypt*>(Encrypt::Unwrap(nObj.Get("encrypt").As<Object>())->GetEncrypt());
+      }
+    }
+    document = make_shared<PdfStreamedDocument>(
+      output.c_str(), version, encrypt, writeMode);
     cout << "Creating new StreamedDocument at " << output << endl;
   } else {
     document = make_shared<PdfMemDocument>();
@@ -70,19 +90,9 @@ Napi::Value
 BaseDocument::GetPage(const CallbackInfo& info)
 {
   int n = info[0].As<Number>();
-  //  PdfPage* page = document->GetPage(n);
-  //  auto pagePtr = External<PdfPage>::New(info.Env(), page);
-  auto instance = Page::constructor.New(
-    { External<BaseDocument>::New(
-        info.Env(),
-        this,
-        [](Napi::Env env, BaseDocument* data) {
-          HandleScope scope(env);
-          cout << "Finalizing BaseDocument 'this' passed to Page constructor"
-               << endl;
-          data = nullptr;
-        }),
-      Number::New(info.Env(), n) });
+  auto instance =
+    Page::constructor.New({ External<BaseDocument>::New(info.Env(), this),
+                            Number::New(info.Env(), n) });
   return instance;
 }
 

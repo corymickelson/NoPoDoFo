@@ -19,7 +19,7 @@
 import { EventEmitter } from "events";
 import { NPDFInternal, IObj } from "./object";
 import {IEncrypt, ProtectionOption} from "./encrypt";
-import {PageMode, PageLayout, CreateFontOpts, Document, IDocument, Callback} from "./document";
+import {PageMode, PageLayout, NPDFCreateFontOpts, Document, IDocument, Callback} from "./document";
 import { IRef } from "./reference";
 import {IPage, Page} from "./page";
 import {Font, IFont} from "./painter";
@@ -78,7 +78,7 @@ export interface IBase {
     getWriteMode():NPDFWriteMode
     getObject(ref: IRef): IObj
     isAllowed(perm: ProtectionOption): boolean
-    createFont(opts: CreateFontOpts): IFont
+    createFont(opts: NPDFCreateFontOpts): IFont
     getOutlines(): IObj
     getNames(): IObj
     createPage(rect: Rect): IPage
@@ -200,7 +200,7 @@ export class BaseDocument extends EventEmitter {
      * @param {CreateFontOpts & Object} opts
      * @returns {Font}
      */
-    createFont(opts: CreateFontOpts & Object): Font {
+    createFont(opts: NPDFCreateFontOpts & Object): Font {
         const instance = this._base.createFont(
             opts.fontName,
             opts.hasOwnProperty('bold') ? opts.bold : false,

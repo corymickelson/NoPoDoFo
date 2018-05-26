@@ -20,6 +20,15 @@ import { Page } from './page'
 import { Document } from './document'
 import {__mod} from './base-document'
 
+export interface IRect {
+    new(): IRect
+    new(left: number, botton: number, width: number, height: number): IRect
+    left: number
+    bottom: number
+    width: number
+    height: number
+    intersect(rect: IRect): void
+}
 export class Rect {
     private _instance: any
 

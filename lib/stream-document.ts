@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import { BaseDocument, __mod } from "./base-document";
+import {BaseDocument, __mod, IBase} from "./base-document";
 import { IEncrypt } from "./encrypt";
 import { NPDFInternal } from "./object";
 
@@ -33,6 +33,17 @@ export enum NPDFVersion {
 export enum NPDFWriteMode {
     Default = 0x01,
     Compact = 0x02
+}
+export interface IStreamDocument extends IBase {
+    /**
+     *
+     * @param {string} file
+     * @param {{version: NPDFVersion, writer: NPDFWriteMode, encrypt: IEncrypt}} [opts] -
+     *      defaults to {pdf1.7, writeMode_default, null}
+     * @returns {IStreamDocument}
+     */
+    new(file:string, opts: {version: NPDFVersion, writer: NPDFWriteMode, encrypt?: IEncrypt}): IStreamDocument
+    close(): void
 }
 
 export class StreamDocument extends BaseDocument {
