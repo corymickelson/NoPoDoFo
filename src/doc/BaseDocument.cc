@@ -61,8 +61,9 @@ BaseDocument::BaseDocument(const Napi::CallbackInfo& info)
           nObj.Get("writeMode").As<Number>().Uint32Value());
       }
       if (nObj.Has("encrypt")) {
+        auto nEncObj = Encrypt::Unwrap(nObj.Get("encrypt").As<Object>());
         encrypt =
-            const_cast<PdfEncrypt*>(Encrypt::Unwrap(nObj.Get("encrypt").As<Object>())->GetEncrypt());
+            const_cast<PdfEncrypt*>(nEncObj->encrypt);
       }
     }
     document = make_shared<PdfStreamedDocument>(

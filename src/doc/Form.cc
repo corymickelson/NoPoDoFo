@@ -278,9 +278,7 @@ Form::GetFont(const CallbackInfo& info)
   uint32_t n = 0;
   if (GetDictionary()->HasKey(Name::DR)) {
     PdfObject* drObj = GetDictionary()->GetKey(Name::DR);
-    //    auto drFont = Dictionary::Resolve(doc.get(), drObj);
     auto fd = drObj->GetDictionary().GetKey(Name::FONT)->GetDictionary();
-    //    auto fd = Dictionary::Resolve(doc.get(), drFont);
     for (auto k : fd.GetKeys()) {
       PdfObject* fontObject;
       if (k.second->IsReference()) {
@@ -290,27 +288,8 @@ Form::GetFont(const CallbackInfo& info)
       }
       auto font = memDoc->GetFont(fontObject);
       cout << "Font: " << font->GetFontMetrics()->GetFontname() << endl;
-      auto fObj = new PdfObject(*fontObject);
       js.Set(n,
-             Font::constructor.New(
-               { External<PdfFontMetrics>::New(
-                   info.Env(),
-                   const_cast<PdfFontMetrics*>(font->GetFontMetrics()),
-                   [](Napi::Env env, PdfFontMetrics* data) {
-                     HandleScope scope(env);
-                     cout << "Finalizing font metric" << endl;
-                     delete data;
-                   }),
-                 // Font will take ownership of encoding
-                 External<PdfEncoding>::New(
-                   info.Env(), const_cast<PdfEncoding*>(font->GetEncoding())),
-                 External<PdfObject>::New(
-                   info.Env(), fObj, [](Napi::Env env, PdfObject* data) {
-                     cout << "Finalizing Font Object" << endl;
-                     cout << "From Form::GetFont" << endl;
-                     HandleScope scope(env);
-                     delete data;
-                   }) }));
+             Font::constructor.New({External<PdfFont>::New(info.Env(), font)} ));
       n++;
     }
     return js;

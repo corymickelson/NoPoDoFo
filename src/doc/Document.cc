@@ -23,6 +23,7 @@
 #include "../base/Names.h"
 #include "../base/Obj.h"
 #include "../base/Ref.h"
+#include "Encrypt.h"
 #include "Font.h"
 #include "Form.h"
 #include "Page.h"
@@ -48,7 +49,7 @@ Document::Initialize(Napi::Env& env, Napi::Object& target)
     "Document",
     { StaticMethod("gc", &Document::GC),
       InstanceAccessor("password", nullptr, &Document::SetPassword),
-      InstanceAccessor("encrypt", nullptr, &Document::SetEncrypt),
+      InstanceAccessor("encrypt", &Document::GetEncrypt, &Document::SetEncrypt),
       InstanceAccessor("form", &Document::GetForm, nullptr),
       InstanceAccessor("body", &Document::GetObjects, nullptr),
       InstanceAccessor("trailer", &Document::GetTrailer, nullptr),
@@ -103,53 +104,62 @@ Document::Document(const CallbackInfo& info)
     std::static_pointer_cast<PdfMemDocument>(BaseDocument::GetBaseDocument());
 }
 
+/**
+ * @note PdfFont resource is managed by the PdfDocument
+ * @param info
+ * @return
+ */
 Value
 Document::GetFont(const CallbackInfo& info)
 {
-  auto id = info[0].As<String>().Utf8Value();
-  vector<PdfObject*> fontObjs;
-  vector<PdfFont*> fonts;
-  for (auto item : document->GetObjects()) {
-    if (item->IsDictionary()) {
-      if (item->GetDictionary().HasKey(Name::TYPE) &&
-          item->GetDictionary().GetKey(Name::TYPE)->IsName() &&
-          item->GetDictionary().GetKey(Name::TYPE)->GetName().GetName() ==
-            Name::FONT) {
-        fontObjs.push_back(item);
-      }
-    }
-    if (item->IsReference()) {
-      auto ref = document->GetObjects().GetObject(item->GetReference());
-      if (ref->IsDictionary()) {
-        if (ref->GetDictionary().HasKey(Name::TYPE) &&
-            ref->GetDictionary().GetKey(Name::TYPE)->IsName() &&
-            ref->GetDictionary().GetKey(Name::TYPE)->GetName().GetName() ==
+  try {
+    auto id = info[0].As<String>().Utf8Value();
+    vector<PdfObject*> fontObjs;
+    vector<PdfFont*> fonts;
+    for (auto item : document->GetObjects()) {
+      if (item->IsDictionary()) {
+        if (item->GetDictionary().HasKey(Name::TYPE) &&
+            item->GetDictionary().GetKey(Name::TYPE)->IsName() &&
+            item->GetDictionary().GetKey(Name::TYPE)->GetName().GetName() ==
               Name::FONT) {
-          fontObjs.push_back(ref);
+          fontObjs.push_back(item);
+        }
+      }
+      if (item->IsReference()) {
+        auto ref = document->GetObjects().GetObject(item->GetReference());
+        if (ref->IsDictionary()) {
+          if (ref->GetDictionary().HasKey(Name::TYPE) &&
+              ref->GetDictionary().GetKey(Name::TYPE)->IsName() &&
+              ref->GetDictionary().GetKey(Name::TYPE)->GetName().GetName() ==
+                Name::FONT) {
+            fontObjs.push_back(ref);
+          }
         }
       }
     }
-  }
-  for (auto o : fontObjs) {
-    auto font = document->GetFont(o);
-    if (!font) {
-      continue;
-    } else {
-      fonts.push_back(font);
+    for (auto o : fontObjs) {
+      auto font = document->GetFont(o);
+      if (!font) {
+        continue;
+      } else {
+        fonts.push_back(font);
+      }
     }
-  }
-  for (auto item : fonts) {
-    cout << "Font Identifier: " << item->GetIdentifier().GetName() << endl;
-    string itemId = item->GetIdentifier().GetName();
-    string itemName = item->GetFontMetrics()->GetFontname();
-    if (itemId == id || itemName == id) {
-      return Font::constructor.New(
-        { this->Value(),
-          External<PdfObject>::New(info.Env(),
-                                   new PdfObject(*item->GetObject())) });
+    for (auto item : fonts) {
+      string itemId = item->GetIdentifier().GetName();
+      string itemName = item->GetFontMetrics()->GetFontname();
+      cout << "Font Identifier: " << itemId << endl;
+      cout << "Font Name: " << itemName << endl;
+      if (itemId == id || itemName == id) {
+        EscapableHandleScope scope(info.Env());
+        return scope.Escape(
+          Font::constructor.New({ External<PdfFont>::New(info.Env(), item) }));
+      }
     }
+    return info.Env().Null();
+  } catch (PdfError& err) {
+    ErrorHandler(err, info);
   }
-  return info.Env().Null();
 }
 
 void
@@ -198,8 +208,7 @@ Document::SetEncrypt(const CallbackInfo& info, const Napi::Value& value)
   try {
     const PdfEncrypt* e = value.As<External<PdfEncrypt>>().Data();
     document->SetEncrypted(*e);
-  }
-  catch (PdfError& err) {
+  } catch (PdfError& err) {
     stringstream msg;
     msg << "PdfMemDocument::SetEncrypt failed with error: " << err.GetError()
         << endl;
@@ -247,7 +256,6 @@ private:
   Document& doc;
   string arg = "";
 
-  // AsyncWorker interface
 protected:
   void Execute() override
   {
@@ -341,13 +349,11 @@ Document::Load(const CallbackInfo& info)
 {
   Function cb;
   bool forUpdate = false, useBuffer = false;
-  string source = "", pwd = "";
+  string source, pwd;
   PdfRefCountedInputDevice* inputDevice = nullptr;
-  //  cout << info.Length() << endl;
-  //  auto t1 = info[0].Type();
-  //  auto t2 = info[1].Type();
-  //  auto t3 = info[2].Type();
-  if (info[1].IsObject()) {
+  if (info.Length() >= 2 && info[1].IsFunction()) {
+    cb = info[1].As<Function>();
+  } else if (info.Length() >= 2 && info[1].IsObject()) {
     auto opts = info[1].As<Object>();
     if (opts.Has("forUpdate")) {
       forUpdate = opts.Get("forUpdate").As<Boolean>();
@@ -358,8 +364,6 @@ Document::Load(const CallbackInfo& info)
     if (opts.Has("pwd")) {
       pwd = opts.Get("pwd").As<String>().Utf8Value();
     }
-  } else if (info[1].IsFunction()) {
-    cb = info[1].As<Function>();
   } else {
     TypeError::New(
       info.Env(),
@@ -528,5 +532,15 @@ Napi::Value
 Document::GetSharedPtrCount(const Napi::CallbackInfo& info)
 {
   return Number::New(info.Env(), BaseDocument::GetBaseDocument().use_count());
+}
+Napi::Value
+Document::GetEncrypt(const Napi::CallbackInfo& info)
+{
+  auto enc = document->GetEncrypt();
+  if(!enc) {
+    return info.Env().Null();
+  }
+  return Encrypt::constructor.New({ External<PdfEncrypt>::New(
+    info.Env(), const_cast<PdfEncrypt*>(enc)) });
 }
 }

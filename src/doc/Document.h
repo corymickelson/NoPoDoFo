@@ -46,6 +46,7 @@ public:
   Napi::Value Write(const Napi::CallbackInfo&);
   Napi::Value GetFont(const Napi::CallbackInfo&);
   void SetEncrypt(const Napi::CallbackInfo&, const Napi::Value&);
+  Napi::Value GetEncrypt(const Napi::CallbackInfo&);
   Napi::Value GetTrailer(const Napi::CallbackInfo&);
   Napi::Value GetCatalog(const Napi::CallbackInfo&);
   static Napi::Value GC(const Napi::CallbackInfo&);

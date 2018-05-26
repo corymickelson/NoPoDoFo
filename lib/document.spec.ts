@@ -6,6 +6,7 @@ import {F_OK} from "constants";
 import {v4} from 'uuid'
 import {Test} from "tape";
 import {IObj} from "./object";
+import {EncryptOption} from "./encrypt";
 
 const filePath = join(__dirname, '../test-documents/test.pdf'),
     pwdDoc = join(__dirname, '../test-documents/pwd.pdf')
@@ -21,11 +22,22 @@ tap('IDocument', t => {
         t.assert(doc.form instanceof (mod.Form as any), "Get Form returns an AcroForm")
         t.assert(doc.catalog instanceof (mod.Obj as any), "Catalog as Obj")
         t.assert(doc.trailer instanceof (mod.Obj as any), "Catalog as Obj")
+        t.comment("Document instance accessors [SET]")
+        let encryptOpts: EncryptOption = {
+                ownerPassword: 'secret',
+                userPassword: 'secret',
+                keyLength: 40,
+                protection: ['Edit', 'FillAndSign'],
+                algorithm: 'aesv3'
+            }
+        let encrypt = mod.Encrypt.createEncrypt(encryptOpts)
+        t.doesNotThrow(() => { doc.encrypt = encrypt })
         t.comment("Document instance methods")
+        t.assert(doc.getFont('PoDoFoFt31') instanceof (mod.Font as any))
 
     })
 })
-tap('Document Api', sub => {
+tap.skip('Document Api', sub => {
     sub.test('unprotected documents', standard => {
         const doc = new Document(filePath)
         doc.on('ready', (pdf: Document) => {

@@ -22,37 +22,23 @@
 
 #include <napi.h>
 #include <podofo/podofo.h>
-#include "Document.h"
 
 namespace NoPoDoFo {
 class Encrypt : public Napi::ObjectWrap<Encrypt>
 {
 public:
   explicit Encrypt(const Napi::CallbackInfo&);
-  ~Encrypt();
-
   static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
   static Napi::Value CreateEncrypt(const Napi::CallbackInfo&);
   Napi::Value IsAllowed(const Napi::CallbackInfo&);
-  Napi::Value Authenticate(const Napi::CallbackInfo&);
   Napi::Value GetOwnerValue(const Napi::CallbackInfo&);
   Napi::Value GetUserValue(const Napi::CallbackInfo&);
   Napi::Value GetProtectionsValue(const Napi::CallbackInfo&);
   Napi::Value GetEncryptionKey(const Napi::CallbackInfo&);
   Napi::Value GetKeyLength(const Napi::CallbackInfo&);
 
-  // unique_ptr<PoDoFo::PdfEncrypt> GetEncrypt()
-  const PoDoFo::PdfEncrypt* GetEncrypt()
-  {
-    //    return make_unique<PoDoFo::PdfEncrypt>(
-    //      *PoDoFo::PdfEncrypt::CreatePdfEncrypt(
-    //        *document->GetDocument()->GetEncrypt()));
-    return document->GetMemDocument()->GetEncrypt();
-  }
-
-private:
-  Document* document;
+  const PoDoFo::PdfEncrypt *encrypt;
 };
 }
 #endif

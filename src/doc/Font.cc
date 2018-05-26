@@ -17,13 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <iostream>
 #include "Font.h"
 #include "../ErrorHandler.h"
 #include "../ValidateArguments.h"
 #include "../base/Obj.h"
 #include "../base/Stream.h"
 #include "Encoding.h"
+#include <iostream>
 
 using namespace PoDoFo;
 using namespace Napi;
@@ -40,24 +40,9 @@ FunctionReference Font::constructor; // NOLINT
 Font::Font(const Napi::CallbackInfo& info)
   : ObjectWrap(info)
 {
-  auto metric = info[0].As<External<PdfFontMetrics>>().Data();
-  auto encoding = info[1].As<External<PdfEncoding>>().Data();
-  auto obj = info[2].As<External<PdfObject>>().Data();
-  font = make_unique<PdfFont>(metric, encoding, obj);
-  if(!encoding->IsAutoDelete()) {
-    this->encoding = encoding;
-  }
+  font = info[0].As<External<PdfFont>>().Data();
 }
 
-Font::~Font()
-{
-  cout << "Destructing Font" << endl;
-  if (encoding != nullptr) {
-    Napi::HandleScope scope(Env());
-    cout << "Delete Encoding" << endl;
-    delete encoding;
-  }
-}
 void
 Font::Initialize(Napi::Env& env, Napi::Object& target)
 {

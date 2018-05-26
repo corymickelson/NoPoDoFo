@@ -28,8 +28,6 @@ class Font : public Napi::ObjectWrap<Font>
 {
 public:
   explicit Font(const Napi::CallbackInfo& callbackInfo);
-  ~Font();
-
   static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
   Napi::Value GetFontSize(const Napi::CallbackInfo&);
@@ -44,7 +42,6 @@ public:
   void SetUnderline(const Napi::CallbackInfo&, const Napi::Value&);
   Napi::Value IsStrikeOut(const Napi::CallbackInfo&);
   void SetStrikeOut(const Napi::CallbackInfo&, const Napi::Value&);
-
   Napi::Value GetIdentifier(const Napi::CallbackInfo&);
   Napi::Value GetEncoding(const Napi::CallbackInfo&);
   Napi::Value GetFontMetric(const Napi::CallbackInfo&);
@@ -52,14 +49,13 @@ public:
   Napi::Value IsItalic(const Napi::CallbackInfo&);
   Napi::Value StringWidth(const Napi::CallbackInfo&);
   Napi::Value GetObject(const Napi::CallbackInfo&);
-
   void WriteToStream(const Napi::CallbackInfo&);
   void EmbedFont(const Napi::CallbackInfo&);
 
-  PoDoFo::PdfFont* GetFont() { return font.get(); }
+  PoDoFo::PdfFont* GetFont() { return font; }
 
 private:
-  std::unique_ptr<PoDoFo::PdfFont> font;
+  PoDoFo::PdfFont* font;
   PoDoFo::PdfEncoding* encoding;
 };
 }

@@ -20,9 +20,8 @@
 #include "Encrypt.h"
 #include "../ErrorHandler.h"
 #include "../ValidateArguments.h"
+#include "Document.h"
 #include <algorithm>
-
-namespace NoPoDoFo {
 
 using namespace Napi;
 using namespace PoDoFo;
@@ -32,22 +31,29 @@ using std::endl;
 using std::string;
 using std::vector;
 
+namespace NoPoDoFo {
+
 Napi::FunctionReference Encrypt::constructor; // NOLINT
 
+/**
+ * @note PdfEncrypt is owned by the PdfDocument
+ * @param info
+ */
 Encrypt::Encrypt(const Napi::CallbackInfo& info)
   : ObjectWrap(info)
 {
-  if (!info[0].As<Object>().InstanceOf(Document::constructor.Value())) {
-    throw TypeError();
+  if (info[0].As<Object>().InstanceOf(Document::constructor.Value())) {
+    encrypt =
+      Document::Unwrap(info[0].As<Object>())->GetMemDocument()->GetEncrypt();
+  } else if (info[0].IsExternal()) {
+    encrypt = info[0].As<External<PdfEncrypt>>().Data();
+  } else {
+    TypeError::New(info.Env(), "Invalid constructor args")
+      .ThrowAsJavaScriptException();
+    return;
   }
-  document = Document::Unwrap(info[0].As<Object>());
 }
-Encrypt::~Encrypt()
-{
-  HandleScope scope(Env());
-  cout << "Destructing encrypt" << endl;
-  document = nullptr;
-}
+
 void
 Encrypt::Initialize(Napi::Env& env, Napi::Object& target)
 {
@@ -61,8 +67,7 @@ Encrypt::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceAccessor("protections", &Encrypt::GetProtectionsValue, nullptr),
       InstanceAccessor("encryptionKey", &Encrypt::GetEncryptionKey, nullptr),
       InstanceAccessor("keyLength", &Encrypt::GetKeyLength, nullptr),
-      InstanceMethod("isAllowed", &Encrypt::IsAllowed),
-      InstanceMethod("authenticate", &Encrypt::Authenticate) });
+      InstanceMethod("isAllowed", &Encrypt::IsAllowed) });
   constructor = Persistent(ctor);
   constructor.SuppressDestruct();
   target.Set("Encrypt", ctor);
@@ -216,21 +221,21 @@ Encrypt::IsAllowed(const CallbackInfo& info)
   bool is = false;
   try {
     if (key == "Copy") {
-      is = GetEncrypt()->IsCopyAllowed();
+      is = encrypt->IsCopyAllowed();
     } else if (key == "Print") {
-      is = GetEncrypt()->IsEditAllowed();
+      is = encrypt->IsEditAllowed();
     } else if (key == "Edit") {
-      is = GetEncrypt()->IsEditAllowed();
+      is = encrypt->IsEditAllowed();
     } else if (key == "EditNotes") {
-      is = GetEncrypt()->IsEditNotesAllowed();
+      is = encrypt->IsEditNotesAllowed();
     } else if (key == "FillAndSign") {
-      is = GetEncrypt()->IsFillAndSignAllowed();
+      is = encrypt->IsFillAndSignAllowed();
     } else if (key == "Accessible") {
-      is = GetEncrypt()->IsAccessibilityAllowed();
+      is = encrypt->IsAccessibilityAllowed();
     } else if (key == "DocAssembly") {
-      is = GetEncrypt()->IsDocAssemblyAllowed();
+      is = encrypt->IsDocAssemblyAllowed();
     } else if (key == "HighPrint") {
-      is = GetEncrypt()->IsHighPrintAllowed();
+      is = encrypt->IsHighPrintAllowed();
     } else {
       throw Napi::Error::New(info.Env(), "Key unknown");
     }
@@ -243,63 +248,63 @@ Encrypt::IsAllowed(const CallbackInfo& info)
   return Napi::Boolean::New(info.Env(), is);
 }
 
-Napi::Value
-Encrypt::Authenticate(const CallbackInfo& info)
-{
-  auto pwdObj = info[0].As<Object>();
-  string pwd = nullptr;
-  if (pwdObj.Has("userPassword") && pwdObj.Get("userPassword").IsString()) {
-    pwd = pwdObj.Get("userPassword").As<String>().Utf8Value();
-  } else if (pwdObj.Has("ownerPassword") &&
-             pwdObj.Get("ownerPassword").IsString()) {
-    pwd = pwdObj.Get("ownerPassword").As<String>().Utf8Value();
-  }
-  if (!pwd.c_str()) {
-    throw Napi::Error::New(
-      info.Env(), "must contain property userPassword OR ownerPassword");
-  }
-  if (!document->GetMemDocument()->GetTrailer()->GetDictionary().HasKey(
-        PdfName("ID"))) {
-    throw Napi::Error::New(info.Env(), "No document ID found in trailer");
-  }
-  string id = document->GetMemDocument()
-                ->GetTrailer()
-                ->GetDictionary()
-                .GetKey(PdfName("ID"))
-                ->GetArray()[0]
-                .GetString()
-                .GetStringUtf8();
-  // TODO: Fix const cast
-  auto auth = const_cast<PdfEncrypt*>(GetEncrypt())->Authenticate(pwd, id);
-  return Napi::Boolean::New(info.Env(), auth);
-}
+// Napi::Value
+// Encrypt::Authenticate(const CallbackInfo& info)
+//{
+//  auto pwdObj = info[0].As<Object>();
+//  string pwd = nullptr;
+//  if (pwdObj.Has("userPassword") && pwdObj.Get("userPassword").IsString()) {
+//    pwd = pwdObj.Get("userPassword").As<String>().Utf8Value();
+//  } else if (pwdObj.Has("ownerPassword") &&
+//             pwdObj.Get("ownerPassword").IsString()) {
+//    pwd = pwdObj.Get("ownerPassword").As<String>().Utf8Value();
+//  }
+//  if (!pwd.c_str()) {
+//    throw Napi::Error::New(
+//      info.Env(), "must contain property userPassword OR ownerPassword");
+//  }
+//  if (!document->GetMemDocument()->GetTrailer()->GetDictionary().HasKey(
+//        PdfName("ID"))) {
+//    throw Napi::Error::New(info.Env(), "No document ID found in trailer");
+//  }
+//  string id = document->GetMemDocument()
+//                ->GetTrailer()
+//                ->GetDictionary()
+//                .GetKey(PdfName("ID"))
+//                ->GetArray()[0]
+//                .GetString()
+//                .GetStringUtf8();
+//  // TODO: Fix const cast
+//  auto auth = const_cast<PdfEncrypt*>(GetEncrypt())->Authenticate(pwd, id);
+//  return Napi::Boolean::New(info.Env(), auth);
+//}
 
 Napi::Value
 Encrypt::GetOwnerValue(const CallbackInfo& info)
 {
   return String::New(info.Env(),
-                     reinterpret_cast<const char*>(GetEncrypt()->GetOValue()));
+                     reinterpret_cast<const char*>(encrypt->GetOValue()));
 }
 
 Napi::Value
 Encrypt::GetUserValue(const CallbackInfo& info)
 {
   return String::New(info.Env(),
-                     reinterpret_cast<const char*>(GetEncrypt()->GetUValue()));
+                     reinterpret_cast<const char*>(encrypt->GetUValue()));
 }
 
 Napi::Value
 Encrypt::GetProtectionsValue(const CallbackInfo& info)
 {
   auto perm = Object::New(info.Env());
-  perm.Set("Accessible", GetEncrypt()->IsAccessibilityAllowed());
-  perm.Set("Print", GetEncrypt()->IsPrintAllowed());
-  perm.Set("Copy", GetEncrypt()->IsCopyAllowed());
-  perm.Set("DocAssembly", GetEncrypt()->IsDocAssemblyAllowed());
-  perm.Set("Edit", GetEncrypt()->IsEditAllowed());
-  perm.Set("EditNotes", GetEncrypt()->IsEditNotesAllowed());
-  perm.Set("FillAndSign", GetEncrypt()->IsFillAndSignAllowed());
-  perm.Set("HighPrint", GetEncrypt()->IsHighPrintAllowed());
+  perm.Set("Accessible", encrypt->IsAccessibilityAllowed());
+  perm.Set("Print", encrypt->IsPrintAllowed());
+  perm.Set("Copy", encrypt->IsCopyAllowed());
+  perm.Set("DocAssembly", encrypt->IsDocAssemblyAllowed());
+  perm.Set("Edit", encrypt->IsEditAllowed());
+  perm.Set("EditNotes", encrypt->IsEditNotesAllowed());
+  perm.Set("FillAndSign", encrypt->IsFillAndSignAllowed());
+  perm.Set("HighPrint", encrypt->IsHighPrintAllowed());
   return perm;
 }
 
@@ -307,13 +312,12 @@ Napi::Value
 Encrypt::GetEncryptionKey(const CallbackInfo& info)
 {
   return String::New(
-    info.Env(),
-    reinterpret_cast<const char*>(GetEncrypt()->GetEncryptionKey()));
+    info.Env(), reinterpret_cast<const char*>(encrypt->GetEncryptionKey()));
 }
 
 Napi::Value
 Encrypt::GetKeyLength(const CallbackInfo& info)
 {
-  return Number::New(info.Env(), GetEncrypt()->GetKeyLength());
+  return Number::New(info.Env(), encrypt->GetKeyLength());
 }
 }
