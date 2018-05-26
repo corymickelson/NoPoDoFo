@@ -17,9 +17,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import { Data } from './data'
-import { Document, NPDFFontEncoding, PageLayout, PageMode } from './document'
+import { IDocument, NPDFFontEncoding, NPDFPageLayout, NPDFPageMode } from './document'
 import {__mod as mod} from './base-document'
-import { StreamDocument, NPDFWriteMode, NPDFVersion } from './stream-document'
+import { IStreamDocument, NPDFWriteMode, NPDFVersion } from './stream-document'
 import { IObj } from './object'
 import { Page } from './page'
 import {
@@ -69,7 +69,7 @@ export {
     Rect,
     Image,
     Data,
-    Document,
+    IDocument,
     NPDFFontEncoding,
     IObj,
     Page,
@@ -103,14 +103,14 @@ export {
     Cell,
     Table,
     mod,
-    PageLayout,
-    PageMode,
-    StreamDocument,
+    NPDFPageLayout,
+    NPDFPageMode,
+    IStreamDocument,
     NPDFWriteMode,
     NPDFVersion
 }
 export const CONVERSION = 0.0028346456693
-export type NPDFExternal<T> = any
+export type NPDFExternal<T> = Object
 
 
 

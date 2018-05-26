@@ -40,18 +40,24 @@ using std::string;
 
 namespace NoPoDoFo {
 
+/**
+ * @note JS Derived class instantiate new <BaseDocument>T(string: filePath,
+ * opts: {version, writeMode, encrypt})
+ * @brief BaseDocument::BaseDocument
+ * @param info
+ */
 BaseDocument::BaseDocument(const Napi::CallbackInfo& info)
 {
-  if (info.Length() == 2 && info[1].IsBoolean() && info[0].IsString()) {
-    create = info[1].As<Boolean>();
+  if (info.Length() >= 1 && info[0].IsString()) {
+    create = true;
     output = info[0].As<String>().Utf8Value();
   }
   if (create) {
     EPdfVersion version = ePdfVersion_1_7;
     EPdfWriteMode writeMode = ePdfWriteMode_Default;
     PdfEncrypt* encrypt = nullptr;
-    if (info.Length() >= 3 && info[2].IsObject()) {
-      auto nObj = info[2].As<Object>();
+    if (info.Length() >= 2 && info[1].IsObject()) {
+      auto nObj = info[1].As<Object>();
       if (nObj.Has("version")) {
         version = static_cast<EPdfVersion>(
           nObj.Get("version").As<Number>().Uint32Value());
@@ -62,8 +68,7 @@ BaseDocument::BaseDocument(const Napi::CallbackInfo& info)
       }
       if (nObj.Has("encrypt")) {
         auto nEncObj = Encrypt::Unwrap(nObj.Get("encrypt").As<Object>());
-        encrypt =
-            const_cast<PdfEncrypt*>(nEncObj->encrypt);
+        encrypt = const_cast<PdfEncrypt*>(nEncObj->encrypt);
       }
     }
     document = make_shared<PdfStreamedDocument>(
@@ -395,6 +400,7 @@ BaseDocument::CreateFont(const CallbackInfo& info)
   } catch (PdfError& err) {
     ErrorHandler(err, info);
   }
+  return info.Env().Undefined();
 }
 /**
  * @note Javascript args (doc:Document, pageN:number, atN:number)
@@ -449,9 +455,8 @@ Napi::Value
 BaseDocument::CreatePage(const CallbackInfo& info)
 {
   auto r = Rect::Unwrap(info[0].As<Object>())->GetRect();
-  document->CreatePage(*r);
-  //  return Page::constructor.New(
-  //    { External<PdfPage>::New(info.Env(), document->CreatePage(*r)) });
+  auto page = document->CreatePage(*r);
+  return Page::constructor.New({ External<PdfPage>::New(info.Env(), page) });
 }
 Napi::Value
 BaseDocument::CreatePages(const Napi::CallbackInfo& info)

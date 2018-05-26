@@ -19,7 +19,7 @@
 import { EventEmitter } from "events";
 import { NPDFInternal, IObj } from "./object";
 import {IEncrypt, ProtectionOption} from "./encrypt";
-import {PageMode, PageLayout, NPDFCreateFontOpts, Document, IDocument, Callback} from "./document";
+import {NPDFPageMode, NPDFPageLayout, NPDFCreateFontOpts, IDocument, Callback} from "./document";
 import { IRef } from "./reference";
 import {IPage, Page} from "./page";
 import {Font, IFont} from "./painter";
@@ -54,8 +54,8 @@ export interface IBase {
     readonly form: IForm
     readonly body: IObj[]
     readonly version: NPDFVersion
-    pageMode: PageMode
-    pageLayout: PageLayout
+    pageMode: NPDFPageMode
+    pageLayout: NPDFPageLayout
     printingScale: string
     baseUri: string
     language: string
@@ -110,15 +110,15 @@ export class BaseDocument extends EventEmitter {
         throw EvalError()
     }
 
-    set pageMode(v: PageMode) {
+    set pageMode(v: NPDFPageMode) {
         this._base.pageMode = v
     }
 
-    get pageMode(): PageMode {
+    get pageMode(): NPDFPageMode {
         return this._base.pageMode
     }
 
-    set pageLayout(v: PageLayout) {
+    set pageLayout(v: NPDFPageLayout) {
         this._base.pageLayout = v
     }
 
@@ -226,7 +226,7 @@ export class BaseDocument extends EventEmitter {
         })
     }
 
-    insertExistingPage(doc:Document, docIndex:number, atIndex:number):number {
+    insertExistingPage(doc:IDocument, docIndex:number, atIndex:number):number {
         return this.base.getPageCount()
     }
 

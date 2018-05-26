@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import {BaseDocument, __mod, IBase} from "./base-document";
+import { BaseDocument, __mod, IBase } from "./base-document";
 import { IEncrypt } from "./encrypt";
 import { NPDFInternal } from "./object";
 
@@ -42,23 +42,6 @@ export interface IStreamDocument extends IBase {
      *      defaults to {pdf1.7, writeMode_default, null}
      * @returns {IStreamDocument}
      */
-    new(file:string, opts: {version: NPDFVersion, writer: NPDFWriteMode, encrypt?: IEncrypt}): IStreamDocument
+    new(file: string, opts?: { version: NPDFVersion, writer: NPDFWriteMode, encrypt?: IEncrypt }): IStreamDocument
     close(): void
-}
-
-export class StreamDocument extends BaseDocument {
-    private _instance: NPDFInternal
-    constructor(name:string, version: NPDFVersion, writer: NPDFWriteMode, encrypt?: IEncrypt) {
-        super()
-        this._instance = new __mod.StreamDocument(name, version, writer, encrypt || null)
-        this.setInternal(this._instance)
-    }
-
-    /**
-     * @description Calls PdfStreamedDocument::Close and emits the close event.
-     */
-    close(): void {
-        this._instance.close()
-        this.emit('close')
-    }
 }

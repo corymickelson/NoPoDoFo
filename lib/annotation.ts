@@ -20,6 +20,8 @@ import {NPDFColor, NPDFrgb} from './painter';
 import {access} from "fs";
 import {F_OK, R_OK} from "constants";
 import {IAction, IDestination} from "./action";
+import {IFileSpec} from "./file-spec";
+import {IBase} from "./base-document";
 
 export enum NPDFAnnotationType {
     Text = 'Text',
@@ -117,6 +119,7 @@ export enum NPDFAction {
 }
 
 export interface IAnnotation {
+    new(doc: IBase): IAnnotation
     flags: NPDFAnnotationFlag
     title: string
     content: string
@@ -125,6 +128,7 @@ export interface IAnnotation {
     open: boolean
     quadPoints: number[]
     color: NPDFColor
+    attachment: IFileSpec
 
     setBorderStyle(v: NPDFAnnotationBorderStyle): void
     hasAppearanceStream(): boolean
@@ -132,86 +136,3 @@ export interface IAnnotation {
 }
 
 export type NPDFAnnotationBorderStyle = { horizontal: number, vertical: number, width: number }
-
-/**
- * @desc Red, Green, Blue
- */
-export class Annotation {
-    get quadPoints(): Array<number> {
-        return this._instance.quadPoints
-    }
-
-    set quadPoints(value: Array<number>) {
-        this._instance.quadPoints = value
-    }
-
-    get title() {
-        return this._instance.title
-    }
-
-    set title(value: string) {
-        this._instance.title = value
-    }
-
-    get flag(): NPDFAnnotationFlag {
-        return this._instance.flag
-    }
-
-    set flag(value: NPDFAnnotationFlag) {
-        this._instance.flag = value
-    }
-
-    get color() {
-        return this._instance.color
-    }
-
-    set color(value: NPDFrgb) {
-        let rgbErr = Error("RGB value must be an integer >= 0 || <= 256")
-        if (value.length !== 3) {
-            throw rgbErr
-        }
-        value.forEach(e => {
-            if (Number.isInteger(e) === false) {
-                throw rgbErr
-            }
-            if (Number.isNaN(e)) {
-                throw rgbErr
-            }
-        });
-        this._instance.color = value
-    }
-
-    constructor(private _instance: any) {
-    }
-
-    hasAppearanceStream(): boolean {
-        return this._instance.hasAppearanceStream()
-    }
-
-    setBorderStyle(horizontalRadius: number, verticalRadius: number, width: number): void {
-        return this._instance.setBorderStyle(horizontalRadius, verticalRadius, width)
-    }
-
-    hasDestination(): boolean {
-        return this._instance.hasDestination()
-    }
-
-    hasAction(): boolean {
-        return this._instance.hasAction()
-    }
-
-    getType(): NPDFAnnotationType {
-        return this._instance.getType()
-    }
-
-    setFileAttachment(filename: string, embed: boolean = true): void {
-        access(filename, F_OK | R_OK, err => {
-            if (err) throw Error("File not found")
-            this._instance.setFileAttachment(filename, embed)
-        })
-    }
-
-    hasFileAttachment(): boolean {
-        return this._instance.hasFileAttachment()
-    }
-}

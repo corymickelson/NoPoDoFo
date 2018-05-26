@@ -51,6 +51,7 @@ public:
   Napi::Value GetCatalog(const Napi::CallbackInfo&);
   static Napi::Value GC(const Napi::CallbackInfo&);
   Napi::Value GetSharedPtrCount(const Napi::CallbackInfo&);
+  Napi::Value InsertPages(const Napi::CallbackInfo&);
 
   std::shared_ptr<PoDoFo::PdfMemDocument> GetMemDocument()
   {

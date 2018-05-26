@@ -233,9 +233,16 @@ Annotation::SetColor(const CallbackInfo& info, const Napi::Value& value)
 {
   if (value.IsArray()) {
     auto jsValue = value.As<Array>();
-    int rgb[3];
+    double rgb[3];
     for (uint8_t i = 0; i < jsValue.Length(); i++) {
-      rgb[i] = jsValue.Get(i).As<Number>();
+      double v = jsValue.Get(i).As<Number>();
+      if (v < 0 || v > 256) {
+        RangeError::New(info.Env(),
+                        "RGB value must be an integer between 0-256")
+          .ThrowAsJavaScriptException();
+        return;
+      }
+      rgb[i] = v;
     }
     GetAnnotation().SetColor(rgb[0], rgb[1], rgb[2]);
   } else {
