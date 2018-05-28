@@ -17,9 +17,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <iostream>
 #include "ListField.h"
 #include "Field.h"
+#include <iostream>
 
 using namespace PoDoFo;
 using namespace Napi;
@@ -27,13 +27,13 @@ using namespace Napi;
 using std::cout;
 using std::endl;
 using std::make_shared;
+using std::shared_ptr;
 
 namespace NoPoDoFo {
 
-ListField::ListField(const CallbackInfo& info)
-{
-  field = Field::Unwrap(info[0].As<Object>())->GetField();
-}
+ListField::ListField(shared_ptr<PdfField> shared)
+  : field(shared)
+{}
 
 void
 ListField::InsertItem(const CallbackInfo& info)
@@ -60,8 +60,7 @@ ListField::GetItem(const CallbackInfo& info)
   Object item = Object::New(info.Env());
   string value = GetListField().GetItem(index).GetStringUtf8();
   string display = GetListField().GetItemDisplayText(index).GetStringUtf8();
-  item.Set(String::New(info.Env(), "value"),
-           String::New(info.Env(), value));
+  item.Set(String::New(info.Env(), "value"), String::New(info.Env(), value));
   item.Set(String::New(info.Env(), "display"),
            String::New(info.Env(), display));
   return item;

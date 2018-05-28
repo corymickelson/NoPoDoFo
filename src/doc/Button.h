@@ -17,33 +17,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef NPDF_CHECKBOX_H
-#define NPDF_CHECKBOX_H
-
-#include "Field.h"
-#include "Button.h"
+#ifndef NPDF_BUTTON_H
+#define NPDF_BUTTON_H
 
 #include <napi.h>
 #include <podofo/podofo.h>
-
-using namespace Napi;
-using namespace PoDoFo;
+#include "Field.h"
 
 namespace NoPoDoFo {
-class CheckBox
-  : public ObjectWrap<CheckBox>
-  , public Field
-  , public Button
-{
-public:
-  explicit CheckBox(const CallbackInfo& callbackInfo);
-  static Napi::FunctionReference constructor;
-  static void Initialize(Napi::Env& env, Napi::Object& target);
-  Napi::Value IsChecked(const CallbackInfo&);
-  void SetChecked(const CallbackInfo&, const Napi::Value&);
 
-  std::unique_ptr<PoDoFo::PdfCheckBox> checkbox;
+class Button {
+public:
+  explicit Button(std::shared_ptr<PoDoFo::PdfField> field);
+  Napi::Value GetCaption(const Napi::CallbackInfo&);
+  void SetCaption(const Napi::CallbackInfo&, const Napi::Value&);
+
+  std::shared_ptr<PoDoFo::PdfButton> button;
   std::shared_ptr<PoDoFo::PdfField> field;
 };
+
 }
-#endif // NPDF_CHECKBOX_H
+#endif //NPDF_BUTTON_H

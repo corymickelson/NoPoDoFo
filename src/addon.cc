@@ -45,6 +45,7 @@
 #include "doc/StreamDocument.h"
 #include "doc/TextField.h"
 #include "doc/Action.h"
+#include "doc/PushButton.h"
 #include <napi.h>
 
 Napi::Object
@@ -52,7 +53,6 @@ init(Napi::Env env, Napi::Object exports)
 {
   NoPoDoFo::Document::Initialize(env, exports);
   NoPoDoFo::Page::Initialize(env, exports);
-  NoPoDoFo::Field::Initialize(env, exports);
   NoPoDoFo::TextField::Initialize(env, exports);
   NoPoDoFo::Image::Initialize(env, exports);
   NoPoDoFo::Annotation::Initialize(env, exports);
@@ -80,6 +80,7 @@ init(Napi::Env env, Napi::Object exports)
   NoPoDoFo::Outline::Initialize(env, exports);
   NoPoDoFo::Destination::Initialize(env, exports);
   NoPoDoFo::Action::Initialize(env, exports);
+  NoPoDoFo::PushButton::Initialize(env, exports);
 
   exports["signature"] = Function::New(env, NPDFSignatureData);
 

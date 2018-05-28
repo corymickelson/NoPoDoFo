@@ -38,6 +38,7 @@ public:
   Napi::Value GetNumFields(const Napi::CallbackInfo&);
   void SetRotation(const Napi::CallbackInfo&, const Napi::Value&);
   Napi::Value GetField(const Napi::CallbackInfo&);
+  Napi::Value GetField(const Napi::Env&, int);
   Napi::Value GetFields(const Napi::CallbackInfo&);
   Napi::Value GetFieldIndex(const Napi::CallbackInfo&);
   void SetPageWidth(const Napi::CallbackInfo&, const Napi::Value&);
@@ -59,8 +60,6 @@ public:
 
   PoDoFo::PdfPage* GetPage() { return page.get(); }
 
-protected:
-private:
   int n = -1;
   std::shared_ptr<PoDoFo::PdfDocument> doc;
   std::shared_ptr<PoDoFo::PdfPage> page;

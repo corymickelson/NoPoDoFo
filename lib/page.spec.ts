@@ -1,20 +1,18 @@
 import { existsSync, unlinkSync, writeFile } from 'fs'
 import { join } from 'path'
 import * as test from 'tape'
-import {__mod, Document} from './document'
+import {__mod as npdf} from './document'
 import { IObj } from "./object";
-import { Field } from './field';
-import { Painter } from "./painter";
-import { Image } from "./image";
-import {IPage, Page} from "./page";
+import {IPage} from "./page";
 
 
 const filePath = join(__dirname, '../test-documents/test.pdf'),
     outFile = './test.out.pdf',
-    doc = new Document(filePath)
-let page: Page;
+    doc = new npdf.Document()
 
-doc.on('ready', e => {
+let page: IPage;
+
+doc.load(filePath, e => {
     page = doc.getPage(0)
     runAll()
 })
@@ -26,8 +24,8 @@ function pageRotation() {
             newRotation = originalRotation + 90
         page.rotation = newRotation
         doc.write(outFile, e => {
-            const testDoc = new Document(outFile)
-            testDoc.on('ready', e => {
+            const testDoc = new npdf.Document()
+            testDoc.load(outFile, e => {
                 if (e instanceof Error) t.fail()
                 const testPage = testDoc.getPage(0)
                 t.assert(testPage.rotation === newRotation, 'Page rotation updated')
@@ -60,37 +58,16 @@ function pageTrimBox() {
 
 function pageFields() {
     test('get number of fields', t => {
-        let n = page.getNumFields()
+        let n = page.fieldsCount()
         t.assert(typeof n === 'number')
-        // t.assert(page.getNumFields() === 22, 'page get number of fields counts all fields')
         t.end()
-    })
-}
-
-function pageFieldInfoArray() {
-    test('get fields info', t => {
-        try {
-            const fields = page.getFieldsInfo()
-
-            // t.assert(fields.length === 22, 'page get field info get\'s info for each field')
-            t.assert(fields instanceof Array)
-            t.ok(fields)
-            t.assert(fields.length > 0)
-            t.end()
-        }
-        catch (e) {
-            console.log(e)
-            t.fail()
-        }
-
     })
 }
 
 function pageGetField() {
     test('get field', t => {
         const field = page.getField(0)
-
-        t.assert(field instanceof Field, 'is an instance of Field')
+        t.assert(field instanceof (npdf.Field as any), 'is an instance of Field')
         t.end()
     })
 }
@@ -99,15 +76,14 @@ function pageGetFields() {
     test('get fields', t => {
         const fields = page.getFields()
         t.assert(Array.isArray(fields), 'returns an array')
-        t.assert(fields.length === page.getNumFields(), 'is not an empty array')
-        t.assert(fields[0] instanceof Field, 'contains instance(s) of Field')
+        t.assert(fields.length === page.fieldsCount(), 'is not an empty array')
         t.end()
     })
 }
 
 function pageGetAnnotsCount() {
     test('page number of annotations', t => {
-        t.assert(page.getNumAnnots() === 22, 'get\'s all annotations on the page')
+        t.assert(page.annotationsCount() === 22, 'get\'s all annotations on the page')
         t.end()
     })
 }
@@ -123,8 +99,8 @@ function pageGetAnnot() {
 
 function pageContents() {
     test('page contents', t => {
-        const contents = page.getContents(false)
-        t.assert(contents instanceof (__mod.Obj as any), 'is an instance of Obj')
+        const contents = page.contents
+        t.assert(contents instanceof (npdf.Obj as any), 'is an instance of Obj')
         t.assert(contents.length > 0, 'content is not null or empty')
         t.end()
     })
@@ -132,8 +108,8 @@ function pageContents() {
 
 function pageResources() {
     test('page resources', t => {
-        const resources = page.getResources()
-        t.assert(resources instanceof (__mod.Obj as any), 'is instance ob Obj')
+        const resources = page.resources
+        t.assert(resources instanceof (npdf.Obj as any), 'is instance ob Obj')
         t.assert(resources.length > 0, 'is not null or empty')
         t.end()
     })
@@ -141,11 +117,11 @@ function pageResources() {
 
 function pageAddImg() {
     test('add image', t => {
-        const painter = new Painter(doc),
-            img = new Image(doc, join(__dirname, '../test-documents/test.jpg'))
+        const painter = new npdf.Painter(doc),
+            img = new npdf.Image(doc, join(__dirname, '../test-documents/test.jpg'))
 
-        painter.page = page
-        painter.drawImage(img, 0, page.height - img.getHeight())
+        painter.setPage(page)
+        painter.drawImage(img, 0, page.height - img.height)
         painter.finishPage()
         function extractImg(obj: IObj, jpg: Boolean) {
             let ext = jpg ? '.jpg' : '.ppm'
@@ -215,7 +191,6 @@ export function runAll() {
         pageProperties,
         pageTrimBox,
         pageFields,
-        pageFieldInfoArray,
         pageGetField,
         pageGetFields,
         pageGetAnnotsCount,

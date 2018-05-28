@@ -43,7 +43,7 @@
   "devDependencies": {
     "coveralls": "^3.0.1",
     "husky": "^0.14.3",
-    "nyc": "^11.7.3",
+    "nyc": "^11.8.0",
     "tap-summary": "^4.0.0",
     "tape": "^4.9.0",
     "uuid": "^3.2.1"

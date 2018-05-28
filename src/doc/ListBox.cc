@@ -33,31 +33,49 @@ FunctionReference ListBox::constructor; // NOLINT
 
 ListBox::ListBox(const Napi::CallbackInfo& info)
   : ObjectWrap(info)
-  , ListField(info)
+  , Field(ePdfField_ListBox, info)
+  , ListField(Field::GetField())
 {
-  field = Field::Unwrap(info[0].As<Object>())->GetField();
+  field = Field::GetField();
 }
 
 void
 ListBox::Initialize(Napi::Env& env, Napi::Object& target)
 {
   HandleScope scope(env);
-  auto ctor = DefineClass(env, "ListBox", {
-          InstanceAccessor(
-        "selected", &ListField::GetSelectedItem, &ListField::SetSelectedItem),
-      InstanceAccessor("length", &ListField::GetItemCount, nullptr),
+  auto ctor = DefineClass(
+    env,
+    "ListBox",
+    { InstanceAccessor(
+        "selected", &ListBox::GetSelectedItem, &ListBox::SetSelectedItem),
+      InstanceAccessor("length", &ListBox::GetItemCount, nullptr),
       InstanceAccessor("spellCheckEnabled",
-                       &ListField::IsSpellCheckEnabled,
-                       &ListField::SetSpellCheckEnabled),
-      InstanceAccessor("sorted", &ListField::IsSorted, &ListField::SetSorted),
+                       &ListBox::IsSpellCheckEnabled,
+                       &ListBox::SetSpellCheckEnabled),
+      InstanceAccessor("sorted", &ListBox::IsSorted, &ListBox::SetSorted),
       InstanceAccessor(
-        "multiSelect", &ListField::IsMultiSelect, &ListField::SetMultiSelect),
-      InstanceMethod("isComboBox", &ListField::IsComboBox),
-      InstanceMethod("insertItem", &ListField::InsertItem),
-      InstanceMethod("removeItem", &ListField::RemoveItem),
-      InstanceMethod("getItem", &ListField::GetItem)
-
-  });
+        "multiSelect", &ListBox::IsMultiSelect, &ListBox::SetMultiSelect),
+      InstanceMethod("isComboBox", &ListBox::IsComboBox),
+      InstanceMethod("insertItem", &ListBox::InsertItem),
+      InstanceMethod("removeItem", &ListBox::RemoveItem),
+      InstanceMethod("getItem", &ListBox::GetItem),
+      InstanceAccessor("readOnly", &ListBox::IsReadOnly, &ListBox::SetReadOnly),
+      InstanceAccessor("required", &ListBox::IsRequired, &ListBox::SetRequired),
+      InstanceAccessor("exported", &ListBox::IsExport, &ListBox::SetExport),
+      InstanceAccessor("type", &ListBox::GetType, nullptr),
+      InstanceAccessor("typeString", &ListBox::GetTypeAsString, nullptr),
+      InstanceAccessor(
+        "fieldName", &ListBox::GetFieldName, &ListBox::SetFieldName),
+      InstanceAccessor("alternateName",
+                       &ListBox::GetAlternateName,
+                       &ListBox::SetAlternateName),
+      InstanceAccessor(
+        "mappingName", &ListBox::GetMappingName, &ListBox::SetMappingName),
+      InstanceMethod("setBackgroundColor", &ListBox::SetBackground),
+      InstanceMethod("setBorderColor", &ListBox::SetBorder),
+      InstanceMethod("setMouseAction", &ListBox::SetMouseAction),
+      InstanceMethod("setPageAction", &ListBox::SetPageAction),
+      InstanceMethod("setHighlightingMode", &ListBox::SetHighlightingMode) });
   constructor = Persistent(ctor);
   constructor.SuppressDestruct();
   target.Set("ListBox", ctor);

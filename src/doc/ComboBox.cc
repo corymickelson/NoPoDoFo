@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <iostream>
 #include "ComboBox.h"
-#include "../ValidateArguments.h"
 #include "Field.h"
 
 using namespace Napi;
@@ -26,6 +26,7 @@ using namespace PoDoFo;
 
 using std::cout;
 using std::endl;
+using std::make_unique;
 
 namespace NoPoDoFo {
 
@@ -33,9 +34,11 @@ FunctionReference ComboBox::constructor; // NOLINT
 
 ComboBox::ComboBox(const Napi::CallbackInfo& info)
   : ObjectWrap(info)
-  , ListField(info)
+  , Field(ePdfField_ComboBox, info)
+  , ListField(Field::GetField())
 {
-  field = Field::Unwrap(info[0].As<Napi::Object>())->GetField();
+  field = Field::GetField();
+  combo = make_unique<PdfComboBox>(*field.get());
 }
 
 void
@@ -49,18 +52,38 @@ ComboBox::Initialize(Napi::Env& env, Napi::Object& target)
         "editable", &ComboBox::GetEditable, &ComboBox::SetEditable),
 
       InstanceAccessor(
-        "selected", &ListField::GetSelectedItem, &ListField::SetSelectedItem),
-      InstanceAccessor("length", &ListField::GetItemCount, nullptr),
+        "selected", &ComboBox::GetSelectedItem, &ComboBox::SetSelectedItem),
+      InstanceAccessor("length", &ComboBox::GetItemCount, nullptr),
       InstanceAccessor("spellCheckEnabled",
-                       &ListField::IsSpellCheckEnabled,
-                       &ListField::SetSpellCheckEnabled),
-      InstanceAccessor("sorted", &ListField::IsSorted, &ListField::SetSorted),
+                       &ComboBox::IsSpellCheckEnabled,
+                       &ComboBox::SetSpellCheckEnabled),
+      InstanceAccessor("sorted", &ComboBox::IsSorted, &ComboBox::SetSorted),
       InstanceAccessor(
-        "multiSelect", &ListField::IsMultiSelect, &ListField::SetMultiSelect),
-      InstanceMethod("isComboBox", &ListField::IsComboBox),
-      InstanceMethod("insertItem", &ListField::InsertItem),
-      InstanceMethod("removeItem", &ListField::RemoveItem),
-      InstanceMethod("getItem", &ListField::GetItem)
+        "multiSelect", &ComboBox::IsMultiSelect, &ComboBox::SetMultiSelect),
+      InstanceMethod("isComboBox", &ComboBox::IsComboBox),
+      InstanceMethod("insertItem", &ComboBox::InsertItem),
+      InstanceMethod("removeItem", &ComboBox::RemoveItem),
+      InstanceMethod("getItem", &ComboBox::GetItem),
+
+      InstanceAccessor(
+        "readOnly", &ComboBox::IsReadOnly, &ComboBox::SetReadOnly),
+      InstanceAccessor(
+        "required", &ComboBox::IsRequired, &ComboBox::SetRequired),
+      InstanceAccessor("exported", &ComboBox::IsExport, &ComboBox::SetExport),
+      InstanceAccessor("type", &ComboBox::GetType, nullptr),
+      InstanceAccessor("typeString", &ComboBox::GetTypeAsString, nullptr),
+      InstanceAccessor(
+        "fieldName", &ComboBox::GetFieldName, &ComboBox::SetFieldName),
+      InstanceAccessor("alternateName",
+                       &ComboBox::GetAlternateName,
+                       &ComboBox::SetAlternateName),
+      InstanceAccessor(
+        "mappingName", &ComboBox::GetMappingName, &ComboBox::SetMappingName),
+      InstanceMethod("setBackgroundColor", &ComboBox::SetBackground),
+      InstanceMethod("setBorderColor", &ComboBox::SetBorder),
+      InstanceMethod("setMouseAction", &ComboBox::SetMouseAction),
+      InstanceMethod("setPageAction", &ComboBox::SetPageAction),
+      InstanceMethod("setHighlightingMode", &ComboBox::SetHighlightingMode)
 
     });
   constructor = Napi::Persistent(ctor);
@@ -70,11 +93,11 @@ ComboBox::Initialize(Napi::Env& env, Napi::Object& target)
 void
 ComboBox::SetEditable(const Napi::CallbackInfo&, const Napi::Value& value)
 {
-  GetField().SetEditable(value.As<Napi::Boolean>());
+  combo->SetEditable(value.As<Napi::Boolean>());
 }
 Napi::Value
 ComboBox::GetEditable(const Napi::CallbackInfo& info)
 {
-  return Napi::Boolean::New(info.Env(), GetField().IsEditable());
+  return Napi::Boolean::New(info.Env(), combo->IsEditable());
 }
 }

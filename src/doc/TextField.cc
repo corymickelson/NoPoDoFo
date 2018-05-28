@@ -18,62 +18,70 @@
  */
 
 #include "TextField.h"
+#include "Document.h"
+#include "StreamDocument.h"
 
 using namespace Napi;
 using namespace PoDoFo;
 using std::cout;
 using std::endl;
+using std::make_unique;
 
 namespace NoPoDoFo {
 
 FunctionReference TextField::constructor; // NOLINT
 
+/**
+ * @brief TextField::TextField
+ * @param info
+ */
 TextField::TextField(const CallbackInfo& info)
   : ObjectWrap(info)
+  , Field(ePdfField_TextField, info)
 {
-  field = Field::Unwrap(info[0].As<Object>())->GetField();
-  if (info.Length() == 2 && info[1].IsObject()) {
-    auto opts = info[1].As<Object>();
+  field = Field::GetField();
+  text = make_unique<PdfTextField>(*field.get());
+  if (info[info.Length() - 1].IsObject() &&
+      !info[info.Length() - 1].As<Object>().InstanceOf(
+        Document::constructor.Value()) &&
+      !info[info.Length() - 1].As<Object>().InstanceOf(
+        StreamDocument::constructor.Value())) {
+    auto opts = info[info.Length() - 1].As<Object>();
     if (opts.Has("maxLen")) {
       long maxLen = opts.Get("maxLen").As<Number>();
-      GetField().SetMaxLen(maxLen);
+      text->SetMaxLen(maxLen);
     }
     if (opts.Has("multiLine")) {
       bool multiLine = opts.Get("multiLine").As<Boolean>();
-      GetField().SetMultiLine(multiLine);
+      text->SetMultiLine(multiLine);
     }
     if (opts.Has("passwordField")) {
       bool passwordField = opts.Get("passwordField").As<Boolean>();
-      GetField().SetPasswordField(passwordField);
+      text->SetPasswordField(passwordField);
     }
     if (opts.Has("fileField")) {
       bool fileField = opts.Get("fileField").As<Boolean>();
-      GetField().SetFileField(fileField);
+      text->SetFileField(fileField);
     }
     if (opts.Has("spellCheckEnabled")) {
       bool spellCheckEnabled = opts.Get("spellCheckEnabled").As<Boolean>();
-      GetField().SetSpellcheckingEnabled(spellCheckEnabled);
+      text->SetSpellcheckingEnabled(spellCheckEnabled);
     }
     if (opts.Has("scrollEnabled")) {
       bool scrollEnabled = opts.Get("scrollEnabled").As<Boolean>();
-      GetField().SetScrollBarsEnabled(scrollEnabled);
+      text->SetScrollBarsEnabled(scrollEnabled);
     }
     if (opts.Has("combs")) {
       bool combs = opts.Get("combs").As<Boolean>();
-      GetField().SetCombs(combs);
+      text->SetCombs(combs);
     }
     if (opts.Has("richText") && opts.Has("maxLen")) {
       bool richText = opts.Get("richText").As<Boolean>();
-      GetField().SetRichText(richText);
+      text->SetRichText(richText);
     }
   }
 }
-TextField::~TextField()
-{
-//  HandleScope scope(Env());
-  cout << "Destructing TextField" << endl;
-//  field = nullptr;
-}
+
 void
 TextField::Initialize(Napi::Env& env, Napi::Object& target)
 {
@@ -98,7 +106,26 @@ TextField::Initialize(Napi::Env& env, Napi::Object& target)
                        &TextField::SetScrollEnabled),
       InstanceAccessor("combs", &TextField::IsCombs, &TextField::SetCombs),
       InstanceAccessor(
-        "richText", &TextField::IsRichText, &TextField::SetRichText) });
+        "richText", &TextField::IsRichText, &TextField::SetRichText),
+      InstanceAccessor(
+        "readOnly", &TextField::IsReadOnly, &TextField::SetReadOnly),
+      InstanceAccessor(
+        "required", &TextField::IsRequired, &TextField::SetRequired),
+      InstanceAccessor("exported", &TextField::IsExport, &TextField::SetExport),
+      InstanceAccessor("type", &TextField::GetType, nullptr),
+      InstanceAccessor("typeString", &TextField::GetTypeAsString, nullptr),
+      InstanceAccessor(
+        "fieldName", &TextField::GetFieldName, &TextField::SetFieldName),
+      InstanceAccessor("alternateName",
+                       &TextField::GetAlternateName,
+                       &TextField::SetAlternateName),
+      InstanceAccessor(
+        "mappingName", &TextField::GetMappingName, &TextField::SetMappingName),
+      InstanceMethod("setBackgroundColor", &TextField::SetBackground),
+      InstanceMethod("setBorderColor", &TextField::SetBorder),
+      InstanceMethod("setMouseAction", &TextField::SetMouseAction),
+      InstanceMethod("setPageAction", &TextField::SetPageAction),
+      InstanceMethod("setHighlightingMode", &TextField::SetHighlightingMode) });
   constructor = Napi::Persistent(ctor);
   constructor.SuppressDestruct();
 
@@ -113,94 +140,94 @@ TextField::SetText(const CallbackInfo& info, const Napi::Value& value)
   }
   string input = value.As<String>().Utf8Value();
   PoDoFo::PdfString v(input);
-  GetField().SetText(v);
+  text->SetText(v);
 }
 
 Napi::Value
 TextField::GetText(const CallbackInfo& info)
 {
-  return Napi::String::New(info.Env(), GetField().GetText().GetStringUtf8());
+  return Napi::String::New(info.Env(), text->GetText().GetStringUtf8());
 }
 void
 TextField::SetMaxLen(const Napi::CallbackInfo& info, const Napi::Value& value)
 {
-  GetField().SetMaxLen(value.As<Number>().Int64Value());
+  text->SetMaxLen(value.As<Number>().Int64Value());
 }
 Napi::Value
 TextField::GetMaxLen(const Napi::CallbackInfo& info)
 {
-  return Number::New(info.Env(), GetField().GetMaxLen());
+  return Number::New(info.Env(), text->GetMaxLen());
 }
 void
 TextField::SetMultiLine(const Napi::CallbackInfo& info,
                         const Napi::Value& value)
 {
-  GetField().SetMultiLine(value.As<Boolean>());
+  text->SetMultiLine(value.As<Boolean>());
 }
 Napi::Value
 TextField::IsMultiLine(const Napi::CallbackInfo& info)
 {
-  return Boolean::New(info.Env(), GetField().IsMultiLine());
+  return Boolean::New(info.Env(), text->IsMultiLine());
 }
 void
 TextField::SetPasswordField(const Napi::CallbackInfo&, const Napi::Value& value)
 {
-  GetField().SetPasswordField(value.As<Boolean>());
+  text->SetPasswordField(value.As<Boolean>());
 }
 Napi::Value
 TextField::IsPasswordField(const Napi::CallbackInfo& info)
 {
-  return Boolean::New(info.Env(), GetField().IsPasswordField());
+  return Boolean::New(info.Env(), text->IsPasswordField());
 }
 void
 TextField::SetFileField(const Napi::CallbackInfo&, const Napi::Value& value)
 {
-  GetField().SetFileField(value.As<Boolean>());
+  text->SetFileField(value.As<Boolean>());
 }
 Napi::Value
 TextField::IsFileField(const Napi::CallbackInfo& info)
 {
-  return Boolean::New(info.Env(), GetField().IsFileField());
+  return Boolean::New(info.Env(), text->IsFileField());
 }
 void
 TextField::SetSpellcheckEnabled(const Napi::CallbackInfo&,
                                 const Napi::Value& value)
 {
-  GetField().SetSpellcheckingEnabled(value.As<Boolean>());
+  text->SetSpellcheckingEnabled(value.As<Boolean>());
 }
 Napi::Value
 TextField::IsSpellcheckEnabled(const Napi::CallbackInfo& info)
 {
-  return Boolean::New(info.Env(), GetField().IsSpellcheckingEnabled());
+  return Boolean::New(info.Env(), text->IsSpellcheckingEnabled());
 }
 void
 TextField::SetScrollEnabled(const Napi::CallbackInfo&, const Napi::Value& value)
 {
-  GetField().SetScrollBarsEnabled(value.As<Boolean>());
+  text->SetScrollBarsEnabled(value.As<Boolean>());
 }
 Napi::Value
 TextField::IsScrollEnabled(const Napi::CallbackInfo& info)
 {
-  return Boolean::New(info.Env(), GetField().IsScrollBarsEnabled());
+  return Boolean::New(info.Env(), text->IsScrollBarsEnabled());
 }
 void
 TextField::SetCombs(const Napi::CallbackInfo&, const Napi::Value& value)
 {
-  GetField().SetCombs(value.As<Boolean>());
+  text->SetCombs(value.As<Boolean>());
 }
 Napi::Value
 TextField::IsCombs(const Napi::CallbackInfo& info)
 {
-  return Boolean::New(info.Env(), GetField().IsCombs());
+  return Boolean::New(info.Env(), text->IsCombs());
 }
 void
 TextField::SetRichText(const Napi::CallbackInfo&, const Napi::Value& value)
 {
-  GetField().SetRichText(value.As<Boolean>());
+  text->SetRichText(value.As<Boolean>());
 }
 Napi::Value
 TextField::IsRichText(const Napi::CallbackInfo& info)
 {
-  return Boolean::New(info.Env(), GetField().IsRichText());
+  return Boolean::New(info.Env(), text->IsRichText());
 }
 }

@@ -26,13 +26,11 @@
 using std::string;
 
 namespace NoPoDoFo {
-class Field : public Napi::ObjectWrap<Field>
+class Field
 {
 public:
-  explicit Field(const Napi::CallbackInfo& info);
-  ~Field();
-  static Napi::FunctionReference constructor;
-  static void Initialize(Napi::Env& env, Napi::Object& target);
+  explicit Field(PoDoFo::EPdfField type, const Napi::CallbackInfo& info);
+  Napi::Value GetTypeAsString(const Napi::CallbackInfo&);
   Napi::Value GetType(const Napi::CallbackInfo&);
   Napi::Value GetFieldName(const Napi::CallbackInfo&);
   void SetFieldName(const Napi::CallbackInfo&, const Napi::Value&);
@@ -65,7 +63,6 @@ protected:
   string TypeString();
 
 private:
-  int index;
   std::shared_ptr<PoDoFo::PdfField> field;
 };
 }

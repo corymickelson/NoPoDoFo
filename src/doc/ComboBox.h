@@ -26,7 +26,10 @@
 #include <podofo/podofo.h>
 
 namespace NoPoDoFo {
-class ComboBox : public Napi::ObjectWrap<ComboBox>, public ListField
+class ComboBox
+  : public Napi::ObjectWrap<ComboBox>
+  , public Field
+  , public ListField
 {
 public:
   explicit ComboBox(const Napi::CallbackInfo&);
@@ -35,9 +38,7 @@ public:
   void SetEditable(const Napi::CallbackInfo&, const Napi::Value&);
   Napi::Value GetEditable(const Napi::CallbackInfo&);
 
-  PoDoFo::PdfComboBox GetField() { return PoDoFo::PdfComboBox(*field); }
-
-private:
+  std::unique_ptr<PoDoFo::PdfComboBox> combo;
   std::shared_ptr<PoDoFo::PdfField> field;
 };
 }

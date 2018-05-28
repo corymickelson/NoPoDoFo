@@ -2,7 +2,7 @@
  * This file is part of the NoPoDoFo (R) project.
  * Copyright (c) 2017-2018
  * Authors: Cory Mickelson, et al.
- * 
+ *
  * NoPoDoFo is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -27,7 +27,7 @@ namespace NoPoDoFo {
 class ListField
 {
 public:
-  explicit ListField(const Napi::CallbackInfo& info);
+  explicit ListField(std::shared_ptr<PoDoFo::PdfField>);
   void InsertItem(const Napi::CallbackInfo&);
   void RemoveItem(const Napi::CallbackInfo&);
   Napi::Value GetItem(const Napi::CallbackInfo&);
@@ -42,6 +42,7 @@ public:
   void SetMultiSelect(const Napi::CallbackInfo&, const Napi::Value&);
   Napi::Value IsMultiSelect(const Napi::CallbackInfo&);
   PoDoFo::PdfListField GetListField() { return PoDoFo::PdfListField(*field); }
+
 private:
   std::shared_ptr<PoDoFo::PdfField> field;
 };

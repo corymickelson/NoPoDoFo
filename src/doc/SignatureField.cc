@@ -29,8 +29,8 @@
 
 using namespace Napi;
 using namespace PoDoFo;
-using std::make_unique;
 using std::make_shared;
+using std::make_unique;
 
 namespace NoPoDoFo {
 
@@ -61,13 +61,11 @@ SignatureField::SignatureField(const CallbackInfo& info)
       field = make_shared<PdfSignatureField>(
         &annot->GetAnnotation(), doc->GetAcroForm(), doc.get());
     } else if (info.Length() == 1 && info[0].IsExternal()) {
-      field =
-        make_shared<PdfSignatureField>(info[0]
-                                         .As<External<PdfSignatureField>>()
-                                         .Data()
-                                         ->GetWidgetAnnotation());
+      field = make_shared<PdfSignatureField>(
+        info[0].As<External<PdfAnnotation>>().Data());
     } else {
-      Error::New(info.Env(), "Invalid constructor args").ThrowAsJavaScriptException();
+      Error::New(info.Env(), "Invalid constructor args")
+        .ThrowAsJavaScriptException();
       return;
     }
   } catch (PdfError& err) {
@@ -152,8 +150,7 @@ SignatureField::AddCertificateReference(const CallbackInfo& info)
       .ThrowAsJavaScriptException();
     return;
   }
-  auto sharedMemDoc =
-    std::static_pointer_cast<PdfMemDocument>(doc);
+  auto sharedMemDoc = std::static_pointer_cast<PdfMemDocument>(doc);
   auto flag = static_cast<PdfSignatureField::EPdfCertPermission>(
     info[0].As<Number>().Int32Value());
   GetField()->AddCertificationReference(sharedMemDoc->GetCatalog(), flag);
@@ -175,5 +172,4 @@ SignatureField::EnsureSignatureObject(const CallbackInfo& info)
   }
   return info.Env().Undefined();
 }
-
 }

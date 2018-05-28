@@ -21,7 +21,13 @@
 #include "../ErrorHandler.h"
 #include "../base/Obj.h"
 #include "Annotation.h"
+#include "CheckBox.h"
+#include "ComboBox.h"
 #include "Field.h"
+#include "ListBox.h"
+#include "PushButton.h"
+#include "SignatureField.h"
+#include "TextField.h"
 
 using namespace Napi;
 using namespace PoDoFo;
@@ -29,6 +35,7 @@ using namespace PoDoFo;
 using std::cout;
 using std::endl;
 using std::make_shared;
+using std::stringstream;
 
 namespace NoPoDoFo {
 
@@ -102,12 +109,43 @@ Napi::Value
 Page::GetField(const CallbackInfo& info)
 {
   int index = info[0].As<Number>();
-  if (index < 0 || index > GetPage()->GetNumFields()) {
-    throw RangeError();
+  if (page->GetNumFields() < index || index < 0) {
+    RangeError::New(info.Env(), "index out of range")
+      .ThrowAsJavaScriptException();
+    return info.Env().Undefined();
   }
-  auto instance =
-    Field::constructor.New({ this->Value(), Number::New(info.Env(), index) });
-  return instance;
+  return GetField(info.Env(), index);
+}
+Napi::Value
+Page::GetField(const Napi::Env &env, int index) {
+    PdfField field = page->GetField(index);
+  EPdfField t = field.GetType();
+  switch (t) {
+    case ePdfField_PushButton:
+      return PushButton::constructor.New(
+        { this->Value(), Number::New(env, index) });
+    case ePdfField_CheckBox:
+      return CheckBox::constructor.New(
+        { this->Value(), Number::New(env, index) });
+    case ePdfField_RadioButton:
+      Error::New(env, "RadioButton not yet implemented").ThrowAsJavaScriptException();
+      return env.Undefined();
+    case ePdfField_TextField:
+      return TextField::constructor.New(
+        { this->Value(), Number::New(env, index) });
+    case ePdfField_ComboBox:
+      return ComboBox::constructor.New(
+        { this->Value(), Number::New(env, index) });
+    case ePdfField_ListBox:
+      return ListBox::constructor.New(
+        { this->Value(), Number::New(env, index) });
+    case ePdfField_Signature:
+      return SignatureField::constructor.New({ External<PdfAnnotation>::New(
+        env, field.GetWidgetAnnotation()) });
+  default:
+      Error::New(env, "Unknown field type").ThrowAsJavaScriptException();
+      return env.Undefined();
+  }
 }
 
 Napi::Value
@@ -116,9 +154,7 @@ Page::GetFields(const CallbackInfo& info)
   auto js = Array::New(info.Env());
   uint32_t n = 0;
   for (auto i = 0; i < GetPage()->GetNumFields(); ++i) {
-    auto instance =
-      Field::constructor.New({ this->Value(), Number::New(info.Env(), i) });
-    js.Set(n, instance);
+    js.Set(n, GetField(info.Env(), i));
     ++n;
   }
   return js;
@@ -243,7 +279,7 @@ Page::GetContents(const CallbackInfo& info)
   bool forAppending = info[0].As<Boolean>();
   PdfObject* contentsObj = forAppending ? GetPage()->GetContentsForAppending()
                                         : GetPage()->GetContents();
-  auto objPtr = External<PdfObject>::New(info.Env(), contentsObj );
+  auto objPtr = External<PdfObject>::New(info.Env(), contentsObj);
   auto instance = Obj::constructor.New({ objPtr });
   return instance;
 }
@@ -253,8 +289,7 @@ Page::GetResources(const CallbackInfo& info)
 {
   EscapableHandleScope scope(info.Env());
   PdfObject* resources = GetPage()->GetResources();
-  auto objPtr = External<PdfObject>::New(
-    info.Env(), resources);
+  auto objPtr = External<PdfObject>::New(info.Env(), resources);
   auto instance = Obj::constructor.New({ objPtr });
   return instance;
 }

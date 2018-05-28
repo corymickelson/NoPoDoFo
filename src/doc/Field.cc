@@ -17,58 +17,66 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <iostream>
 #include "Field.h"
 #include "Action.h"
+#include "Annotation.h"
 #include "Document.h"
+#include "Form.h"
 #include "Page.h"
+#include "Rect.h"
+#include "StreamDocument.h"
+#include <iostream>
 
 using namespace Napi;
 using namespace PoDoFo;
 
 using std::cout;
 using std::endl;
-using std::make_unique;
 using std::make_shared;
+using std::make_unique;
 
 namespace NoPoDoFo {
 
-FunctionReference Field::constructor; // NOLINT
+// FunctionReference Field::constructor; // NOLINT
 
-Field::Field(const CallbackInfo& info)
-  : ObjectWrap(info)
-  , index(info[1].As<Number>())
+/**
+ * @brief Field::Field
+ * @param info
+ */
+Field::Field(EPdfField type, const CallbackInfo& info)
 {
-  auto page =  Page::Unwrap(info[0].As<Object>());
-  field = make_shared<PdfField>(page->GetPage()->GetField(index));
+  if (info.Length() < 2) {
+    TypeError::New(info.Env(),
+                   "Field constructor args: [[IPage, number], [IAnnotation, "
+                   "IForm], [IPage, IRect, IBase]]")
+      .ThrowAsJavaScriptException();
+    return;
+  }
+  auto arg1 =
+    info[0]
+      .As<Object>();
+  if (arg1.InstanceOf(Page::constructor.Value())) {
+    auto page = Page::Unwrap(arg1);
+    if (info[1].IsNumber()) {
+      int index = info[1].As<Number>();
+      cout << "Constructing field from existing object" << endl;
+      field = make_shared<PdfField>(page->GetPage()->GetField(index));
+    }
+  } else if (arg1.InstanceOf(Annotation::constructor.Value())) {
+    PdfAnnotation* annotation = &Annotation::Unwrap(arg1)->GetAnnotation();
+    if (info[1].IsObject() &&
+        info[1].As<Object>().InstanceOf(Form::constructor.Value())) {
+      PdfAcroForm* form = Form::Unwrap(info[1].As<Object>())->GetForm();
+      field = make_shared<PdfField>(form->GetObject(), annotation);
+    }
+  } else {
+    TypeError::New(info.Env(), "Signature Mismatch")
+      .ThrowAsJavaScriptException();
+    return;
+  }
   fieldName = field.get()->GetFieldName().GetStringUtf8();
   fieldType = TypeString();
-}
-
-void
-Field::Initialize(Napi::Env& env, Napi::Object& target)
-{
-  HandleScope scope(env);
-  Function ctor = DefineClass(
-    env,
-    "Field",
-    { InstanceAccessor("readOnly", &Field::IsReadOnly, &Field::SetReadOnly),
-      InstanceAccessor("required", &Field::IsRequired, &Field::SetRequired),
-      InstanceAccessor("exported", &Field::IsExport, &Field::SetExport),
-      InstanceAccessor("type", &Field::GetType, nullptr),
-      InstanceAccessor("fieldName", &Field::GetFieldName, &Field::SetFieldName),
-      InstanceAccessor(
-        "alternateName", &Field::GetAlternateName, &Field::SetAlternateName),
-      InstanceAccessor(
-        "mappingName", &Field::GetMappingName, &Field::SetMappingName),
-      InstanceMethod("setBackgroundColor", &Field::SetBackground),
-      InstanceMethod("setBorderColor", &Field::SetBorder),
-      InstanceMethod("setMouseAction", &Field::SetMouseAction),
-      InstanceMethod("setPageAction", &Field::SetPageAction),
-      InstanceMethod("setHighlightingMode", &Field::SetHighlightingMode) });
-  constructor = Napi::Persistent(ctor);
-  constructor.SuppressDestruct();
-  target.Set("Field", ctor);
+  cout << "Field type: " << fieldType << endl;
 }
 
 string
@@ -103,9 +111,13 @@ Field::TypeString()
   return typeStr;
 }
 Napi::Value
-Field::GetType(const CallbackInfo& info)
+Field::GetTypeAsString(const CallbackInfo& info)
 {
   return Napi::String::New(info.Env(), fieldType);
+}
+Napi::Value
+Field::GetType(const Napi::CallbackInfo &info) {
+  return Number::New(info.Env(), static_cast<int>(field->GetType()));
 }
 
 Napi::Value

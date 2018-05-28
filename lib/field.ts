@@ -16,14 +16,14 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import {__mod} from './base-document'
 import {IDocument} from './document'
-import {NPDFInternal, IObj} from "./object";
-import {Document} from './document'
-import {Annotation} from "./annotation";
+import {IObj} from "./object";
+import {IAnnotation} from "./annotation";
 import {IListItem} from "../dist/field";
 import {NPDFColor, NPDFHighlightingMode} from "./painter";
-import {IAction, NPDFActions, NPDFMouseEvent, NPDFPageEvent} from "./action";
+import {IAction, NPDFMouseEvent, NPDFPageEvent} from "./action";
+import {IPage} from './page';
+import {IForm} from './form';
 
 export interface NPDFTextFieldOpts {
     maxLen?: number
@@ -40,27 +40,23 @@ export interface NPDFTextFieldOpts {
     richText?: boolean
 }
 
-export interface IFieldInfo {
-    name: string,
-    alternateName: string,
-    mappingName: string,
-    required: boolean,
-    readOnly: boolean,
-    value: string | number,
-    maxLen?: number,
-    multiLine?: boolean,
-    caption?: string,
-    type: string,
-    selected?: string
-}
-
 export enum NPDFCertificatePermission {
     NoPerms = 1,
     FormFill = 2,
     Annotations = 3,
 }
 
-export type NPDFFieldType =
+export enum NPDFFieldType {
+    PushButton,
+    CheckBox,
+    RadioButton,
+    TextField,
+    ComboBox,
+    ListBox,
+    Signature,
+    Unknown = 0xff
+}
+export type NPDFFieldTypeString =
     'TextField'
     | 'CheckBox'
     | 'RadioButton'
@@ -73,7 +69,8 @@ export type NPDFFieldType =
 export interface IField {
     readOnly: boolean
     required: boolean
-    type: NPDFFieldType
+    readonly type: NPDFFieldType
+    readonly typeAsString: NPDFFieldTypeString
     fieldName: string
     alternateName?: string
     mappingName?: string
@@ -90,8 +87,16 @@ export interface IField {
     setPageAction(on: NPDFPageEvent, action: IAction): void
 }
 
-export interface ITextField {
-    new(field: IField, opts?: NPDFTextFieldOpts): ITextField
+export interface ITextField extends IField {
+    /**
+     * @desc Create from an existing Field
+     */
+    new(page: IPage, fieldIndex: number): ITextField
+
+    /**
+     * @desc Creates a new TextField
+     */
+    new(form: IForm, annotation: IAnnotation): ITextField
 
     text: string
     maxLen: number
@@ -104,13 +109,21 @@ export interface ITextField {
     richText: boolean
 }
 
-export interface ICheckBox {
-    new(field:IField): ICheckBox
+export interface ICheckBox extends IField {
+    /**
+     * @desc Create from an existing Field
+     */
+    new(page: IPage, fieldIndex: number): ICheckBox
+
+    /**
+     * @desc Creates a new TextField
+     */
+    new(form: IForm, annotation: IAnnotation): ICheckBox
+
     checked: boolean
 }
 
-export interface IListField {
-    new(field:IField): IListField
+export interface IListField extends IField {
     selected: number
     length: number
     spellCheckEnabled: boolean
@@ -127,12 +140,45 @@ export interface IListField {
 }
 
 export interface IComboBox extends IListField {
-    new(field:IField): IComboBox
+    /**
+     * @desc Create from an existing Field
+     */
+    new(page: IPage, fieldIndex: number): IComboBox
+
+    /**
+     * @desc Creates a new TextField
+     */
+    new(form: IForm, annotation: IAnnotation): IComboBox
+
     editable: boolean
 }
 
 export interface IListBox extends IListField {
-    new(field:IField): IListBox
+    /**
+     * @desc Create from an existing Field
+     */
+    new(page: IPage, fieldIndex: number): IListBox
+
+    /**
+     * @desc Creates a new TextField
+     */
+    new(form: IForm, annotation: IAnnotation): IListBox
+
+}
+
+export interface IPushButton extends IField {
+     /**
+     * @desc Create from an existing Field
+     */
+    new(page: IPage, fieldIndex: number): IPushButton
+
+    /**
+     * @desc Creates a new TextField
+     */
+    new(form: IForm, annotation: IAnnotation): IPushButton
+
+    rollover:string
+    rolloverAlternate: string
 }
 
 export enum NPDFAnnotationAppearance {
@@ -142,7 +188,8 @@ export enum NPDFAnnotationAppearance {
 }
 
 export interface ISignatureField {
-    new(annotation: Annotation, doc: IDocument): ISignatureField
+    new(annotation: IAnnotation, doc: IDocument): ISignatureField
+
     setAppearanceStream(xObj: any, appearance: NPDFAnnotationAppearance, name: string): void
 
     setReason(reason: string): void
@@ -162,196 +209,7 @@ export interface ISignatureField {
     ensureSignatureObject(): void
 }
 
-export class Field {
-
-    get readOnly(): boolean {
-        return this._instance.readOnly
-    }
-
-    set readOnly(v: boolean) {
-        this._instance.readOnly = v
-    }
-
-    get fieldName(): string {
-        return this._instance.fieldName
-    }
-
-    set fieldName(v: string) {
-        this._instance.fieldName = v
-    }
-
-    get type(): NPDFFieldType {
-        return this._instance.type
-    }
-
-    constructor(private _instance: NPDFInternal) {
-    }
-
-    getAlternateName(): string {
-        return this._instance.getAlternateName()
-    }
-
-    getMappingName(): string {
-        return this._instance.getMappingName()
-    }
-
-    isRequired(): boolean {
-        return this._instance.isRequired()
-    }
-
-    setRequired(required: boolean): void {
-        this._instance.setRequired(required)
-    }
-
-    setAlternateName(name: string): void {
-        this._instance.setAlternateName(name)
-    }
-
-    setMappingName(name: string): void {
-        this._instance.setMappingName(name)
-    }
-}
-
-export class TextField extends Field {
-    private _textFieldInstance: any
-
-    constructor(field: Field, opts?: NPDFTextFieldOpts) {
-        super((field as any)._instance)
-        if (field.type !== 'TextField') {
-            throw Error('field parameter must be a field of type TextField')
-        }
-        this._textFieldInstance = new __mod.TextField((field as any)._instance, opts)
-    }
-
-    get text(): string {
-        return this._textFieldInstance.text
-    }
-
-    set text(value: string) {
-        this._textFieldInstance.text = value
-    }
-}
-
-export class CheckBox extends Field {
-    private _checkboxInstance: any
-
-    get checked() {
-        return this._checkboxInstance.checked
-    }
-
-    set checked(value: boolean) {
-        this._checkboxInstance.checked = value
-    }
-
-    constructor(field: Field) {
-        super((field as any)._instance)
-        if (field.type !== 'CheckBox') {
-            throw Error('must be of type CheckBox')
-        }
-        this._checkboxInstance = new __mod.CheckBox((field as any)._instance)
-    }
-}
-
 export type IListItem = {
     value: string,
     display: string
-}
-
-export class EnumerableField extends Field {
-    private _enumerableFieldInstance: any
-
-    get selected(): number {
-        return this._enumerableFieldInstance.selected
-    }
-
-    set selected(index: number) {
-        this._enumerableFieldInstance.selected = index
-    }
-
-    get length() {
-        return this._enumerableFieldInstance.length
-    }
-
-    constructor(field: Field) {
-        super((field as any)._instance)
-        const t = field.type
-        if (t === 'ListBox' || t === 'ComboBox') {
-            this._enumerableFieldInstance = new __mod.ListField((field as any)._instance)
-        } else {
-            throw TypeError("EnumerableField must be a field type ListBox or ComboBox")
-        }
-    }
-
-    getItem(index: number): IListItem {
-        return this._enumerableFieldInstance.getItem(index)
-    }
-
-    setItem(item: IListItem): void {
-        this._enumerableFieldInstance.insertItem(item.value, item.display)
-    }
-
-    removeItem(index: number): void {
-        this._enumerableFieldInstance.removeItem(index)
-    }
-}
-
-export class ListBox extends EnumerableField {
-    private _listBoxInstance: NPDFInternal
-
-    constructor(field: Field) {
-        super(field)
-        if (field.type !== 'ListBox') {
-            throw TypeError('Must be field type ListBox')
-        }
-        this._listBoxInstance = new __mod.ListBox((field as any)._instance)
-    }
-}
-
-export class ComboBox extends EnumerableField {
-    private _comboBoxInstance: NPDFInternal
-
-    constructor(field: Field) {
-        super(field)
-        if (field.type !== 'ComboBox') {
-            throw TypeError('Must be field type ComboBox')
-        }
-        this._comboBoxInstance = new __mod.ComboBox((field as any)._instance)
-    }
-}
-
-export class SignatureField {
-    private _instance: any
-
-    constructor(annot: Annotation | any, doc?: Document) {
-        if (doc instanceof Document) {
-            this._instance = new __mod.SignatureField((annot as any)._instance, (doc as any)._instance)
-        }
-        else {
-            this._instance = new __mod.SignatureField(annot)
-        }
-    }
-
-    setReason(reason: string): void {
-        this._instance.setReason(reason)
-    }
-
-    setLocation(local: string): void {
-        this._instance.setLocation(local)
-    }
-
-    setCreator(creator: string): void {
-        this._instance.setCreator(creator)
-    }
-
-    setDate(): void {
-        this._instance.setDate()
-    }
-
-    setFieldName(n: string): void {
-        this._instance.setFieldName(n)
-    }
-
-    getObject(): IObj {
-        return this._instance.getObject()
-    }
 }

@@ -17,32 +17,55 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <iostream>
 #include "CheckBox.h"
 #include "Field.h"
-
-namespace NoPoDoFo {
-FunctionReference CheckBox::constructor; // NOLINT
+#include <iostream>
 
 using std::cout;
 using std::endl;
+using std::make_unique;
+
+namespace NoPoDoFo {
+
+FunctionReference CheckBox::constructor; // NOLINT
 
 CheckBox::CheckBox(const CallbackInfo& info)
   : ObjectWrap<CheckBox>(info)
+  , Field(ePdfField_CheckBox, info)
+  , Button(Field::GetField())
 {
-  field = Field::Unwrap(info[0].As<Object>())->GetField();
+  field = Field::GetField();
+  checkbox = make_unique<PdfCheckBox>(*field.get());
 }
-
 
 void
 CheckBox::Initialize(Napi::Env& env, Napi::Object& target)
 {
   HandleScope scope(env);
-  Function ctor =
-    DefineClass(env,
-                "CheckBox",
-                { InstanceAccessor(
-                  "checked", &CheckBox::IsChecked, &CheckBox::SetChecked) });
+  Function ctor = DefineClass(
+    env,
+    "CheckBox",
+    { InstanceAccessor("checked", &CheckBox::IsChecked, &CheckBox::SetChecked),
+      InstanceAccessor(
+        "readOnly", &CheckBox::IsReadOnly, &CheckBox::SetReadOnly),
+      InstanceAccessor(
+        "required", &CheckBox::IsRequired, &CheckBox::SetRequired),
+      InstanceAccessor("exported", &CheckBox::IsExport, &CheckBox::SetExport),
+      InstanceAccessor("type", &CheckBox::GetType, nullptr),
+      InstanceAccessor("typeString", &CheckBox::GetTypeAsString, nullptr),
+      InstanceAccessor(
+        "fieldName", &CheckBox::GetFieldName, &CheckBox::SetFieldName),
+      InstanceAccessor("alternateName",
+                       &CheckBox::GetAlternateName,
+                       &CheckBox::SetAlternateName),
+      InstanceAccessor(
+        "mappingName", &CheckBox::GetMappingName, &CheckBox::SetMappingName),
+      InstanceAccessor("caption", &CheckBox::GetCaption, &CheckBox::SetCaption),
+      InstanceMethod("setBackgroundColor", &CheckBox::SetBackground),
+      InstanceMethod("setBorderColor", &CheckBox::SetBorder),
+      InstanceMethod("setMouseAction", &CheckBox::SetMouseAction),
+      InstanceMethod("setPageAction", &CheckBox::SetPageAction),
+      InstanceMethod("setHighlightingMode", &CheckBox::SetHighlightingMode) });
   constructor = Napi::Persistent(ctor);
   constructor.SuppressDestruct();
 
@@ -51,7 +74,7 @@ CheckBox::Initialize(Napi::Env& env, Napi::Object& target)
 Napi::Value
 CheckBox::IsChecked(const CallbackInfo& info)
 {
-  return Napi::Boolean::New(info.Env(), GetField().IsChecked());
+  return Napi::Boolean::New(info.Env(), checkbox->IsChecked());
 }
 
 void
@@ -62,6 +85,6 @@ CheckBox::SetChecked(const CallbackInfo& info, const Napi::Value& value)
                                "CheckBox.checked requires boolean value");
   }
   bool checked = value.As<Boolean>();
-  GetField().SetChecked(checked);
+  checkbox->SetChecked(checked);
 }
 }

@@ -28,12 +28,13 @@
 
 namespace NoPoDoFo {
 using namespace std;
-class TextField : public Napi::ObjectWrap<TextField>
+class TextField
+  : public Napi::ObjectWrap<TextField>
+  , public Field
 {
 public:
   static Napi::FunctionReference constructor;
   explicit TextField(const Napi::CallbackInfo&);
-  ~TextField();
   static void Initialize(Napi::Env& env, Napi::Object& target);
   void SetText(const Napi::CallbackInfo&, const Napi::Value&);
   Napi::Value GetText(const Napi::CallbackInfo&);
@@ -53,14 +54,9 @@ public:
   Napi::Value IsCombs(const Napi::CallbackInfo&);
   void SetRichText(const Napi::CallbackInfo&, const Napi::Value&);
   Napi::Value IsRichText(const Napi::CallbackInfo&);
-  PoDoFo::PdfTextField GetField()
-  {
-    return PoDoFo::PdfTextField(*field);
-  }
 
-private:
+  std::unique_ptr<PoDoFo::PdfTextField> text;
   std::shared_ptr<PoDoFo::PdfField> field;
-//  Field* field;
 };
 }
 #endif // NPDF_TEXTFIELD_H
