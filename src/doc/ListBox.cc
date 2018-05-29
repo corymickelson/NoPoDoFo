@@ -63,7 +63,6 @@ ListBox::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceAccessor("required", &ListBox::IsRequired, &ListBox::SetRequired),
       InstanceAccessor("exported", &ListBox::IsExport, &ListBox::SetExport),
       InstanceAccessor("type", &ListBox::GetType, nullptr),
-      InstanceAccessor("typeString", &ListBox::GetTypeAsString, nullptr),
       InstanceAccessor(
         "fieldName", &ListBox::GetFieldName, &ListBox::SetFieldName),
       InstanceAccessor("alternateName",

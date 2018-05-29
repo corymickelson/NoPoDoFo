@@ -18,16 +18,15 @@
  */
 import { IDocument, __mod} from "./document";
 import {IFont, NPDFAlignment, NPDFColor, NPDFPoint, NPDFVerticalAlignment, IPainter} from "./painter";
-import {IPage} from "./page";
+import {IPage} from './page'
 
 export class Cell {
     /**
      * Get the font on this cell or null for the default font
      * @returns {Font}
      */
-    get font(): Font {
-        const fInstance = (this._table as any)._instance.getFont(this._col, this._row)
-        return new Font(fInstance)
+    get font(): IFont {
+        return (this._table as any)._instance.getFont(this._col, this._row)
     }
 
     get text(): string {
@@ -75,28 +74,29 @@ export class Cell {
 
 }
 
+
 export class Table {
     private _instance: any
     private _position: NPDFPoint = {x:0, y:0}
-    private _page: Page|null = null
+    private _page: IPage|null = null
 
     // model accessors
     /**
      * Sets the font for all contents of the table
      * @param {Font} v
      */
-    set font(v: Font) {
-        if (v instanceof Font === false) {
+    set font(v: IFont) {
+        if (v instanceof (__mod.Font as any) === false) {
             throw Error("must be instance of Font")
         }
         this._instance.font = (v as any)._instance
     }
 
-    get page():Page|null {
+    get page():IPage|null {
         return this._page
     }
 
-    set page(value:Page|null) {
+    set page(value:IPage|null) {
         this._page = value
     }
 
@@ -166,7 +166,7 @@ export class Table {
         this._instance.autoPageBreak = v
     }
 
-    constructor(doc: Document, cols: number, rows: number) {
+    constructor(doc: IDocument, cols: number, rows: number) {
         this._instance = new __mod.SimpleTable((doc as any)._instance, cols, rows)
     }
 
@@ -184,8 +184,8 @@ export class Table {
     }
 
     // table methods
-    draw(point: NPDFPoint, painter: Painter): void {
-        if (painter instanceof Painter === false) {
+    draw(point: NPDFPoint, painter: IPainter): void {
+        if (painter instanceof (__mod.Painter as any) === false) {
             throw Error('painter must be an instance of NoPoDoFo Painter')
         }
         this._instance.draw(point, (painter as any)._instance)

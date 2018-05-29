@@ -358,8 +358,8 @@ Document::Load(const CallbackInfo& info)
     if (opts.Has("forUpdate")) {
       forUpdate = opts.Get("forUpdate").As<Boolean>();
     }
-    if (opts.Has("isBuffer")) {
-      useBuffer = opts.Get("isBuffer").As<Boolean>();
+    if (opts.Has("fromBuffer")) {
+      useBuffer = opts.Get("fromBuffer").As<Boolean>();
     }
     if (opts.Has("pwd")) {
       pwd = opts.Get("pwd").As<String>().Utf8Value();

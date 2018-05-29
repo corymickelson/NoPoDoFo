@@ -110,11 +110,7 @@ Field::TypeString()
   }
   return typeStr;
 }
-Napi::Value
-Field::GetTypeAsString(const CallbackInfo& info)
-{
-  return Napi::String::New(info.Env(), fieldType);
-}
+
 Napi::Value
 Field::GetType(const Napi::CallbackInfo &info) {
   return Number::New(info.Env(), static_cast<int>(field->GetType()));

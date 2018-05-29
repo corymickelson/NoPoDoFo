@@ -1,7 +1,6 @@
 import * as tap from 'tape'
 import {join} from "path"
-import {IEncrypt} from "./encrypt"
-import {__mod as npdf} from "./document"
+import {IEncrypt,npdf} from "../../dist"
 
 const filePath = join(__dirname, '../test-documents/test.pdf'),
     secureDoc = join(__dirname, '../test-documents/secure.pdf')

@@ -71,7 +71,6 @@ ComboBox::Initialize(Napi::Env& env, Napi::Object& target)
         "required", &ComboBox::IsRequired, &ComboBox::SetRequired),
       InstanceAccessor("exported", &ComboBox::IsExport, &ComboBox::SetExport),
       InstanceAccessor("type", &ComboBox::GetType, nullptr),
-      InstanceAccessor("typeString", &ComboBox::GetTypeAsString, nullptr),
       InstanceAccessor(
         "fieldName", &ComboBox::GetFieldName, &ComboBox::SetFieldName),
       InstanceAccessor("alternateName",

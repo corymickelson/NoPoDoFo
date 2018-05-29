@@ -52,7 +52,6 @@ CheckBox::Initialize(Napi::Env& env, Napi::Object& target)
         "required", &CheckBox::IsRequired, &CheckBox::SetRequired),
       InstanceAccessor("exported", &CheckBox::IsExport, &CheckBox::SetExport),
       InstanceAccessor("type", &CheckBox::GetType, nullptr),
-      InstanceAccessor("typeString", &CheckBox::GetTypeAsString, nullptr),
       InstanceAccessor(
         "fieldName", &CheckBox::GetFieldName, &CheckBox::SetFieldName),
       InstanceAccessor("alternateName",

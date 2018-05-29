@@ -19,7 +19,7 @@
 import {IDocument} from './document'
 import {IObj} from "./object";
 import {IAnnotation} from "./annotation";
-import {IListItem} from "../dist/field";
+import {IListItem} from "./field";
 import {NPDFColor, NPDFHighlightingMode} from "./painter";
 import {IAction, NPDFMouseEvent, NPDFPageEvent} from "./action";
 import {IPage} from './page';
@@ -56,21 +56,11 @@ export enum NPDFFieldType {
     Signature,
     Unknown = 0xff
 }
-export type NPDFFieldTypeString =
-    'TextField'
-    | 'CheckBox'
-    | 'RadioButton'
-    | 'PushButton'
-    | 'Signature'
-    | 'ListField'
-    | 'ComboBox'
-    | 'ListBox'
 
 export interface IField {
     readOnly: boolean
     required: boolean
     readonly type: NPDFFieldType
-    readonly typeAsString: NPDFFieldTypeString
     fieldName: string
     alternateName?: string
     mappingName?: string

@@ -110,31 +110,7 @@ BaseDocument::SetHideMenubar(const Napi::CallbackInfo&)
 Napi::Value
 BaseDocument::GetPageMode(const CallbackInfo& info)
 {
-  string mode;
-  switch (document->GetPageMode()) {
-    case ePdfPageModeDontCare:
-      mode = "DontCare";
-      break;
-    case ePdfPageModeFullScreen:
-      mode = "FullScreen";
-      break;
-    case ePdfPageModeUseAttachments:
-      mode = "UseAttachments";
-      break;
-    case ePdfPageModeUseBookmarks:
-      mode = "UseBookmarks";
-      break;
-    case ePdfPageModeUseNone:
-      mode = "UseNone";
-      break;
-    case ePdfPageModeUseOC:
-      mode = "UseOC";
-      break;
-    case ePdfPageModeUseThumbs:
-      mode = "UseThumbs";
-      break;
-  }
-  return String::New(info.Env(), mode);
+  return Number::New(info.Env(), static_cast<int>(document->GetPageMode()));
 }
 
 void

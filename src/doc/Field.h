@@ -30,7 +30,6 @@ class Field
 {
 public:
   explicit Field(PoDoFo::EPdfField type, const Napi::CallbackInfo& info);
-  Napi::Value GetTypeAsString(const Napi::CallbackInfo&);
   Napi::Value GetType(const Napi::CallbackInfo&);
   Napi::Value GetFieldName(const Napi::CallbackInfo&);
   void SetFieldName(const Napi::CallbackInfo&, const Napi::Value&);

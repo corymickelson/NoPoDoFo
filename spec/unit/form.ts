@@ -1,8 +1,6 @@
-import {NPDFName as name, NPDFName} from './names'
-import {__mod as npdf, NPDFFontEncoding} from './document'
 import {join} from 'path'
 import * as tap from 'tape'
-import {IDictionary, IObj} from './object';
+import { NPDFName as name, npdf, NPDFFontEncoding, IDictionary, IObj} from '../../dist';
 
 const filePath = join(__dirname, '../test-documents/test.pdf')
 
@@ -29,7 +27,7 @@ tap('NPDF Form Accessors and Methods', standard => {
         standard.test('Creating Default Appearance', t => {
             let dr = doc.form.DR as IDictionary
             let font = doc.createFont({fontName: 'Helvetica', encoding: NPDFFontEncoding.WinAnsi})
-            let fontObj = dr.hasKey(NPDFName.FONT) ? dr.getKey(NPDFName.FONT) : null
+            let fontObj = dr.hasKey(name.FONT) ? dr.getKey(name.FONT) : null
             let fontDict: IDictionary
             if (!fontObj) t.fail()
             else {

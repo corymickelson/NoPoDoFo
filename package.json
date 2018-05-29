@@ -6,6 +6,7 @@
   "types": "dist/index.d.ts",
   "repository": "git+https://github.com/corymickelson/NoPoDoFo.git",
   "scripts": {
+    "build": "node ./scripts/install.js",
     "build:all": "node ./scripts/install.js && tsc -p tsconfig.json",
     "build:debug": "node ./scripts/install.js -D",
     "build:test": "npm run build:all && npm run test",
@@ -41,8 +42,12 @@
   },
   "license": "ISC",
   "devDependencies": {
+    "@types/benchmark": "^1.0.31",
+    "@types/microtime": "^2.1.0",
+    "benchmark": "^2.1.4",
     "coveralls": "^3.0.1",
     "husky": "^0.14.3",
+    "microtime": "^2.1.8",
     "nyc": "^11.8.0",
     "tap-summary": "^4.0.0",
     "tape": "^4.9.0",

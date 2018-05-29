@@ -40,7 +40,6 @@ PushButton::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceAccessor(
         "exported", &PushButton::IsExport, &PushButton::SetExport),
       InstanceAccessor("type", &PushButton::GetType, nullptr),
-      InstanceAccessor("typeString", &PushButton::GetTypeAsString, nullptr),
       InstanceAccessor(
         "fieldName", &PushButton::GetFieldName, &PushButton::SetFieldName),
       InstanceAccessor("alternateName",

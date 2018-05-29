@@ -1,19 +1,17 @@
-import {ContentsTokenizer} from './parser'
 import {join} from 'path';
-import {Document} from './document';
+import { npdf, IContentsTokenizer} from '../../dist';
 import * as test from 'tape'
 
 test('get contents as string, contents tokenizer', t => {
 
     const filePath = join(__dirname, '../test-documents/test.pdf'),
-        doc = new Document(filePath)
+        doc = new npdf.Document()
 
-    doc.on('ready', e => {
+    doc.load(filePath, e => {
         if (e instanceof Error) t.fail()
-        const page = doc.getPage(0),
-            tokenizer = new ContentsTokenizer(page, doc)
+            let tokenizer: IContentsTokenizer = new npdf.ContentsTokenizer(doc, 0)
 
-        const pageContents = tokenizer.readAllContent()
+        const pageContents = tokenizer.readAll()
         t.assert(pageContents.length === 155) // fix this
         t.end()
     })

@@ -113,7 +113,6 @@ TextField::Initialize(Napi::Env& env, Napi::Object& target)
         "required", &TextField::IsRequired, &TextField::SetRequired),
       InstanceAccessor("exported", &TextField::IsExport, &TextField::SetExport),
       InstanceAccessor("type", &TextField::GetType, nullptr),
-      InstanceAccessor("typeString", &TextField::GetTypeAsString, nullptr),
       InstanceAccessor(
         "fieldName", &TextField::GetFieldName, &TextField::SetFieldName),
       InstanceAccessor("alternateName",

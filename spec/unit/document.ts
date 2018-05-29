@@ -1,18 +1,17 @@
 import {join} from 'path'
 import * as tap from 'tape'
-import {IDocument, __mod as npdf, NPDFPageMode} from './document'
 import {Test} from "tape";
-import {NPDFVersion} from '.';
+import {NPDFVersion, IDocument, npdf, NPDFPageMode} from '../../dist';
 
-const filePath = join(__dirname, '../test-documents/test.pdf'),
-    pwdDoc = join(__dirname, '../test-documents/pwd.pdf')
+const filePath = join(__dirname, '../../test-documents/test.pdf'),
+    pwdDoc = join(__dirname, '../../test-documents/pwd.pdf')
 
 export const end = (...tests: Test[]) => tests.forEach(t => t.end())
 
 tap('IStreamDocument', t => {
     const doc = new npdf.StreamDocument('/tmp/npdf.streamdoc.pdf')
     t.comment('StreamDocument default values')
-    t.assert(doc.version === NPDFVersion.Pdf17, 'default to pdf version 1.7')
+    t.assert(doc.version === 1.7, 'default to pdf version 1.7')
     t.assert(doc.info.producer === 'PoDoFo - http://podofo.sf.net', 'Produced by PoDoFo')
     t.assert(doc.getPageCount() === 0, 'StreamDocument instantiated with 0')
     t.assert(doc.pageMode === NPDFPageMode.UseNone, 'defaults to \'UseNone\'')

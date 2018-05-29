@@ -101,12 +101,12 @@ export enum NPDFFontEncoding {
 
 export enum NPDFPageMode {
     DontCare,
-    FullScreen,
-    UseAttachments,
-    UseBookmarks,
     UseNone,
+    UseThumbs,
+    UseBookmarks,
+    FullScreen,
     UseOC,
-    UseThumbs
+    UseAttachments
 }
 
 export enum NPDFPageLayout {

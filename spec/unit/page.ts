@@ -1,9 +1,7 @@
 import { existsSync, unlinkSync, writeFile } from 'fs'
 import { join } from 'path'
 import * as test from 'tape'
-import {__mod as npdf} from './document'
-import { IObj } from "./object";
-import {IPage} from "./page";
+import { IObj, IPage, npdf } from "../../dist";
 
 
 const filePath = join(__dirname, '../test-documents/test.pdf'),

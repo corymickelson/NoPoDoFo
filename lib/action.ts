@@ -1,6 +1,6 @@
 import {IDocument} from "./document"
 import {IDictionary, IObj} from "./object";
-import {IPage} from "../dist/page";
+import {IPage} from "./page";
 
 export enum NPDFActions {
     GoTo = 0,

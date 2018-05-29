@@ -1,9 +1,6 @@
-import {IPainter} from './painter'
+import {npdf, CONVERSION, IPainter, NPDFFontEncoding, Cell, Table} from '../../dist'
 import * as tap from 'tape'
 import {join} from 'path';
-import {__mod as npdf, NPDFFontEncoding} from './document';
-import {CONVERSION} from "./index";
-import {Cell, Table} from "./table";
 
 const filePath = join(__dirname, '../test-documents/test.pdf'),
     outFile = '/tmp/painter.out.pdf',

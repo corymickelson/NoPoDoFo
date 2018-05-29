@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "declaration": true,
+    "preserveConstEnums": true,
+    "lib": [
+      "esnext"
+    ],
+    "module": "commonjs",
+    "sourceMap": true,
+    "rootDir": "./spec",
+    "strict": true,
+    "removeComments": false,
+    "target": "es6",
+    "types": [
+      "node"
+    ],
+    "typeRoots": [
+      "node_modules/@types"
+    ]
+  },
+  "include": ["spec/bench/*.ts", "spec/unit/*.ts"]
+}

@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import {Callback, __mod, IDocument} from './document'
-import {ISignatureField, SignatureField} from "./field";
+import {ISignatureField} from "./field";
 import {access} from "fs";
 import {F_OK, R_OK} from 'constants'
 
@@ -25,39 +25,6 @@ export interface ISigner {
     new(doc: IDocument, output?: string): ISigner
     setField(field: ISignatureField): void
     sign(signature: string, cb: Callback): void
-}
-
-/**
- * The Signer class binds PoDoFo::PdfSignOutputDevice
- */
-export class Signer {
-    private _instance: any
-    constructor(doc: IDocument, output?: string) {
-        if (output) {
-            this._instance = new __mod.Signer((doc as any)._instance, output)
-
-        } else
-            this._instance = new __mod.Signer((doc as any)._instance)
-    }
-
-    signSync(signature: string , output?:string): Buffer {
-        return this._instance.signSync(signature, output)
-    }
-
-    sign(signature:string, output:string, cb:(e:Error, d:Buffer) => void): void {
-        this._instance.sign(cb, signature, output)
-    }
-
-    setField(field:SignatureField) {
-        if(!(field as any)._instance) {
-            throw Error("field undefined")
-        }
-        this._instance.setField((field as any)._instance)
-    }
-
-    getField(): SignatureField {
-        return new SignatureField(this._instance.getField())
-    }
 }
 
 export function signature(certfile: string, pkeyfile: string, password: string = ''): Promise<string> {
