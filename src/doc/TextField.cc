@@ -48,7 +48,7 @@ TextField::TextField(const CallbackInfo& info)
         StreamDocument::constructor.Value())) {
     auto opts = info[info.Length() - 1].As<Object>();
     if (opts.Has("maxLen")) {
-      long maxLen = opts.Get("maxLen").As<Number>();
+      int maxLen = opts.Get("maxLen").As<Number>();
       text->SetMaxLen(maxLen);
     }
     if (opts.Has("multiLine")) {

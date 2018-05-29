@@ -29,7 +29,6 @@ class FileSpec : public Napi::ObjectWrap<FileSpec>
 {
 public:
   explicit FileSpec(const Napi::CallbackInfo&);
-  ~FileSpec();
   static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
   Napi::Value GetFileName(const Napi::CallbackInfo&);

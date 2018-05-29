@@ -1,5 +1,5 @@
 import {NPDFName as name, NPDFName} from './names'
-import {Document, __mod, NPDFFontEncoding} from './document'
+import {__mod as npdf, NPDFFontEncoding} from './document'
 import {join} from 'path'
 import * as tap from 'tape'
 import {IDictionary, IObj} from './object';
@@ -7,8 +7,9 @@ import {IDictionary, IObj} from './object';
 const filePath = join(__dirname, '../test-documents/test.pdf')
 
 tap('NPDF Form Accessors and Methods', standard => {
-    let doc = new Document(filePath)
-    doc.on('ready', e => {
+    let doc = new npdf.Document()
+
+    doc.load(filePath, e => {
         if (e instanceof Error) {
             standard.fail(e.message)
         }
@@ -19,7 +20,7 @@ tap('NPDF Form Accessors and Methods', standard => {
                     .every(i => acroformKeys.includes(i)),
                 'AcroForm Dictionary contains all expected keys')
             t.assert((doc.form.DA as string).includes('Helv'), 'test.pdf DA should be set to Helv')
-            t.assert((doc.form.DR as any) instanceof (__mod.Dictionary as any))
+            t.assert((doc.form.DR as any) instanceof (npdf.Dictionary as any))
             t.assert((doc.form.Fonts as Array<any>).length > 0, 'Fonts contains at least one font')
             t.assert(doc.form.needAppearances === false)
             t.end()

@@ -303,7 +303,12 @@ protected:
       if (!useBuffer)
         doc.GetMemDocument()->Load(arg.c_str(), update);
       else {
+#if PODOFO_VERSION_MINOR >= 9 && PODOFO_VERSION_PATCH >= 6
         doc.GetMemDocument()->LoadFromDevice(*refBuffer);
+#else
+        Error::New(Env(), "This podofo build does not support loading a buffered document").ThrowAsJavascriptException();
+        return;
+#endif
       }
     } catch (PdfError& e) {
       if (e.GetError() == ePdfError_InvalidPassword) {

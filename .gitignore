@@ -28,3 +28,4 @@ lib/*.js
 .nyc_output
 coverage
 *.tmp.*
+*temp*

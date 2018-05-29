@@ -122,7 +122,7 @@ Form::SetSigFlags(const CallbackInfo& info, const Napi::Value& value)
     TypeError::New(info.Env(), "value must be of type number")
       .ThrowAsJavaScriptException();
   } else {
-    long f = value.As<Number>().Int64Value();
+    pdf_int64 f = value.As<Number>().Int64Value();
     if (f < 1 || f > 3) {
       RangeError::New(info.Env(),
                       "SigFlags value can only be 1, 2, or 3. See NPDFSigFlags "

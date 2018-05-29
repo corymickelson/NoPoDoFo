@@ -2,16 +2,16 @@
   // See https://go.microsoft.com//fwlink//?linkid=834763 for more information about this file.
   "configurations": [
     {
-          "name": "x86-Debug",
-          "generator": "Visual Studio 15 2017",
-          "configurationType": "Debug",
-          "buildRoot": "${env.USERPROFILE}\\CMakeBuilds\\${workspaceHash}\\build\\${name}",
-          "cmakeCommandArgs": "",
-          "buildCommandArgs": "-m -v:minimal",
+      "name": "x86-Debug",
+      "generator": "Visual Studio 15 2017",
+      "configurationType": "Debug",
+      "buildRoot": "${env.USERPROFILE}\\CMakeBuilds\\npdf-x86-debug\\build\\${name}",
+      "cmakeCommandArgs": "",
+      "buildCommandArgs": "-m -v:minimal",
       "variables": [
         {
           "name": "CMAKE_TOOLCHAIN_FILE",
-          "value": "C:\\Libs\\vcpkg\\scripts\\buildsystems\\vcpkg.cmake"
+          "value": "C:\\libs\\scripts\\buildsystems\\vcpkg.cmake"
         },
         {
           "name": "CMAKE_JS_VERSION",
@@ -27,7 +27,7 @@
         },
         {
           "name": "CMAKE_JS_INC",
-          "value": "C:\\Users\\micke\\.cmake-js\\node-ia32\\v8.7.0\\include\\node\\"
+          "value": "C:\\Users\\micke\\.cmake-js\\node-ia32\\v8.9.4\\include\\node\\"
         },
         {
           "name": "NODE_RUNTIME",
@@ -43,7 +43,7 @@
         },
         {
           "name": "CMAKE_JS_LIB",
-          "value": "C:\\Users\\micke\\.cmake-js\\node-ia32\\v8.7.0\\win-x86\\node.lib"
+          "value": "C:\\Users\\micke\\.cmake-js\\node-ia32\\v8.9.4\\win-x86\\node.lib"
         },
         {
           "name": "LIBCRYPTO_LIBRARY_NAMES",
