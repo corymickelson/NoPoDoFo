@@ -5,10 +5,8 @@
       "cflags": [ "-w" ],
       "defines": [
         "BUILDING_PODOFO=1",
-      # "USING_SHARED_PODOFO=1"
       ],
       "type": "static_library",
-      # "type": "shared_library",
       "sources": [
         # From PODOFO_BASE_SOURCES
         "podofo/src/base/PdfArray.cpp",
@@ -103,6 +101,7 @@
         "podofo/src/doc/PdfTilingPattern.cpp",
         "podofo/src/doc/PdfXObject.cpp",
       ],
+      ############### Windows ####################
       "conditions": [
         ["OS=='win'", {
           "cflags": [
@@ -121,7 +120,7 @@
             "-l<(VCPKG_Path)/lib/bz2.lib",
             "-l<(VCPKG_Path)/lib/expat.lib",
             "-l<(VCPKG_Path)/lib/fontconfig.lib",
-            "-l<(VCPKG_Path)/lib/freetype.lib",
+            # "-l<(VCPKG_Path)/lib/freetype.lib",
             "-l<(VCPKG_Path)/lib/jpeg.lib",
             "-l<(VCPKG_Path)/lib/libcharset.lib",
             "-l<(VCPKG_Path)/lib/libeay32.lib",
@@ -137,13 +136,14 @@
           "include_dirs": [
             "<(VCPKG_Path)/include",
             "<(VCPKG_Path)/fontconfig", 
-            "<(VCPKG_Path)/freetype", 
+            # "<(VCPKG_Path)/freetype", 
             "<(VCPKG_Path)/libpng16", 
             "<(VCPKG_Path)/lzma", 
             "<(VCPKG_Path)/openssl", 
           ],
         }],
-        ["OS=='linux'", { ############### linux ####################
+         ############### linux ####################
+        ["OS=='linux'", {
           "cflags_cc!": [
             "-fno-exceptions",
             "-fno-rtti"
@@ -171,13 +171,14 @@
             '<!@(pkg-config libtiff-4 --cflags-only-I | sed s/-I//g)',
           ]
         }],
+        ############### Darwin ####################
         ["OS=='mac'", {
           "xcode_settings": {
            "GCC_ENABLE_CPP_EXCEPTIONS": "YES",
            "GCC_ENABLE_CPP_RTTI": "YES"
           }
         }]
-      ],
+      ], # end conditions
       "configurations": {
         "Release": {
           "msvs_settings": {

@@ -94,6 +94,7 @@
         "src/base/Data.cc",
         "src/base/ContentsTokenizer.cc"
       ],
+      # !!!! Windows NPDF Build !!!! #
       "conditions": [
         ["OS==\"win\"", {
           "link_settings": {
@@ -148,7 +149,10 @@
               }
             }
           }
-        }, {  # "OS!=\"win\""
+        }, 
+
+      # !!!! Linux NPDF Build !!!! #
+        {  # "OS!=\"win\""
           'conditions': [
             ['node_shared_openssl=="false"', {
               'include_dirs': [

@@ -1,6 +1,6 @@
 [submodule "deps/podofo"]
 	path = deps/podofo
-	url = git@github.com:corymickelson/podofo.git
+	url = https://github.com/corymickelson/podofo.git
   branch = nopodofo_0_7_0
 [submodule "deps/zlib"]
 	path = deps/zlib
