@@ -109,7 +109,7 @@
             '/EH'
           ],
           "variables": {
-            "VCPKG_Path%": "C:/libs/installed/x64-windows-static",
+            "VCPKG_Path%": "C:/libs/installed/x86-windows-static",
           },
           "dependencies": [
             "zlib.gypi:zlib",
@@ -117,6 +117,7 @@
           ],
           "libraries": [
             "-lws2_32",
+            #"-l<(VCPKG_Path)/lib",
             "-l<(VCPKG_Path)/lib/bz2.lib",
             "-l<(VCPKG_Path)/lib/expat.lib",
             "-l<(VCPKG_Path)/lib/fontconfig.lib",
@@ -135,11 +136,11 @@
           ],
           "include_dirs": [
             "<(VCPKG_Path)/include",
-            "<(VCPKG_Path)/fontconfig", 
-            # "<(VCPKG_Path)/freetype", 
-            "<(VCPKG_Path)/libpng16", 
-            "<(VCPKG_Path)/lzma", 
-            "<(VCPKG_Path)/openssl", 
+            "<(VCPKG_Path)/include/fontconfig", 
+            "<(VCPKG_Path)/include/boost", 
+            "<(VCPKG_Path)/include/libpng16", 
+            "<(VCPKG_Path)/include/lzma", 
+            "<(VCPKG_Path)/include/openssl", 
           ],
         }],
          ############### linux ####################

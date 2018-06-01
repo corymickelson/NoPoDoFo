@@ -2,7 +2,7 @@
   "conditions": [
     ["OS==\"win\"", {
       "variables": {
-        "VCPKG_Path%": "C:/libs/installed/x64-windows-static"
+        "VCPKG_Path%": "C:/libs/installed/x86-windows-static"
       },
       # "defines": ["USING_SHARED_PODOFO=1"]
     }],
@@ -100,31 +100,33 @@
           "link_settings": {
             "libraries": ["ws2_32"]
           },
-          # "libraries": [
-          #   "-l<(VCPKG_Path)/lib/bz2.lib",
-          #   "-l<(VCPKG_Path)/lib/expat.lib",
-          #   "-l<(VCPKG_Path)/lib/fontconfig.lib",
-          #   "-l<(VCPKG_Path)/lib/freetype.lib",
-          #   "-l<(VCPKG_Path)/lib/jpeg.lib",
-          #   "-l<(VCPKG_Path)/lib/libcharset.lib",
-          #   "-l<(VCPKG_Path)/lib/libeay32.lib",
-          #   "-l<(VCPKG_Path)/lib/libiconv.lib",
-          #   "-l<(VCPKG_Path)/lib/libpng16.lib",
-          #   "-l<(VCPKG_Path)/lib/lzma.lib",
-          #   "-l<(VCPKG_Path)/lib/ssleay32.lib",
-          #   "-l<(VCPKG_Path)/lib/tiff.lib",
-          #   "-l<(VCPKG_Path)/lib/tiffxx.lib",
-          #   "-l<(VCPKG_Path)/lib/turbojpeg.lib",
+          "libraries": [
+            "-l<(VCPKG_Path)/lib/bz2.lib",
+            "-l<(VCPKG_Path)/lib/expat.lib",
+            "-l<(VCPKG_Path)/lib/fontconfig.lib",
+            # "-l<(VCPKG_Path)/lib/freetype.lib",
+            "-l<(VCPKG_Path)/lib/jpeg.lib",
+            "-l<(VCPKG_Path)/lib/libcharset.lib",
+            "-l<(VCPKG_Path)/lib/libeay32.lib",
+            "-l<(VCPKG_Path)/lib/libiconv.lib",
+            "-l<(VCPKG_Path)/lib/libpng16.lib",
+            "-l<(VCPKG_Path)/lib/lzma.lib",
+            "-l<(VCPKG_Path)/lib/ssleay32.lib",
+            "-l<(VCPKG_Path)/lib/tiff.lib",
+            "-l<(VCPKG_Path)/lib/tiffxx.lib",
+            "-l<(VCPKG_Path)/lib/turbojpeg.lib",
+            #"-l<(VCPKG_Path)/lib"
             # "-l<(VCPKG_Path)/lib/zlib.lib",
-          # ],
-          # "include_dirs": [
-          #   "<(VCPKG_Path)/include",
-          #   "<(VCPKG_Path)/fontconfig", 
-          #   "<(VCPKG_Path)/freetype", 
-          #   "<(VCPKG_Path)/libpng16", 
-          #   "<(VCPKG_Path)/lzma", 
-          #   "<(VCPKG_Path)/openssl", 
-          # ],
+          ],
+          "include_dirs": [
+            "<(VCPKG_Path)/include",
+            "<(VCPKG_Path)/include/boost",
+            "<(VCPKG_Path)/include/fontconfig", 
+            "<(VCPKG_Path)/include/freetype", 
+            "<(VCPKG_Path)/include/libpng16", 
+            "<(VCPKG_Path)/include/lzma", 
+            "<(VCPKG_Path)/include/openssl", 
+          ],
           "configurations": {
             "Debug": {
               "msvs_settings": {
