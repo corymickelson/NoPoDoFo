@@ -1,64 +1,60 @@
 {
-"conditions": [
+  "conditions": [
     ["OS==\"win\"", {
       "variables": {
-	    "VCPKG_Path%": "C:/libs/installed/x86-windows",
-   		"podofo_library%": "C:/Users/micke/CMakeBuilds/podofo-x86-debug/install/x86-Debug",
-   		"podofo_include_dir%": "C:/Users/micke/CMakeBuilds/podofo-x86-debug/install/x86-Debug/include"
-      }
+        "VCPKG_Path%": "C:/libs/installed/x64-windows-static"
+      },
+      # "defines": ["USING_SHARED_PODOFO=1"]
     }],
-    ["OS=='linux'", {
-      "variables": {
-        "podofo_library%": "/usr/lib/libpodofo.so",
-        "podofo_include_dir%": "/usr/include/podofo"
-      }
-    }]
   ],
   "targets": [
-    {
-      "target_name": "npdf-postbuild",
-      "dependencies": ["npdf"],
-      "conditions": [
-        ["OS==\"win\"", {
-          "copies": [{
-            "destination": "<(PRODUCT_DIR)",
-            "files": [
-              "<(VCPKG_Path)/bin/zlib1.dll",
-              "<(VCPKG_Path)/bin/libpng16.dll",
-              "<(VCPKG_Path)/bin/fontconfig.dll",
-              "<(VCPKG_Path)/bin/jpeg62.dll",
-              "<(VCPKG_Path)/bin/expat.dll",
-              "<(VCPKG_Path)/bin/freetype.dll",
-              "<(VCPKG_Path)/bin/libbz2.dll",
-              "<(VCPKG_Path)/bin/libcharset.dll",
-              "<(VCPKG_Path)/bin/libeay32.dll",
-              "<(VCPKG_Path)/bin/libiconv.dll",
-              "<(VCPKG_Path)/bin/ssleay32.dll",
-              "<(VCPKG_Path)/bin/tiff.dll",
-              "<(VCPKG_Path)/bin/tiffxx.dll",
-              "<(VCPKG_Path)/bin/turbojpeg.dll",
-   		        "<(podofo_library)/bin/podofo.dll"
-              #"<(VCPKG_Path)/bin/libidn2.dll",
-            ]
-          }]
-        }]
-      ]
-    },
+    # {
+    #   "target_name": "npdf-postbuild",
+    #   "dependencies": ["npdf"],
+    #   "conditions": [
+    #     ["OS==\"win\"", {
+    #       "copies": [{
+    #         "destination": "<(PRODUCT_DIR)",
+    #         "files": [
+    #           "<(VCPKG_Path)/bin/zlib1.dll",
+    #           "<(VCPKG_Path)/bin/libpng16.dll",
+    #           "<(VCPKG_Path)/bin/fontconfig.dll",
+    #           "<(VCPKG_Path)/bin/jpeg62.dll",
+    #           "<(VCPKG_Path)/bin/expat.dll",
+    #           "<(VCPKG_Path)/bin/freetype.dll",
+    #           "<(VCPKG_Path)/bin/libbz2.dll",
+    #           "<(VCPKG_Path)/bin/libcharset.dll",
+    #           "<(VCPKG_Path)/bin/libeay32.dll",
+    #           "<(VCPKG_Path)/bin/libiconv.dll",
+    #           "<(VCPKG_Path)/bin/ssleay32.dll",
+    #           "<(VCPKG_Path)/bin/tiff.dll",
+    #           "<(VCPKG_Path)/bin/tiffxx.dll",
+    #           "<(VCPKG_Path)/bin/turbojpeg.dll"
+    #         ]
+    #       }]
+    #     }]
+    #   ]
+    # },
     {
       "target_name": "npdf",
-      'include_dirs': ["<!@(node -p \"require('node-addon-api').include\")", "include/"],
+      'include_dirs': ["<!@(node -p \"require('node-addon-api').include\")"],
       'dependencies': ["<!(node -p \"require('node-addon-api').gyp\")"],
-      "defines": ["USING_SHARED_PODOFO=1"],
-      'cflags!': [ '-fno-exceptions'],
+      'cflags_cc': ['-std=c++14'],
       'cflags_cc!': [ '-fno-exceptions', '-fno-rtti' ],
+      'cflags!': [ '-fno-exceptions', '-fno-rtti' ],
       'xcode_settings': {
-      'GCC_ENABLE_CPP_EXCEPTIONS': 'YES',
-      'CLANG_CXX_LIBRARY': 'libc++',
-      'MACOSX_DEPLOYMENT_TARGET': '10.7',
-	  },
-  	  'msvs_settings': {
-	  	'VCCLCompilerTool': { 'ExceptionHandling': 1 },
-	  },
+        'GCC_ENABLE_CPP_EXCEPTIONS': 'YES',
+        'CLANG_CXX_LIBRARY': 'libc++',
+        'MACOSX_DEPLOYMENT_TARGET': '10.7',
+      },
+      'msvs_settings': {
+        'VCCLCompilerTool': {
+          'ExceptionHandling': 1,
+        },
+      },
+      "dependencies": [
+        "deps/podofo.gypi:libpodofo"
+      ],
       "sources": [
         "src/addon.cc",
         "src/ErrorHandler.cc",
@@ -100,38 +96,34 @@
       ],
       "conditions": [
         ["OS==\"win\"", {
-          "libraries": [
-            "-l<(VCPKG_Path)/lib/bz2.lib",
-            "-l<(VCPKG_Path)/lib/expat.lib",
-            "-l<(VCPKG_Path)/lib/fontconfig.lib",
-            "-l<(VCPKG_Path)/lib/freetype.lib",
-            "-l<(VCPKG_Path)/lib/jpeg.lib",
-            "-l<(VCPKG_Path)/lib/libcharset.lib",
-            "-l<(VCPKG_Path)/lib/libeay32.lib",
-            "-l<(VCPKG_Path)/lib/libiconv.lib",
-            "-l<(VCPKG_Path)/lib/libpng16.lib",
-            "-l<(VCPKG_Path)/lib/lzma.lib",
-            "-l<(VCPKG_Path)/lib/ssleay32.lib",
-            "-l<(VCPKG_Path)/lib/tiff.lib",
-            "-l<(VCPKG_Path)/lib/tiffxx.lib",
-            "-l<(VCPKG_Path)/lib/turbojpeg.lib",
-            "-l<(VCPKG_Path)/lib/zlib.lib",
-      		  "-l<(podofo_library)/lib/podofo.lib" # podofo built from source
-            #"-l<(VCPKG_Path)/lib/libidn2.lib",
-            #"-l<(VCPKG_Path)/lib/podofo.lib", # vcpkg podofo installed
-          ],
-          "include_dirs": [
-            "<(VCPKG_Path)/include",
-            "<(VCPKG_Path)/fontconfig", 
-            "<(VCPKG_Path)/freetype", 
-            "<(VCPKG_Path)/libpng16", 
-            "<(VCPKG_Path)/lzma", 
-            "<(VCPKG_Path)/openssl", 
-            # "<(VCPKG_Path)/podofo", # vcpkg podofo installed
-			"<(podofo_include_dir)" # podofo built from source
-          ],
-          "defines": [
-          ],
+          "link_settings": {
+            "libraries": ["ws2_32"]
+          },
+          # "libraries": [
+          #   "-l<(VCPKG_Path)/lib/bz2.lib",
+          #   "-l<(VCPKG_Path)/lib/expat.lib",
+          #   "-l<(VCPKG_Path)/lib/fontconfig.lib",
+          #   "-l<(VCPKG_Path)/lib/freetype.lib",
+          #   "-l<(VCPKG_Path)/lib/jpeg.lib",
+          #   "-l<(VCPKG_Path)/lib/libcharset.lib",
+          #   "-l<(VCPKG_Path)/lib/libeay32.lib",
+          #   "-l<(VCPKG_Path)/lib/libiconv.lib",
+          #   "-l<(VCPKG_Path)/lib/libpng16.lib",
+          #   "-l<(VCPKG_Path)/lib/lzma.lib",
+          #   "-l<(VCPKG_Path)/lib/ssleay32.lib",
+          #   "-l<(VCPKG_Path)/lib/tiff.lib",
+          #   "-l<(VCPKG_Path)/lib/tiffxx.lib",
+          #   "-l<(VCPKG_Path)/lib/turbojpeg.lib",
+            # "-l<(VCPKG_Path)/lib/zlib.lib",
+          # ],
+          # "include_dirs": [
+          #   "<(VCPKG_Path)/include",
+          #   "<(VCPKG_Path)/fontconfig", 
+          #   "<(VCPKG_Path)/freetype", 
+          #   "<(VCPKG_Path)/libpng16", 
+          #   "<(VCPKG_Path)/lzma", 
+          #   "<(VCPKG_Path)/openssl", 
+          # ],
           "configurations": {
             "Debug": {
               "msvs_settings": {
@@ -179,25 +171,20 @@
             '<!@(pkg-config openssl --libs)',
             '<!@(pkg-config fontconfig --libs)',
             '<!@(pkg-config libpng --libs)',
-            #'<!@(pkg-config libjpeg --libs)',
-	    '-ljpeg',
+            '<!@(pkg-config libjpeg --libs)',
             '<!@(pkg-config libpng --libs)',
             '<!@(pkg-config freetype2 --libs)',
             '<!@(pkg-config libidn --libs)',
             '<!@(pkg-config libtiff-4 --libs)',
-            '<(podofo_library)'
-         ],
+          ],
           "include_dirs": [
             '<!@(pkg-config openssl --cflags-only-I | sed s/-I//g)',
             '<!@(pkg-config libpng --cflags-only-I | sed s/-I//g)',
             '<!@(pkg-config fontconfig --cflags-only-I | sed s/-I//g)',
             '<!@(pkg-config freetype2 --cflags-only-I | sed s/-I//g)',
-            #'<!@(pkg-config libjpeg --cflags-only-I | sed s/-I//g)',
-	    '-I/usr/include',
+            '<!@(pkg-config libjpeg --cflags-only-I | sed s/-I//g)',
             '<!@(pkg-config libidn --cflags-only-I | sed s/-I//g)',
             '<!@(pkg-config libtiff-4 --cflags-only-I | sed s/-I//g)',
-            '/usr/local/include',
-            '<(podofo_include_dir)'
           ]
         }],
       ]
@@ -208,19 +195,14 @@
       'Debug': {
         'conditions': [
           ['OS == "linux" or OS == "freebsd" or OS == "openbsd"', {
-            'cflags_cc+': [
-              '-std=c++17',
-              '-Wno-missing-field-initializers'
-            ]
+            'cflags_cc': ['-g']
           }]
         ]
       },
       'Release': {
         'conditions': [
           ['OS == "linux" or OS == "freebsd" or OS == "openbsd"', {
-            'cflags_cc+': [ '-std=c++14'],
-	'cflags_c+': [ '-std=c++14'],
-	'cflags+': [ '-std=c++14']
+            'cflags_cc': ['-O3']
           }]
         ]
       }

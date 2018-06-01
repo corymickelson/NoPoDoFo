@@ -42,6 +42,7 @@ Napi::FunctionReference Encrypt::constructor; // NOLINT
 Encrypt::Encrypt(const Napi::CallbackInfo& info)
   : ObjectWrap(info)
 {
+#if defined(PODOFO_HAVE_OPENSSL) || defined(PODOFO_HAVE_OPENSSL_1_1)
   if (info[0].As<Object>().InstanceOf(Document::constructor.Value())) {
     encrypt =
       Document::Unwrap(info[0].As<Object>())->GetMemDocument()->GetEncrypt();
@@ -52,6 +53,10 @@ Encrypt::Encrypt(const Napi::CallbackInfo& info)
       .ThrowAsJavaScriptException();
     return;
   }
+#else
+  Error::New(info.Env(), "This build does not include OpenSSL")
+    .ThrowAsJavaScriptException();
+#endif
 }
 
 void
@@ -151,10 +156,19 @@ Encrypt::CreateEncrypt(const CallbackInfo& info)
             algoParameter = 1;
           else if (algo == "rc4v2")
             algoParameter = 2;
+#ifdef PODOFO_HAVE_LIBIDN
           else if (algo == "aesv2")
             algoParameter = 4;
           else if (algo == "aesv3")
             algoParameter = 8;
+#else
+          else if (algo == "aesv2")
+            Error::New(info.Env(), "AES support not available in thie build")
+              .ThrowAsJavaScriptException();
+          else if (algo == "aesv3")
+            Error::New(info.Env(), "AES support not available in thie build")
+              .ThrowAsJavaScriptException();
+#endif
           else {
             stringstream msg;
             msg << "Unknown permission parameter: " << algo
@@ -247,37 +261,6 @@ Encrypt::IsAllowed(const CallbackInfo& info)
   }
   return Napi::Boolean::New(info.Env(), is);
 }
-
-// Napi::Value
-// Encrypt::Authenticate(const CallbackInfo& info)
-//{
-//  auto pwdObj = info[0].As<Object>();
-//  string pwd = nullptr;
-//  if (pwdObj.Has("userPassword") && pwdObj.Get("userPassword").IsString()) {
-//    pwd = pwdObj.Get("userPassword").As<String>().Utf8Value();
-//  } else if (pwdObj.Has("ownerPassword") &&
-//             pwdObj.Get("ownerPassword").IsString()) {
-//    pwd = pwdObj.Get("ownerPassword").As<String>().Utf8Value();
-//  }
-//  if (!pwd.c_str()) {
-//    throw Napi::Error::New(
-//      info.Env(), "must contain property userPassword OR ownerPassword");
-//  }
-//  if (!document->GetMemDocument()->GetTrailer()->GetDictionary().HasKey(
-//        PdfName("ID"))) {
-//    throw Napi::Error::New(info.Env(), "No document ID found in trailer");
-//  }
-//  string id = document->GetMemDocument()
-//                ->GetTrailer()
-//                ->GetDictionary()
-//                .GetKey(PdfName("ID"))
-//                ->GetArray()[0]
-//                .GetString()
-//                .GetStringUtf8();
-//  // TODO: Fix const cast
-//  auto auth = const_cast<PdfEncrypt*>(GetEncrypt())->Authenticate(pwd, id);
-//  return Napi::Boolean::New(info.Env(), auth);
-//}
 
 Napi::Value
 Encrypt::GetOwnerValue(const CallbackInfo& info)

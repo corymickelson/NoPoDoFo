@@ -306,7 +306,7 @@ protected:
 #if PODOFO_VERSION_MINOR >= 9 && PODOFO_VERSION_PATCH >= 6
         doc.GetMemDocument()->LoadFromDevice(*refBuffer);
 #else
-        Error::New(Env(), "This podofo build does not support loading a buffered document").ThrowAsJavascriptException();
+        Error::New(Env(), "This podofo build does not support loading a buffered document").ThrowAsJavaScriptException();
         return;
 #endif
       }
