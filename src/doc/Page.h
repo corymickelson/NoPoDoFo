@@ -22,8 +22,12 @@
 
 #define CONVERSION_CONSTANT 0.002834645669291339
 
+#include <iostream>
 #include <napi.h>
 #include <podofo/podofo.h>
+
+using std::cout;
+using std::endl;
 
 namespace NoPoDoFo {
 
@@ -31,7 +35,7 @@ class Page : public Napi::ObjectWrap<Page>
 {
 public:
   explicit Page(const Napi::CallbackInfo& callbackInfo);
-
+  ~Page() { cout << "Destructing page" << endl; }
   static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
   Napi::Value GetRotation(const Napi::CallbackInfo&);
@@ -58,7 +62,11 @@ public:
   Napi::Value GetNumAnnots(const Napi::CallbackInfo&);
   void DeleteAnnotation(const Napi::CallbackInfo&);
 
-  PoDoFo::PdfPage* GetPage() { return page.get(); }
+  //  PoDoFo::PdfPage* GetPage() { return doc->GetPage(n); }
+  PoDoFo::PdfPage* GetPage()
+  {
+    return page.use_count() > 0 ? page.get() : doc->GetPage(n);
+  }
 
   int n = -1;
   std::shared_ptr<PoDoFo::PdfDocument> doc;

@@ -109,7 +109,7 @@
             '/EH'
           ],
           "variables": {
-            "VCPKG_Path%": "C:/libs/installed/x86-windows-static",
+            "VCPKG_Path%": '$(vcpkg_path)'#"C:/libs/installed/x86-windows-static",
           },
           "dependencies": [
             "zlib.gypi:zlib",

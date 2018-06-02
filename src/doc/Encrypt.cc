@@ -212,7 +212,10 @@ Encrypt::CreateEncrypt(const CallbackInfo& info)
       nperm,
       static_cast<PdfEncrypt::EPdfEncryptAlgorithm>(algoParameter),
       static_cast<PdfEncrypt::EPdfKeyLength>(key));
-    return External<PdfEncrypt>::New(info.Env(), encrypt);
+    return External<PdfEncrypt>::New(
+      info.Env(), encrypt, [](Napi::Env env, PdfEncrypt* data) {
+        cout << "Finalizer CreateEncrypt" << endl;
+      });
   } catch (PdfError& err) {
     stringstream msg;
     msg << "PdfMemDocument::SetEncrypt failed with error: " << err.GetError()

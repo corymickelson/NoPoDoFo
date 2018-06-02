@@ -23,11 +23,16 @@
 #include <napi.h>
 #include <podofo/podofo.h>
 
+#include <iostream>
+using std::cout;
+using std::endl;
+
 namespace NoPoDoFo {
 class Encrypt : public Napi::ObjectWrap<Encrypt>
 {
 public:
   explicit Encrypt(const Napi::CallbackInfo&);
+  ~Encrypt() { cout << "Destructing Encrypt" << endl; }
   static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
   static Napi::Value CreateEncrypt(const Napi::CallbackInfo&);
@@ -38,7 +43,7 @@ public:
   Napi::Value GetEncryptionKey(const Napi::CallbackInfo&);
   Napi::Value GetKeyLength(const Napi::CallbackInfo&);
 
-  const PoDoFo::PdfEncrypt *encrypt;
+  const PoDoFo::PdfEncrypt* encrypt;
 };
 }
 #endif

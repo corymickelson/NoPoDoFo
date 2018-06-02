@@ -22,9 +22,12 @@
 
 #include "BaseDocument.h"
 
+#include <iostream>
 #include <napi.h>
 #include <podofo/podofo.h>
 
+using std::cout;
+using std::endl;
 using std::map;
 using std::pair;
 using std::string;
@@ -37,6 +40,7 @@ class Document
 {
 public:
   static Napi::FunctionReference constructor;
+  ~Document() { cout << "Destructing Document" << endl; }
   explicit Document(const Napi::CallbackInfo& callbackInfo); // constructor
   static void Initialize(Napi::Env& env, Napi::Object& target);
   Napi::Value Load(const Napi::CallbackInfo&);

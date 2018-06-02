@@ -16,7 +16,8 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import {Callback, __mod, IDocument} from './document'
+import {Callback, IDocument} from './document'
+import {npdf} from './'
 import {ISignatureField} from "./field";
 import {access} from "fs";
 import {F_OK, R_OK} from 'constants'
@@ -38,7 +39,7 @@ export function signature(certfile: string, pkeyfile: string, password: string =
     }
     Promise.all([check(certfile), check(pkeyfile)])
         .then(() => {
-            resolve(__mod.signature(certfile, pkeyfile, password))
+            resolve(npdf.signature(certfile, pkeyfile, password))
         })
         .catch(err => {
            reject(err)

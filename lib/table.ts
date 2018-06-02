@@ -16,7 +16,8 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import { IDocument, __mod} from "./document";
+import { IDocument} from "./document";
+import {npdf} from './'
 import {IFont, NPDFAlignment, NPDFColor, NPDFPoint, NPDFVerticalAlignment, IPainter} from "./painter";
 import {IPage} from './page'
 
@@ -86,7 +87,7 @@ export class Table {
      * @param {Font} v
      */
     set font(v: IFont) {
-        if (v instanceof (__mod.Font as any) === false) {
+        if (v instanceof (npdf.Font as any) === false) {
             throw Error("must be instance of Font")
         }
         this._instance.font = (v as any)._instance
@@ -167,7 +168,7 @@ export class Table {
     }
 
     constructor(doc: IDocument, cols: number, rows: number) {
-        this._instance = new __mod.SimpleTable((doc as any)._instance, cols, rows)
+        this._instance = new npdf.SimpleTable((doc as any)._instance, cols, rows)
     }
 
     // model methods
@@ -185,7 +186,7 @@ export class Table {
 
     // table methods
     draw(point: NPDFPoint, painter: IPainter): void {
-        if (painter instanceof (__mod.Painter as any) === false) {
+        if (painter instanceof (npdf.Painter as any) === false) {
             throw Error('painter must be an instance of NoPoDoFo Painter')
         }
         this._instance.draw(point, (painter as any)._instance)

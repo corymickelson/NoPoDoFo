@@ -41,19 +41,23 @@ namespace NoPoDoFo {
 
 FunctionReference Page::constructor; // NOLINT
 
+/**
+ * @note When constructed from a document, the document will manage page
+ * resource. Otherwise manage page resources here.
+ * @brief Page::Page
+ * @param info
+ */
 Page::Page(const CallbackInfo& info)
   : ObjectWrap(info)
 {
   if (info[0].IsObject() &&
       info[0].As<Object>().InstanceOf(Document::constructor.Value()) &&
       info[1].IsNumber()) {
-    doc = Document::Unwrap(info[0].As<Object>())->GetBaseDocument();
     n = info[1].As<Number>();
     page = make_shared<PdfPage>(*doc->GetPage(n));
   } else if (info[0].IsExternal() && info.Length() >= 2 && info[1].IsNumber()) {
     doc = info[0].As<External<BaseDocument>>().Data()->GetBaseDocument();
     n = info[1].As<Number>();
-    page = make_shared<PdfPage>(*doc->GetPage(n));
   } else if (info[0].IsExternal() && info.Length() == 1) {
     page = make_shared<PdfPage>(*info[0].As<External<PdfPage>>().Data());
   } else {
@@ -109,7 +113,7 @@ Napi::Value
 Page::GetField(const CallbackInfo& info)
 {
   int index = info[0].As<Number>();
-  if (page->GetNumFields() < index || index < 0) {
+  if (GetPage()->GetNumFields() < index || index < 0) {
     RangeError::New(info.Env(), "index out of range")
       .ThrowAsJavaScriptException();
     return info.Env().Undefined();
@@ -117,8 +121,9 @@ Page::GetField(const CallbackInfo& info)
   return GetField(info.Env(), index);
 }
 Napi::Value
-Page::GetField(const Napi::Env &env, int index) {
-    PdfField field = page->GetField(index);
+Page::GetField(const Napi::Env& env, int index)
+{
+  PdfField field = GetPage()->GetField(index);
   EPdfField t = field.GetType();
   switch (t) {
     case ePdfField_PushButton:
@@ -128,7 +133,8 @@ Page::GetField(const Napi::Env &env, int index) {
       return CheckBox::constructor.New(
         { this->Value(), Number::New(env, index) });
     case ePdfField_RadioButton:
-      Error::New(env, "RadioButton not yet implemented").ThrowAsJavaScriptException();
+      Error::New(env, "RadioButton not yet implemented")
+        .ThrowAsJavaScriptException();
       return env.Undefined();
     case ePdfField_TextField:
       return TextField::constructor.New(
@@ -140,9 +146,9 @@ Page::GetField(const Napi::Env &env, int index) {
       return ListBox::constructor.New(
         { this->Value(), Number::New(env, index) });
     case ePdfField_Signature:
-      return SignatureField::constructor.New({ External<PdfAnnotation>::New(
-        env, field.GetWidgetAnnotation()) });
-  default:
+      return SignatureField::constructor.New(
+        { External<PdfAnnotation>::New(env, field.GetWidgetAnnotation()) });
+    default:
       Error::New(env, "Unknown field type").ThrowAsJavaScriptException();
       return env.Undefined();
   }

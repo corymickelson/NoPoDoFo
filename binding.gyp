@@ -2,41 +2,16 @@
   "conditions": [
     ["OS==\"win\"", {
       "variables": {
-        "VCPKG_Path%": "C:/libs/installed/x86-windows-static"
+        "VCPKG_Path%": '$(vcpkg_path)'#"C:/libs/installed/x86-windows-static"
       },
-      # "defines": ["USING_SHARED_PODOFO=1"]
     }],
   ],
+  "defines": [
+    "NAPI_BUILD_VERSION=<(napi_build_version)",
+  ],
   "targets": [
-    # {
-    #   "target_name": "npdf-postbuild",
-    #   "dependencies": ["npdf"],
-    #   "conditions": [
-    #     ["OS==\"win\"", {
-    #       "copies": [{
-    #         "destination": "<(PRODUCT_DIR)",
-    #         "files": [
-    #           "<(VCPKG_Path)/bin/zlib1.dll",
-    #           "<(VCPKG_Path)/bin/libpng16.dll",
-    #           "<(VCPKG_Path)/bin/fontconfig.dll",
-    #           "<(VCPKG_Path)/bin/jpeg62.dll",
-    #           "<(VCPKG_Path)/bin/expat.dll",
-    #           "<(VCPKG_Path)/bin/freetype.dll",
-    #           "<(VCPKG_Path)/bin/libbz2.dll",
-    #           "<(VCPKG_Path)/bin/libcharset.dll",
-    #           "<(VCPKG_Path)/bin/libeay32.dll",
-    #           "<(VCPKG_Path)/bin/libiconv.dll",
-    #           "<(VCPKG_Path)/bin/ssleay32.dll",
-    #           "<(VCPKG_Path)/bin/tiff.dll",
-    #           "<(VCPKG_Path)/bin/tiffxx.dll",
-    #           "<(VCPKG_Path)/bin/turbojpeg.dll"
-    #         ]
-    #       }]
-    #     }]
-    #   ]
-    # },
     {
-      "target_name": "npdf",
+      "target_name": "nopodofo",
       'include_dirs': ["<!@(node -p \"require('node-addon-api').include\")"],
       'dependencies': ["<!(node -p \"require('node-addon-api').gyp\")"],
       'cflags_cc': ['-std=c++14'],
@@ -193,6 +168,14 @@
             '<!@(pkg-config libtiff-4 --cflags-only-I | sed s/-I//g)',
           ]
         }],
+      ]
+    },
+    {
+      'target_name': 'action_after_build',
+      'type': 'none',
+      'dependencies': [ '<(module_name)'],
+      'copies': [
+        { 'files': [ '<(PRODUCT_DIR)/<(module_name).node' ], 'destination': '<(module_path)' },
       ]
     }
   ],

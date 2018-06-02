@@ -182,7 +182,7 @@ Document::SetPassword(const CallbackInfo& info, const Napi::Value& value)
 void
 Document::DeletePages(const CallbackInfo& info)
 {
-  AssertFunctionArgs(info, 2, { { napi_number, napi_number } }, nullptr);
+  // AssertFunctionArgs(info, 2, { { napi_number, napi_number } }, nullptr);
   int pageIndex = info[0].As<Number>();
   int count = info[1].As<Number>();
   if (document->GetPageCount() < pageIndex + count) {
@@ -192,6 +192,8 @@ Document::DeletePages(const CallbackInfo& info)
   try {
     document->DeletePages(pageIndex, count);
   } catch (PdfError& err) {
+    ErrorHandler(err, info);
+  } catch (Error& err) {
     ErrorHandler(err, info);
   }
 }
@@ -221,8 +223,7 @@ Document::GetTrailer(const CallbackInfo& info)
 {
   const PdfObject* trailerPdObject = document->GetTrailer();
   auto ptr = const_cast<PdfObject*>(trailerPdObject);
-  auto initPtr = Napi::External<PdfObject>::New(
-    info.Env(), ptr);
+  auto initPtr = Napi::External<PdfObject>::New(info.Env(), ptr);
   auto instance = Obj::constructor.New({ initPtr });
   return instance;
 }
@@ -232,8 +233,7 @@ Document::GetCatalog(const CallbackInfo& info)
 {
   const PdfObject* catalog = document->GetCatalog();
   auto ptr = const_cast<PdfObject*>(catalog);
-  auto initPtr = Napi::External<PdfObject>::New(
-    info.Env(), ptr);
+  auto initPtr = Napi::External<PdfObject>::New(info.Env(), ptr);
   auto instance = Obj::constructor.New({ initPtr });
   return instance;
 }
@@ -279,8 +279,8 @@ public:
                     PdfRefCountedInputDevice* refBuffer)
     : AsyncWorker(cb)
     , doc(doc)
-    , arg(std::move(arg))
     , refBuffer(refBuffer)
+    , arg(std::move(arg))
   {}
 
   void ForUpdate(bool v) { update = v; }
@@ -306,7 +306,10 @@ protected:
 #if PODOFO_VERSION_MINOR >= 9 && PODOFO_VERSION_PATCH >= 6
         doc.GetMemDocument()->LoadFromDevice(*refBuffer);
 #else
-        Error::New(Env(), "This podofo build does not support loading a buffered document").ThrowAsJavaScriptException();
+        Error::New(
+          Env(),
+          "This podofo build does not support loading a buffered document")
+          .ThrowAsJavaScriptException();
         return;
 #endif
       }
@@ -361,8 +364,8 @@ Document::Load(const CallbackInfo& info)
     if (opts.Has("fromBuffer")) {
       useBuffer = opts.Get("fromBuffer").As<Boolean>();
     }
-    if (opts.Has("pwd")) {
-      pwd = opts.Get("pwd").As<String>().Utf8Value();
+    if (opts.Has("password")) {
+      pwd = opts.Get("password").As<String>().Utf8Value();
     }
   } else {
     TypeError::New(

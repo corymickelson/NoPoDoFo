@@ -20,14 +20,19 @@
 #ifndef NPDF_FORM_H
 #define NPDF_FORM_H
 
+#include <iostream>
 #include <napi.h>
 #include <podofo/podofo.h>
+
+using std::cout;
+using std::endl;
 
 namespace NoPoDoFo {
 class Form : public Napi::ObjectWrap<Form>
 {
 public:
   explicit Form(const Napi::CallbackInfo&);
+  ~Form() { cout << "Destructing Form" << endl; }
   static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
   void SetNeedAppearances(const Napi::CallbackInfo&, const Napi::Value&);
@@ -44,10 +49,7 @@ public:
   Napi::Value GetFont(const Napi::CallbackInfo&);
   void SetFont(const Napi::CallbackInfo&, const Napi::Value&);
 
-  PoDoFo::PdfAcroForm* GetForm()
-  {
-    return doc->GetAcroForm(create);
-  }
+  PoDoFo::PdfAcroForm* GetForm() { return doc->GetAcroForm(create); }
   PoDoFo::PdfDictionary* GetDictionary()
   {
     return &doc->GetAcroForm()->GetObject()->GetDictionary();

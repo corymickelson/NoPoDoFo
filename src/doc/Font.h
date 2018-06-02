@@ -20,14 +20,19 @@
 #ifndef NPDF_FONT_H
 #define NPDF_FONT_H
 
+#include <iostream>
 #include <napi.h>
 #include <podofo/podofo.h>
+
+using std::cout;
+using std::endl;
 
 namespace NoPoDoFo {
 class Font : public Napi::ObjectWrap<Font>
 {
 public:
   explicit Font(const Napi::CallbackInfo& callbackInfo);
+  ~Font() { cout << "Destructing Font" << endl; }
   static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
   Napi::Value GetFontSize(const Napi::CallbackInfo&);

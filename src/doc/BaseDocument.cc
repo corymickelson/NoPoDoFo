@@ -260,7 +260,7 @@ BaseDocument::GetObjects(const CallbackInfo& info)
     auto js = Array::New(info.Env());
     uint32_t count = 0;
     for (auto item : *document->GetObjects()) {
-      if(item->IsReference()) {
+      if (item->IsReference()) {
         item = item->GetOwner()->GetObject(item->GetReference());
       }
       auto instance = External<PdfObject>::New(info.Env(), item);
@@ -317,48 +317,50 @@ Napi::Value
 BaseDocument::CreateFont(const CallbackInfo& info)
 {
   auto opts = info[0].As<Object>();
-  if(!opts.Has("fontName")) {
-    TypeError::New(info.Env(), "Requires fontName").ThrowAsJavaScriptException();
+  if (!opts.Has("fontName")) {
+    TypeError::New(info.Env(), "Requires fontName")
+      .ThrowAsJavaScriptException();
     return info.Env().Undefined();
   }
   auto fontName = opts.Get("fontName").As<String>().Utf8Value();
   bool bold = opts.Has("bold") ? opts.Get("bold").As<Boolean>() : false;
   bool italic = opts.Has("italic") ? opts.Get("italic").As<Boolean>() : false;
   bool embed = opts.Has("embed") ? opts.Get("embed").As<Boolean>() : false;
-  const PdfEncoding* encoding =  nullptr;
-  string filename = opts.Has("fileName") ? opts.Get("fileName").As<String>().Utf8Value() : "";
+  const PdfEncoding* encoding = nullptr;
+  string filename =
+    opts.Has("fileName") ? opts.Get("fileName").As<String>().Utf8Value() : "";
   int n = opts.Has("encoding") ? opts.Get("encoding").As<Number>() : 1;
-    switch (n) {
-      case 1:
-        encoding = new PdfWinAnsiEncoding();
-        break;
-      case 2:
-        encoding = new PdfStandardEncoding();
-        break;
-      case 3:
-        encoding = new PdfDocEncoding();
-        break;
-      case 4:
-        encoding = new PdfMacRomanEncoding();
-        break;
-      case 5:
-        encoding = new PdfMacExpertEncoding();
-        break;
-      case 6:
-        encoding = new PdfSymbolEncoding();
-        break;
-      case 7:
-        encoding = new PdfZapfDingbatsEncoding();
-        break;
-      case 8:
-        encoding = new PdfWin1250Encoding();
-        break;
-      case 9:
-        encoding = new PdfIso88592Encoding();
-        break;
-      default:
-        encoding = new PdfIdentityEncoding(0, 0xffff, true);
-    }
+  switch (n) {
+    case 1:
+      encoding = new PdfWinAnsiEncoding();
+      break;
+    case 2:
+      encoding = new PdfStandardEncoding();
+      break;
+    case 3:
+      encoding = new PdfDocEncoding();
+      break;
+    case 4:
+      encoding = new PdfMacRomanEncoding();
+      break;
+    case 5:
+      encoding = new PdfMacExpertEncoding();
+      break;
+    case 6:
+      encoding = new PdfSymbolEncoding();
+      break;
+    case 7:
+      encoding = new PdfZapfDingbatsEncoding();
+      break;
+    case 8:
+      encoding = new PdfWin1250Encoding();
+      break;
+    case 9:
+      encoding = new PdfIso88592Encoding();
+      break;
+    default:
+      encoding = new PdfIdentityEncoding(0, 0xffff, true);
+  }
   try {
     PdfFont* font =
       document->CreateFont(fontName.c_str(),

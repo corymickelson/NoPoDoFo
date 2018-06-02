@@ -13,9 +13,14 @@ CTestTestfile.cmake
 
 .idea/
 .vscode/
+.circleci/
+lib/binding/
 .vs/
-build/
+.directory
+.node-version
+build*
 cmake-build-debug/
+CMakeSettings.json
 node_modules/
 generators/
 *.user
@@ -35,6 +40,6 @@ spec/unit/*.map
 .coveralls.yml
 .nyc_output
 coverage
-*.tmp.*
+*tmp.*
 *temp*
 

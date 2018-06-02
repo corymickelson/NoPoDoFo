@@ -162,7 +162,7 @@ Napi::Value
 Annotation::GetContent(const CallbackInfo& info)
 {
   return Napi::String::New(info.Env(),
-                           GetAnnotation().GetContents().GetString());
+                           GetAnnotation().GetContents().GetStringUtf8());
 }
 
 void

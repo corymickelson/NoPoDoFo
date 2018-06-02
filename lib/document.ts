@@ -34,6 +34,7 @@ import {IFileSpec} from "./file-spec";
 import {IContentsTokenizer} from "./parser";
 import {IRect} from "./rect";
 import {IData} from "./data";
+import { npdf } from '.';
 
 export declare enum NPDFVersion {
     Pdf11 = 0,
@@ -50,40 +51,6 @@ export declare enum NPDFWriteMode {
     Compact = 2,
 }
 
-export interface INPDF {
-    Document: IDocument
-    StreamDocument: IStreamDocument
-    Page: IPage
-    Field: IField
-    TextField: ITextField
-    Image: IImage
-    Annotation: IAnnotation
-    Rect: IRect
-    Painter: IPainter
-    CheckBox: ICheckBox
-    ComboBox: IComboBox
-    ListBox: IListBox
-    Form: IForm
-    Dictionary: IDictionary
-    FileSpec: IFileSpec
-    Obj: IObj
-    Array: IArray
-    Stream: any
-    Encrypt: IEncrypt
-    ListField: IListField
-    Font: IFont
-    Encoding: IEncoding
-    ExtGState: IExtGState
-    Signer: ISigner
-    SignatureField: ISignatureField
-    Data: IData
-    ContentsTokenizer: IContentsTokenizer
-    SimpleTable: any
-    Action: IAction
-    signature: Function
-}
-
-export const __mod: INPDF = require('bindings')('npdf')
 export type Callback = (err: Error, data: Buffer | string) => void
 
 export enum NPDFFontEncoding {
@@ -167,7 +134,7 @@ export const documentGc = (file: string, pwd: string, output: string, cb: Callba
         if (err) {
             throw Error('File not found')
         }
-        (__mod.Document as any).gc(file, pwd, output, cb) // gc is a static method on Document
+        (npdf.Document as any).gc(file, pwd, output, cb) // gc is a static method on Document
     })
 }
 
