@@ -62,7 +62,6 @@ public:
   Napi::Value GetNumAnnots(const Napi::CallbackInfo&);
   void DeleteAnnotation(const Napi::CallbackInfo&);
 
-  //  PoDoFo::PdfPage* GetPage() { return doc->GetPage(n); }
   PoDoFo::PdfPage* GetPage()
   {
     return page.use_count() > 0 ? page.get() : doc->GetPage(n);

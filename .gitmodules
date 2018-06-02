@@ -2,9 +2,4 @@
 	path = deps/podofo
 	url = https://github.com/corymickelson/podofo.git
   branch = nopodofo_0_7_0
-[submodule "deps/zlib"]
-	path = deps/zlib
-	url = https://github.com/madler/zlib.git
-[submodule "deps/freetype"]
-	path = deps/freetype
-	url = http://git.savannah.gnu.org/r/freetype/freetype2.git
+

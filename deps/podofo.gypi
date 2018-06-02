@@ -112,8 +112,8 @@
             "VCPKG_Path%": '$(vcpkg_path)'#"C:/libs/installed/x86-windows-static",
           },
           "dependencies": [
-            "zlib.gypi:zlib",
-            "freetype.gypi:libfreetype"
+            # "zlib.gypi:zlib",
+            # "freetype.gypi:libfreetype"
           ],
           "libraries": [
             "-lws2_32",
@@ -121,7 +121,7 @@
             "-l<(VCPKG_Path)/lib/bz2.lib",
             "-l<(VCPKG_Path)/lib/expat.lib",
             "-l<(VCPKG_Path)/lib/fontconfig.lib",
-            # "-l<(VCPKG_Path)/lib/freetype.lib",
+            "-l<(VCPKG_Path)/lib/freetype.lib",
             "-l<(VCPKG_Path)/lib/jpeg.lib",
             "-l<(VCPKG_Path)/lib/libcharset.lib",
             "-l<(VCPKG_Path)/lib/libeay32.lib",
@@ -132,7 +132,6 @@
             "-l<(VCPKG_Path)/lib/tiff.lib",
             "-l<(VCPKG_Path)/lib/tiffxx.lib",
             "-l<(VCPKG_Path)/lib/turbojpeg.lib",
-            # "-l<(VCPKG_Path)/lib/zlib.lib",
           ],
           "include_dirs": [
             "<(VCPKG_Path)/include",
@@ -141,6 +140,7 @@
             "<(VCPKG_Path)/include/libpng16", 
             "<(VCPKG_Path)/include/lzma", 
             "<(VCPKG_Path)/include/openssl", 
+            "<(VCPKG_Path)/include/freetype", 
           ],
         }],
          ############### linux ####################

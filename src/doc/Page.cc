@@ -41,12 +41,6 @@ namespace NoPoDoFo {
 
 FunctionReference Page::constructor; // NOLINT
 
-/**
- * @note When constructed from a document, the document will manage page
- * resource. Otherwise manage page resources here.
- * @brief Page::Page
- * @param info
- */
 Page::Page(const CallbackInfo& info)
   : ObjectWrap(info)
 {
