@@ -89,7 +89,7 @@
             "-l<(VCPKG_Path)/lib/ssleay32.lib",
             "-l<(VCPKG_Path)/lib/tiff.lib",
             "-l<(VCPKG_Path)/lib/tiffxx.lib",
-            "-l<(VCPKG_Path)/lib/turbojpeg.lib"
+            "-l<(VCPKG_Path)/lib/turbojpeg.lib",
           ],
           "include_dirs": [
             "<(VCPKG_Path)/include",

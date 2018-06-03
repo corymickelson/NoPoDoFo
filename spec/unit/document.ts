@@ -8,8 +8,9 @@ const filePath = join(__dirname, '../test-documents/test.pdf'),
 
 export const end = (...tests: Test[]) => tests.forEach(t => t.end())
 
-tap('IStreamDocument', (t: Test) => {
-    const doc = new npdf.StreamDocument('/tmp/npdf.streamdoc.pdf')
+tap('IStreamDocument', (t:Test) => {
+    let strPath = join(__dirname, './stream.tmp.pdf')
+    const doc = new npdf.StreamDocument(strPath)
     t.comment('StreamDocument default values')
     t.assert(doc.version === 1.7, 'default to pdf version 1.7')
     t.assert(doc.info.producer === 'PoDoFo - http://podofo.sf.net', 'Produced by PoDoFo')
@@ -42,7 +43,7 @@ tap('IDocument', (t: Test) => {
             userPassword: 'secret',
             keyLength: 40,
             protection: ['Edit', 'FillAndSign'],
-            algorithm: 'aesv3'
+            algorithm: 'rc4v1'
         })
 
         global.gc()

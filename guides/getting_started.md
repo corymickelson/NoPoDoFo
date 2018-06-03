@@ -9,6 +9,7 @@ This build does not support AES encryption option, to enable AES you will need l
    - tiff
    - libpng
    - jpeg 
+   - boost
    - fontconfig
    - freetype
    - openssl
@@ -26,6 +27,7 @@ dependencies:
  - openssl-dev
  - fontconfig-dev
  - libtiff-dev
+ - boost
  - libidn-dev
  - libjpeg-turbo-dev
  - libpng-dev
