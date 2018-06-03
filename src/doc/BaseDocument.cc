@@ -388,10 +388,21 @@ BaseDocument::InsertExistingPage(const CallbackInfo& info)
   auto memDoc = Document::Unwrap(info[0].As<Object>());
   int memPageN = info[1].As<Number>();
   int atN = info[2].As<Number>();
-  if (document->GetPageCount() < atN) {
-    throw RangeError();
+  if (atN < 0) {
+    cout << "Appending page to the beginning of this document" << endl;
   }
-  document->InsertExistingPageAt(memDoc->GetMemDocument().get(), memPageN, atN);
+  if (document->GetPageCount() + 1 < atN) {
+    RangeError::New(info.Env(), "at index out of range")
+      .ThrowAsJavaScriptException();
+    return Value();
+  }
+  if (memPageN < 0 || memPageN > memDoc->GetMemDocument()->GetPageCount() - 1) {
+    RangeError::New(info.Env(), "parameter document page range exception")
+      .ThrowAsJavaScriptException();
+    return Value();
+  }
+  document->InsertExistingPageAt(
+    *memDoc->GetMemDocument().get(), memPageN, atN);
   return Number::New(info.Env(), document->GetPageCount());
 }
 Napi::Value

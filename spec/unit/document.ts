@@ -86,15 +86,28 @@ tap('IDocument password protected', (t: Test) => {
         if (e) t.fail(e.message)
         else {
             t.pass('Loaded password protected document (provided a valid password on load)')
-            t.comment('insert pages')
+            t.comment('testing insert existing pages')
             let inner = new npdf.Document()
             inner.load(filePath, err => {
                 if (err) t.fail(err.message)
                 else {
-                    t.assert(inner.insertPages(doc, 0, 1) === 5, 'added additional page')
+                    inner.insertExistingPage(doc, 0, -1)
+                    t.assert(inner.getPageCount() === 5, 'added additional page')
+                    t.end()
                 }
             })
         }
     })
 })
 
+tap('IDocument append doc', (t: Test) => {
+    let doc = new npdf.Document()
+    doc.load(filePath, (err) => {
+        if(err) t.fail(err.message)
+        else {
+            doc.append(filePath)
+            t.assert(doc.getPageCount() === 8, 'appended doc using file path')
+            t.end()
+        }
+    })
+})

@@ -66,7 +66,7 @@ export interface IBase {
     displayDocTitle(): void
     useFullScreen(): void
     attachFile(file:string, document:IBase): void
-    insertExistingPage(memDoc:IDocument, index: number): number
+    insertExistingPage(memDoc:IDocument, index: number, insertIndex: number): number
     insertPage(rect: IRect, index:number): IPage
     append(doc: string|IDocument): void
     isLinearized(): boolean
