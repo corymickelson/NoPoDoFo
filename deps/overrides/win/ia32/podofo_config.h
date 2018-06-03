@@ -58,5 +58,6 @@
 /* #undef PODOFO_HAVE_OPENSSL_1_1 */
 /* #undef PODOFO_HAVE_OPENSSL_NO_RC4 */
 /* #undef PODOFO_HAVE_LIBIDN */
+// #define PODOFO_HAVE_LIBIDN
 /* #undef PODOFO_HAVE_UNISTRING_LIB */
 

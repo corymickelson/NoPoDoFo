@@ -163,10 +163,10 @@ Encrypt::CreateEncrypt(const CallbackInfo& info)
             algoParameter = 8;
 #else
           else if (algo == "aesv2")
-            Error::New(info.Env(), "AES support not available in thie build")
+            Error::New(info.Env(), "AES support not available in this build")
               .ThrowAsJavaScriptException();
           else if (algo == "aesv3")
-            Error::New(info.Env(), "AES support not available in thie build")
+            Error::New(info.Env(), "AES support not available in this build")
               .ThrowAsJavaScriptException();
 #endif
           else {

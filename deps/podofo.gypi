@@ -6,6 +6,9 @@
       "defines": [
         "BUILDING_PODOFO=1",
       ],
+      # "dependencies": [
+      #   "./idn.gypi:libidn"
+      # ],
       "type": "static_library",
       "sources": [
         # From PODOFO_BASE_SOURCES
@@ -109,19 +112,14 @@
             '/EH'
           ],
           "variables": {
-            "VCPKG_Path%": '$(vcpkg_path)'#"C:/libs/installed/x86-windows-static",
+            "VCPKG_Path%": '$(vcpkg_path)'
           },
-          "dependencies": [
-            "zlib.gypi:zlib",
-            "freetype.gypi:libfreetype"
-          ],
           "libraries": [
             "-lws2_32",
-            #"-l<(VCPKG_Path)/lib",
             "-l<(VCPKG_Path)/lib/bz2.lib",
             "-l<(VCPKG_Path)/lib/expat.lib",
             "-l<(VCPKG_Path)/lib/fontconfig.lib",
-            # "-l<(VCPKG_Path)/lib/freetype.lib",
+            "-l<(VCPKG_Path)/lib/freetype.lib",
             "-l<(VCPKG_Path)/lib/jpeg.lib",
             "-l<(VCPKG_Path)/lib/libcharset.lib",
             "-l<(VCPKG_Path)/lib/libeay32.lib",
@@ -131,12 +129,12 @@
             "-l<(VCPKG_Path)/lib/ssleay32.lib",
             "-l<(VCPKG_Path)/lib/tiff.lib",
             "-l<(VCPKG_Path)/lib/tiffxx.lib",
-            "-l<(VCPKG_Path)/lib/turbojpeg.lib",
-            # "-l<(VCPKG_Path)/lib/zlib.lib",
+            "-l<(VCPKG_Path)/lib/turbojpeg.lib"
           ],
           "include_dirs": [
             "<(VCPKG_Path)/include",
             "<(VCPKG_Path)/include/fontconfig", 
+            "<(VCPKG_Path)/include/freetype", 
             "<(VCPKG_Path)/include/boost", 
             "<(VCPKG_Path)/include/libpng16", 
             "<(VCPKG_Path)/include/lzma", 

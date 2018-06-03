@@ -122,6 +122,8 @@ export interface IDocument extends IBase {
 
     splicePages(startIndex: number, count: number): void
 
+    insertPages(fromDoc: IDocument, startIndex: number, count: number): number
+
     write(destination: Callback | string, cb?: Callback): void
 
     getFont(name: string): IFont

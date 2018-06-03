@@ -8,7 +8,7 @@ const filePath = join(__dirname, '../test-documents/test.pdf'),
 
 export const end = (...tests: Test[]) => tests.forEach(t => t.end())
 
-tap('IStreamDocument', (t:Test) => {
+tap('IStreamDocument', (t: Test) => {
     const doc = new npdf.StreamDocument('/tmp/npdf.streamdoc.pdf')
     t.comment('StreamDocument default values')
     t.assert(doc.version === 1.7, 'default to pdf version 1.7')
@@ -17,8 +17,8 @@ tap('IStreamDocument', (t:Test) => {
     t.assert(doc.pageMode === NPDFPageMode.UseNone, 'defaults to \'UseNone\'')
     t.end()
 })
-tap('IDocument', (t:Test) => {
-    const doc:IDocument = new npdf.Document()
+tap('IDocument', (t: Test) => {
+    const doc: IDocument = new npdf.Document()
     doc.load(filePath, e => {
         if (e) t.fail(e.message)
         t.comment("Document instance accessors [GET]")
@@ -26,7 +26,6 @@ tap('IDocument', (t:Test) => {
         doc.splicePages(0, 1)
         t.comment('Pages spliced')
         global.gc()
-        t.comment('Pages after GC')
         t.assert(doc.getPageCount() === 3, 'Page zero removed from document')
         t.assert(doc.form instanceof (npdf.Form as any), "Get Form returns an AcroForm")
         t.assert(doc.catalog instanceof (npdf.Obj as any), "Catalog as Obj")
@@ -55,9 +54,8 @@ tap('IDocument', (t:Test) => {
         t.assert(docFont instanceof (npdf.Font as any))
         global.gc()
         t.assert(docFont.getMetrics().fontSize > 0)
-        // doc.splicePages(0, 1)
         global.gc()
-        // t.assert(doc.getPageCount() === 3)
+        t.assert(doc.getPageCount() === 3)
         let font = doc.createFont({italic: true, embed: false, fontName: 'serif'})
 
         global.gc()
@@ -82,13 +80,21 @@ tap('IDocument', (t:Test) => {
         })
     })
 })
-tap('IDocument password protected', (t:Test) => {
+tap('IDocument password protected', (t: Test) => {
     let doc = new npdf.Document()
     doc.load(pwdDoc, {password: 'secret'}, e => {
-        if(e) t.fail(e.message)
+        if (e) t.fail(e.message)
         else {
             t.pass('Loaded password protected document (provided a valid password on load)')
-            t.end()
+            t.comment('insert pages')
+            let inner = new npdf.Document()
+            inner.load(filePath, err => {
+                if (err) t.fail(err.message)
+                else {
+                    t.assert(inner.insertPages(doc, 0, 1) === 5, 'added additional page')
+                }
+            })
         }
     })
 })
+
