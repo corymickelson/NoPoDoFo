@@ -14,8 +14,7 @@
     "coverage": "nyc node --expose-gc ./dist/_all.spec.js && nyc report --reporter=text-lcov | coveralls",
     "prepublish": "npm ls",
     "test": "tsc -p tsconfig.json && tsc -p tsconfig.spec.json && node --expose-gc ./node_modules/.bin/tape spec/unit/*.js",
-    "preinstall": "git submodule update --init --recursive",
-    "install": "node-pre-gyp install --fallback-to-build"
+    "install": "node scripts/install.js"
   },
   "nyc": {
     "exclude": [
@@ -61,6 +60,8 @@
     "module_path": "./lib/binding/{napi_build_version}/",
     "remote_path": "napi{napi_build_version}/v{version}",
     "host": "https://nopodofo.s3-us-west-2.amazonaws.com",
-    "napi_versions": [ 1 ]
+    "napi_versions": [
+      1
+    ]
   }
 }
