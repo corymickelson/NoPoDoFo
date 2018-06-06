@@ -33,5 +33,5 @@ jobs:
             - node_modules
           key: v1-dependencies-{{ checksum "package.json" }}
       - run: git submodule update --init --recursive
-      - run: ./node_modules/.bin/node-pre-gyp install
+      - run: ./node_modules/.bin/node-pre-gyp build
       - run: npm test

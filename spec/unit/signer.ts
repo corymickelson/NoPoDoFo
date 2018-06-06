@@ -7,7 +7,7 @@ tap('Signer', sub => {
     const doc = new npdf.Document()
     doc.load(join(__dirname, '../test-documents/test.pdf'), {forUpdate: true}, async e => {
         sub.test('Sign Sync', async standard => {
-            standard.plan(2)
+            standard.plan(3)
             if (e instanceof Error) throw e
             try {
                 if ((doc.form as IForm).dictionary.hasKey('SigFlags') ||
