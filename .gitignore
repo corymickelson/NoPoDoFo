@@ -13,7 +13,6 @@ CTestTestfile.cmake
 
 .idea/
 .vscode/
-.circleci/
 lib/binding/
 .vs/
 .directory
