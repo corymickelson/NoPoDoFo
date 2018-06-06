@@ -128,26 +128,8 @@
           }
         }, 
         {  # "OS!=\"win\""
-          'conditions': [
-            ['node_shared_openssl=="false"', {
-              'include_dirs': [
-                '<(node_root_dir)/deps/openssl/openssl/include'
-              ],
-              'conditions': [
-                 ["target_arch=='ia32'", {
-                   "include_dirs": [ "<(node_root_dir)/deps/openssl/config/piii" ]
-                }],
-                ["target_arch=='x64'", {
-                  "include_dirs": [ "<(node_root_dir)/deps/openssl/config/k8" ]
-                }],
-                ["target_arch=='arm'", {
-                  "include_dirs": [ "<(node_root_dir)/deps/openssl/config/arm" ]
-                }]
-              ]
-            }]
-          ],
           "libraries": [
-            '<!@(pkg-config openssl --libs)',
+            # '<!@(pkg-config openssl --libs)',
             '<!@(pkg-config fontconfig --libs)',
             '<!@(pkg-config libpng --libs)',
             '<!@(pkg-config libjpeg --libs)',
@@ -157,7 +139,8 @@
             '<!@(pkg-config libtiff-4 --libs)',
           ],
           "include_dirs": [
-            '<!@(pkg-config openssl --cflags-only-I | sed s/-I//g)',
+            '<(node_root_dir)/deps/openssl/openssl/include',
+            # '<!@(pkg-config openssl --cflags-only-I | sed s/-I//g)',
             '<!@(pkg-config libpng --cflags-only-I | sed s/-I//g)',
             '<!@(pkg-config fontconfig --cflags-only-I | sed s/-I//g)',
             '<!@(pkg-config freetype2 --cflags-only-I | sed s/-I//g)',
