@@ -16,9 +16,16 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import {IField} from './field'
-import {  IRect } from './rect';
-import {  IObj } from './object';
+import {
+    IField,
+    ICheckBox,
+    IComboBox,
+    IListBox,
+    IPushButton,
+    ITextField
+} from './field'
+import { IRect } from './rect';
+import { IObj } from './object';
 import { IAnnotation, NPDFAnnotation } from './annotation';
 
 export interface IPage {
@@ -30,7 +37,20 @@ export interface IPage {
     contents: IObj
     resources: IObj
 
-    getField(index: number): IField
+    /**
+     * Get the field as a field of type T where T is one of: Checkbox, Pushbutton, Textfield, Combobox, or ListField
+     * @param index - field index
+     * @see ICheckBox
+     * @see IListBox
+     * @see ITextField
+     * @see IComboBox
+     * @see IPushButton
+     */
+    getField<T extends IField>(index: number): T
+    /**
+     * Get all fields on this page.
+     * Note: to determine the type of field use the Field.type property
+     */
     getFields(): IField[]
     fieldsCount(): number
     getFieldIndex(fieldName: string): number

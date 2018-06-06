@@ -37,7 +37,7 @@ FunctionReference SimpleTable::constructor; // NOLINT
 SimpleTable::SimpleTable(const CallbackInfo& info)
   : ObjectWrap(info)
 {
-  doc = Document::Unwrap(info[0].As<Object>());
+  doc = Document::Unwrap(info[0].As<Object>())->GetBaseDocument();
   const int cols = info[1].As<Number>();
   const int rows = info[2].As<Number>();
   model = new PdfSimpleTableModel(cols, rows);
@@ -51,7 +51,6 @@ SimpleTable::~SimpleTable()
   delete table;
   delete backgroundColor;
   delete foregroundColor;
-  doc = nullptr;
 }
 
 void
@@ -443,7 +442,7 @@ void
 SimpleTable::SetAutoPageBreak(const CallbackInfo& info,
                               const Napi::Value& value)
 {
-  auto* d = static_cast<void*>(doc->GetMemDocument().get());
+  auto* d = static_cast<void*>(doc.get());
   table->SetAutoPageBreak(
     value.As<Boolean>(),
     [](PdfRect& rect, void* data) -> PdfPage* {

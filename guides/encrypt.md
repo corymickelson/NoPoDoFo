@@ -1,5 +1,7 @@
 # NoPoDoFo Encrypt
 NoPoDoFo (PoDoFo compiled with libidn and OpenSSL) provides the ability to set owner / user password(s), encryption key length, document protection, and encryption algorithm options.
+Please note, on windows NoPoDoFo is built without libidn, which is required for aes encryption, algorithms `rc4v1` and `rc4v2`
+are however still available without libidn.
 See [EncryptionOption](https://github.com/corymickelson/nopodofo/blob/master/lib/encrypt.ts#L21-L27) for details.
 
 To encrypt a document see the [Document guide](https://github.com/corymickelson/NoPoDoFo/tree/master/guides/document.md)
@@ -21,8 +23,11 @@ interface IEncrypt {
 
 ## Getting an Encryption Object from a Document
 ```typescript
-let doc:Document = new nopodofo.Document('/path/to/doc.pdf')
-doc.on('ready', () => {
+let doc:Document = new nopodofo.Document()
+doc.load('/path/to/doc.pdf', (e) => {
+  if(e.message.includes('Password required')) {
+      doc.password = 'secret'
+  }
   const encrypt:IEncrypt
   if(doc.encrypt) {
     encrypt= doc.encrypt
@@ -31,9 +36,5 @@ doc.on('ready', () => {
     // check that you are allowed to perform desired action
     // ...do action
   }
-}).on('error', (e:Error) => {
-      if(e.message.includes('Password required')) {
-          doc.password = 'secret'
-      }
-  })
+})
 ```

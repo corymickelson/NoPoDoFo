@@ -30,7 +30,7 @@ namespace NoPoDoFo {
 class SimpleTable : public Napi::ObjectWrap<SimpleTable>
 {
 public:
-  explicit SimpleTable(const Napi::CallbackInfo& callbackInfo);
+  explicit SimpleTable(const Napi::CallbackInfo&);
   ~SimpleTable();
   static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env&, Napi::Object&);
@@ -75,7 +75,7 @@ public:
 private:
   PoDoFo::PdfSimpleTableModel* model = nullptr;
   PoDoFo::PdfTable* table = nullptr;
-  Document* doc = nullptr;
+  std::shared_ptr<PoDoFo::PdfDocument> doc = nullptr;
   PoDoFo::PdfColor* backgroundColor = nullptr;
   PoDoFo::PdfColor* foregroundColor = nullptr;
 

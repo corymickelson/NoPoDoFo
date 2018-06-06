@@ -34,7 +34,7 @@ class Obj : public Napi::ObjectWrap<Obj>
 {
 public:
   explicit Obj(const Napi::CallbackInfo&);
-  //  ~Obj() { cout << "Destructing Obj" << endl; }
+  ~Obj() { obj = nullptr; }
   static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
   Napi::Value GetStream(const Napi::CallbackInfo&);
@@ -59,11 +59,12 @@ public:
   void Clear(const Napi::CallbackInfo&);
   Napi::Value Eq(const Napi::CallbackInfo&);
 
-  std::shared_ptr<PoDoFo::PdfObject> GetObject() { return obj; }
-  // PoDoFo::PdfObject* GetObject() { return obj.get(); }
+  //  std::shared_ptr<PoDoFo::PdfObject> GetObject() { return obj; }
+
+  PoDoFo::PdfObject* obj;
 
 private:
-  std::shared_ptr<PoDoFo::PdfObject> obj;
+  //  std::shared_ptr<PoDoFo::PdfObject> obj;
 };
 }
 #endif

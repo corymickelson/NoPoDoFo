@@ -41,14 +41,18 @@ tap('Signer', sub => {
                         let signed = new npdf.Document()
                         signed.load(signedPath, e => {
                             if (e instanceof Error) standard.fail(e.message)
-                            const signedPage = doc.getPage(1),
-                                fields = signedPage.getFields()
-                            let signatureFieldCandidates = fields.filter((i:IField) => i.fieldName === 'signer.sign')
-                            if (!signatureFieldCandidates || signatureFieldCandidates.length === 0) standard.fail("signature field not found")
-                            else if (signatureFieldCandidates.length === 1) {
-                                standard.pass("signature found")
-                            }
-                            else standard.fail("something went wrong")
+                            standard.assert(signed.getPage(1).getFields().filter(i => i instanceof npdf.SignatureField).length === 1)
+                            standard.assert(signed.form.SigFlags === 3)
+                            standard.end()
+                            //
+                            // const signedPage = doc.getPage(1),
+                            //     fields = signedPage.getFields()
+                            // let signatureFieldCandidates = fields.filter(i => i instanceof npdf.SignatureField)
+                            // if (!signatureFieldCandidates || signatureFieldCandidates.length === 0) standard.fail("signature field not found")
+                            // else if (signatureFieldCandidates.length === 1) {
+                            //     standard.pass("signature found")
+                            // }
+                            // else standard.fail("something went wrong")
                         })
                     }
                 })

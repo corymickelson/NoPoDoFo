@@ -28,11 +28,11 @@ using namespace PoDoFo;
 
 using std::cout;
 using std::endl;
+using std::make_shared;
 using std::map;
+using std::shared_ptr;
 using std::string;
 using std::vector;
-using std::make_shared;
-using std::shared_ptr;
 
 namespace NoPoDoFo {
 
@@ -48,12 +48,12 @@ Dictionary::Dictionary(const CallbackInfo& info)
 {
   if (info[0].IsExternal()) {
     auto iObj = info[0].As<External<PdfObject>>();
-//    nObj = Obj::constructor.New( { iObj });
-//    obj = Obj::Unwrap(nObj.As<Object>())->GetObject();
-    obj = make_shared<PdfObject>(*iObj.Data());
+    //    nObj = Obj::constructor.New( { iObj });
+    //    obj = Obj::Unwrap(nObj.As<Object>())->GetObject();
+    obj = iObj.Data(); // make_shared<PdfObject>(*iObj.Data());
   }
   if (info[0].As<Object>().InstanceOf(Obj::constructor.Value())) {
-    obj = Obj::Unwrap(info[0].As<Object>())->GetObject();
+    obj = Obj::Unwrap(info[0].As<Object>())->obj;
   } else {
     TypeError::New(info.Env(), "requires Obj as parameter to constructor")
       .ThrowAsJavaScriptException();
@@ -69,7 +69,7 @@ Dictionary::Initialize(Napi::Env& env, Napi::Object& target)
     env,
     "Dictionary",
     { // StaticMethod("tryGetDictionary", &Dictionary::ResolveDictionary),
-//      InstanceAccessor("object", &Dictionary::GetObject, nullptr),
+      //      InstanceAccessor("object", &Dictionary::GetObject, nullptr),
       InstanceMethod("getKey", &Dictionary::GetKey),
       InstanceMethod("getKeys", &Dictionary::GetKeys),
       InstanceMethod("hasKey", &Dictionary::HasKey),
@@ -142,7 +142,7 @@ Dictionary::AddKey(const CallbackInfo& info)
     } else if (v.IsObject() &&
                v.As<Object>().InstanceOf(Obj::constructor.Value())) {
       auto objWrap = info[1].As<Object>();
-      PdfObject* obj = Obj::Unwrap(objWrap)->GetObject().get();
+      PdfObject* obj = Obj::Unwrap(objWrap)->obj;
       if (obj->IsDictionary()) {
         GetDictionary().AddKey(key, obj->Reference());
         cout << "Adding key: " << key.GetName() << " as reference#"
@@ -196,8 +196,7 @@ Dictionary::GetKey(const CallbackInfo& info)
         o = o->GetOwner()->GetObject(o->GetReference());
       }
     }
-    auto objPtr = Napi::External<PdfObject>::New(
-      info.Env(), o);
+    auto objPtr = Napi::External<PdfObject>::New(info.Env(), o);
     auto instance = Obj::constructor.New({ objPtr });
     return instance;
   } catch (PdfError& err) {

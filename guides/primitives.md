@@ -43,19 +43,6 @@ interface NObj {
 ```
 For more on NoPoDoFo.Obj see [here](../docs/classes/_object_.obj.html)
 
-### NoPoDoFo.Ref
-The NoPoDoF.Ref type is loosely a type of pointer to an NoPoDoFo.Obj. 
-``` typescript
-// ... assuming the document has already been loaded
-let body = doc.getObjects()
-    .filter(i => i.type === 'Dictionary')
-    .filter(i => {
-        let o = i.asDictionary().toObject()
-        return Object.keys(o).filter(k => k.type === 'Reference').length > 0
-    })
-    .map(i => i.asReference().deref()) // find all the ref's in dictionary objects and 'deref' to NoPoDoFo.Obj
-```
-
 ### NoPoDoFo.Stream
 A stream object, like a string object, is a sequence of bytes. However, a PDF application can read a stream incrementally, while a string must be read in its entirety. Furthermore, a stream can be of unlimited length, whereas a string is subject to an implementation limit. For this reason, objects with potentially large amounts of data, such as images and page descriptions, are represented as streams.
 NoPoDoF.Stream provides access to Stream Object via `Obj.stream`. 

@@ -3,7 +3,6 @@ import { join } from 'path'
 import * as test from 'tape'
 import { IObj, IPage, npdf } from "../../dist";
 
-
 const filePath = join(__dirname, '../test-documents/test.pdf'),
     outFile = './test.out.pdf',
     doc = new npdf.Document()
@@ -50,31 +49,6 @@ function pageTrimBox() {
         t.assert(trimBox.width > 0, 'trimbox width not null')
         t.assert(trimBox.left === 0, 'trimbox left')
         t.assert(trimBox.bottom === 0, 'trimbox bottom')
-        t.end()
-    })
-}
-
-function pageFields() {
-    test('get number of fields', t => {
-        let n = page.fieldsCount()
-        t.assert(typeof n === 'number')
-        t.end()
-    })
-}
-
-function pageGetField() {
-    test('get field', t => {
-        const field = page.getField(0)
-        t.assert(field instanceof (npdf.Field as any), 'is an instance of Field')
-        t.end()
-    })
-}
-
-function pageGetFields() {
-    test('get fields', t => {
-        const fields = page.getFields()
-        t.assert(Array.isArray(fields), 'returns an array')
-        t.assert(fields.length === page.fieldsCount(), 'is not an empty array')
         t.end()
     })
 }
@@ -127,50 +101,42 @@ function pageAddImg() {
                 if (err instanceof Error)
                     t.fail()
                 t.assert(existsSync(`/tmp/test.img.extract.${ext}`) === true)
-                // if (existsSync('./img.out.pdf')) unlinkSync('./img.out.pdf')
+                if (existsSync('./img.out.pdf')) unlinkSync('./img.out.pdf')
                 t.end()
             })
         }
         doc.write('./img.out.pdf', e => {
             if (e instanceof Error) t.fail()
-            // doc.body.forEach(o => {
-            //     if (o.type === 'Dictionary') {
-            //         let objDict = o.getDictionary(),
-            //             objType = objDict.hasKey('Type') ? objDict.getKey('Type') : null,
-            //             objSubType = objDict.hasKey('SubType') ? objDict.getKey('SubType') : null
+            doc.body.forEach(o => {
+                if (o.type === 'Dictionary') {
+                    let objDict = o.getDictionary(),
+                        objType = objDict.hasKey('Type') ? objDict.getKey('Type') : null,
+                        objSubType = objDict.hasKey('SubType') ? objDict.getKey('SubType') : null
 
-            //         if ((objType && objType.type === 'Name') ||
-            //             (objSubType && objSubType.type === 'Name')) {
+                    if ((objType && objType.type === 'Name') ||
+                        (objSubType && objSubType.type === 'Name')) {
 
-            //             if ((objType && objType.getName() === 'XObject') || (objSubType && objSubType.getName() === 'Image')) {
-            //                 let imgObj = objDict.hasKey('Filter') ? objDict.getKey('Filter') : null
-
-            //                 if (imgObj && imgObj.type === 'Array') {
-            //                     const imgObjArr = imgObj.getArray()
-            //                     if (imgObjArr.length === 1) {
-            //                         if (imgObjArr.at(0).type === 'Name') {
-                                        // if (imgObj.asArray().at(0).type === 'Name') {
-                                        // if (imgObj.asArray().at(0).asName() === 'DCTDecode') {
-                                        // if (imgObjArr.at(0).getName() === 'DCTDecode') {
-            //                                 extractImg(o, true)
-            //                                 return
-            //                             }
-            //                         }
-            //                     }
-            //                 }
-            //                 else if (imgObj && imgObj.type === 'Name' && imgObj.getName() === 'DCTDecode') {
-            //                     extractImg(o, true)
-            //                     return
-            //                 }
-            //                 else {
-            //                     extractImg(o, false)
-            //                     return
-            //                 }
-            //             }
-            //         }
-            //     }
-            // })
-            
+                        if ((objType && objType.getName() === 'XObject') || (objSubType && objSubType.getName() === 'Image')) {
+                            let imgObj = objDict.hasKey('Filter') ? objDict.getKey('Filter') : null
+                            if (imgObj && imgObj.type === 'Array') {
+                                const imgObjArr = imgObj.getArray()
+                                if (imgObjArr.length === 1) {
+                                    if (imgObjArr.at(0).type === 'Name') {
+                                        if (imgObjArr.at(0).getName() === 'DCTDecode') {
+                                            extractImg(o, true)
+                                            return
+                                        }
+                                    }
+                                }
+                            }
+                            else if (imgObj && imgObj.type === 'Name' && imgObj.getName() === 'DCTDecode') {
+                                extractImg(o, true)
+                                return
+                            }
+                        }
+                    }
+                }
+            })
         })
 
     })
@@ -188,9 +154,6 @@ export function runAll() {
         pageRotation,
         pageProperties,
         pageTrimBox,
-        pageFields,
-        pageGetField,
-        pageGetFields,
         pageGetAnnotsCount,
         pageGetAnnot,
         pageContents,

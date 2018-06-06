@@ -276,9 +276,9 @@ Napi::Value
 Page::GetContents(const CallbackInfo& info)
 {
   EscapableHandleScope scope(info.Env());
-  bool forAppending = info[0].As<Boolean>();
-  PdfObject* contentsObj = forAppending ? GetPage()->GetContentsForAppending()
-                                        : GetPage()->GetContents();
+  // bool forAppending = info[0].As<Boolean>();
+  PdfObject* contentsObj = GetPage()->GetContents();
+  // forAppending ? GetPage()->GetContentsForAppending() : GetPage()->GetContents();
   auto objPtr = External<PdfObject>::New(info.Env(), contentsObj);
   auto instance = Obj::constructor.New({ objPtr });
   return instance;

@@ -2,7 +2,7 @@
   "conditions": [
     ["OS==\"win\"", {
       "variables": {
-        "VCPKG_Path%": '$(vcpkg_path)'#"C:/libs/installed/x86-windows-static"
+        "VCPKG_Path%": '$(vcpkg_path)'
       },
     }],
   ],
@@ -17,11 +17,6 @@
       'cflags_cc': ['-std=c++14'],
       'cflags_cc!': [ '-fno-exceptions', '-fno-rtti' ],
       'cflags!': [ '-fno-exceptions', '-fno-rtti' ],
-      'xcode_settings': {
-        'GCC_ENABLE_CPP_EXCEPTIONS': 'YES',
-        'CLANG_CXX_LIBRARY': 'libc++',
-        'MACOSX_DEPLOYMENT_TARGET': '10.7',
-      },
       'msvs_settings': {
         'VCCLCompilerTool': {
           'ExceptionHandling': 1,
@@ -69,8 +64,15 @@
         "src/base/Data.cc",
         "src/base/ContentsTokenizer.cc"
       ],
-      # !!!! Windows NPDF Build !!!! #
       "conditions": [
+        ['OS=="mac"', {
+          'xcode_settings': {
+            'GCC_ENABLE_CPP_EXCEPTIONS': 'YES',
+            'CLANG_CXX_LIBRARY': 'libc++',
+            'MACOSX_DEPLOYMENT_TARGET': '10.9',
+            'CLANG_CXX_LANGUAGE_STANDARD': 'c++14'
+          },
+        }],
         ["OS==\"win\"", {
           "link_settings": {
             "libraries": ["ws2_32"]
@@ -125,8 +127,6 @@
             }
           }
         }, 
-
-      # !!!! Linux NPDF Build !!!! #
         {  # "OS!=\"win\""
           'conditions': [
             ['node_shared_openssl=="false"', {

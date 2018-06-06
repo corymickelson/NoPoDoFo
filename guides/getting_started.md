@@ -1,4 +1,12 @@
-# Build Dependencies
+# Getting Started
+PoDoFo is a cross-platform low-level pdf library. NoPoDoFo is a nodejs bindings library to PoDoFo.
+NoPoDoFo is built against PoDoFo trunk(master) and requires you have a the necessary library dependencies
+installed on your system before trying to `npm install` or `git clone` this library. 
+Instructions for installing required libraries follow.
+
+## Build Dependencies
+
+Note: Please use your platforms native package manager
 
 ## Windows
 
@@ -39,6 +47,6 @@ Install dependencies with `pacman -S [dependencies]`
 ## Mac
 todo
 
-# Building NoPoDoFo
+## Building NoPoDoFo
 
 With all dependencies installled you can install NoPoDoFo with `npm i nopodofo`

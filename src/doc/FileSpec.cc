@@ -51,8 +51,7 @@ FileSpec::FileSpec(const CallbackInfo& info)
 {
   if (info.Length() == 1 && info[0].IsObject() &&
       info[0].As<Object>().InstanceOf(Obj::constructor.Value())) {
-    spec = make_unique<PdfFileSpec>(
-      Obj::Unwrap(info[0].As<Object>())->GetObject().get());
+    spec = make_unique<PdfFileSpec>(Obj::Unwrap(info[0].As<Object>())->obj);
   } else if (info.Length() == 1 && info[0].Type() == napi_external) {
     auto pObj = info[0].As<External<PdfObject>>().Data();
     spec = make_unique<PdfFileSpec>(pObj);
@@ -71,7 +70,7 @@ FileSpec::FileSpec(const CallbackInfo& info)
         .ThrowAsJavaScriptException();
     }
     bool embed = true;
-    if(info.Length() >= 3 && info[2].IsBuffer()) {
+    if (info.Length() >= 3 && info[2].IsBuffer()) {
       embed = info[2].As<Boolean>();
     }
     spec = make_unique<PdfFileSpec>(file.c_str(), embed, doc, true);

@@ -39,10 +39,13 @@ Array::Array(const CallbackInfo& info)
 {
   if (info[0].IsObject() &&
       info[0].As<Object>().InstanceOf(Obj::constructor.Value())) {
-    shared_ptr<PdfObject> obj = Obj::Unwrap(info[0].As<Object>())->GetObject();
-    array = make_unique<PdfArray>(*obj.get());
+    PdfObject* obj = Obj::Unwrap(info[0].As<Object>())->obj;
+    //    array = make_unique<PdfArray>(*obj);
+    array = &obj->GetArray();
   } else if (info[0].IsExternal()) {
-    array = make_unique<PdfArray>(*info[0].As<External<PdfArray>>().Data());
+    array = info[0].As<External<PdfArray>>().Data();
+    //    array =
+    //    make_unique<PdfArray>(*info[0].As<External<PdfArray>>().Data());
   } else {
     TypeError::New(
       info.Env(),
@@ -155,7 +158,7 @@ Array::Push(const CallbackInfo& info)
   }
   try {
     auto item = Obj::Unwrap(wrapper);
-    GetArray()->push_back(*item->GetObject());
+    GetArray()->push_back(*item->obj);
 
   } catch (PdfError& err) {
     ErrorHandler(err, info);
@@ -181,8 +184,7 @@ Array::GetObjAtIndex(const CallbackInfo& info)
   if (item.IsReference()) {
     item = *item.GetOwner()->GetObject(item.GetReference());
   }
-  auto initPtr = Napi::External<PdfObject>::New(
-    info.Env(), &item);
+  auto initPtr = Napi::External<PdfObject>::New(info.Env(), &item);
   auto instance = Obj::constructor.New({ initPtr });
   return instance;
 }
@@ -200,8 +202,7 @@ Array::ToArray(const Napi::CallbackInfo& info)
       } else {
         item = &it;
       }
-      auto initPtr = Napi::External<PdfObject>::New(
-        info.Env(), item);
+      auto initPtr = Napi::External<PdfObject>::New(info.Env(), item);
       const auto instance = Obj::constructor.New({ initPtr });
       js.Set(counter, instance);
       counter++;

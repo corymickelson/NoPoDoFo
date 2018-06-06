@@ -279,7 +279,7 @@ BaseDocument::GetObjects(const CallbackInfo& info)
 Napi::Value
 BaseDocument::GetObject(const CallbackInfo& info)
 {
-  auto ref = Obj::Unwrap(info[0].As<Object>())->GetObject();
+  auto ref = Obj::Unwrap(info[0].As<Object>())->obj;
   PdfObject* target = document->GetObjects()->GetObject(ref->GetReference());
   return Obj::constructor.New({ External<PdfObject>::New(info.Env(), target) });
 }

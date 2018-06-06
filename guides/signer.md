@@ -1,6 +1,6 @@
 # NoPoDoFo Signer
 
-The NoPoDoFo Signer class is an attempt at exposing an easy to understand, easy to use signature api. NoPoDoFo Signer wraps PoDoFo PdfSignatureField, PdfOutputDevice, PdfSignOutputDevice, and PdfRefCountedBuffer classes. NoPoDoFo Signer also exposes a `signature` function to read-in, parse, and return a valid digital signature from a locally persisted certificate and private key file, <mark>Use of Signer.signature depends on Openssl</mark>. Digital signing has only been tested on linux.
+The NoPoDoFo Signer class is an attempt at exposing an easy to understand, easy to use signature api. NoPoDoFo Signer wraps PoDoFo PdfSignatureField, PdfOutputDevice, PdfSignOutputDevice, and PdfRefCountedBuffer classes. NoPoDoFo Signer also exposes a `signature` function to read-in, parse, and return a valid digital signature from a certificate and private key file, <mark>Use of Signer.signature depends on Openssl</mark>. Digital signing has only been tested on linux.
 
 
 ### Generating a certificate with Openssl
@@ -38,10 +38,8 @@ otherwise the document will be returned as a nodejs buffer.
 Provided the above mentioned objects NoPoDoFo will handle allocating space for the signature on the document, and writing the signature to the document.
 
 ```typescript
-import ...
-
-const doc = new Document('/path/to/doc', true)
-doc.on('ready', e => {
+const doc = new Document()
+doc.load('/path/to/doc', {forUpdate: true}, e => {
     if(e instanceof Error) {
         // handle error
     }
@@ -66,8 +64,8 @@ doc.on('ready', e => {
 NoPoDoFo signer is responsible for setting the signature field, signature, and persisting the document.
 
 ```typescript
-const doc = new Document('/path/to/doc.pdf', true)
-doc.on('ready', e => {
+const doc = new Document()
+doc.load('/path/to/doc.pdf', {forUpdate: true}, e => {
     if(e instanceof Error) {
         // handle error
     }

@@ -4,19 +4,18 @@ The NoPoDoFo Document class is a wrapper around PoDoFo::PdfMemDocument. This is 
 This class was designed to allow easy access to the pdf object structure and should be used whenever you want to change the structure of
 the pdf document. If you are only <i>creating</i> a pdf file use the [StreamDocument](https://github.com/corymickelson/NoPoDoFo/tree/master/guides/stream_document.md) class.
 
+
 ### Loading a document
 
 When loading a pdf document, NoPoDofo will throw error `Password required` when a user/owner password has been set on the target document.
 ``` typescript
-let doc:Document = new nopodofo.Document('/path/to/doc.pdf')
-doc.on('ready', () => {
-    // do something with the loaded pdf
+let doc:Document = new nopodofo.Document()
+doc.load('/path/to/doc.pdf', (e:Error) => {
+    if(e.message.includes('Password required')) {
+        doc.password = 'secret'
+    }
 })
-    .on('error', (e:Error) => {
-        if(e.message.includes('Password required')) {
-            doc.password = 'secret'
-        }
-    })
+
 ```
 
 ### Persisting changes
@@ -45,8 +44,11 @@ doc.write((e:Error, d:Buffer) => {
 NoPoDoFo provides the ability to encrypt a document through ```Document.createEncrypt```.
 Encryption options are dependent on PoDoFo built with libidn and OpenSSL.
 ``` typescript
-let doc = new NoPoDoFo.Document('/path/to/doc.pdf')
-doc.on('ready', () => {
+let doc = new NoPoDoFo.Document()
+doc.load('/path/to/doc.pdf', (e) => {
+    if(e.message.includes('Password required')) {
+        // handle error or set password if password is known
+    }
     let encrypt:EncryptionOption = {
         userPassword: 'secret',
         ownerPassword: 'secret',
@@ -57,11 +59,7 @@ doc.on('ready', () => {
     doc.createEncrypt(encrypt) // Creates a PdfEncrypt object and sets document encrypt to this object.
     doc.write('output/path/doc.pdf', (e:Error) => {}) // write the document with new/updated encryption
 })
-    .on('error', e => {
-        if(e.message.includes('Password required')) {
-            // handle error or set password if password is known
-        }
-    })
+
 ```
 
 ### Pdf body (pdf object / pdf catalog)
@@ -70,14 +68,12 @@ A PDF is comprised of an array of [NoPoDoFo.Obj](obj.md), each object contains a
 Document `.getObjects()` will return an array of [NoPoDoFo.Obj](https://corymickelson.github.io/NoPoDoFo/modules/_object_.html)
 
 ``` typescript
-let doc = new NoPoDoFo.Document('/path/to/doc.pdf')
-doc.on('ready', () => {
-    let body = doc.getObjects()
-    // do something with pdf object
-})
-.on('error', e => {
+let doc = new NoPoDoFo.Document()
+doc.load('/path/to/doc.pdf', () => {
     if(e.message.includes('Password required')) {
         doc.password = 'secret'
     }
+    let body = doc.getObjects()
+    // do something with pdf object
 })
 ```

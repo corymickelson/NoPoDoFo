@@ -13,7 +13,7 @@
     "docs": "typedoc --options ./tsconfig.docs.json --out ./docs",
     "coverage": "nyc node --expose-gc ./dist/_all.spec.js && nyc report --reporter=text-lcov | coveralls",
     "prepublish": "npm ls",
-    "test": "tsc -p tsconfig.json && tsc -p tsconfig.spec.json && node --expose-gc spec/unit/*.js",
+    "test": "tsc -p tsconfig.json && tsc -p tsconfig.spec.json && node --expose-gc ./node_modules/.bin/tape spec/unit/*.js",
     "preinstall": "git submodule update --init --recursive",
     "install": "node-pre-gyp install --fallback-to-build"
   },

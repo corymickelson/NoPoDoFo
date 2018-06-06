@@ -203,14 +203,14 @@ Form::SetResource(const CallbackInfo& info, const Napi::Value& value)
     try {
       auto formDict = doc->GetAcroForm()->GetObject()->GetDictionary();
       auto dr = Obj::Unwrap(value.As<Object>());
-      if (dr->GetObject()->GetDataType() != ePdfDataType_Dictionary)
+      if (dr->obj->GetDataType() != ePdfDataType_Dictionary)
         TypeError::New(
           info.Env(),
           "Default resource must be an instance of NoPoDoFo::Dictionary")
           .ThrowAsJavaScriptException();
       if (formDict.HasKey(Name::DR))
         formDict.RemoveKey(Name::DR);
-      formDict.AddKey(PdfName(Name::DR), dr->GetObject()->Reference());
+      formDict.AddKey(PdfName(Name::DR), dr->obj->Reference());
     } catch (PdfError& err) {
       ErrorHandler(err, info);
     }
@@ -232,8 +232,8 @@ Form::GetCalculationOrder(const CallbackInfo& info)
       for (const auto& item : arr) {
         if (item.IsReference()) {
           auto value = doc->GetObjects()->GetObject(item.GetReference());
-          auto nObj = Obj::constructor.New({ External<PdfObject>::New(
-            info.Env(), value) });
+          auto nObj = Obj::constructor.New(
+            { External<PdfObject>::New(info.Env(), value) });
           if (!value->IsDictionary()) {
             js.Set(n, nObj);
             n++;
@@ -283,8 +283,8 @@ Form::GetFont(const CallbackInfo& info)
       }
       auto font = memDoc->GetFont(fontObject);
       cout << "Font: " << font->GetFontMetrics()->GetFontname() << endl;
-      js.Set(n,
-             Font::constructor.New({External<PdfFont>::New(info.Env(), font)} ));
+      js.Set(
+        n, Font::constructor.New({ External<PdfFont>::New(info.Env(), font) }));
       n++;
     }
     return js;

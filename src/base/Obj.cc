@@ -60,8 +60,7 @@ Obj::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceMethod("getName", &Obj::GetName),
       InstanceMethod("getArray", &Obj::GetArray),
       InstanceMethod("getRawData", &Obj::GetRawData),
-      InstanceMethod("clear", &Obj::Clear),
-      InstanceMethod("eq", &Obj::Eq) });
+      InstanceMethod("clear", &Obj::Clear) });
   constructor = Persistent(ctor);
   constructor.SuppressDestruct();
   target.Set("Obj", ctor);
@@ -69,8 +68,9 @@ Obj::Initialize(Napi::Env& env, Napi::Object& target)
 
 Obj::Obj(const Napi::CallbackInfo& info)
   : ObjectWrap<Obj>(info)
+  , obj(info[0].As<External<PdfObject>>().Data())
 {
-  obj = make_shared<PdfObject>(*info[0].As<External<PdfObject>>().Data());
+  //  obj = make_shared<PdfObject>(*info[0].As<External<PdfObject>>().Data());
 }
 
 void
@@ -86,6 +86,17 @@ Napi::Value
 Obj::GetStream(const CallbackInfo& info)
 {
   try {
+    if (!obj->HasStream()) {
+      cout << "This Object does not have a stream associated with it" << endl;
+      stringstream output;
+      output << "/tmp/" << obj->Reference().GenerationNumber() << "."
+             << obj->Reference().ObjectNumber() << ".txt" << endl;
+      const char* outfile = output.str().c_str();
+      cout << "Writing Object to: " << outfile << endl;
+      PdfOutputDevice outDevice(outfile);
+      obj->WriteObject(&outDevice, ePdfWriteMode_Clean, nullptr);
+      return info.Env().Undefined();
+    }
     auto pStream = dynamic_cast<PdfMemStream*>(obj->GetStream());
     auto stream = pStream->Get();
     auto length = pStream->GetLength();
@@ -162,17 +173,6 @@ Obj::GetDataType(const CallbackInfo& info)
     js = "Unknown";
   }
   return Napi::String::New(info.Env(), js);
-}
-
-Napi::Value
-Obj::Eq(const CallbackInfo& info)
-{
-  auto wrap = info[0].As<Object>();
-  if (!wrap.InstanceOf(Obj::constructor.Value())) {
-    throw Error::New(info.Env(), "Must be an instance of NoPoDoFo Obj");
-  }
-  auto value = Obj::Unwrap(wrap);
-  return Boolean::New(info.Env(), value->GetObject() == this->GetObject());
 }
 
 Napi::Value
@@ -302,7 +302,7 @@ protected:
   void Execute() override
   {
     try {
-      auto o = obj->GetObject();
+      auto o = obj->obj;
       value = o->GetByteOffset(arg.c_str(), ePdfWriteMode_Default);
     } catch (PdfError& err) {
       SetError(ErrorHandler::WriteMsg(err));
@@ -347,7 +347,7 @@ protected:
   {
     try {
       PdfOutputDevice device(arg.c_str());
-      obj->GetObject()->WriteObject(&device, ePdfWriteMode_Default, nullptr);
+      obj->obj->WriteObject(&device, ePdfWriteMode_Default, nullptr);
     } catch (PdfError& err) {
       SetError(ErrorHandler::WriteMsg(err));
     } catch (Napi::Error& err) {

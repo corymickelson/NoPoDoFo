@@ -5,8 +5,8 @@
 
 The NoPoDoFo ContentsTokenizer class is used for extracting text from a page. 
 ```typescript
-const doc:Document = new Document('path/to/pdf')
-doc.on('ready', e => {
+const doc:Document = new Document()
+doc.load('path/to/pdf', e => {
     if(e instanceof Error) {
         //handle error
     }

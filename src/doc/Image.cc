@@ -40,7 +40,7 @@ Image::Image(const CallbackInfo& info)
 #if defined(PODOFO_HAVE_JPEG_LIB) && defined(PODOFO_HAVE_PNG_LIB) &&           \
   defined(PODOFO_HAVE_TIFF_LIB)
   if (info.Length() < 2 || !info[0].IsObject() ||
-      (!info[1].IsString() || !info[1].IsBuffer())) {
+      (!info[1].IsString() && !info[1].IsBuffer())) {
     Error::New(info.Env(),
                "Image requires the document and image source [file or buffer].")
       .ThrowAsJavaScriptException();

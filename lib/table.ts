@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import { IDocument} from "./document";
-import {npdf} from './'
+import {npdf, NPDFInternal} from './'
 import {IFont, NPDFAlignment, NPDFColor, NPDFPoint, NPDFVerticalAlignment, IPainter} from "./painter";
 import {IPage} from './page'
 
@@ -27,50 +27,50 @@ export class Cell {
      * @returns {Font}
      */
     get font(): IFont {
-        return (this._table as any)._instance.getFont(this._col, this._row)
+        return this._table.getFont(this._col, this._row)
     }
 
     get text(): string {
-        return (this._table as any)._instance.getText(this._col, this._row)
+        return this._table.getText(this._col, this._row)
     }
 
     set text(v: string) {
-        (this._table as any)._instance.text = {col: this._col, row: this._row, text: v}
+        this._table.text = {col: this._col, row: this._row, text: v}
     }
 
     get foregroundColor(): NPDFColor {
-        return (this._table as any)._instance.getForegroundColor(this._col, this._row)
+        return this._table.getForegroundColor(this._col, this._row)
     }
 
     get backgroundColor(): NPDFColor {
-        return (this._table as any)._instance.getBackgroundColor(this._col, this._row)
+        return this._table.getBackgroundColor(this._col, this._row)
     }
 
     get alignment(): NPDFAlignment {
-        return (this._table as any)._instance.getAlignment(this._col, this._row)
+        return this._table.getAlignment(this._col, this._row)
     }
 
     get wordWrap(): boolean {
-        return (this._table as any)._instance.getWordWrap(this._col, this._row)
+        return this._table.getWordWrap(this._col, this._row)
     }
 
     get verticalAlignment(): NPDFVerticalAlignment {
-        return (this._table as any)._instance.getVerticalAlignment(this._col, this._row)
+        return this._table.getVerticalAlignment(this._col, this._row)
     }
 
-    constructor(private _table: Table, private _col: number, private _row: number) {
+    constructor(private _table: NPDFInternal, private _col: number, private _row: number) {
     }
 
     getImage(): Buffer {
-        return (this._table as any)._instance.getImage(this._col, this._row)
+        return this._table.getImage(this._col, this._row)
     }
 
     hasImage(): boolean {
-        return (this._table as any)._instance.hasImage()
+        return this._table.hasImage()
     }
 
     hasBackgroundColor(): boolean {
-        return (this._table as any)._instance.hasBackgroundColor()
+        return this._table.hasBackgroundColor()
     }
 
 }

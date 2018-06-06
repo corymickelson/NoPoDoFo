@@ -2,7 +2,7 @@
  * This file is part of the NoPoDoFo (R) project.
  * Copyright (c) 2017-2018
  * Authors: Cory Mickelson, et al.
- * 
+ *
  * NoPoDoFo is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -28,6 +28,7 @@ class Array : public Napi::ObjectWrap<Array>
 {
 public:
   explicit Array(const Napi::CallbackInfo&);
+  ~Array() { array = nullptr; }
   static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
 
@@ -45,10 +46,11 @@ public:
   Napi::Value Pop(const Napi::CallbackInfo&);
   void Clear(const Napi::CallbackInfo&);
   Napi::Value Eq(const Napi::CallbackInfo&);
-  PoDoFo::PdfArray* GetArray() { return array.get(); }
+  PoDoFo::PdfArray* GetArray() { return array; }
 
 private:
-  std::unique_ptr<PoDoFo::PdfArray> array;
+  //  std::unique_ptr<PoDoFo::PdfArray> array;
+  PoDoFo::PdfArray* array;
   Napi::Value GetObjAtIndex(const Napi::CallbackInfo&);
 };
 }
