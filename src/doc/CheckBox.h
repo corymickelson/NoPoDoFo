@@ -20,8 +20,8 @@
 #ifndef NPDF_CHECKBOX_H
 #define NPDF_CHECKBOX_H
 
-#include "Field.h"
 #include "Button.h"
+#include "Field.h"
 
 #include <napi.h>
 #include <podofo/podofo.h>
@@ -42,7 +42,10 @@ public:
   Napi::Value IsChecked(const CallbackInfo&);
   void SetChecked(const CallbackInfo&, const Napi::Value&);
 
-  std::unique_ptr<PoDoFo::PdfCheckBox> checkbox;
+  PoDoFo::PdfCheckBox GetCheckBox()
+  {
+    return PoDoFo::PdfCheckBox(*field.get());
+  }
   std::shared_ptr<PoDoFo::PdfField> field;
 };
 }

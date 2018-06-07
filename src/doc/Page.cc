@@ -117,31 +117,35 @@ Page::GetField(const CallbackInfo& info)
 Napi::Value
 Page::GetField(const Napi::Env& env, int index)
 {
-  PdfField field = GetPage()->GetField(index);
-  EPdfField t = field.GetType();
+  auto field = new PdfField(page->GetField(index));
+  auto destruct = [](Napi::Env env, PdfField* field) {
+    HandleScope scope(env);
+    delete field;
+  };
+  EPdfField t = field->GetType();
   switch (t) {
     case ePdfField_PushButton:
       return PushButton::constructor.New(
-        { this->Value(), Number::New(env, index) });
+        { External<PdfField>::New(env, field, destruct) });
     case ePdfField_CheckBox:
       return CheckBox::constructor.New(
-        { this->Value(), Number::New(env, index) });
+        { External<PdfField>::New(env, field, destruct) });
     case ePdfField_RadioButton:
       Error::New(env, "RadioButton not yet implemented")
         .ThrowAsJavaScriptException();
       return env.Undefined();
     case ePdfField_TextField:
       return TextField::constructor.New(
-        { this->Value(), Number::New(env, index) });
+        { External<PdfField>::New(env, field, destruct) });
     case ePdfField_ComboBox:
       return ComboBox::constructor.New(
-        { this->Value(), Number::New(env, index) });
+        { External<PdfField>::New(env, field, destruct) });
     case ePdfField_ListBox:
       return ListBox::constructor.New(
-        { this->Value(), Number::New(env, index) });
+        { External<PdfField>::New(env, field, destruct) });
     case ePdfField_Signature:
       return SignatureField::constructor.New(
-        { External<PdfAnnotation>::New(env, field.GetWidgetAnnotation()) });
+        { External<PdfAnnotation>::New(env, field->GetWidgetAnnotation()) });
     default:
       Error::New(env, "Unknown field type").ThrowAsJavaScriptException();
       return env.Undefined();

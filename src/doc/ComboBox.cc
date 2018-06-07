@@ -17,9 +17,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <iostream>
 #include "ComboBox.h"
 #include "Field.h"
+#include <iostream>
 
 using namespace Napi;
 using namespace PoDoFo;
@@ -38,7 +38,6 @@ ComboBox::ComboBox(const Napi::CallbackInfo& info)
   , ListField(Field::GetField())
 {
   field = Field::GetField();
-  combo = make_unique<PdfComboBox>(*field.get());
 }
 
 void
@@ -92,11 +91,11 @@ ComboBox::Initialize(Napi::Env& env, Napi::Object& target)
 void
 ComboBox::SetEditable(const Napi::CallbackInfo&, const Napi::Value& value)
 {
-  combo->SetEditable(value.As<Napi::Boolean>());
+  GetComboBox().SetEditable(value.As<Napi::Boolean>());
 }
 Napi::Value
 ComboBox::GetEditable(const Napi::CallbackInfo& info)
 {
-  return Napi::Boolean::New(info.Env(), combo->IsEditable());
+  return Napi::Boolean::New(info.Env(), GetComboBox().IsEditable());
 }
 }

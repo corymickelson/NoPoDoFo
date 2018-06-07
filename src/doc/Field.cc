@@ -45,38 +45,32 @@ namespace NoPoDoFo {
  */
 Field::Field(EPdfField type, const CallbackInfo& info)
 {
-  if (info.Length() < 2) {
-    TypeError::New(info.Env(),
-                   "Field constructor args: [[IPage, number], [IAnnotation, "
-                   "IForm], [IPage, IRect, IBase]]")
-      .ThrowAsJavaScriptException();
-    return;
-  }
-  auto arg1 =
-    info[0]
-      .As<Object>();
-  if (arg1.InstanceOf(Page::constructor.Value())) {
-    auto page = Page::Unwrap(arg1);
-    if (info[1].IsNumber()) {
-      int index = info[1].As<Number>();
-      cout << "Constructing field from existing object" << endl;
-      field = make_shared<PdfField>(page->GetPage()->GetField(index));
-    }
-  } else if (arg1.InstanceOf(Annotation::constructor.Value())) {
-    PdfAnnotation* annotation = &Annotation::Unwrap(arg1)->GetAnnotation();
-    if (info[1].IsObject() &&
-        info[1].As<Object>().InstanceOf(Form::constructor.Value())) {
-      PdfAcroForm* form = Form::Unwrap(info[1].As<Object>())->GetForm();
-      field = make_shared<PdfField>(form->GetObject(), annotation);
-    }
+  if (info[0].IsExternal()) {
+    auto arg = info[0].As<External<PdfField>>().Data();
+    field = make_shared<PdfField>(*arg);
   } else {
-    TypeError::New(info.Env(), "Signature Mismatch")
-      .ThrowAsJavaScriptException();
-    return;
+    auto arg1 = info[0].As<Object>();
+    if (arg1.InstanceOf(Page::constructor.Value())) {
+      auto page = Page::Unwrap(arg1);
+      if (info[1].IsNumber()) {
+        int index = info[1].As<Number>();
+        field = make_shared<PdfField>(page->page->GetField(index));
+      }
+    } else if (arg1.InstanceOf(Annotation::constructor.Value())) {
+      PdfAnnotation* annotation = &Annotation::Unwrap(arg1)->GetAnnotation();
+      if (info[1].IsObject() &&
+          info[1].As<Object>().InstanceOf(Form::constructor.Value())) {
+        PdfAcroForm* form = Form::Unwrap(info[1].As<Object>())->GetForm();
+        field = make_shared<PdfField>(form->GetObject(), annotation);
+      }
+    } else {
+      TypeError::New(info.Env(), "Signature Mismatch")
+        .ThrowAsJavaScriptException();
+      return;
+    }
   }
   fieldName = field.get()->GetFieldName().GetStringUtf8();
   fieldType = TypeString();
-  cout << "Field type: " << fieldType << endl;
 }
 
 string
@@ -112,7 +106,8 @@ Field::TypeString()
 }
 
 Napi::Value
-Field::GetType(const Napi::CallbackInfo &info) {
+Field::GetType(const Napi::CallbackInfo& info)
+{
   return Number::New(info.Env(), static_cast<int>(field->GetType()));
 }
 

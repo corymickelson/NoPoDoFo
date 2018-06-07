@@ -40,7 +40,6 @@ TextField::TextField(const CallbackInfo& info)
   , Field(ePdfField_TextField, info)
 {
   field = Field::GetField();
-  text = make_unique<PdfTextField>(*field.get());
   if (info[info.Length() - 1].IsObject() &&
       !info[info.Length() - 1].As<Object>().InstanceOf(
         Document::constructor.Value()) &&
@@ -49,35 +48,35 @@ TextField::TextField(const CallbackInfo& info)
     auto opts = info[info.Length() - 1].As<Object>();
     if (opts.Has("maxLen")) {
       int maxLen = opts.Get("maxLen").As<Number>();
-      text->SetMaxLen(maxLen);
+      GetText().SetMaxLen(maxLen);
     }
     if (opts.Has("multiLine")) {
       bool multiLine = opts.Get("multiLine").As<Boolean>();
-      text->SetMultiLine(multiLine);
+      GetText().SetMultiLine(multiLine);
     }
     if (opts.Has("passwordField")) {
       bool passwordField = opts.Get("passwordField").As<Boolean>();
-      text->SetPasswordField(passwordField);
+      GetText().SetPasswordField(passwordField);
     }
     if (opts.Has("fileField")) {
       bool fileField = opts.Get("fileField").As<Boolean>();
-      text->SetFileField(fileField);
+      GetText().SetFileField(fileField);
     }
     if (opts.Has("spellCheckEnabled")) {
       bool spellCheckEnabled = opts.Get("spellCheckEnabled").As<Boolean>();
-      text->SetSpellcheckingEnabled(spellCheckEnabled);
+      GetText().SetSpellcheckingEnabled(spellCheckEnabled);
     }
     if (opts.Has("scrollEnabled")) {
       bool scrollEnabled = opts.Get("scrollEnabled").As<Boolean>();
-      text->SetScrollBarsEnabled(scrollEnabled);
+      GetText().SetScrollBarsEnabled(scrollEnabled);
     }
     if (opts.Has("combs")) {
       bool combs = opts.Get("combs").As<Boolean>();
-      text->SetCombs(combs);
+      GetText().SetCombs(combs);
     }
     if (opts.Has("richText") && opts.Has("maxLen")) {
       bool richText = opts.Get("richText").As<Boolean>();
-      text->SetRichText(richText);
+      GetText().SetRichText(richText);
     }
   }
 }
@@ -139,94 +138,94 @@ TextField::SetText(const CallbackInfo& info, const Napi::Value& value)
   }
   string input = value.As<String>().Utf8Value();
   PoDoFo::PdfString v(input);
-  text->SetText(v);
+  GetText().SetText(v);
 }
 
 Napi::Value
 TextField::GetText(const CallbackInfo& info)
 {
-  return Napi::String::New(info.Env(), text->GetText().GetStringUtf8());
+  return Napi::String::New(info.Env(), GetText().GetText().GetStringUtf8());
 }
 void
 TextField::SetMaxLen(const Napi::CallbackInfo& info, const Napi::Value& value)
 {
-  text->SetMaxLen(value.As<Number>().Int64Value());
+  GetText().SetMaxLen(value.As<Number>().Int64Value());
 }
 Napi::Value
 TextField::GetMaxLen(const Napi::CallbackInfo& info)
 {
-  return Number::New(info.Env(), text->GetMaxLen());
+  return Number::New(info.Env(), GetText().GetMaxLen());
 }
 void
 TextField::SetMultiLine(const Napi::CallbackInfo& info,
                         const Napi::Value& value)
 {
-  text->SetMultiLine(value.As<Boolean>());
+  GetText().SetMultiLine(value.As<Boolean>());
 }
 Napi::Value
 TextField::IsMultiLine(const Napi::CallbackInfo& info)
 {
-  return Boolean::New(info.Env(), text->IsMultiLine());
+  return Boolean::New(info.Env(), GetText().IsMultiLine());
 }
 void
 TextField::SetPasswordField(const Napi::CallbackInfo&, const Napi::Value& value)
 {
-  text->SetPasswordField(value.As<Boolean>());
+  GetText().SetPasswordField(value.As<Boolean>());
 }
 Napi::Value
 TextField::IsPasswordField(const Napi::CallbackInfo& info)
 {
-  return Boolean::New(info.Env(), text->IsPasswordField());
+  return Boolean::New(info.Env(), GetText().IsPasswordField());
 }
 void
 TextField::SetFileField(const Napi::CallbackInfo&, const Napi::Value& value)
 {
-  text->SetFileField(value.As<Boolean>());
+  GetText().SetFileField(value.As<Boolean>());
 }
 Napi::Value
 TextField::IsFileField(const Napi::CallbackInfo& info)
 {
-  return Boolean::New(info.Env(), text->IsFileField());
+  return Boolean::New(info.Env(), GetText().IsFileField());
 }
 void
 TextField::SetSpellcheckEnabled(const Napi::CallbackInfo&,
                                 const Napi::Value& value)
 {
-  text->SetSpellcheckingEnabled(value.As<Boolean>());
+  GetText().SetSpellcheckingEnabled(value.As<Boolean>());
 }
 Napi::Value
 TextField::IsSpellcheckEnabled(const Napi::CallbackInfo& info)
 {
-  return Boolean::New(info.Env(), text->IsSpellcheckingEnabled());
+  return Boolean::New(info.Env(), GetText().IsSpellcheckingEnabled());
 }
 void
 TextField::SetScrollEnabled(const Napi::CallbackInfo&, const Napi::Value& value)
 {
-  text->SetScrollBarsEnabled(value.As<Boolean>());
+  GetText().SetScrollBarsEnabled(value.As<Boolean>());
 }
 Napi::Value
 TextField::IsScrollEnabled(const Napi::CallbackInfo& info)
 {
-  return Boolean::New(info.Env(), text->IsScrollBarsEnabled());
+  return Boolean::New(info.Env(), GetText().IsScrollBarsEnabled());
 }
 void
 TextField::SetCombs(const Napi::CallbackInfo&, const Napi::Value& value)
 {
-  text->SetCombs(value.As<Boolean>());
+  GetText().SetCombs(value.As<Boolean>());
 }
 Napi::Value
 TextField::IsCombs(const Napi::CallbackInfo& info)
 {
-  return Boolean::New(info.Env(), text->IsCombs());
+  return Boolean::New(info.Env(), GetText().IsCombs());
 }
 void
 TextField::SetRichText(const Napi::CallbackInfo&, const Napi::Value& value)
 {
-  text->SetRichText(value.As<Boolean>());
+  GetText().SetRichText(value.As<Boolean>());
 }
 Napi::Value
 TextField::IsRichText(const Napi::CallbackInfo& info)
 {
-  return Boolean::New(info.Env(), text->IsRichText());
+  return Boolean::New(info.Env(), GetText().IsRichText());
 }
 }

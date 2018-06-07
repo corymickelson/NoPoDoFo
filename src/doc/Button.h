@@ -20,21 +20,22 @@
 #ifndef NPDF_BUTTON_H
 #define NPDF_BUTTON_H
 
+#include "Field.h"
 #include <napi.h>
 #include <podofo/podofo.h>
-#include "Field.h"
 
 namespace NoPoDoFo {
 
-class Button {
+class Button
+{
 public:
   explicit Button(std::shared_ptr<PoDoFo::PdfField> field);
+  ~Button();
   Napi::Value GetCaption(const Napi::CallbackInfo&);
   void SetCaption(const Napi::CallbackInfo&, const Napi::Value&);
 
   std::shared_ptr<PoDoFo::PdfButton> button;
   std::shared_ptr<PoDoFo::PdfField> field;
 };
-
 }
-#endif //NPDF_BUTTON_H
+#endif // NPDF_BUTTON_H

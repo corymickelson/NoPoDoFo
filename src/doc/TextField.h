@@ -55,7 +55,7 @@ public:
   void SetRichText(const Napi::CallbackInfo&, const Napi::Value&);
   Napi::Value IsRichText(const Napi::CallbackInfo&);
 
-  std::unique_ptr<PoDoFo::PdfTextField> text;
+  PoDoFo::PdfTextField GetText() { return PoDoFo::PdfTextField(*field.get()); }
   std::shared_ptr<PoDoFo::PdfField> field;
 };
 }

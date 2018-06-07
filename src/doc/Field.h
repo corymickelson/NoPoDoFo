@@ -20,9 +20,12 @@
 #ifndef NPDF_PDFFIELD_H
 #define NPDF_PDFFIELD_H
 
+#include <iostream>
 #include <napi.h>
 #include <podofo/podofo.h>
 
+using std::cout;
+using std::endl;
 using std::string;
 
 namespace NoPoDoFo {
@@ -52,6 +55,7 @@ public:
   std::shared_ptr<PoDoFo::PdfField> GetField()
   {
     auto shared = field;
+    cout << "Field use count: " << field.use_count() << endl;
     return shared;
   }
 

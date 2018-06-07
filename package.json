@@ -12,9 +12,9 @@
   "scripts": {
     "docs": "typedoc --options ./tsconfig.docs.json --out ./docs",
     "coverage": "nyc node --expose-gc ./dist/_all.spec.js && nyc report --reporter=text-lcov | coveralls",
-    "prepublish": "npm ls",
     "test": "tsc -p tsconfig.json && tsc -p tsconfig.spec.json && node --expose-gc ./node_modules/.bin/tape spec/unit/*.js",
-    "install": "node-pre-gyp install --fallback-to-build && tsc -p tsconfig.json"
+    "install": "node-pre-gyp install --fallback-to-build && tsc -p tsconfig.json",
+    "qt:debug": "cmake-js build -D && cp build/Debug/nopodofo.node lib/binding/1/"
   },
   "nyc": {
     "exclude": [

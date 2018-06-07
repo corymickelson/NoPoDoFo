@@ -35,7 +35,6 @@ CheckBox::CheckBox(const CallbackInfo& info)
   , Button(Field::GetField())
 {
   field = Field::GetField();
-  checkbox = make_unique<PdfCheckBox>(*field.get());
 }
 
 void
@@ -73,7 +72,7 @@ CheckBox::Initialize(Napi::Env& env, Napi::Object& target)
 Napi::Value
 CheckBox::IsChecked(const CallbackInfo& info)
 {
-  return Napi::Boolean::New(info.Env(), checkbox->IsChecked());
+  return Napi::Boolean::New(info.Env(), GetCheckBox().IsChecked());
 }
 
 void
@@ -84,6 +83,6 @@ CheckBox::SetChecked(const CallbackInfo& info, const Napi::Value& value)
                                "CheckBox.checked requires boolean value");
   }
   bool checked = value.As<Boolean>();
-  checkbox->SetChecked(checked);
+  GetCheckBox().SetChecked(checked);
 }
 }
