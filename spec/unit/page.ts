@@ -2,7 +2,9 @@ import { existsSync, unlinkSync, writeFile } from 'fs'
 import { join } from 'path'
 import * as test from 'tape'
 import { IObj, IPage, npdf } from "../../dist";
-
+if(!global.gc) {
+    global.gc = () => {}
+}
 const filePath = join(__dirname, '../test-documents/test.pdf'),
     outFile = './test.out.pdf',
     doc = new npdf.Document()

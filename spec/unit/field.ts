@@ -2,7 +2,9 @@ import {join} from 'path'
 import * as tap from 'tape'
 import {npdf, ICheckBox, IComboBox, IField, ITextField, NPDFFieldType} from '../../dist'
 import {unlinkSync} from "fs";
-
+if(!global.gc) {
+    global.gc = () => {}
+}
 const filePath = join(__dirname, '../test-documents/iss.16.checkbox-field-state-options.pdf')
 tap('IField', t => {
     const doc = new npdf.Document()

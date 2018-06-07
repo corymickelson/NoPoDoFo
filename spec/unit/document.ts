@@ -2,7 +2,9 @@ import {join} from 'path'
 import * as tap from 'tape'
 import {Test} from 'tape'
 import {NPDFVersion, IDocument, npdf, NPDFPageMode} from '../../dist';
-
+if(!global.gc) {
+    global.gc = () => {}
+}
 const filePath = join(__dirname, '../test-documents/test.pdf'),
     pwdDoc = join(__dirname, '../test-documents/pwd.pdf')
 
@@ -57,7 +59,8 @@ tap('IDocument', (t: Test) => {
         t.assert(docFont.getMetrics().fontSize > 0)
         global.gc()
         t.assert(doc.getPageCount() === 3)
-        let font = doc.createFont({italic: true, embed: false, fontName: 'serif'})
+        t.comment('create font')
+        let font = doc.createFont({italic: true, embed: false, fontName: 'Arial'})
 
         global.gc()
         t.assert(font.getMetrics().fontSize === 12, 'Default font size is 12')

@@ -1,7 +1,9 @@
 import {join} from 'path';
 import { npdf, IContentsTokenizer} from '../../dist';
 import * as test from 'tape'
-
+if(!global.gc) {
+    global.gc = () => {}
+}
 test('get contents as string, contents tokenizer', t => {
 
     const filePath = join(__dirname, '../test-documents/test.pdf'),

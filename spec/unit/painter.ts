@@ -1,7 +1,9 @@
 import {npdf, CONVERSION, IPainter, NPDFFontEncoding, Cell, Table} from '../../dist'
 import * as tap from 'tape'
 import {join} from 'path';
-
+if(!global.gc) {
+    global.gc = () => {}
+}
 const filePath = join(__dirname, '../test-documents/test.pdf'),
     outFile = '/tmp/painter.out.pdf',
     doc = new npdf.Document()

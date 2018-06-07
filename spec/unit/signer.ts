@@ -2,7 +2,9 @@ import * as tap from 'tape'
 import {join} from 'path'
 import {IField, signature, IForm, NPDFAnnotation, NPDFAnnotationFlag, npdf} from "../../dist";
 
-
+if(!global.gc) {
+    global.gc = () => {}
+}
 tap('Signer', sub => {
     const doc = new npdf.Document()
     doc.load(join(__dirname, '../test-documents/test.pdf'), {forUpdate: true}, async e => {

@@ -1,7 +1,9 @@
 import {IDocument, npdf} from '../../dist'
 import * as test from 'tape'
 import {join} from 'path';
-
+if(!global.gc) {
+    global.gc = () => {}
+}
 test('document objects instance of nopodofo.Obj', t => {
     const filePath = join(__dirname, '../test-documents/test.pdf'),
           doc      = new npdf.Document()

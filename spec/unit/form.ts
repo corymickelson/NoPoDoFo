@@ -1,7 +1,9 @@
 import {join} from 'path'
 import * as tap from 'tape'
 import { NPDFName as name, npdf, NPDFFontEncoding, IDictionary, IObj} from '../../dist';
-
+if(!global.gc) {
+    global.gc = () => {}
+}
 const filePath = join(__dirname, '../test-documents/test.pdf')
 
 tap('NPDF Form Accessors and Methods', standard => {
