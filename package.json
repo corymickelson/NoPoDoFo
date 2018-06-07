@@ -14,7 +14,7 @@
     "coverage": "nyc node --expose-gc ./dist/_all.spec.js && nyc report --reporter=text-lcov | coveralls",
     "prepublish": "npm ls",
     "test": "tsc -p tsconfig.json && tsc -p tsconfig.spec.json && node --expose-gc ./node_modules/.bin/tape spec/unit/*.js",
-    "install": "node-pre-gyp install --fallback-to-build"
+    "install": "node-pre-gyp install --fallback-to-build && ./node_modules/.bin/tsc -p tsconfig.json"
   },
   "nyc": {
     "exclude": [
