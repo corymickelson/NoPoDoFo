@@ -1,8 +1,0 @@
-[submodule "deps/podofo"]
-	path = deps/podofo
-	url = https://github.com/corymickelson/podofo.git
-  branch = nopodofo_0_7_0
-[submodule "deps/idn"]
-	path = deps/idn
-	url = https://git.savannah.gnu.org/git/libidn.git
-	branch = libidn-1-35

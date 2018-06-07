@@ -14,7 +14,7 @@
     "coverage": "nyc node --expose-gc ./dist/_all.spec.js && nyc report --reporter=text-lcov | coveralls",
     "prepublish": "npm ls",
     "test": "tsc -p tsconfig.json && tsc -p tsconfig.spec.json && node --expose-gc ./node_modules/.bin/tape spec/unit/*.js",
-    "install": "node scripts/install.js"
+    "install": "node-pre-gyp install --fallback-to-build"
   },
   "nyc": {
     "exclude": [
@@ -33,23 +33,24 @@
   "devDependencies": {
     "@types/benchmark": "^1.0.31",
     "@types/microtime": "^2.1.0",
-    "aws-sdk": "^2.249.1",
+    "aws-sdk": "^2.252.1",
     "benchmark": "^2.1.4",
     "cmake-js": "^3.7.3",
     "coveralls": "^3.0.1",
     "husky": "^0.14.3",
     "microtime": "^2.1.8",
-    "nyc": "^11.8.0",
+    "nyc": "^11.9.0",
     "tap-summary": "^4.0.0",
     "tape": "^4.9.0",
     "uuid": "^3.2.1"
   },
   "dependencies": {
-    "@types/node": "^8.10.14",
+    "@types/node": "^8.10.18",
     "@types/tape": "^4.2.32",
     "@types/uuid": "^3.4.3",
     "node-addon-api": "1.3.0",
     "node-pre-gyp": "^0.10.0",
+    "podofo": "github:corymickelson/podofo#nopodofo_0_7_0",
     "typescript": "~2.5.3"
   },
   "bundledDependencies": [
