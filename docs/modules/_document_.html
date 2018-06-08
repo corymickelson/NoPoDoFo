@@ -73,41 +73,105 @@
 						<section class="tsd-index-section ">
 							<h3>Enumerations</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-enum tsd-parent-kind-external-module"><a href="../enums/_document_.fontencoding.html" class="tsd-kind-icon">Font<wbr>Encoding</a></li>
-							</ul>
-						</section>
-						<section class="tsd-index-section ">
-							<h3>Classes</h3>
-							<ul class="tsd-index-list">
-								<li class="tsd-kind-class tsd-parent-kind-external-module"><a href="../classes/_document_.document.html" class="tsd-kind-icon">Document</a></li>
+								<li class="tsd-kind-enum tsd-parent-kind-external-module"><a href="../enums/_document_.npdffontencoding.html" class="tsd-kind-icon">NPDFFont<wbr>Encoding</a></li>
+								<li class="tsd-kind-enum tsd-parent-kind-external-module"><a href="../enums/_document_.npdfpagelayout.html" class="tsd-kind-icon">NPDFPage<wbr>Layout</a></li>
+								<li class="tsd-kind-enum tsd-parent-kind-external-module"><a href="../enums/_document_.npdfpagemode.html" class="tsd-kind-icon">NPDFPage<wbr>Mode</a></li>
+								<li class="tsd-kind-enum tsd-parent-kind-external-module"><a href="../enums/_document_.npdfversion.html" class="tsd-kind-icon">NPDFVersion</a></li>
+								<li class="tsd-kind-enum tsd-parent-kind-external-module"><a href="../enums/_document_.npdfwritemode.html" class="tsd-kind-icon">NPDFWrite<wbr>Mode</a></li>
 							</ul>
 						</section>
 						<section class="tsd-index-section ">
 							<h3>Interfaces</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-interface tsd-parent-kind-external-module"><a href="../interfaces/_document_.createfontopts.html" class="tsd-kind-icon">Create<wbr>Font<wbr>Opts</a></li>
+								<li class="tsd-kind-interface tsd-parent-kind-external-module"><a href="../interfaces/_document_.idocument.html" class="tsd-kind-icon">IDocument</a></li>
+								<li class="tsd-kind-interface tsd-parent-kind-external-module"><a href="../interfaces/_document_.npdfcreatefontopts.html" class="tsd-kind-icon">NPDFCreate<wbr>Font<wbr>Opts</a></li>
 							</ul>
 						</section>
 						<section class="tsd-index-section ">
-							<h3>Variables</h3>
+							<h3>Type aliases</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-variable tsd-parent-kind-external-module"><a href="_document_.html#__mod" class="tsd-kind-icon">__mod</a></li>
+								<li class="tsd-kind-type-alias tsd-parent-kind-external-module"><a href="_document_.html#callback" class="tsd-kind-icon">Callback</a></li>
+							</ul>
+						</section>
+						<section class="tsd-index-section ">
+							<h3>Functions</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-function tsd-parent-kind-external-module"><a href="_document_.html#documentgc" class="tsd-kind-icon">document<wbr>Gc</a></li>
 							</ul>
 						</section>
 					</div>
 				</section>
 			</section>
 			<section class="tsd-panel-group tsd-member-group ">
-				<h2>Variables</h2>
-				<section class="tsd-panel tsd-member tsd-kind-variable tsd-parent-kind-external-module">
-					<a name="__mod" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagConst">Const</span> __mod</h3>
-					<div class="tsd-signature tsd-kind-icon">__mod<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">any</span><span class="tsd-signature-symbol"> =&nbsp;require(&#x27;bindings&#x27;)(&#x27;npdf&#x27;)</span></div>
+				<h2>Type aliases</h2>
+				<section class="tsd-panel tsd-member tsd-kind-type-alias tsd-parent-kind-external-module">
+					<a name="callback" class="tsd-anchor"></a>
+					<h3>Callback</h3>
+					<div class="tsd-signature tsd-kind-icon">Callback<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">function</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/e2c617d/lib/document.ts#L28">document.ts:28</a></li>
+							<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/17a56ff/lib/document.ts#L54">document.ts:54</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-type-declaration">
+						<h4>Type declaration</h4>
+						<ul class="tsd-parameters">
+							<li class="tsd-parameter-siganture">
+								<ul class="tsd-signatures tsd-kind-type-literal tsd-parent-kind-type-alias tsd-is-not-exported">
+									<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>err<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Error</span>, data<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Buffer</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+								</ul>
+								<ul class="tsd-descriptions">
+									<li class="tsd-description">
+										<h4 class="tsd-parameters-title">Parameters</h4>
+										<ul class="tsd-parameters">
+											<li>
+												<h5>err: <span class="tsd-signature-type">Error</span></h5>
+											</li>
+											<li>
+												<h5>data: <span class="tsd-signature-type">Buffer</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span></h5>
+											</li>
+										</ul>
+										<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+									</li>
+								</ul>
+							</li>
+						</ul>
+					</div>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group ">
+				<h2>Functions</h2>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-external-module">
+					<a name="documentgc" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> document<wbr>Gc</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-external-module">
+						<li class="tsd-signature tsd-kind-icon">document<wbr>Gc<span class="tsd-signature-symbol">(</span>file<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, pwd<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, output<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, cb<span class="tsd-signature-symbol">: </span><a href="_document_.html#callback" class="tsd-signature-type">Callback</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/17a56ff/lib/document.ts#L171">document.ts:171</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>file: <span class="tsd-signature-type">string</span></h5>
+								</li>
+								<li>
+									<h5>pwd: <span class="tsd-signature-type">string</span></h5>
+								</li>
+								<li>
+									<h5>output: <span class="tsd-signature-type">string</span></h5>
+								</li>
+								<li>
+									<h5>cb: <a href="_document_.html#callback" class="tsd-signature-type">Callback</a></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
 				</section>
 			</section>
 		</div>
@@ -118,7 +182,13 @@
 						<a href="../globals.html"><em>Globals</em></a>
 					</li>
 					<li class=" tsd-kind-external-module">
+						<a href="_action_.html">"action"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
 						<a href="_annotation_.html">"annotation"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="_base_document_.html">"base-<wbr>document"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
 						<a href="_data_.html">"data"</a>
@@ -133,6 +203,9 @@
 						<a href="_field_.html">"field"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
+						<a href="_file_spec_.html">"file-<wbr>spec"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
 						<a href="_form_.html">"form"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
@@ -142,7 +215,13 @@
 						<a href="_index_.html">"index"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
+						<a href="_names_.html">"names"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
 						<a href="_object_.html">"object"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="_outlines_.html">"outlines"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
 						<a href="_page_.html">"page"</a>
@@ -157,13 +236,16 @@
 						<a href="_rect_.html">"rect"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
-						<a href="_reference_.html">"reference"</a>
+						<a href="_resource_.html">"resource"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
 						<a href="_signer_.html">"signer"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
 						<a href="_stream_.html">"stream"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="_stream_document_.html">"stream-<wbr>document"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
 						<a href="_table_.html">"table"</a>
@@ -173,16 +255,31 @@
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
 					<li class=" tsd-kind-enum tsd-parent-kind-external-module">
-						<a href="../enums/_document_.fontencoding.html" class="tsd-kind-icon">Font<wbr>Encoding</a>
+						<a href="../enums/_document_.npdffontencoding.html" class="tsd-kind-icon">NPDFFont<wbr>Encoding</a>
 					</li>
-					<li class=" tsd-kind-class tsd-parent-kind-external-module">
-						<a href="../classes/_document_.document.html" class="tsd-kind-icon">Document</a>
+					<li class=" tsd-kind-enum tsd-parent-kind-external-module">
+						<a href="../enums/_document_.npdfpagelayout.html" class="tsd-kind-icon">NPDFPage<wbr>Layout</a>
+					</li>
+					<li class=" tsd-kind-enum tsd-parent-kind-external-module">
+						<a href="../enums/_document_.npdfpagemode.html" class="tsd-kind-icon">NPDFPage<wbr>Mode</a>
+					</li>
+					<li class=" tsd-kind-enum tsd-parent-kind-external-module">
+						<a href="../enums/_document_.npdfversion.html" class="tsd-kind-icon">NPDFVersion</a>
+					</li>
+					<li class=" tsd-kind-enum tsd-parent-kind-external-module">
+						<a href="../enums/_document_.npdfwritemode.html" class="tsd-kind-icon">NPDFWrite<wbr>Mode</a>
 					</li>
 					<li class=" tsd-kind-interface tsd-parent-kind-external-module">
-						<a href="../interfaces/_document_.createfontopts.html" class="tsd-kind-icon">Create<wbr>Font<wbr>Opts</a>
+						<a href="../interfaces/_document_.idocument.html" class="tsd-kind-icon">IDocument</a>
 					</li>
-					<li class=" tsd-kind-variable tsd-parent-kind-external-module">
-						<a href="_document_.html#__mod" class="tsd-kind-icon">__mod</a>
+					<li class=" tsd-kind-interface tsd-parent-kind-external-module">
+						<a href="../interfaces/_document_.npdfcreatefontopts.html" class="tsd-kind-icon">NPDFCreate<wbr>Font<wbr>Opts</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-parent-kind-external-module">
+						<a href="_document_.html#callback" class="tsd-kind-icon">Callback</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-external-module">
+						<a href="_document_.html#documentgc" class="tsd-kind-icon">document<wbr>Gc</a>
 					</li>
 				</ul>
 			</nav>

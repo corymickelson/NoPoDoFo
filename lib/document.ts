@@ -120,14 +120,51 @@ export interface IDocument extends IBase {
          cb: Callback): void
     load(file: string | Buffer, cb: Callback): void
 
+    /**
+     * Deletes one or more pages from the document by removing the pages reference
+     * from the pages tree. This does NOT remove the page object as the page object
+     * may be used by other objects in the document.
+     * @param startIndex - first page to delete (0-based)
+     * @param count - number of pages to delete
+     */
     splicePages(startIndex: number, count: number): void
 
+    /**
+     * Copies one or more pages from another pdf to this document
+     * This function copies the entire document to the target document and then
+     * deletes pages that are not of interest. This is a much faster process, but
+     * without object garbage collection the document may result in a much larger
+     * than necessary document
+     * @see {IDocument#gc}
+     * @param fromDoc - PdfMemDocument to append
+     * @param startIndex - first page to copy (0-based)
+     * @param count - number of pages to copy
+     */
     insertPages(fromDoc: IDocument, startIndex: number, count: number): number
 
+    /**
+     * Persist the document with any changes applied to either a new nodejs buffer or to disk.
+     * @param destination - file path or callback function
+     * @param cb - if file path was provided as destination, this must be a callback function
+     */
     write(destination: Callback | string, cb?: Callback): void
 
+    /**
+     * Looks for a font containg the provided name or id.
+     * This operation may be expensive as it iterates all pdf object searching for the font.
+     * If nothing is found null is returned
+     * @param name - font name or font id
+     */
     getFont(name: string): IFont
 
+    /**
+     * Performs garbage collection on the document. All objects not
+     * reachable by the trailer or deleted.
+     * @param file - pdf document
+     * @param pwd - if document is password protected this parameter is required
+     * @param output - file location
+     * @param cb - function
+     */
     gc(file: string, pwd: string, output: string, cb: Callback): void
 }
 

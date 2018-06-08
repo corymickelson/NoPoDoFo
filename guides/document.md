@@ -8,6 +8,10 @@ the pdf document. If you are only <i>creating</i> a pdf file use the [StreamDocu
 ### Loading a document
 
 When loading a pdf document, NoPoDofo will throw error `Password required` when a user/owner password has been set on the target document.
+The load method takes an optional configuration object with properties for: forUpdate, fromBuffer, and password.
+ - forUpdate, when true creates a copy of the file or buffer for later use by WriteUpdate
+ - password, the password
+ - fromBuffer, when true will parse the first parameter as a buffer. This should of course be a pdf document loaded into a buffer.
 ``` typescript
 let doc:Document = new nopodofo.Document()
 doc.load('/path/to/doc.pdf', (e:Error) => {

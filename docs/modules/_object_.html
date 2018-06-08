@@ -71,24 +71,20 @@
 				<section class="tsd-panel tsd-index-panel">
 					<div class="tsd-index-content">
 						<section class="tsd-index-section ">
-							<h3>Classes</h3>
-							<ul class="tsd-index-list">
-								<li class="tsd-kind-class tsd-parent-kind-external-module"><a href="../classes/_object_.obj.html" class="tsd-kind-icon">Obj</a></li>
-							</ul>
-						</section>
-						<section class="tsd-index-section ">
 							<h3>Interfaces</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-interface tsd-parent-kind-external-module"><a href="../interfaces/_object_.narray.html" class="tsd-kind-icon">NArray</a></li>
-								<li class="tsd-kind-interface tsd-parent-kind-external-module"><a href="../interfaces/_object_.nobj.html" class="tsd-kind-icon">NObj</a></li>
+								<li class="tsd-kind-interface tsd-parent-kind-external-module"><a href="../interfaces/_object_.iarray.html" class="tsd-kind-icon">IArray</a></li>
+								<li class="tsd-kind-interface tsd-parent-kind-external-module"><a href="../interfaces/_object_.idictionary.html" class="tsd-kind-icon">IDictionary</a></li>
+								<li class="tsd-kind-interface tsd-parent-kind-external-module"><a href="../interfaces/_object_.iobj.html" class="tsd-kind-icon">IObj</a></li>
 							</ul>
 						</section>
 						<section class="tsd-index-section ">
 							<h3>Type aliases</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-type-alias tsd-parent-kind-external-module"><a href="_object_.html#coercekeytype" class="tsd-kind-icon">Coerce<wbr>Key<wbr>Type</a></li>
+								<li class="tsd-kind-type-alias tsd-parent-kind-external-module"><a href="_object_.html#npdfcoercekeytype" class="tsd-kind-icon">NPDFCoerce<wbr>Key<wbr>Type</a></li>
+								<li class="tsd-kind-type-alias tsd-parent-kind-external-module"><a href="_object_.html#npdfdatatype" class="tsd-kind-icon">NPDFData<wbr>Type</a></li>
+								<li class="tsd-kind-type-alias tsd-parent-kind-external-module"><a href="_object_.html#npdfdictionarykeytype" class="tsd-kind-icon">NPDFDictionary<wbr>Key<wbr>Type</a></li>
 								<li class="tsd-kind-type-alias tsd-parent-kind-external-module"><a href="_object_.html#npdfinternal" class="tsd-kind-icon">NPDFInternal</a></li>
-								<li class="tsd-kind-type-alias tsd-parent-kind-external-module"><a href="_object_.html#pdtype" class="tsd-kind-icon">PDType</a></li>
 							</ul>
 						</section>
 					</div>
@@ -97,12 +93,32 @@
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Type aliases</h2>
 				<section class="tsd-panel tsd-member tsd-kind-type-alias tsd-parent-kind-external-module">
-					<a name="coercekeytype" class="tsd-anchor"></a>
-					<h3>Coerce<wbr>Key<wbr>Type</h3>
-					<div class="tsd-signature tsd-kind-icon">Coerce<wbr>Key<wbr>Type<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">"boolean"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"long"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"name"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"real"</span></div>
+					<a name="npdfcoercekeytype" class="tsd-anchor"></a>
+					<h3>NPDFCoerce<wbr>Key<wbr>Type</h3>
+					<div class="tsd-signature tsd-kind-icon">NPDFCoerce<wbr>Key<wbr>Type<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">"boolean"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"long"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"name"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"real"</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/e2c617d/lib/object.ts#L25">object.ts:25</a></li>
+							<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/17a56ff/lib/object.ts#L26">object.ts:26</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-type-alias tsd-parent-kind-external-module">
+					<a name="npdfdatatype" class="tsd-anchor"></a>
+					<h3>NPDFData<wbr>Type</h3>
+					<div class="tsd-signature tsd-kind-icon">NPDFData<wbr>Type<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">"Boolean"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"Number"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"Name"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"Real"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"String"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"Array"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"Dictionary"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"Reference"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"RawData"</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/17a56ff/lib/object.ts#L28">object.ts:28</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-type-alias tsd-parent-kind-external-module">
+					<a name="npdfdictionarykeytype" class="tsd-anchor"></a>
+					<h3>NPDFDictionary<wbr>Key<wbr>Type</h3>
+					<div class="tsd-signature tsd-kind-icon">NPDFDictionary<wbr>Key<wbr>Type<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">"boolean"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"long"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"name"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"real"</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/17a56ff/lib/object.ts#L85">object.ts:85</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -112,17 +128,7 @@
 					<div class="tsd-signature tsd-kind-icon">NPDFInternal<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">any</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/e2c617d/lib/object.ts#L23">object.ts:23</a></li>
-						</ul>
-					</aside>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-type-alias tsd-parent-kind-external-module">
-					<a name="pdtype" class="tsd-anchor"></a>
-					<h3>PDType</h3>
-					<div class="tsd-signature tsd-kind-icon">PDType<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">"Boolean"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"Number"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"Name"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"Real"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"String"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"Array"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"Dictionary"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"Reference"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"RawData"</span></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/e2c617d/lib/object.ts#L27">object.ts:27</a></li>
+							<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/17a56ff/lib/object.ts#L24">object.ts:24</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -135,7 +141,13 @@
 						<a href="../globals.html"><em>Globals</em></a>
 					</li>
 					<li class=" tsd-kind-external-module">
+						<a href="_action_.html">"action"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
 						<a href="_annotation_.html">"annotation"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="_base_document_.html">"base-<wbr>document"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
 						<a href="_data_.html">"data"</a>
@@ -150,6 +162,9 @@
 						<a href="_field_.html">"field"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
+						<a href="_file_spec_.html">"file-<wbr>spec"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
 						<a href="_form_.html">"form"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
@@ -158,8 +173,14 @@
 					<li class=" tsd-kind-external-module">
 						<a href="_index_.html">"index"</a>
 					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="_names_.html">"names"</a>
+					</li>
 					<li class="current tsd-kind-external-module">
 						<a href="_object_.html">"object"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="_outlines_.html">"outlines"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
 						<a href="_page_.html">"page"</a>
@@ -174,7 +195,7 @@
 						<a href="_rect_.html">"rect"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
-						<a href="_reference_.html">"reference"</a>
+						<a href="_resource_.html">"resource"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
 						<a href="_signer_.html">"signer"</a>
@@ -183,29 +204,35 @@
 						<a href="_stream_.html">"stream"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
+						<a href="_stream_document_.html">"stream-<wbr>document"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
 						<a href="_table_.html">"table"</a>
 					</li>
 				</ul>
 			</nav>
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
-					<li class=" tsd-kind-class tsd-parent-kind-external-module">
-						<a href="../classes/_object_.obj.html" class="tsd-kind-icon">Obj</a>
+					<li class=" tsd-kind-interface tsd-parent-kind-external-module">
+						<a href="../interfaces/_object_.iarray.html" class="tsd-kind-icon">IArray</a>
 					</li>
 					<li class=" tsd-kind-interface tsd-parent-kind-external-module">
-						<a href="../interfaces/_object_.narray.html" class="tsd-kind-icon">NArray</a>
+						<a href="../interfaces/_object_.idictionary.html" class="tsd-kind-icon">IDictionary</a>
 					</li>
 					<li class=" tsd-kind-interface tsd-parent-kind-external-module">
-						<a href="../interfaces/_object_.nobj.html" class="tsd-kind-icon">NObj</a>
+						<a href="../interfaces/_object_.iobj.html" class="tsd-kind-icon">IObj</a>
 					</li>
 					<li class=" tsd-kind-type-alias tsd-parent-kind-external-module">
-						<a href="_object_.html#coercekeytype" class="tsd-kind-icon">Coerce<wbr>Key<wbr>Type</a>
+						<a href="_object_.html#npdfcoercekeytype" class="tsd-kind-icon">NPDFCoerce<wbr>Key<wbr>Type</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-parent-kind-external-module">
+						<a href="_object_.html#npdfdatatype" class="tsd-kind-icon">NPDFData<wbr>Type</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-parent-kind-external-module">
+						<a href="_object_.html#npdfdictionarykeytype" class="tsd-kind-icon">NPDFDictionary<wbr>Key<wbr>Type</a>
 					</li>
 					<li class=" tsd-kind-type-alias tsd-parent-kind-external-module">
 						<a href="_object_.html#npdfinternal" class="tsd-kind-icon">NPDFInternal</a>
-					</li>
-					<li class=" tsd-kind-type-alias tsd-parent-kind-external-module">
-						<a href="_object_.html#pdtype" class="tsd-kind-icon">PDType</a>
 					</li>
 				</ul>
 			</nav>
