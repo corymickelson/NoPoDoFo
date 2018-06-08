@@ -23,12 +23,14 @@
 #include <napi.h>
 #include <podofo/podofo.h>
 
+using std::vector;
+
 namespace NoPoDoFo {
 class Array : public Napi::ObjectWrap<Array>
 {
 public:
   explicit Array(const Napi::CallbackInfo&);
-  ~Array() { array = nullptr; }
+  ~Array();
   static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
 
@@ -46,11 +48,11 @@ public:
   Napi::Value Pop(const Napi::CallbackInfo&);
   void Clear(const Napi::CallbackInfo&);
   Napi::Value Eq(const Napi::CallbackInfo&);
-  PoDoFo::PdfArray* GetArray() { return array; }
+  PoDoFo::PdfArray& GetArray() { return obj->GetArray(); }
 
 private:
-  //  std::unique_ptr<PoDoFo::PdfArray> array;
-  PoDoFo::PdfArray* array;
+  PoDoFo::PdfObject* obj;
+  vector<PoDoFo::PdfObject*> children;
   Napi::Value GetObjAtIndex(const Napi::CallbackInfo&);
 };
 }

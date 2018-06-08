@@ -100,9 +100,9 @@ Napi::Value
 Form::GetFormDictionary(const CallbackInfo& info)
 {
   auto obj = doc->GetAcroForm()->GetObject();
-  Object nObj =
-    Obj::constructor.New({ External<PdfObject>::New(info.Env(), obj) });
-  return Dictionary::constructor.New({ nObj });
+  auto ptr =
+    Dictionary::constructor.New({ External<PdfObject>::New(info.Env(), obj) });
+  return ptr;
 }
 
 Napi::Value
@@ -183,10 +183,8 @@ Form::GetResource(const CallbackInfo& info)
     if (drObj->IsReference()) {
       drObj = doc->GetObjects()->GetObject(drObj->GetReference());
     }
-    //    auto dr = Dictionary::Resolve(doc->GetDocument(), drObj);
-    auto nObj =
-      Obj::constructor.New({ External<PdfObject>::New(info.Env(), drObj) });
-    return Dictionary::constructor.New({ nObj });
+    return Dictionary::constructor.New(
+      { External<PdfObject>::New(info.Env(), drObj) });
   }
   return info.Env().Null();
 }
@@ -203,14 +201,14 @@ Form::SetResource(const CallbackInfo& info, const Napi::Value& value)
     try {
       auto formDict = doc->GetAcroForm()->GetObject()->GetDictionary();
       auto dr = Obj::Unwrap(value.As<Object>());
-      if (dr->obj->GetDataType() != ePdfDataType_Dictionary)
+      if (dr->GetObject()->GetDataType() != ePdfDataType_Dictionary)
         TypeError::New(
           info.Env(),
           "Default resource must be an instance of NoPoDoFo::Dictionary")
           .ThrowAsJavaScriptException();
       if (formDict.HasKey(Name::DR))
         formDict.RemoveKey(Name::DR);
-      formDict.AddKey(PdfName(Name::DR), dr->obj->Reference());
+      formDict.AddKey(PdfName(Name::DR), dr->GetObject()->Reference());
     } catch (PdfError& err) {
       ErrorHandler(err, info);
     }
@@ -238,7 +236,9 @@ Form::GetCalculationOrder(const CallbackInfo& info)
             js.Set(n, nObj);
             n++;
           } else {
-            js.Set(n, Dictionary::constructor.New({ nObj }));
+            js.Set(n,
+                   Dictionary::constructor.New(
+                     { External<PdfObject>::New(info.Env(), value) }));
             n++;
           }
         }

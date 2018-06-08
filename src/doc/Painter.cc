@@ -129,7 +129,7 @@ Painter::SetPage(const Napi::CallbackInfo& info)
     throw Napi::Error::New(info.Env(), "Page must be an instance of Page.");
   }
   auto page = Page::Unwrap(info[0].As<Object>());
-  painter->SetPage(page->GetPage());
+  painter->SetPage(page->page);
 }
 
 void

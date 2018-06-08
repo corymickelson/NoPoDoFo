@@ -32,7 +32,6 @@ class Encrypt : public Napi::ObjectWrap<Encrypt>
 {
 public:
   explicit Encrypt(const Napi::CallbackInfo&);
-  ~Encrypt() { cout << "Destructing Encrypt" << endl; }
   static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
   static Napi::Value CreateEncrypt(const Napi::CallbackInfo&);

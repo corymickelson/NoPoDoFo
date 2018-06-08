@@ -17,17 +17,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <iostream>
 #include "Destination.h"
 #include "./Page.h"
+#include <iostream>
 
 using namespace PoDoFo;
 using namespace Napi;
 
-using std::string;
 using std::cout;
 using std::endl;
 using std::make_unique;
+using std::string;
 
 namespace NoPoDoFo {
 
@@ -37,9 +37,10 @@ Destination::Destination(const CallbackInfo& info)
   : ObjectWrap(info)
 {
   if (info.Length() == 1 && info[0].Type() == napi_external) {
-    destination = make_unique<PdfDestination>(*info[0].As<External<PdfDestination>>().Data());
+    destination = make_unique<PdfDestination>(
+      *info[0].As<External<PdfDestination>>().Data());
   } else if (info.Length() == 2 && info[0].IsObject() && info[1].IsNumber()) {
-    auto page = Page::Unwrap(info[0].As<Object>())->GetPage();
+    auto page = Page::Unwrap(info[0].As<Object>())->page;
     auto fit =
       static_cast<EPdfDestinationFit>(info[1].As<Number>().Int32Value());
     destination = make_unique<PdfDestination>(page, fit);
@@ -72,7 +73,7 @@ Destination::Initialize(Napi::Env& env, Napi::Object& target)
 Napi::Value
 Destination::GetPage(const Napi::CallbackInfo& info)
 {
-//  destination->GetPage()->GetObject()->GetOwner()->GetParentDocument();
+  //  destination->GetPage()->GetObject()->GetOwner()->GetParentDocument();
   return Value();
 }
 Napi::Value

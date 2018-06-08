@@ -20,9 +20,12 @@
 #ifndef NPDF_BASEDOCUMENT_H
 #define NPDF_BASEDOCUMENT_H
 
+#include <iostream>
 #include <napi.h>
 #include <podofo/podofo.h>
 
+using std::cout;
+using std::endl;
 using std::string;
 
 namespace NoPoDoFo {
@@ -30,7 +33,6 @@ class BaseDocument
 {
 public:
   explicit BaseDocument(const Napi::CallbackInfo&);
-  ~BaseDocument();
   Napi::Value GetPageCount(const Napi::CallbackInfo&);
   virtual Napi::Value GetPage(const Napi::CallbackInfo&);
   Napi::Value GetObjects(const Napi::CallbackInfo&);
@@ -69,6 +71,7 @@ public:
   std::shared_ptr<PoDoFo::PdfDocument> GetBaseDocument()
   {
     auto shared = document;
+    cout << "Base Document count: " << document.use_count() << endl;
     return shared;
   }
   bool created() { return create; }

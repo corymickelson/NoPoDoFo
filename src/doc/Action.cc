@@ -5,8 +5,8 @@
 #include "Action.h"
 #include "../base/Dictionary.h"
 #include "../base/Obj.h"
-#include "StreamDocument.h"
 #include "Document.h"
+#include "StreamDocument.h"
 
 using namespace PoDoFo;
 using namespace Napi;
@@ -89,11 +89,9 @@ Action::GetObject(const Napi::CallbackInfo& info)
 {
   PdfObject* o = GetAction()->GetObject();
   if (GetAction()->GetObject()->IsReference()) {
-    o = doc->GetObjects()->GetObject(
-      GetAction()->GetObject()->GetReference());
+    o = doc->GetObjects()->GetObject(GetAction()->GetObject()->GetReference());
   }
-  return Obj::constructor.New({ External<PdfObject>::New(
-    info.Env(), o) });
+  return Obj::constructor.New({ External<PdfObject>::New(info.Env(), o) });
 }
 void
 Action::AddToDictionary(const Napi::CallbackInfo& info)

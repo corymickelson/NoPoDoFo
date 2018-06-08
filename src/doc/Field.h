@@ -55,7 +55,6 @@ public:
   std::shared_ptr<PoDoFo::PdfField> GetField()
   {
     auto shared = field;
-    cout << "Field use count: " << field.use_count() << endl;
     return shared;
   }
 

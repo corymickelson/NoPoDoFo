@@ -58,12 +58,10 @@ public:
   void SetImmutable(const Napi::CallbackInfo&, const Napi::Value&);
   void Clear(const Napi::CallbackInfo&);
   Napi::Value Eq(const Napi::CallbackInfo&);
-
-  //  std::shared_ptr<PoDoFo::PdfObject> GetObject() { return obj; }
-
-  PoDoFo::PdfObject* obj;
+  PoDoFo::PdfObject* GetObject() { return &(*obj); }
 
 private:
+  PoDoFo::PdfObject* obj;
   //  std::shared_ptr<PoDoFo::PdfObject> obj;
 };
 }

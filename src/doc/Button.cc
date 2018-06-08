@@ -33,13 +33,7 @@ using std::shared_ptr;
 namespace NoPoDoFo {
 Button::Button(shared_ptr<PdfField> field)
 {
-  this->field = field;
-  button = make_shared<PdfButton>(*this->field.get());
-}
-Button::~Button()
-{
-  cout << "Destructing Button" << endl;
-  cout << "Button field use count: " << field.use_count() << endl;
+  button = make_shared<PdfButton>(*field.get());
 }
 Napi::Value
 Button::GetCaption(const Napi::CallbackInfo& info)
@@ -47,7 +41,7 @@ Button::GetCaption(const Napi::CallbackInfo& info)
   return String::New(info.Env(), button->GetCaption().GetStringUtf8());
 }
 void
-Button::SetCaption(const Napi::CallbackInfo& info, const Napi::Value& value)
+Button::SetCaption(const Napi::CallbackInfo&, const Napi::Value& value)
 {
   button->SetCaption(PdfString(value.As<String>().Utf8Value()));
 }

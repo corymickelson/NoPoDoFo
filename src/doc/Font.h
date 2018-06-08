@@ -32,7 +32,6 @@ class Font : public Napi::ObjectWrap<Font>
 {
 public:
   explicit Font(const Napi::CallbackInfo& callbackInfo);
-  ~Font() { cout << "Destructing Font" << endl; }
   static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
   Napi::Value GetFontSize(const Napi::CallbackInfo&);

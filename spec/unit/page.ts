@@ -163,8 +163,8 @@ export function runAll() {
         pageGetAnnotsCount,
         pageGetAnnot,
         pageContents,
-        pageResources //,
-        // pageAddImg
+        pageResources,
+        pageAddImg
     ].map(i => runTest(i))
 }
 

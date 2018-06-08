@@ -2,7 +2,7 @@
  * This file is part of the NoPoDoFo (R) project.
  * Copyright (c) 2017-2018
  * Authors: Cory Mickelson, et al.
- * 
+ *
  * NoPoDoFo is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -46,7 +46,7 @@ Rect::Rect(const CallbackInfo& info)
                        "Rect requires Page as constructor parameter");
     }
     Page* page = Page::Unwrap(pageObj);
-    rect = make_shared<PdfRect>(page->GetPage()->GetPageSize());
+    rect = make_shared<PdfRect>(page->page->GetPageSize());
   }
   if (info.Length() == 4) {
     double left, bottom, width, height;
@@ -76,8 +76,7 @@ Rect::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceAccessor("bottom", &Rect::GetBottom, &Rect::SetBottom),
       InstanceAccessor("width", &Rect::GetWidth, &Rect::SetWidth),
       InstanceAccessor("height", &Rect::GetHeight, &Rect::SetHeight),
-      InstanceMethod("intersect", &Rect::Intersect)
-    });
+      InstanceMethod("intersect", &Rect::Intersect) });
   constructor = Napi::Persistent(ctor);
   constructor.SuppressDestruct();
 

@@ -79,11 +79,6 @@ BaseDocument::BaseDocument(const Napi::CallbackInfo& info)
   }
 }
 
-BaseDocument::~BaseDocument()
-{
-  cout << "Ptr Count" << document.use_count() << endl;
-  std::cout << "Destructing BaseDocument" << std::endl;
-}
 
 Napi::Value
 BaseDocument::GetPageCount(const CallbackInfo& info)
@@ -95,10 +90,8 @@ Napi::Value
 BaseDocument::GetPage(const CallbackInfo& info)
 {
   int n = info[0].As<Number>();
-  auto instance =
-    Page::constructor.New({ External<BaseDocument>::New(info.Env(), this),
-                            Number::New(info.Env(), n) });
-  return instance;
+  return Page::constructor.New(
+    { External<PdfPage>::New(info.Env(), document->GetPage(n)) });
 }
 
 void
@@ -279,7 +272,7 @@ BaseDocument::GetObjects(const CallbackInfo& info)
 Napi::Value
 BaseDocument::GetObject(const CallbackInfo& info)
 {
-  auto ref = Obj::Unwrap(info[0].As<Object>())->obj;
+  auto ref = Obj::Unwrap(info[0].As<Object>())->GetObject();
   PdfObject* target = document->GetObjects()->GetObject(ref->GetReference());
   return Obj::constructor.New({ External<PdfObject>::New(info.Env(), target) });
 }
@@ -505,7 +498,7 @@ BaseDocument::GetAttachment(const CallbackInfo& info)
 void
 BaseDocument::AddNamedDestination(const Napi::CallbackInfo& info)
 {
-  PdfPage* page = Page::Unwrap(info[0].As<Object>())->GetPage();
+  PdfPage* page = Page::Unwrap(info[0].As<Object>())->page;
   EPdfDestinationFit fit =
     static_cast<EPdfDestinationFit>(info[1].As<Number>().Int32Value());
   string name = info[2].As<String>().Utf8Value();

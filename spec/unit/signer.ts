@@ -12,15 +12,8 @@ tap('Signer', sub => {
             standard.plan(3)
             if (e instanceof Error) throw e
             try {
-                if ((doc.form as IForm).dictionary.hasKey('SigFlags') ||
-                    (doc.form as IForm).dictionary.getKey('SigFlags').type !== 'Number' ||
-                    (doc.form as IForm).dictionary.getKey('SigFlags').getNumber() !== 3) {
-                    (doc.form as IForm).dictionary.removeKey('SigFlags');
-                    (doc.form as IForm).dictionary.addKey('SigFlags', 3)
-                }
-                if ((doc.form as IForm).needAppearances)
-                    (doc.form as IForm).needAppearances = false
-
+                doc.form.SigFlags = 3
+                doc.form.needAppearances = false
                 const rect = new npdf.Rect(0, 0, 10, 10),
                     page = doc.getPage(1),
                     annot = page.createAnnotation(NPDFAnnotation.Widget, rect)
@@ -46,15 +39,6 @@ tap('Signer', sub => {
                             standard.assert(signed.getPage(1).getFields().filter(i => i instanceof npdf.SignatureField).length === 1)
                             standard.assert(signed.form.SigFlags === 3)
                             standard.end()
-                            //
-                            // const signedPage = doc.getPage(1),
-                            //     fields = signedPage.getFields()
-                            // let signatureFieldCandidates = fields.filter(i => i instanceof npdf.SignatureField)
-                            // if (!signatureFieldCandidates || signatureFieldCandidates.length === 0) standard.fail("signature field not found")
-                            // else if (signatureFieldCandidates.length === 1) {
-                            //     standard.pass("signature found")
-                            // }
-                            // else standard.fail("something went wrong")
                         })
                     }
                 })

@@ -28,7 +28,6 @@ using namespace PoDoFo;
 
 using std::cout;
 using std::endl;
-using std::make_shared;
 using std::string;
 
 namespace NoPoDoFo {
@@ -70,7 +69,8 @@ Obj::Obj(const Napi::CallbackInfo& info)
   : ObjectWrap<Obj>(info)
   , obj(info[0].As<External<PdfObject>>().Data())
 {
-  //  obj = make_shared<PdfObject>(*info[0].As<External<PdfObject>>().Data());
+  // Objects are managed by the Document.
+  // This class will NOT manage Obj resources.
 }
 
 void
@@ -276,7 +276,8 @@ Obj::GetDictionary(const CallbackInfo& info)
   if (!obj->IsDictionary()) {
     throw Napi::Error::New(info.Env(), "Obj only accessible as Dictionary");
   }
-  return Dictionary::constructor.New({ this->Value() });
+  return Dictionary::constructor.New(
+    { External<PdfObject>::New(info.Env(), obj) });
 }
 
 Napi::Value
@@ -302,7 +303,7 @@ protected:
   void Execute() override
   {
     try {
-      auto o = obj->obj;
+      auto o = obj->GetObject();
       value = o->GetByteOffset(arg.c_str(), ePdfWriteMode_Default);
     } catch (PdfError& err) {
       SetError(ErrorHandler::WriteMsg(err));
@@ -347,7 +348,7 @@ protected:
   {
     try {
       PdfOutputDevice device(arg.c_str());
-      obj->obj->WriteObject(&device, ePdfWriteMode_Default, nullptr);
+      obj->GetObject()->WriteObject(&device, ePdfWriteMode_Default, nullptr);
     } catch (PdfError& err) {
       SetError(ErrorHandler::WriteMsg(err));
     } catch (Napi::Error& err) {

@@ -361,7 +361,7 @@ SimpleTable::GetWidth(const CallbackInfo& info)
   const double posX = info[0].As<Number>();
   const double posY = info[1].As<Number>();
   auto page = Page::Unwrap(info[2].As<Object>());
-  const auto w = table->GetWidth(posX, posY, page->GetPage());
+  const auto w = table->GetWidth(posX, posY, page->page);
   return Number::New(info.Env(), w);
 }
 
@@ -377,7 +377,7 @@ SimpleTable::GetHeight(const CallbackInfo& info)
   const double posX = info[0].As<Number>();
   const double posY = info[1].As<Number>();
   auto page = Page::Unwrap(info[2].As<Object>());
-  const auto w = table->GetHeight(posX, posY, page->GetPage());
+  const auto w = table->GetHeight(posX, posY, page->page);
   return Number::New(info.Env(), w);
 }
 

@@ -29,13 +29,12 @@ namespace NoPoDoFo {
 class Button
 {
 public:
-  explicit Button(std::shared_ptr<PoDoFo::PdfField> field);
-  ~Button();
+  explicit Button(std::shared_ptr<PoDoFo::PdfField>);
   Napi::Value GetCaption(const Napi::CallbackInfo&);
   void SetCaption(const Napi::CallbackInfo&, const Napi::Value&);
 
   std::shared_ptr<PoDoFo::PdfButton> button;
-  std::shared_ptr<PoDoFo::PdfField> field;
+  //  std::shared_ptr<PoDoFo::PdfField> field;
 };
 }
 #endif // NPDF_BUTTON_H

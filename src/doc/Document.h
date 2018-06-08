@@ -40,7 +40,6 @@ class Document
 {
 public:
   static Napi::FunctionReference constructor;
-  ~Document() { cout << "Destructing Document" << endl; }
   explicit Document(const Napi::CallbackInfo& callbackInfo); // constructor
   static void Initialize(Napi::Env& env, Napi::Object& target);
   Napi::Value Load(const Napi::CallbackInfo&);
@@ -60,6 +59,7 @@ public:
   std::shared_ptr<PoDoFo::PdfMemDocument> GetMemDocument()
   {
     auto shared = document;
+    cout << "PdfMemDocument count: " << document.use_count() << endl;
     return shared;
   }
   bool LoadedForIncrementalUpdates() { return loadForIncrementalUpdates; }
