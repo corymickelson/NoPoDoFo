@@ -1,4 +1,4 @@
-import {npdf, CONVERSION, IPainter, NPDFFontEncoding, Cell, Table} from '../../dist'
+import {npdf, CONVERSION, IPainter, NPDFFontEncoding, Cell, Table, NPDFAlignment, NPDFVerticalAlignment} from '../../dist'
 import * as tap from 'tape'
 import {join} from 'path';
 if(!global.gc) {
@@ -29,7 +29,7 @@ tap('IPainter', t => {
                 x = CONVERSION * 10000
                 y = page.height - 10000 * CONVERSION
                 y -= metric.lineSpacing
-                t.doesNotThrow(() => painter.drawText({x, y}, 'Test'))
+                t.doesNotThrow(() => painter.drawText({x, y}, 'DRAW TEXT TEST'))
                 x = 0
                 let l: number, h: number, w: number, i: number
                 let msg = "Grayscale - Colospace"
@@ -65,10 +65,25 @@ tap('IPainter', t => {
                 table.tableHeight = 200
                 t.doesNotThrow(() => table.draw({x: 300, y: 300}, painter))
 
+                let multiLineContainer = new npdf.Rect(300, 300, 150, 50)
+                painter.drawMultiLineText(multiLineContainer, 'MULTILINE\nTEST')
                 painter.finishPage()
                 doc.write(outFile, (e: Error, d: any) => {
                     if (e instanceof Error) t.fail()
-                    t.end()
+                    else {
+                        let subject = new npdf.Document()
+                        subject.load(outFile, e => {
+                            if(e) t.fail(e.message)
+                            else {
+                                let contentsParser = new npdf.ContentsTokenizer(doc, 0)
+                                let pageContents = contentsParser.readAll().join('');
+                                ['MULTILINETEST', 'DRAW TEXT TEST'].forEach(i => {
+                                    t.ok(pageContents.includes(i), 'page includes text')
+                                })
+                                t.end()
+                            }
+                        })
+                    }
                 })
             }
         })
