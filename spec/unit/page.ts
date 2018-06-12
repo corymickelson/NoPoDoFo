@@ -16,6 +16,19 @@ doc.load(filePath, e => {
     runAll()
 })
 
+function removeAnnotation() {
+    test('remove annotation', t => {
+        let annCount = page.annotationsCount()
+        let fieldsCount = page.fieldsCount()
+        page.deleteAnnotation(0)
+        let field = page.getField(0)
+        t.assert(annCount === page.annotationsCount() - 1)
+        t.assert(fieldsCount === page.fieldsCount() - 1)
+        t.ok(field)
+        t.end()
+    })
+}
+
 function pageRotation() {
 
     test('set page rotation', t => {
@@ -156,7 +169,7 @@ function runTest(test: Function) {
 }
 
 export function runAll() {
-    [
+    [ removeAnnotation,
         pageRotation,
         pageProperties,
         pageTrimBox,

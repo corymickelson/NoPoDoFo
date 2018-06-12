@@ -60,7 +60,7 @@ protected:
 private:
   bool create = true;
   bool isMemDoc = false;
-  std::shared_ptr<PoDoFo::PdfDocument> doc;
+  PoDoFo::PdfDocument* doc;
 };
 }
 #endif

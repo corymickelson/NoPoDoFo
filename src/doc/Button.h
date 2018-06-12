@@ -34,7 +34,6 @@ public:
   void SetCaption(const Napi::CallbackInfo&, const Napi::Value&);
 
   std::shared_ptr<PoDoFo::PdfButton> button;
-  //  std::shared_ptr<PoDoFo::PdfField> field;
 };
 }
 #endif // NPDF_BUTTON_H

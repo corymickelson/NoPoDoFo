@@ -55,18 +55,12 @@ public:
   static Napi::Value GC(const Napi::CallbackInfo&);
   Napi::Value GetSharedPtrCount(const Napi::CallbackInfo&);
   Napi::Value InsertPages(const Napi::CallbackInfo&);
-
-  std::shared_ptr<PoDoFo::PdfMemDocument> GetMemDocument()
-  {
-    auto shared = document;
-    cout << "PdfMemDocument count: " << document.use_count() << endl;
-    return shared;
-  }
   bool LoadedForIncrementalUpdates() { return loadForIncrementalUpdates; }
+  PoDoFo::PdfMemDocument& GetDocument() { return *document; }
 
 private:
   bool loadForIncrementalUpdates = false;
-  std::shared_ptr<PoDoFo::PdfMemDocument> document;
+  PoDoFo::PdfMemDocument* document;
 };
 }
 #endif // NPDF_PDFMEMDOCUMENT_H

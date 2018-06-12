@@ -327,7 +327,6 @@ Page::DeleteAnnotation(const CallbackInfo& info)
 Napi::Value
 Page::GetAnnotation(const CallbackInfo& info)
 {
-  EscapableHandleScope scope(info.Env());
   int index = info[0].As<Number>();
   auto ptr = page->GetAnnotation(index);
   auto instance = External<PdfAnnotation>::New(info.Env(), ptr);

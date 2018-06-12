@@ -100,8 +100,7 @@ Document::Document(const CallbackInfo& info)
   : ObjectWrap(info)
   , BaseDocument(info)
 {
-  document =
-    std::static_pointer_cast<PdfMemDocument>(BaseDocument::GetBaseDocument());
+  document = static_cast<PdfMemDocument*>(BaseDocument::base);
 }
 
 /**
@@ -256,7 +255,7 @@ protected:
   {
     try {
       PdfOutputDevice device(arg.c_str());
-      doc.GetMemDocument()->Write(&device);
+      doc.GetDocument().Write(&device);
     } catch (PdfError& err) {
       SetError(String::New(Env(), ErrorHandler::WriteMsg(err)));
     } catch (Napi::Error& err) {
@@ -301,10 +300,10 @@ protected:
   {
     try {
       if (!useBuffer)
-        doc.GetMemDocument()->Load(arg.c_str(), update);
+        doc.GetDocument().Load(arg.c_str(), update);
       else {
 #if PODOFO_VERSION_MINOR >= 9 && PODOFO_VERSION_PATCH >= 6
-        doc.GetMemDocument()->LoadFromDevice(*refBuffer);
+        doc.GetDocument().LoadFromDevice(*refBuffer);
 #else
         Error::New(
           Env(),
@@ -320,7 +319,7 @@ protected:
           SetError("Password required to modify this document");
         else {
           try {
-            doc.GetMemDocument()->SetPassword(pwd);
+            doc.GetDocument().SetPassword(pwd);
             cout << "password set" << endl;
           } catch (PdfError& err) {
             cout << "Invalid password" << endl;
@@ -411,7 +410,7 @@ protected:
   void Execute() override
   {
     PdfOutputDevice device(&output);
-    doc.GetMemDocument()->Write(&device);
+    doc.GetDocument().Write(&device);
   }
   void OnOK() override
   {
@@ -526,11 +525,7 @@ Document::CreatePage(const Napi::CallbackInfo& info)
 {
   return BaseDocument::CreatePage(info);
 }
-Napi::Value
-Document::GetSharedPtrCount(const Napi::CallbackInfo& info)
-{
-  return Number::New(info.Env(), BaseDocument::GetBaseDocument().use_count());
-}
+
 Napi::Value
 Document::GetEncrypt(const Napi::CallbackInfo& info)
 {
@@ -560,10 +555,10 @@ Document::InsertPages(const Napi::CallbackInfo& info)
       .ThrowAsJavaScriptException();
     return info.Env().Undefined();
   }
-  auto pagesDoc = Document::Unwrap(info[0].As<Object>())->GetMemDocument();
+  auto pagesDoc = Document::Unwrap(info[0].As<Object>())->document;
   int start = info[1].As<Number>();
   int end = info[2].As<Number>();
-  document->InsertPages(pagesDoc.get(), start, end);
+  document->InsertPages(pagesDoc, start, end);
   return Number::New(info.Env(), document->GetPageCount());
 }
 }

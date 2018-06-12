@@ -10,9 +10,10 @@
 
 namespace NoPoDoFo {
 
-class Action: public Napi::ObjectWrap<Action> {
+class Action : public Napi::ObjectWrap<Action>
+{
 public:
-  explicit Action(const Napi::CallbackInfo &info);
+  explicit Action(const Napi::CallbackInfo& info);
   static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
   Napi::Value GetUri(const Napi::CallbackInfo&);
@@ -22,12 +23,11 @@ public:
   void SetScript(const Napi::CallbackInfo&, const Napi::Value&);
   Napi::Value GetObject(const Napi::CallbackInfo&);
   void AddToDictionary(const Napi::CallbackInfo&);
-
   PoDoFo::PdfAction* GetAction() { return action.get(); }
 
 private:
   std::unique_ptr<PoDoFo::PdfAction> action;
-  std::shared_ptr<PoDoFo::PdfDocument> doc;
+  PoDoFo::PdfDocument* doc;
 };
 }
-#endif //NPDF_ACTION_H
+#endif // NPDF_ACTION_H

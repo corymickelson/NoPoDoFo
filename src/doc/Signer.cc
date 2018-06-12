@@ -57,7 +57,7 @@ Signer::Signer(const Napi::CallbackInfo& info)
   }
   auto nObj = info[0].As<Object>();
   if (nObj.InstanceOf(Document::constructor.Value())) {
-    doc = Document::Unwrap(nObj)->GetMemDocument();
+    doc = Document::Unwrap(nObj)->document;
   } else if (nObj.InstanceOf(StreamDocument::constructor.Value())) {
     TypeError::New(
       info.Env(),

@@ -19,9 +19,9 @@
 
 #include "ContentsTokenizer.h"
 #include "../ValidateArguments.h"
+#include "../doc/Document.h"
 #include "../doc/Page.h"
 #include "../doc/StreamDocument.h"
-#include "../doc/Document.h"
 #include <iostream>
 #include <stack>
 
@@ -44,14 +44,20 @@ ContentsTokenizer::ContentsTokenizer(const Napi::CallbackInfo& info)
 {
   auto dWrap = info[0].As<Object>();
   if (dWrap.InstanceOf(Document::constructor.Value())) {
-    doc = Document::Unwrap(dWrap)->GetMemDocument();
+    doc = Document::Unwrap(dWrap);
   } else {
     throw Error::New(info.Env(),
                      "must be an instance of Document. This class does not "
                      "work with StreamDocument currently.");
   }
 
-  self = make_unique<PdfContentsTokenizer>(doc->GetPage(pIndex));
+  self = make_unique<PdfContentsTokenizer>(doc->GetDocument().GetPage(pIndex));
+}
+
+ContentsTokenizer::~ContentsTokenizer()
+{
+  HandleScope scope(Env());
+  doc = nullptr;
 }
 
 void
@@ -110,11 +116,12 @@ ContentsTokenizer::ReadAll(const CallbackInfo& info)
           stack.pop();
           PdfName fontName = stack.top().GetName();
           PdfObject* pFont =
-            doc->GetPage(pIndex)->GetFromResources(PdfName("Font"), fontName);
+            doc->GetDocument().GetPage(pIndex)->GetFromResources(
+              PdfName("Font"), fontName);
           if (!pFont) {
             throw Error::New(info.Env(), "Failed to create font");
           }
-          font = doc->GetFont(pFont);
+          font = doc->GetDocument().GetFont(pFont);
           if (!font) {
             throw Error::New(info.Env(), "Failed to create font");
           }

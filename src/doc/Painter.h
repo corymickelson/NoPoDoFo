@@ -92,7 +92,7 @@ public:
 private:
   bool isMemDoc = false;
   std::unique_ptr<PoDoFo::PdfPainter> painter;
-  std::shared_ptr<PoDoFo::PdfDocument> document;
+  PoDoFo::PdfDocument* document;
   void GetCMYK(Napi::Value&, int* cmyk);
   void GetRGB(Napi::Value&, int* rgb);
 };

@@ -67,19 +67,11 @@ public:
   Napi::Value Append(const Napi::CallbackInfo&);
   Napi::Value GetAttachment(const Napi::CallbackInfo&);
   void AddNamedDestination(const Napi::CallbackInfo&);
-
-  std::shared_ptr<PoDoFo::PdfDocument> GetBaseDocument()
-  {
-    auto shared = document;
-    cout << "Base Document count: " << document.use_count() << endl;
-    return shared;
-  }
   bool created() { return create; }
 
-private:
   bool create = false;
   string output;
-  std::shared_ptr<PoDoFo::PdfDocument> document;
+  PoDoFo::PdfDocument* base;
 };
 }
 #endif

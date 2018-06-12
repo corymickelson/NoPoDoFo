@@ -45,7 +45,7 @@ Encrypt::Encrypt(const Napi::CallbackInfo& info)
 #if defined(PODOFO_HAVE_OPENSSL) || defined(PODOFO_HAVE_OPENSSL_1_1)
   if (info[0].As<Object>().InstanceOf(Document::constructor.Value())) {
     encrypt =
-      Document::Unwrap(info[0].As<Object>())->GetMemDocument()->GetEncrypt();
+      Document::Unwrap(info[0].As<Object>())->GetDocument().GetEncrypt();
   } else if (info[0].IsExternal()) {
     encrypt = info[0].As<External<PdfEncrypt>>().Data();
   } else {

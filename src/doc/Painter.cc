@@ -47,10 +47,10 @@ Painter::Painter(const Napi::CallbackInfo& info)
   auto o = info[0].As<Object>();
   if (o.InstanceOf(Document::constructor.Value())) {
     isMemDoc = true;
-    document = Document::Unwrap(o)->GetBaseDocument();
+    document = Document::Unwrap(o)->base;
   } else if (o.InstanceOf(StreamDocument::constructor.Value())) {
     isMemDoc = false;
-    document = StreamDocument::Unwrap(o)->GetBaseDocument();
+    document = StreamDocument::Unwrap(o)->base;
   } else {
     TypeError::New(info.Env(), "requires an instance of BaseDocument")
       .ThrowAsJavaScriptException();

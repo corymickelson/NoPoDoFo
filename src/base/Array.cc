@@ -20,6 +20,7 @@
 #include "Array.h"
 #include "../ErrorHandler.h"
 #include "../ValidateArguments.h"
+#include "../doc/Document.h"
 #include "Obj.h"
 
 using namespace Napi;
@@ -162,7 +163,7 @@ Array::GetObjAtIndex(const CallbackInfo& info)
   }
   PdfObject item(GetArray()[index]);
   if (item.IsReference()) {
-    item = *item.GetOwner()->GetObject(item.GetReference());
+    item = *obj->GetOwner()->GetObject(item.GetReference());
   }
   auto child = new PdfObject(item);
   children.push_back(child);

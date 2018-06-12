@@ -48,10 +48,10 @@ SignatureField::SignatureField(const CallbackInfo& info)
       auto annot = Annotation::Unwrap(info[0].As<Object>());
       auto nObj = info[1].As<Object>();
       if (nObj.InstanceOf(Document::constructor.Value())) {
-        doc = Document::Unwrap(nObj)->GetBaseDocument();
+        doc = Document::Unwrap(nObj)->base;
         isMemDoc = true;
       } else if (nObj.InstanceOf(StreamDocument::constructor.Value())) {
-        doc = StreamDocument::Unwrap(nObj)->GetBaseDocument();
+        doc = StreamDocument::Unwrap(nObj)->base;
         isMemDoc = false;
       } else {
         TypeError::New(info.Env(), "IBase required")
@@ -59,7 +59,7 @@ SignatureField::SignatureField(const CallbackInfo& info)
         return;
       }
       field = make_shared<PdfSignatureField>(
-        &annot->GetAnnotation(), doc->GetAcroForm(), doc.get());
+        &annot->GetAnnotation(), doc->GetAcroForm(), doc);
     } else if (info.Length() == 1 && info[0].IsExternal()) {
       field = make_shared<PdfSignatureField>(
         info[0].As<External<PdfAnnotation>>().Data());
@@ -150,7 +150,7 @@ SignatureField::AddCertificateReference(const CallbackInfo& info)
       .ThrowAsJavaScriptException();
     return;
   }
-  auto sharedMemDoc = std::static_pointer_cast<PdfMemDocument>(doc);
+  auto sharedMemDoc = static_cast<PdfMemDocument*>(doc);
   auto flag = static_cast<PdfSignatureField::EPdfCertPermission>(
     info[0].As<Number>().Int32Value());
   GetField()->AddCertificationReference(sharedMemDoc->GetCatalog(), flag);
