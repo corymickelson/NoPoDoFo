@@ -38,8 +38,8 @@ FunctionReference TextField::constructor; // NOLINT
 TextField::TextField(const CallbackInfo& info)
   : ObjectWrap(info)
   , Field(ePdfField_TextField, info)
+  , field(Field::GetField())
 {
-  field = Field::GetField();
   if (info[info.Length() - 1].IsObject() &&
       !info[info.Length() - 1].As<Object>().InstanceOf(
         Document::constructor.Value()) &&

@@ -304,7 +304,7 @@ Form::SetFont(const CallbackInfo& info, const Napi::Value& value)
     auto item = arr.Get(i);
     if (item.As<Object>().InstanceOf(Font::constructor.Value())) {
       auto font = Font::Unwrap(item.As<Object>());
-      AddFont(font->GetFont());
+      AddFont(&font->GetFont());
     }
   }
 }

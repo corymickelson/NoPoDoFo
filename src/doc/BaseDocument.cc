@@ -78,6 +78,12 @@ BaseDocument::BaseDocument(const Napi::CallbackInfo& info)
   }
 }
 
+BaseDocument::~BaseDocument()
+{
+  cout << "Clean up Base Document" << endl;
+  delete base;
+}
+
 Napi::Value
 BaseDocument::GetPageCount(const CallbackInfo& info)
 {
@@ -392,7 +398,7 @@ BaseDocument::InsertExistingPage(const CallbackInfo& info)
       .ThrowAsJavaScriptException();
     return Value();
   }
-  base->InsertExistingPageAt(*memDoc->document.get(), memPageN, atN);
+  base->InsertExistingPageAt(memDoc->GetDocument(), memPageN, atN);
   return Number::New(info.Env(), base->GetPageCount());
 }
 Napi::Value
@@ -431,7 +437,7 @@ Napi::Value
 BaseDocument::CreatePage(const CallbackInfo& info)
 {
   auto r = Rect::Unwrap(info[0].As<Object>())->GetRect();
-  auto page = base->CreatePage(*r);
+  auto page = base->CreatePage(r);
   return Page::constructor.New({ External<PdfPage>::New(info.Env(), page) });
 }
 Napi::Value
@@ -440,7 +446,7 @@ BaseDocument::CreatePages(const Napi::CallbackInfo& info)
   auto coll = info[0].As<Array>();
   vector<PdfRect> rects;
   for (int n = coll.Length(); n >= 0; n++) {
-    PdfRect r = *Rect::Unwrap(coll.Get(n).As<Object>())->GetRect();
+    PdfRect r = Rect::Unwrap(coll.Get(n).As<Object>())->GetRect();
     rects.push_back(r);
   }
   base->CreatePages(rects);
@@ -451,7 +457,7 @@ BaseDocument::InsertPage(const Napi::CallbackInfo& info)
 {
   auto rect = Rect::Unwrap(info[0].As<Object>())->GetRect();
   int index = info[1].As<Number>();
-  base->InsertPage(*rect, index);
+  base->InsertPage(rect, index);
   return Page::constructor.New(
     { External<PdfPage>::New(info.Env(), base->GetPage(index)) });
 }
@@ -495,11 +501,11 @@ BaseDocument::GetAttachment(const CallbackInfo& info)
 void
 BaseDocument::AddNamedDestination(const Napi::CallbackInfo& info)
 {
-  PdfPage* page = Page::Unwrap(info[0].As<Object>())->page;
+  PdfPage page = Page::Unwrap(info[0].As<Object>())->page;
   EPdfDestinationFit fit =
     static_cast<EPdfDestinationFit>(info[1].As<Number>().Int32Value());
   string name = info[2].As<String>().Utf8Value();
-  PdfDestination destination(page, fit);
+  PdfDestination destination(&page, fit);
   base->AddNamedDestination(destination, name);
 }
 Napi::Value

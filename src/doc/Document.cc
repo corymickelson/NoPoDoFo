@@ -90,8 +90,7 @@ Document::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceMethod("createPage", &Document::CreatePage),
       InstanceMethod("createPages", &Document::CreatePages),
       InstanceMethod("getAttachment", &Document::GetAttachment),
-      InstanceMethod("addNamedDestination", &Document::AddNamedDestination),
-      InstanceMethod("__ptrCount", &Document::GetSharedPtrCount) });
+      InstanceMethod("addNamedDestination", &Document::AddNamedDestination) });
   constructor = Persistent(ctor);
   constructor.SuppressDestruct();
   target.Set("Document", ctor);
@@ -99,9 +98,7 @@ Document::Initialize(Napi::Env& env, Napi::Object& target)
 Document::Document(const CallbackInfo& info)
   : ObjectWrap(info)
   , BaseDocument(info)
-{
-  document = static_cast<PdfMemDocument*>(BaseDocument::base);
-}
+{}
 
 /**
  * @note PdfFont resource is managed by the PdfDocument
@@ -115,7 +112,7 @@ Document::GetFont(const CallbackInfo& info)
     auto id = info[0].As<String>().Utf8Value();
     vector<PdfObject*> fontObjs;
     vector<PdfFont*> fonts;
-    for (auto item : document->GetObjects()) {
+    for (auto item : GetDocument().GetObjects()) {
       if (item->IsDictionary()) {
         if (item->GetDictionary().HasKey(Name::TYPE) &&
             item->GetDictionary().GetKey(Name::TYPE)->IsName() &&
@@ -125,7 +122,7 @@ Document::GetFont(const CallbackInfo& info)
         }
       }
       if (item->IsReference()) {
-        auto ref = document->GetObjects().GetObject(item->GetReference());
+        auto ref = GetDocument().GetObjects().GetObject(item->GetReference());
         if (ref->IsDictionary()) {
           if (ref->GetDictionary().HasKey(Name::TYPE) &&
               ref->GetDictionary().GetKey(Name::TYPE)->IsName() &&
@@ -137,7 +134,7 @@ Document::GetFont(const CallbackInfo& info)
       }
     }
     for (auto o : fontObjs) {
-      auto font = document->GetFont(o);
+      auto font = GetDocument().GetFont(o);
       if (!font) {
         continue;
       } else {
@@ -170,7 +167,7 @@ Document::SetPassword(const CallbackInfo& info, const Napi::Value& value)
   }
   string password = value.As<String>().Utf8Value();
   try {
-    document->SetPassword(password);
+    GetDocument().SetPassword(password);
   } catch (PdfError& err) {
     ErrorHandler(err, info);
   } catch (Error& err) {
@@ -184,12 +181,12 @@ Document::DeletePages(const CallbackInfo& info)
   // AssertFunctionArgs(info, 2, { { napi_number, napi_number } }, nullptr);
   int pageIndex = info[0].As<Number>();
   int count = info[1].As<Number>();
-  if (document->GetPageCount() < pageIndex + count) {
+  if (GetDocument().GetPageCount() < pageIndex + count) {
     RangeError::New(info.Env(), "Pages out of range")
       .ThrowAsJavaScriptException();
   }
   try {
-    document->DeletePages(pageIndex, count);
+    GetDocument().DeletePages(pageIndex, count);
   } catch (PdfError& err) {
     ErrorHandler(err, info);
   } catch (Error& err) {
@@ -209,7 +206,7 @@ Document::SetEncrypt(const CallbackInfo& info, const Napi::Value& value)
   }
   try {
     const PdfEncrypt* e = value.As<External<PdfEncrypt>>().Data();
-    document->SetEncrypted(*e);
+    GetDocument().SetEncrypted(*e);
   } catch (PdfError& err) {
     stringstream msg;
     msg << "PdfMemDocument::SetEncrypt failed with error: " << err.GetError()
@@ -220,7 +217,7 @@ Document::SetEncrypt(const CallbackInfo& info, const Napi::Value& value)
 Napi::Value
 Document::GetTrailer(const CallbackInfo& info)
 {
-  const PdfObject* trailerPdObject = document->GetTrailer();
+  const PdfObject* trailerPdObject = GetDocument().GetTrailer();
   auto ptr = const_cast<PdfObject*>(trailerPdObject);
   auto initPtr = Napi::External<PdfObject>::New(info.Env(), ptr);
   auto instance = Obj::constructor.New({ initPtr });
@@ -230,7 +227,7 @@ Document::GetTrailer(const CallbackInfo& info)
 Napi::Value
 Document::GetCatalog(const CallbackInfo& info)
 {
-  const PdfObject* catalog = document->GetCatalog();
+  const PdfObject* catalog = GetDocument().GetCatalog();
   auto ptr = const_cast<PdfObject*>(catalog);
   auto initPtr = Napi::External<PdfObject>::New(info.Env(), ptr);
   auto instance = Obj::constructor.New({ initPtr });
@@ -352,7 +349,7 @@ Document::Load(const CallbackInfo& info)
   Function cb;
   bool forUpdate = false, useBuffer = false;
   string source, pwd;
-  PdfRefCountedInputDevice* inputDevice = nullptr;
+  DocumentLoadAsync* worker = nullptr;
   if (info.Length() >= 2 && info[1].IsFunction()) {
     cb = info[1].As<Function>();
   } else if (info.Length() >= 2 && info[1].IsObject()) {
@@ -378,15 +375,18 @@ Document::Load(const CallbackInfo& info)
   }
   if (useBuffer) {
     auto buffer = info[0].As<Buffer<char>>();
-    inputDevice = new PdfRefCountedInputDevice(buffer.Data(), buffer.Length());
+    //    new PdfRefCountedInputDevice(buffer.Data(), buffer.Length());
+    worker = new DocumentLoadAsync(
+      cb,
+      *this,
+      source,
+      new PdfRefCountedInputDevice(buffer.Data(), buffer.Length()));
   } else {
     source = info[0].As<String>().Utf8Value();
+    worker = new DocumentLoadAsync(cb, *this, source, nullptr);
   }
 
   loadForIncrementalUpdates = forUpdate;
-  DocumentLoadAsync* worker =
-    new DocumentLoadAsync(cb, *this, source, inputDevice);
-
   worker->SetPassword(pwd);
   worker->ForUpdate(forUpdate);
   worker->SetUseBuffer(useBuffer);
@@ -529,7 +529,7 @@ Document::CreatePage(const Napi::CallbackInfo& info)
 Napi::Value
 Document::GetEncrypt(const Napi::CallbackInfo& info)
 {
-  auto enc = document->GetEncrypt();
+  auto enc = GetDocument().GetEncrypt();
   if (!enc) {
     return info.Env().Null();
   }
@@ -555,10 +555,16 @@ Document::InsertPages(const Napi::CallbackInfo& info)
       .ThrowAsJavaScriptException();
     return info.Env().Undefined();
   }
-  auto pagesDoc = Document::Unwrap(info[0].As<Object>())->document;
+  auto pagesDoc = &Document::Unwrap(info[0].As<Object>())->GetDocument();
   int start = info[1].As<Number>();
   int end = info[2].As<Number>();
-  document->InsertPages(pagesDoc, start, end);
-  return Number::New(info.Env(), document->GetPageCount());
+  GetDocument().InsertPages(pagesDoc, start, end);
+  return Number::New(info.Env(), GetDocument().GetPageCount());
+}
+
+PdfMemDocument&
+Document::GetDocument()
+{
+  return *static_cast<PdfMemDocument*>(BaseDocument::base);
 }
 }

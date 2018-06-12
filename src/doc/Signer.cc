@@ -44,6 +44,7 @@ FunctionReference Signer::constructor; // NOLINT
  */
 Signer::Signer(const Napi::CallbackInfo& info)
   : ObjectWrap(info)
+  , doc(Document::Unwrap(info[0].As<Object>())->GetDocument())
 {
   if (info.Length() < 1) {
     Error::New(info.Env(), "Document required to construct Signer")
@@ -51,20 +52,6 @@ Signer::Signer(const Napi::CallbackInfo& info)
     return;
   }
   if (!info[0].IsObject()) {
-    TypeError::New(info.Env(), "Requires Document to construct Signer")
-      .ThrowAsJavaScriptException();
-    return;
-  }
-  auto nObj = info[0].As<Object>();
-  if (nObj.InstanceOf(Document::constructor.Value())) {
-    doc = Document::Unwrap(nObj)->document;
-  } else if (nObj.InstanceOf(StreamDocument::constructor.Value())) {
-    TypeError::New(
-      info.Env(),
-      "StreamDocument is not currently supported in Signing operations")
-      .ThrowAsJavaScriptException();
-    return;
-  } else {
     TypeError::New(info.Env(), "Requires Document to construct Signer")
       .ThrowAsJavaScriptException();
     return;
@@ -134,8 +121,7 @@ Signer::Sign(const CallbackInfo& info)
 
     field->SetSignatureDate(PdfDate());
     field->SetSignature(*signer.GetSignatureBeacon());
-    auto writable = static_pointer_cast<PdfMemDocument>(doc);
-    writable->WriteUpdate(&signer, true);
+    doc.WriteUpdate(&signer, true);
 
     if (!signer.HasSignaturePosition())
       throw Error::New(info.Env(),
@@ -192,7 +178,7 @@ protected:
 
       self->field->SetSignatureDate(PdfDate());
       self->field->SetSignature(*signer.GetSignatureBeacon());
-      self->doc->WriteUpdate(&signer, true);
+      self->doc.WriteUpdate(&signer, true);
 
       if (!signer.HasSignaturePosition())
         throw Error::New(Env(),

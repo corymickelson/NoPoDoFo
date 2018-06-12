@@ -101,6 +101,12 @@ Image::Image(const CallbackInfo& info)
     info.Env(), "Please rebuild PoDoFo with libpng libjpeg and libtiff.");
 #endif
 }
+
+Image::~Image()
+{
+  HandleScope scope(Env());
+  doc = nullptr;
+}
 void
 Image::Initialize(Napi::Env& env, Napi::Object& target)
 {

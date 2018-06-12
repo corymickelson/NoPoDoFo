@@ -54,10 +54,8 @@ public:
   void SetTextFormat(const Napi::CallbackInfo&, const Napi::Value&);
   Napi::Value GetTextColor(const Napi::CallbackInfo&);
   void SetTextColor(const Napi::CallbackInfo&, const Napi::Value&);
-  PoDoFo::PdfOutlines* GetOutline() { return outlines.get(); }
 
-private:
-  std::unique_ptr<PoDoFo::PdfOutlines> outlines;
+  PoDoFo::PdfOutlines& outlines; // owned by the document
 };
 }
 #endif // NPDF_OUTLINE_H

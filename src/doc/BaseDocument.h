@@ -33,6 +33,7 @@ class BaseDocument
 {
 public:
   explicit BaseDocument(const Napi::CallbackInfo&);
+  ~BaseDocument();
   Napi::Value GetPageCount(const Napi::CallbackInfo&);
   virtual Napi::Value GetPage(const Napi::CallbackInfo&);
   Napi::Value GetObjects(const Napi::CallbackInfo&);

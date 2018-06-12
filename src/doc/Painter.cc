@@ -59,6 +59,12 @@ Painter::Painter(const Napi::CallbackInfo& info)
   painter = make_unique<PdfPainter>();
 }
 
+Painter::~Painter()
+{
+  HandleScope scope(Env());
+  document = nullptr;
+}
+
 void
 Painter::Initialize(Napi::Env& env, Napi::Object& target)
 {
@@ -129,7 +135,7 @@ Painter::SetPage(const Napi::CallbackInfo& info)
     throw Napi::Error::New(info.Env(), "Page must be an instance of Page.");
   }
   auto page = Page::Unwrap(info[0].As<Object>());
-  painter->SetPage(page->page);
+  painter->SetPage(&page->page);
 }
 
 void
@@ -239,7 +245,7 @@ Painter::DrawMultiLineText(const CallbackInfo& info)
   // For some reason windows builds break with unresolved external symbol on
   // podofo's DrawMultiLineText method
   //#ifndef WIN32
-  PdfRect rect = *Rect::Unwrap(info[0].As<Object>())->GetRect();
+  PdfRect rect = Rect::Unwrap(info[0].As<Object>())->GetRect();
   string text = info[1].As<String>().Utf8Value();
   EPdfAlignment alignment = ePdfAlignment_Center;
   if (info.Length() >= 3 && info[2].IsNumber()) {
@@ -345,7 +351,7 @@ Painter::SetFont(const Napi::CallbackInfo& info, const Napi::Value& value)
 {
   Font* font = Font::Unwrap(value.As<Object>());
   try {
-    painter->SetFont(font->GetFont());
+    painter->SetFont(&font->GetFont());
   } catch (PdfError& err) {
     ErrorHandler(err, info);
   }
@@ -363,7 +369,7 @@ void
 Painter::SetClipRect(const Napi::CallbackInfo& info)
 {
   Rect* r = Rect::Unwrap(info[0].As<Object>());
-  painter->SetClipRect(*r->GetRect());
+  painter->SetClipRect(r->GetRect());
 }
 
 void
@@ -378,7 +384,7 @@ Painter::Rectangle(const CallbackInfo& info)
 {
   Rect* r = Rect::Unwrap(info[0].As<Object>());
   try {
-    painter->Rectangle(*r->GetRect());
+    painter->Rectangle(r->GetRect());
   } catch (PdfError& err) {
     ErrorHandler(err, info);
   }
@@ -768,14 +774,14 @@ Painter::DrawGlyph(const CallbackInfo& info)
       .ThrowAsJavaScriptException();
     return;
   }
-  auto sharedMemDoc = std::static_pointer_cast<PdfMemDocument>(document);
+  auto sharedMemDoc = static_cast<PdfMemDocument*>(document);
   auto point = info[0].As<Object>();
   string glyph = info[1].As<String>().Utf8Value();
   double x, y;
   x = point.Get("x").As<Number>();
   y = point.Get("y").As<Number>();
   try {
-    painter->DrawGlyph(sharedMemDoc.get(), x, y, glyph.c_str());
+    painter->DrawGlyph(sharedMemDoc, x, y, glyph.c_str());
   } catch (PdfError& err) {
     ErrorHandler(err, info);
   }

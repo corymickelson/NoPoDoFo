@@ -36,9 +36,8 @@ ComboBox::ComboBox(const Napi::CallbackInfo& info)
   : ObjectWrap(info)
   , Field(ePdfField_ComboBox, info)
   , ListField(Field::GetField())
-{
-  field = Field::GetField();
-}
+  , field(Field::GetField())
+{}
 
 void
 ComboBox::Initialize(Napi::Env& env, Napi::Object& target)

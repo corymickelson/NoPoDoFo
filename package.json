@@ -15,7 +15,7 @@
     "test": "tsc -p tsconfig.json && tsc -p tsconfig.spec.json && node --expose-gc ./node_modules/.bin/tape spec/unit/*.js",
     "install": "node-pre-gyp install --fallback-to-build && tsc -p tsconfig.json",
     "qt:debug": "cmake-js build -D && cp build/Debug/nopodofo.node lib/binding/1/",
-    "aws:lambda": "LDLFLAGS=-Wl,-rpath=/var/task/node_modules/nopodofolambda/lib node-pre-gyp rebuild -j 4"
+    "build:aws:lambda": "LDLFLAGS=-Wl,-rpath=/var/task/node_modules/nopodofolambda/lib node-pre-gyp rebuild -j 4"
   },
   "nyc": {
     "exclude": [

@@ -37,7 +37,7 @@ FunctionReference SimpleTable::constructor; // NOLINT
 SimpleTable::SimpleTable(const CallbackInfo& info)
   : ObjectWrap(info)
 {
-  doc = Document::Unwrap(info[0].As<Object>())->GetBaseDocument();
+  doc = Document::Unwrap(info[0].As<Object>())->base;
   const int cols = info[1].As<Number>();
   const int rows = info[2].As<Number>();
   model = new PdfSimpleTableModel(cols, rows);
@@ -51,6 +51,7 @@ SimpleTable::~SimpleTable()
   delete table;
   delete backgroundColor;
   delete foregroundColor;
+  doc = nullptr;
 }
 
 void
@@ -121,8 +122,7 @@ SimpleTable::SetFont(const CallbackInfo& info, const Napi::Value& value)
       !value.As<Object>().InstanceOf(Font::constructor.Value())) {
     throw Error::New(info.Env(), "value must be an instance of NoPoDoFo Font");
   }
-  const auto pFont = Font::Unwrap(value.As<Object>())->GetFont();
-  model->SetFont(pFont);
+  model->SetFont(&Font::Unwrap(value.As<Object>())->GetFont());
 }
 
 Value
@@ -352,7 +352,7 @@ SimpleTable::Draw(const CallbackInfo& info)
     cout << model->GetText(0, 0).GetStringUtf8() << endl;
     table->SetModel(model);
   }
-  table->Draw(posX, posY, painter->GetPainter());
+  table->Draw(posX, posY, &painter->GetPainter());
 }
 
 Value
@@ -361,7 +361,7 @@ SimpleTable::GetWidth(const CallbackInfo& info)
   const double posX = info[0].As<Number>();
   const double posY = info[1].As<Number>();
   auto page = Page::Unwrap(info[2].As<Object>());
-  const auto w = table->GetWidth(posX, posY, page->page);
+  const auto w = table->GetWidth(posX, posY, &page->page);
   return Number::New(info.Env(), w);
 }
 
@@ -377,7 +377,7 @@ SimpleTable::GetHeight(const CallbackInfo& info)
   const double posX = info[0].As<Number>();
   const double posY = info[1].As<Number>();
   auto page = Page::Unwrap(info[2].As<Object>());
-  const auto w = table->GetHeight(posX, posY, page->page);
+  const auto w = table->GetHeight(posX, posY, &page->page);
   return Number::New(info.Env(), w);
 }
 
@@ -442,7 +442,7 @@ void
 SimpleTable::SetAutoPageBreak(const CallbackInfo& info,
                               const Napi::Value& value)
 {
-  auto* d = static_cast<void*>(doc.get());
+  auto* d = static_cast<void*>(doc);
   table->SetAutoPageBreak(
     value.As<Boolean>(),
     [](PdfRect& rect, void* data) -> PdfPage* {

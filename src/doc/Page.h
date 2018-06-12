@@ -35,7 +35,6 @@ class Page : public Napi::ObjectWrap<Page>
 {
 public:
   explicit Page(const Napi::CallbackInfo& callbackInfo);
-  ~Page();
   static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
   Napi::Value GetRotation(const Napi::CallbackInfo&);
@@ -61,7 +60,7 @@ public:
   Napi::Value GetAnnotation(const Napi::CallbackInfo&);
   Napi::Value GetNumAnnots(const Napi::CallbackInfo&);
   void DeleteAnnotation(const Napi::CallbackInfo&);
-  PoDoFo::PdfPage* page;
+  PoDoFo::PdfPage& page;
   Napi::Object ExtractAndApplyRectValues(const Napi::CallbackInfo&,
                                          PoDoFo::PdfRect&);
 };

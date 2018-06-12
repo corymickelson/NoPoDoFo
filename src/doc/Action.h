@@ -14,6 +14,7 @@ class Action : public Napi::ObjectWrap<Action>
 {
 public:
   explicit Action(const Napi::CallbackInfo& info);
+  ~Action();
   static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
   Napi::Value GetUri(const Napi::CallbackInfo&);

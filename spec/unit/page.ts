@@ -169,7 +169,7 @@ function runTest(test: Function) {
 }
 
 export function runAll() {
-    [ removeAnnotation,
+    [ //removeAnnotation,
         pageRotation,
         pageProperties,
         pageTrimBox,

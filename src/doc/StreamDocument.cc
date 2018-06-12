@@ -41,15 +41,7 @@ FunctionReference StreamDocument::constructor; // NOLINT
 StreamDocument::StreamDocument(const CallbackInfo& info)
   : ObjectWrap(info)
   , BaseDocument(info)
-{
-  document = std::static_pointer_cast<PdfStreamedDocument>(
-    BaseDocument::GetBaseDocument());
-}
-
-StreamDocument::~StreamDocument()
-{
-  std::cout << "Destructing StreamDocument" << std::endl;
-}
+{}
 
 void
 StreamDocument::Initialize(Napi::Env& env, Napi::Object& target)
@@ -107,6 +99,6 @@ StreamDocument::Initialize(Napi::Env& env, Napi::Object& target)
 void
 StreamDocument::Close(const CallbackInfo&)
 {
-  document->Close();
+  GetStreamedDocument().Close();
 }
 }

@@ -33,9 +33,8 @@ CheckBox::CheckBox(const CallbackInfo& info)
   : ObjectWrap<CheckBox>(info)
   , Field(ePdfField_CheckBox, info)
   , Button(Field::GetField())
-{
-  field = Field::GetField();
-}
+  , field(Field::GetField())
+{}
 
 void
 CheckBox::Initialize(Napi::Env& env, Napi::Object& target)

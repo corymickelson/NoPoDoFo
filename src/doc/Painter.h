@@ -30,6 +30,7 @@ class Painter : public Napi::ObjectWrap<Painter>
 {
 public:
   explicit Painter(const Napi::CallbackInfo& callbackInfo);
+  ~Painter();
   static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
 
@@ -87,7 +88,7 @@ public:
   Napi::Value GetPrecision(const Napi::CallbackInfo&);
   void SetPrecision(const Napi::CallbackInfo&, const Napi::Value&);
 
-  PoDoFo::PdfPainter* GetPainter() { return painter.get(); }
+  PoDoFo::PdfPainter& GetPainter() { return *painter; }
 
 private:
   bool isMemDoc = false;

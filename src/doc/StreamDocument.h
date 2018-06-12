@@ -33,17 +33,12 @@ class StreamDocument
 public:
   static Napi::FunctionReference constructor;
   explicit StreamDocument(const Napi::CallbackInfo&);
-  ~StreamDocument();
   static void Initialize(Napi::Env& env, Napi::Object& target);
   void Close(const Napi::CallbackInfo&);
-  std::shared_ptr<PoDoFo::PdfStreamedDocument> GetStreamedDocument()
+  PoDoFo::PdfStreamedDocument& GetStreamedDocument()
   {
-    auto shared = document;
-    return shared;
+    return *static_cast<PoDoFo::PdfStreamedDocument*>(BaseDocument::base);
   }
-
-private:
-  std::shared_ptr<PoDoFo::PdfStreamedDocument> document;
 };
 };
 #endif

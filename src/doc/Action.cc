@@ -22,17 +22,23 @@ Action::Action(const Napi::CallbackInfo& info)
   : ObjectWrap(info)
 {
   if (info[0].As<Object>().InstanceOf(Document::constructor.Value())) {
-    doc = Document::Unwrap(info[0].As<Object>())->GetBaseDocument();
+    doc = Document::Unwrap(info[0].As<Object>())->base;
   } else if (info[0].As<Object>().InstanceOf(
                StreamDocument::constructor.Value())) {
-    doc = StreamDocument::Unwrap(info[0].As<Object>())->GetBaseDocument();
+    doc = StreamDocument::Unwrap(info[0].As<Object>())->base;
   } else {
     TypeError::New(info.Env(), "Instance of BaseDocument required")
       .ThrowAsJavaScriptException();
     return;
   }
   EPdfAction t = static_cast<EPdfAction>(info[0].As<Number>().Uint32Value());
-  action = make_unique<PdfAction>(t, doc.get());
+  action = make_unique<PdfAction>(t, doc);
+}
+
+Action::~Action()
+{
+  HandleScope scope(Env());
+  doc = nullptr;
 }
 
 void
