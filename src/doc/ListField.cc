@@ -31,8 +31,8 @@ using std::shared_ptr;
 
 namespace NoPoDoFo {
 
-ListField::ListField(shared_ptr<PdfField> shared)
-  : field(shared)
+ListField::ListField(PdfField& field)
+  : field(field)
 {}
 
 void

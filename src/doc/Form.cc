@@ -45,13 +45,13 @@ Form::Form(const Napi::CallbackInfo& info)
   if (info[0].IsObject() &&
       info[0].As<Object>().InstanceOf(Document::constructor.Value())) {
     cout << "Using Document instance" << endl;
-    doc = Document::Unwrap(info[0].As<Object>())->GetBaseDocument();
+    doc = Document::Unwrap(info[0].As<Object>())->base;
     isMemDoc = true;
   } else if (info[0].Type() == napi_external) {
     cout << "Using BaseDocument" << endl;
     auto base = info[0].As<External<BaseDocument>>().Data();
     isMemDoc = !base->created();
-    doc = base->GetBaseDocument();
+    doc = base->base;
   }
 }
 
@@ -268,7 +268,7 @@ Form::GetFont(const CallbackInfo& info)
       .ThrowAsJavaScriptException();
     return info.Env().Undefined();
   }
-  auto memDoc = std::static_pointer_cast<PdfMemDocument>(doc);
+  auto memDoc = static_cast<PdfMemDocument*>(doc);
   auto js = Array::New(info.Env());
   uint32_t n = 0;
   if (GetDictionary()->HasKey(Name::DR)) {
@@ -304,7 +304,7 @@ Form::SetFont(const CallbackInfo& info, const Napi::Value& value)
     auto item = arr.Get(i);
     if (item.As<Object>().InstanceOf(Font::constructor.Value())) {
       auto font = Font::Unwrap(item.As<Object>());
-      AddFont(font->GetFont());
+      AddFont(&font->GetFont());
     }
   }
 }

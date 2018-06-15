@@ -70,19 +70,24 @@ BaseDocument::BaseDocument(const Napi::CallbackInfo& info)
         encrypt = const_cast<PdfEncrypt*>(nEncObj->encrypt);
       }
     }
-    document = make_shared<PdfStreamedDocument>(
-      output.c_str(), version, encrypt, writeMode);
+    base = new PdfStreamedDocument(output.c_str(), version, encrypt, writeMode);
     cout << "Creating new StreamedDocument at " << output << endl;
   } else {
-    document = make_shared<PdfMemDocument>();
+    base = new PdfMemDocument();
     cout << "Creating new MemDocument" << endl;
   }
+}
+
+BaseDocument::~BaseDocument()
+{
+  cout << "Clean up Base Document" << endl;
+  delete base;
 }
 
 Napi::Value
 BaseDocument::GetPageCount(const CallbackInfo& info)
 {
-  int pages = document->GetPageCount();
+  int pages = base->GetPageCount();
   return Number::New(info.Env(), pages);
 }
 Napi::Value
@@ -90,19 +95,19 @@ BaseDocument::GetPage(const CallbackInfo& info)
 {
   int n = info[0].As<Number>();
   return Page::constructor.New(
-    { External<PdfPage>::New(info.Env(), document->GetPage(n)) });
+    { External<PdfPage>::New(info.Env(), base->GetPage(n)) });
 }
 
 void
 BaseDocument::SetHideMenubar(const Napi::CallbackInfo&)
 {
-  document->SetHideMenubar();
+  base->SetHideMenubar();
 }
 
 Napi::Value
 BaseDocument::GetPageMode(const CallbackInfo& info)
 {
-  return Number::New(info.Env(), static_cast<int>(document->GetPageMode()));
+  return Number::New(info.Env(), static_cast<int>(base->GetPageMode()));
 }
 
 void
@@ -110,7 +115,7 @@ BaseDocument::SetPageMode(const CallbackInfo&, const Napi::Value& value)
 {
   int flag = value.As<Number>();
   auto mode = static_cast<EPdfPageMode>(flag);
-  document->SetPageMode(mode);
+  base->SetPageMode(mode);
 }
 
 void
@@ -118,76 +123,76 @@ BaseDocument::SetPageLayout(const CallbackInfo&, const Napi::Value& value)
 {
   int flag = value.As<Number>();
   auto mode = static_cast<EPdfPageLayout>(flag);
-  document->SetPageLayout(mode);
+  base->SetPageLayout(mode);
 }
 
 void
 BaseDocument::SetUseFullScreen(const CallbackInfo&)
 {
-  document->SetUseFullScreen();
+  base->SetUseFullScreen();
 }
 
 void
 BaseDocument::SetHideToolbar(const CallbackInfo&)
 {
-  document->SetHideMenubar();
+  base->SetHideMenubar();
 }
 
 void
 BaseDocument::SetHideWindowUI(const CallbackInfo&)
 {
-  document->SetHideWindowUI();
+  base->SetHideWindowUI();
 }
 
 void
 BaseDocument::SetFitWindow(const CallbackInfo&)
 {
-  document->SetFitWindow();
+  base->SetFitWindow();
 }
 
 void
 BaseDocument::SetCenterWindow(const CallbackInfo&)
 {
-  document->SetCenterWindow();
+  base->SetCenterWindow();
 }
 
 void
 BaseDocument::SetDisplayDocTitle(const CallbackInfo&)
 {
-  document->SetDisplayDocTitle();
+  base->SetDisplayDocTitle();
 }
 
 void
 BaseDocument::SetPrintingScale(const CallbackInfo&, const Napi::Value& value)
 {
   PdfName scale(value.As<String>().Utf8Value());
-  document->SetPrintScaling(scale);
+  base->SetPrintScaling(scale);
 }
 
 void
 BaseDocument::SetBaseURI(const CallbackInfo&, const Napi::Value& value)
 {
-  document->SetBaseURI(value.As<String>().Utf8Value());
+  base->SetBaseURI(value.As<String>().Utf8Value());
 }
 
 void
 BaseDocument::SetLanguage(const CallbackInfo&, const Napi::Value& value)
 {
-  document->SetLanguage(value.As<String>().Utf8Value());
+  base->SetLanguage(value.As<String>().Utf8Value());
 }
 
 void
 BaseDocument::AttachFile(const CallbackInfo& info)
 {
   auto value = info[0].As<String>().Utf8Value();
-  PdfFileSpec attachment(value.c_str(), true, document.get());
-  document->AttachFile(attachment);
+  PdfFileSpec attachment(value.c_str(), true, base);
+  base->AttachFile(attachment);
 }
 
 Napi::Value
 BaseDocument::GetVersion(const CallbackInfo& info)
 {
-  EPdfVersion versionE = document->GetPdfVersion();
+  EPdfVersion versionE = base->GetPdfVersion();
   double v = 0.0;
   switch (versionE) {
     case ePdfVersion_1_1:
@@ -225,14 +230,14 @@ BaseDocument::GetVersion(const CallbackInfo& info)
 Napi::Value
 BaseDocument::IsLinearized(const CallbackInfo& info)
 {
-  return Boolean::New(info.Env(), document->IsLinearized());
+  return Boolean::New(info.Env(), base->IsLinearized());
 }
 
 Napi::Value
 BaseDocument::GetWriteMode(const CallbackInfo& info)
 {
   string writeMode;
-  switch (document->GetWriteMode()) {
+  switch (base->GetWriteMode()) {
     case ePdfWriteMode_Clean: {
       writeMode = "Clean";
       break;
@@ -251,7 +256,7 @@ BaseDocument::GetObjects(const CallbackInfo& info)
   try {
     auto js = Array::New(info.Env());
     uint32_t count = 0;
-    for (auto item : *document->GetObjects()) {
+    for (auto item : *base->GetObjects()) {
       if (item->IsReference()) {
         item = item->GetOwner()->GetObject(item->GetReference());
       }
@@ -272,7 +277,7 @@ Napi::Value
 BaseDocument::GetObject(const CallbackInfo& info)
 {
   auto ref = Obj::Unwrap(info[0].As<Object>())->GetObject();
-  PdfObject* target = document->GetObjects()->GetObject(ref.GetReference());
+  PdfObject* target = base->GetObjects()->GetObject(ref.GetReference());
   return Obj::constructor.New({ External<PdfObject>::New(info.Env(), target) });
 }
 
@@ -282,21 +287,21 @@ BaseDocument::IsAllowed(const CallbackInfo& info)
   string allowed = info[0].As<String>().Utf8Value();
   bool is;
   if (allowed == "Print") {
-    is = document->IsPrintAllowed();
+    is = base->IsPrintAllowed();
   } else if (allowed == "Edit") {
-    is = document->IsEditAllowed();
+    is = base->IsEditAllowed();
   } else if (allowed == "Copy") {
-    is = document->IsCopyAllowed();
+    is = base->IsCopyAllowed();
   } else if (allowed == "EditNotes") {
-    is = document->IsEditNotesAllowed();
+    is = base->IsEditNotesAllowed();
   } else if (allowed == "FillAndSign") {
-    is = document->IsFillAndSignAllowed();
+    is = base->IsFillAndSignAllowed();
   } else if (allowed == "Accessible") {
-    is = document->IsAccessibilityAllowed();
+    is = base->IsAccessibilityAllowed();
   } else if (allowed == "DocAssembly") {
-    is = document->IsDocAssemblyAllowed();
+    is = base->IsDocAssemblyAllowed();
   } else if (allowed == "HighPrint") {
-    is = document->IsHighPrintAllowed();
+    is = base->IsHighPrintAllowed();
   } else {
     throw Napi::Error::New(
       info.Env(),
@@ -355,14 +360,14 @@ BaseDocument::CreateFont(const CallbackInfo& info)
   }
   try {
     PdfFont* font =
-      document->CreateFont(fontName.c_str(),
-                           bold,
-                           italic,
-                           false,
-                           encoding,
-                           PdfFontCache::eFontCreationFlags_AutoSelectBase14,
-                           embed,
-                           filename.empty() ? nullptr : filename.c_str());
+      base->CreateFont(fontName.c_str(),
+                       bold,
+                       italic,
+                       false,
+                       encoding,
+                       PdfFontCache::eFontCreationFlags_AutoSelectBase14,
+                       embed,
+                       filename.empty() ? nullptr : filename.c_str());
     return Font::constructor.New({ External<PdfFont>::New(info.Env(), font) });
   } catch (PdfError& err) {
     ErrorHandler(err, info);
@@ -383,24 +388,23 @@ BaseDocument::InsertExistingPage(const CallbackInfo& info)
   if (atN < 0) {
     cout << "Appending page to the beginning of this document" << endl;
   }
-  if (document->GetPageCount() + 1 < atN) {
+  if (base->GetPageCount() + 1 < atN) {
     RangeError::New(info.Env(), "at index out of range")
       .ThrowAsJavaScriptException();
     return Value();
   }
-  if (memPageN < 0 || memPageN > memDoc->GetMemDocument()->GetPageCount() - 1) {
+  if (memPageN < 0 || memPageN > memDoc->base->GetPageCount() - 1) {
     RangeError::New(info.Env(), "parameter document page range exception")
       .ThrowAsJavaScriptException();
     return Value();
   }
-  document->InsertExistingPageAt(
-    *memDoc->GetMemDocument().get(), memPageN, atN);
-  return Number::New(info.Env(), document->GetPageCount());
+  base->InsertExistingPageAt(memDoc->GetDocument(), memPageN, atN);
+  return Number::New(info.Env(), base->GetPageCount());
 }
 Napi::Value
 BaseDocument::GetInfo(const CallbackInfo& info)
 {
-  PdfInfo* i = document->GetInfo();
+  PdfInfo* i = base->GetInfo();
   auto infoObj = Object::New(info.Env());
   infoObj.Set("author", i->GetAuthor().GetStringUtf8());
   infoObj.Set("createdAt", i->GetCreationDate().GetTime());
@@ -419,7 +423,7 @@ BaseDocument::GetInfo(const CallbackInfo& info)
 Napi::Value
 BaseDocument::GetOutlines(const CallbackInfo& info)
 {
-  auto outline = document->GetOutlines(info[0].As<Boolean>())->GetObject();
+  auto outline = base->GetOutlines(info[0].As<Boolean>())->GetObject();
   return Obj::constructor.New(
     { External<PdfObject>::New(info.Env(), outline) });
 }
@@ -427,13 +431,13 @@ Napi::Value
 BaseDocument::GetNamesTree(const CallbackInfo& info)
 {
   return Obj::constructor.New({ External<PdfObject>::New(
-    info.Env(), document->GetNamesTree(info[0].As<Boolean>())->GetObject()) });
+    info.Env(), base->GetNamesTree(info[0].As<Boolean>())->GetObject()) });
 }
 Napi::Value
 BaseDocument::CreatePage(const CallbackInfo& info)
 {
   auto r = Rect::Unwrap(info[0].As<Object>())->GetRect();
-  auto page = document->CreatePage(*r);
+  auto page = base->CreatePage(r);
   return Page::constructor.New({ External<PdfPage>::New(info.Env(), page) });
 }
 Napi::Value
@@ -442,20 +446,20 @@ BaseDocument::CreatePages(const Napi::CallbackInfo& info)
   auto coll = info[0].As<Array>();
   vector<PdfRect> rects;
   for (int n = coll.Length(); n >= 0; n++) {
-    PdfRect r = *Rect::Unwrap(coll.Get(n).As<Object>())->GetRect();
+    PdfRect r = Rect::Unwrap(coll.Get(n).As<Object>())->GetRect();
     rects.push_back(r);
   }
-  document->CreatePages(rects);
-  return Number::New(info.Env(), document->GetPageCount());
+  base->CreatePages(rects);
+  return Number::New(info.Env(), base->GetPageCount());
 }
 Napi::Value
 BaseDocument::InsertPage(const Napi::CallbackInfo& info)
 {
   auto rect = Rect::Unwrap(info[0].As<Object>())->GetRect();
   int index = info[1].As<Number>();
-  document->InsertPage(*rect, index);
+  base->InsertPage(rect, index);
   return Page::constructor.New(
-    { External<PdfPage>::New(info.Env(), document->GetPage(index)) });
+    { External<PdfPage>::New(info.Env(), base->GetPage(index)) });
 }
 Napi::Value
 BaseDocument::Append(const Napi::CallbackInfo& info)
@@ -476,7 +480,7 @@ BaseDocument::Append(const Napi::CallbackInfo& info)
     }
   }
   try {
-    document->Append(mergedDoc);
+    base->Append(mergedDoc);
   } catch (PdfError& err) {
     ErrorHandler(err, info);
   }
@@ -492,22 +496,22 @@ Napi::Value
 BaseDocument::GetAttachment(const CallbackInfo& info)
 {
   return FileSpec::constructor.New({ External<PdfFileSpec>::New(
-    info.Env(), document->GetAttachment(info[0].As<String>().Utf8Value())) });
+    info.Env(), base->GetAttachment(info[0].As<String>().Utf8Value())) });
 }
 void
 BaseDocument::AddNamedDestination(const Napi::CallbackInfo& info)
 {
-  PdfPage* page = Page::Unwrap(info[0].As<Object>())->page;
+  PdfPage page = Page::Unwrap(info[0].As<Object>())->page;
   EPdfDestinationFit fit =
     static_cast<EPdfDestinationFit>(info[1].As<Number>().Int32Value());
   string name = info[2].As<String>().Utf8Value();
-  PdfDestination destination(page, fit);
-  document->AddNamedDestination(destination, name);
+  PdfDestination destination(&page, fit);
+  base->AddNamedDestination(destination, name);
 }
 Napi::Value
 BaseDocument::GetForm(const CallbackInfo& info)
 {
-  if (!document->GetAcroForm()) {
+  if (!base->GetAcroForm()) {
     return info.Env().Null();
   }
   Napi::Object instance =

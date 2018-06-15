@@ -1,8 +1,8 @@
-import {join} from 'path'
-import {Suite, Options} from 'benchmark'
-import {} from 'microtime'
-import {npdf} from '../../dist'
-import {readFileSync} from "fs";
+import { join } from 'path'
+import { Suite, Options } from 'benchmark'
+import { } from 'microtime'
+import { npdf } from '../../dist'
+import { readFileSync } from "fs";
 
 const opts: Options = {
     defer: true,
@@ -11,7 +11,7 @@ const opts: Options = {
     onError: console.error,
     onStart: (target: any) => console.log('Starting benchmark: ', target.target.name)
 }
-const testDoc = join(__dirname, '../../test-documents/test.pdf')
+const testDoc = join(__dirname, '../test-documents/test.pdf')
 const testDocData = readFileSync(testDoc)
 const reader = new Suite('reader')
 /**
@@ -29,7 +29,7 @@ reader.add('Document load (from file) and iterate body', Object.assign({
                     if (!work.hasOwnProperty(o.type)) work[o.type] = 0
                     work[o.type]++
                 })
-                global.gc()
+                console.log(`Memory used: ${JSON.stringify(process.memoryUsage(), null, 2)}`)
                 defer.resolve()
             }
         })
@@ -38,7 +38,7 @@ reader.add('Document load (from file) and iterate body', Object.assign({
     .add('Document load (from buffer) and iterate body', Object.assign({
         fn: (defer: PromiseConstructor) => {
             const doc = new npdf.Document()
-            doc.load(testDocData, {fromBuffer: true}, err => {
+            doc.load(testDocData, { fromBuffer: true }, err => {
                 if (err) defer.reject(err)
                 else {
                     let work: { [key: string]: number } = {}
@@ -46,7 +46,7 @@ reader.add('Document load (from file) and iterate body', Object.assign({
                         if (!work.hasOwnProperty(o.type)) work[o.type] = 0
                         work[o.type]++
                     })
-                    global.gc()
+                    console.log(`Memory used: ${JSON.stringify(process.memoryUsage(), null, 2)}`)
                     defer.resolve()
                 }
             })
@@ -55,4 +55,4 @@ reader.add('Document load (from file) and iterate body', Object.assign({
     .on('complete', () => {
         reader.forEach((t: any) => console.log(t.toString()))
     })
-    .run({async: false})
+    .run({ async: false })

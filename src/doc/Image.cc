@@ -48,15 +48,15 @@ Image::Image(const CallbackInfo& info)
   }
   auto iObj = info[0].As<Object>();
   if (iObj.InstanceOf(Document::constructor.Value())) {
-    doc = Document::Unwrap(iObj)->GetBaseDocument();
+    doc = Document::Unwrap(iObj)->base;
   } else if (iObj.InstanceOf(StreamDocument::constructor.Value())) {
-    doc = StreamDocument::Unwrap(iObj)->GetBaseDocument();
+    doc = StreamDocument::Unwrap(iObj)->base;
   }
   int format = 0;
   if (info.Length() >= 3 && info[2].IsString()) {
     format = info[2].As<Number>();
   }
-  img = make_unique<PdfImage>(doc.get());
+  img = make_unique<PdfImage>(doc);
   string file;
   unsigned char* buffer;
   size_t bufLen = 0;
@@ -100,6 +100,12 @@ Image::Image(const CallbackInfo& info)
   throw Napi::Error::New(
     info.Env(), "Please rebuild PoDoFo with libpng libjpeg and libtiff.");
 #endif
+}
+
+Image::~Image()
+{
+  HandleScope scope(Env());
+  doc = nullptr;
 }
 void
 Image::Initialize(Napi::Env& env, Napi::Object& target)

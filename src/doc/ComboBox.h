@@ -38,11 +38,8 @@ public:
   void SetEditable(const Napi::CallbackInfo&, const Napi::Value&);
   Napi::Value GetEditable(const Napi::CallbackInfo&);
 
-  PoDoFo::PdfComboBox GetComboBox()
-  {
-    return PoDoFo::PdfComboBox(*field.get());
-  }
-  std::shared_ptr<PoDoFo::PdfField> field;
+  PoDoFo::PdfComboBox GetComboBox() { return PoDoFo::PdfComboBox(field); }
+  PoDoFo::PdfField& field;
 };
 }
 

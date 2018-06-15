@@ -42,12 +42,11 @@ ExtGState::ExtGState(const Napi::CallbackInfo& info)
   auto o = info[0].As<Object>();
   if (o.InstanceOf(Document::constructor.Value())) {
     auto d = Document::Unwrap(o);
-    self = make_unique<PdfExtGState>(d->GetMemDocument().get());
-  } else if(o.InstanceOf(StreamDocument::constructor.Value())) {
+    self = make_unique<PdfExtGState>(&d->GetDocument());
+  } else if (o.InstanceOf(StreamDocument::constructor.Value())) {
     auto d = StreamDocument::Unwrap(o);
-    self = make_unique<PdfExtGState>(d->GetBaseDocument().get());
-  }
-  else {
+    self = make_unique<PdfExtGState>(d->base);
+  } else {
     Error::New(
       info.Env(),
       "Requires an instance of StreamDocument or Document for construction")

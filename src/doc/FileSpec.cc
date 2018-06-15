@@ -61,9 +61,9 @@ FileSpec::FileSpec(const CallbackInfo& info)
     auto docObj = info[1].As<Object>();
     PdfDocument* doc;
     if (docObj.InstanceOf(Document::constructor.Value()))
-      doc = Document::Unwrap(docObj)->GetBaseDocument().get();
+      doc = Document::Unwrap(docObj)->base;
     else if (docObj.InstanceOf(StreamDocument::constructor.Value()))
-      doc = StreamDocument::Unwrap(docObj)->GetBaseDocument().get();
+      doc = StreamDocument::Unwrap(docObj)->base;
     else {
       TypeError::New(
         info.Env(),

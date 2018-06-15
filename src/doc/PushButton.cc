@@ -16,10 +16,8 @@ PushButton::PushButton(const Napi::CallbackInfo& info)
   : ObjectWrap<PushButton>(info)
   , Field(ePdfField_PushButton, info)
   , Button(Field::GetField())
-{
-  field = Field::GetField();
-  pushBtn = make_unique<PdfPushButton>(*field.get());
-}
+  , field(Field::GetField())
+{}
 void
 PushButton::Initialize(Napi::Env& env, Napi::Object& target)
 {
@@ -64,24 +62,26 @@ PushButton::Initialize(Napi::Env& env, Napi::Object& target)
 Napi::Value
 PushButton::GetRolloverCaption(const Napi::CallbackInfo& info)
 {
-  return String::New(info.Env(), pushBtn->GetRolloverCaption().GetStringUtf8());
+  return String::New(info.Env(),
+                     GetPushButton().GetRolloverCaption().GetStringUtf8());
 }
 Napi::Value
 PushButton::GetAlternateCaption(const Napi::CallbackInfo& info)
 {
   return String::New(info.Env(),
-                     pushBtn->GetAlternateCaption().GetStringUtf8());
+                     GetPushButton().GetAlternateCaption().GetStringUtf8());
 }
 void
 PushButton::SetRolloverCaption(const Napi::CallbackInfo&,
                                const Napi::Value& value)
 {
-  pushBtn->SetCaption(PdfString(value.As<String>().Utf8Value()));
+  GetPushButton().SetCaption(PdfString(value.As<String>().Utf8Value()));
 }
 void
 PushButton::SetAlternateCaption(const Napi::CallbackInfo&,
                                 const Napi::Value& value)
 {
-  pushBtn->SetAlternateCaption(PdfString(value.As<String>().Utf8Value()));
+  GetPushButton().SetAlternateCaption(
+    PdfString(value.As<String>().Utf8Value()));
 }
 }

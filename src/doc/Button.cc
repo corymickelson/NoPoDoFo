@@ -31,9 +31,14 @@ using std::make_unique;
 using std::shared_ptr;
 
 namespace NoPoDoFo {
-Button::Button(shared_ptr<PdfField> field)
+Button::Button(PdfField& field)
 {
-  button = make_shared<PdfButton>(*field.get());
+  button = new PdfButton(field);
+}
+
+Button::~Button()
+{
+  delete button;
 }
 Napi::Value
 Button::GetCaption(const Napi::CallbackInfo& info)

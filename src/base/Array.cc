@@ -20,6 +20,7 @@
 #include "Array.h"
 #include "../ErrorHandler.h"
 #include "../ValidateArguments.h"
+#include "../doc/Document.h"
 #include "Obj.h"
 
 using namespace Napi;

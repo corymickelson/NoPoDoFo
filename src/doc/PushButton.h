@@ -25,8 +25,8 @@ public:
   Napi::Value GetAlternateCaption(const Napi::CallbackInfo&);
   void SetRolloverCaption(const Napi::CallbackInfo&, const Napi::Value&);
   void SetAlternateCaption(const Napi::CallbackInfo&, const Napi::Value&);
-  std::shared_ptr<PoDoFo::PdfField> field;
-  std::unique_ptr<PoDoFo::PdfPushButton> pushBtn;
+  PoDoFo::PdfPushButton GetPushButton() { return PoDoFo::PdfPushButton(field); }
+  PoDoFo::PdfField& field;
 };
 }
 #endif // NPDF_PUSHBUTTON_H

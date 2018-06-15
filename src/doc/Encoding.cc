@@ -72,7 +72,7 @@ Encoding::ConvertToUnicode(const Napi::CallbackInfo& info)
   string content = info[0].As<String>().Utf8Value();
   Font* font = Font::Unwrap(info[1].As<Object>());
   PdfString buffer =
-    encoding->ConvertToUnicode(PdfString(content), font->GetFont());
+    encoding->ConvertToUnicode(PdfString(content), &font->GetFont());
   return String::New(info.Env(), buffer.GetStringUtf8());
 }
 Napi::Value
@@ -81,7 +81,7 @@ Encoding::ConvertToEncoding(const Napi::CallbackInfo& info)
   string content = info[0].As<String>().Utf8Value();
   Font* font = Font::Unwrap(info[1].As<Object>());
   PdfRefCountedBuffer buffer =
-    encoding->ConvertToEncoding(PdfString(content), font->GetFont());
+    encoding->ConvertToEncoding(PdfString(content), &font->GetFont());
   return String::New(info.Env(), buffer.GetBuffer());
 }
 Napi::Value

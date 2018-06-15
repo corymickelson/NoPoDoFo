@@ -43,17 +43,8 @@ FunctionReference Page::constructor; // NOLINT
 
 Page::Page(const CallbackInfo& info)
   : ObjectWrap(info)
-  , page(info[0].As<External<PdfPage>>().Data())
-{
-  // The page is managed by the document. Do not pass a page pointer to this
-  // class without first adding it to the document
-}
-
-Page::~Page()
-{
-  HandleScope scope(Env());
-  page = nullptr;
-}
+  , page(*info[0].As<External<PdfPage>>().Data())
+{}
 
 void
 Page::Initialize(Napi::Env& env, Napi::Object& target)
@@ -88,19 +79,19 @@ Page::Initialize(Napi::Env& env, Napi::Object& target)
 Napi::Value
 Page::GetRotation(const CallbackInfo& info)
 {
-  return Number::New(info.Env(), page->GetRotation());
+  return Number::New(info.Env(), page.GetRotation());
 }
 Napi::Value
 Page::GetNumFields(const CallbackInfo& info)
 {
-  return Number::New(info.Env(), page->GetNumFields());
+  return Number::New(info.Env(), page.GetNumFields());
 }
 
 Napi::Value
 Page::GetField(const CallbackInfo& info)
 {
   int index = info[0].As<Number>();
-  if (page->GetNumFields() < index || index < 0) {
+  if (page.GetNumFields() < index || index < 0) {
     RangeError::New(info.Env(), "index out of range")
       .ThrowAsJavaScriptException();
     return info.Env().Undefined();
@@ -110,7 +101,7 @@ Page::GetField(const CallbackInfo& info)
 Napi::Value
 Page::GetField(const Napi::Env& env, int index)
 {
-  auto field = page->GetField(index);
+  auto field = page.GetField(index);
   EPdfField t = field.GetType();
   switch (t) {
     case ePdfField_PushButton:
@@ -145,7 +136,7 @@ Page::GetFields(const CallbackInfo& info)
 {
   auto js = Array::New(info.Env());
   uint32_t n = 0;
-  for (auto i = 0; i < page->GetNumFields(); ++i) {
+  for (auto i = 0; i < page.GetNumFields(); ++i) {
     js.Set(n, GetField(info.Env(), i));
     ++n;
   }
@@ -174,7 +165,7 @@ Page::SetRotation(const CallbackInfo& info, const Napi::Value& value)
     throw Napi::Error::New(info.Env(),
                            "Rotate values must be a value of: 0, 90, 180, 270");
   }
-  page->SetRotation(rotate);
+  page.SetRotation(rotate);
 }
 
 Napi::Value
@@ -182,8 +173,8 @@ Page::GetFieldIndex(const CallbackInfo& info)
 {
   string key = info[0].As<String>().Utf8Value();
   int index = -1;
-  for (int i = 0; i < page->GetNumFields(); ++i) {
-    PdfField field = page->GetField(i);
+  for (int i = 0; i < page.GetNumFields(); ++i) {
+    PdfField field = page.GetField(i);
     string name = field.GetFieldName().GetStringUtf8();
     string alternate = field.GetAlternateName().GetStringUtf8();
     string mapping = field.GetMappingName().GetStringUtf8();
@@ -203,7 +194,7 @@ Page::SetPageWidth(const CallbackInfo& info, const Napi::Value& value)
   }
   try {
     int width = value.As<Number>();
-    page->SetPageWidth(width);
+    page.SetPageWidth(width);
   } catch (PdfError& err) {
     ErrorHandler(err, info);
   }
@@ -217,7 +208,7 @@ Page::SetPageHeight(const CallbackInfo& info, const Napi::Value& value)
   }
   try {
     int height = value.As<Number>();
-    page->SetPageWidth(height);
+    page.SetPageWidth(height);
   } catch (PdfError& err) {
     ErrorHandler(err, info);
   }
@@ -226,19 +217,19 @@ Page::SetPageHeight(const CallbackInfo& info, const Napi::Value& value)
 Napi::Value
 Page::GetPageWidth(const CallbackInfo& info)
 {
-  return Napi::Number::New(info.Env(), page->GetPageSize().GetWidth());
+  return Napi::Number::New(info.Env(), page.GetPageSize().GetWidth());
 }
 
 Napi::Value
 Page::GetPageHeight(const CallbackInfo& info)
 {
-  return Napi::Number::New(info.Env(), page->GetPageSize().GetHeight());
+  return Napi::Number::New(info.Env(), page.GetPageSize().GetHeight());
 }
 
 Napi::Value
 Page::GetTrimBox(const CallbackInfo& info)
 {
-  PdfRect trimBox = page->GetTrimBox();
+  PdfRect trimBox = page.GetTrimBox();
   return ExtractAndApplyRectValues(info, trimBox);
 }
 
@@ -251,7 +242,7 @@ Page::SetTrimBox(const CallbackInfo& info, const Napi::Value& value)
   try {
     Rect* rect = Rect::Unwrap(value.As<Object>());
     auto pdfRect = rect->GetRect();
-    page->SetTrimBox(*pdfRect);
+    page.SetTrimBox(pdfRect);
 
   } catch (PdfError& err) {
     ErrorHandler(err, info);
@@ -261,7 +252,7 @@ Page::SetTrimBox(const CallbackInfo& info, const Napi::Value& value)
 Napi::Value
 Page::GetPageNumber(const CallbackInfo& info)
 {
-  return Napi::Number::New(info.Env(), page->GetPageNumber());
+  return Napi::Number::New(info.Env(), page.GetPageNumber());
 }
 
 Napi::Value
@@ -269,9 +260,9 @@ Page::GetContents(const CallbackInfo& info)
 {
   EscapableHandleScope scope(info.Env());
   // bool forAppending = info[0].As<Boolean>();
-  PdfObject* contentsObj = page->GetContents();
-  // forAppending ? page->GetContentsForAppending() :
-  // page->GetContents();
+  PdfObject* contentsObj = page.GetContents();
+  // forAppending ? page.GetContentsForAppending() :
+  // page.GetContents();
   auto objPtr = External<PdfObject>::New(info.Env(), contentsObj);
   auto instance = Obj::constructor.New({ objPtr });
   return instance;
@@ -281,7 +272,7 @@ Napi::Value
 Page::GetResources(const CallbackInfo& info)
 {
   EscapableHandleScope scope(info.Env());
-  PdfObject* resources = page->GetResources();
+  PdfObject* resources = page.GetResources();
   auto objPtr = External<PdfObject>::New(info.Env(), resources);
   auto instance = Obj::constructor.New({ objPtr });
   return instance;
@@ -290,28 +281,28 @@ Page::GetResources(const CallbackInfo& info)
 Napi::Value
 Page::GetMediaBox(const CallbackInfo& info)
 {
-  PdfRect mediaBox = page->GetMediaBox();
+  PdfRect mediaBox = page.GetMediaBox();
   return ExtractAndApplyRectValues(info, mediaBox);
 }
 
 Napi::Value
 Page::GetBleedBox(const CallbackInfo& info)
 {
-  PdfRect bleedBox = page->GetBleedBox();
+  PdfRect bleedBox = page.GetBleedBox();
   return ExtractAndApplyRectValues(info, bleedBox);
 }
 
 Napi::Value
 Page::GetArtBox(const CallbackInfo& info)
 {
-  PdfRect artBox = page->GetArtBox();
+  PdfRect artBox = page.GetArtBox();
   return ExtractAndApplyRectValues(info, artBox);
 }
 
 Napi::Value
 Page::GetNumAnnots(const CallbackInfo& info)
 {
-  return Napi::Number::New(info.Env(), page->GetNumAnnots());
+  return Napi::Number::New(info.Env(), page.GetNumAnnots());
 }
 
 void
@@ -319,7 +310,7 @@ Page::DeleteAnnotation(const CallbackInfo& info)
 {
   int index = info[0].As<Number>();
   try {
-    page->DeleteAnnotation(index);
+    page.DeleteAnnotation(index);
   } catch (PdfError& err) {
     ErrorHandler(err, info);
   }
@@ -327,9 +318,8 @@ Page::DeleteAnnotation(const CallbackInfo& info)
 Napi::Value
 Page::GetAnnotation(const CallbackInfo& info)
 {
-  EscapableHandleScope scope(info.Env());
   int index = info[0].As<Number>();
-  auto ptr = page->GetAnnotation(index);
+  auto ptr = page.GetAnnotation(index);
   auto instance = External<PdfAnnotation>::New(info.Env(), ptr);
   return Annotation::constructor.New({ instance });
 }
@@ -341,7 +331,7 @@ Page::CreateAnnotation(const CallbackInfo& info)
   auto type = static_cast<EPdfAnnotation>(flag);
   auto obj = info[1].As<Object>();
   Rect* rect = Rect::Unwrap(obj);
-  PdfAnnotation* annot = page->CreateAnnotation(type, *rect->GetRect());
+  PdfAnnotation* annot = page.CreateAnnotation(type, rect->GetRect());
   auto instance = Annotation::constructor.New(
     { External<PdfAnnotation>::New(info.Env(), annot) });
   return instance;

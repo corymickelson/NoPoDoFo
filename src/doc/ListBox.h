@@ -37,10 +37,10 @@ public:
   static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env&, Napi::Object&);
 
-  PoDoFo::PdfListBox GetField() { return PoDoFo::PdfListBox(*field); }
+  PoDoFo::PdfListBox GetField() { return PoDoFo::PdfListBox(field); }
 
 private:
-  std::shared_ptr<PoDoFo::PdfField> field;
+  PoDoFo::PdfField& field;
 };
 }
 

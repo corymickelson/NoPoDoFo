@@ -27,7 +27,7 @@ namespace NoPoDoFo {
 class ListField
 {
 public:
-  explicit ListField(std::shared_ptr<PoDoFo::PdfField>);
+  explicit ListField(PoDoFo::PdfField&);
   void InsertItem(const Napi::CallbackInfo&);
   void RemoveItem(const Napi::CallbackInfo&);
   Napi::Value GetItem(const Napi::CallbackInfo&);
@@ -41,10 +41,10 @@ public:
   Napi::Value IsSorted(const Napi::CallbackInfo&);
   void SetMultiSelect(const Napi::CallbackInfo&, const Napi::Value&);
   Napi::Value IsMultiSelect(const Napi::CallbackInfo&);
-  PoDoFo::PdfListField GetListField() { return PoDoFo::PdfListField(*field); }
+  PoDoFo::PdfListField GetListField() { return PoDoFo::PdfListField(field); }
 
 private:
-  std::shared_ptr<PoDoFo::PdfField> field;
+  PoDoFo::PdfField& field;
 };
 }
 #endif

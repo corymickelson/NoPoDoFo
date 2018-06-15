@@ -137,6 +137,7 @@ export interface IPainter {
     drawLine(p1:NPDFPoint, p2:NPDFPoint): void
     drawText(point:NPDFPoint, text:string): void
     drawTextAligned(point:NPDFPoint, text:string, alignment:NPDFAlignment): void
+    drawMultiLineText(rect:IRect, value:string, alignment?:NPDFAlignment, vertical?:NPDFVerticalAlignment): void
     getMultiLineText(width:number, text:string, skipSpaces?:boolean):Array<string>
     bt(point:NPDFPoint): void
     et(): void

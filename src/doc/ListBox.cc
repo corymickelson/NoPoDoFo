@@ -35,9 +35,8 @@ ListBox::ListBox(const Napi::CallbackInfo& info)
   : ObjectWrap(info)
   , Field(ePdfField_ListBox, info)
   , ListField(Field::GetField())
-{
-  field = Field::GetField();
-}
+  , field(Field::GetField())
+{}
 
 void
 ListBox::Initialize(Napi::Env& env, Napi::Object& target)

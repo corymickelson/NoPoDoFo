@@ -73,7 +73,7 @@ Font::Initialize(Napi::Env& env, Napi::Object& target)
 Napi::Value
 Font::GetFontSize(const Napi::CallbackInfo& info)
 {
-  return Number::New(info.Env(), static_cast<double>(GetFont()->GetFontSize()));
+  return Number::New(info.Env(), static_cast<double>(GetFont().GetFontSize()));
 }
 void
 Font::SetFontSize(const Napi::CallbackInfo& info, const Napi::Value& value)
@@ -81,13 +81,12 @@ Font::SetFontSize(const Napi::CallbackInfo& info, const Napi::Value& value)
   if (!value.IsNumber()) {
     throw Error::New(info.Env(), "font size must be number");
   }
-  GetFont()->SetFontSize(value.As<Number>().FloatValue());
+  GetFont().SetFontSize(value.As<Number>().FloatValue());
 }
 Napi::Value
 Font::GetFontScale(const Napi::CallbackInfo& info)
 {
-  return Number::New(info.Env(),
-                     static_cast<double>(GetFont()->GetFontScale()));
+  return Number::New(info.Env(), static_cast<double>(GetFont().GetFontScale()));
 }
 void
 Font::SetFontScale(const Napi::CallbackInfo& info, const Napi::Value& value)
@@ -95,13 +94,13 @@ Font::SetFontScale(const Napi::CallbackInfo& info, const Napi::Value& value)
   if (!value.IsNumber()) {
     throw Error::New(info.Env(), "scale must be a number");
   }
-  GetFont()->SetFontScale(value.As<Number>().FloatValue());
+  GetFont().SetFontScale(value.As<Number>().FloatValue());
 }
 Napi::Value
 Font::GetFontCharSpace(const Napi::CallbackInfo& info)
 {
   return Number::New(info.Env(),
-                     static_cast<double>(GetFont()->GetFontCharSpace()));
+                     static_cast<double>(GetFont().GetFontCharSpace()));
 }
 void
 Font::SetFontCharSpace(const Napi::CallbackInfo& info, const Napi::Value& value)
@@ -109,13 +108,12 @@ Font::SetFontCharSpace(const Napi::CallbackInfo& info, const Napi::Value& value)
   if (!value.IsNumber()) {
     throw Error::New(info.Env(), "char space must be a number");
   }
-  GetFont()->SetFontCharSpace(value.As<Number>().FloatValue());
+  GetFont().SetFontCharSpace(value.As<Number>().FloatValue());
 }
 Napi::Value
 Font::GetWordSpace(const Napi::CallbackInfo& info)
 {
-  return Number::New(info.Env(),
-                     static_cast<double>(GetFont()->GetWordSpace()));
+  return Number::New(info.Env(), static_cast<double>(GetFont().GetWordSpace()));
 }
 void
 Font::SetWordSpace(const Napi::CallbackInfo& info, const Napi::Value& value)
@@ -123,12 +121,12 @@ Font::SetWordSpace(const Napi::CallbackInfo& info, const Napi::Value& value)
   if (!value.IsNumber()) {
     throw Error::New(info.Env(), "word space must be a number");
   }
-  GetFont()->SetWordSpace(value.As<Number>().FloatValue());
+  GetFont().SetWordSpace(value.As<Number>().FloatValue());
 }
 Napi::Value
 Font::IsUnderlined(const Napi::CallbackInfo& info)
 {
-  return Boolean::New(info.Env(), GetFont()->IsUnderlined());
+  return Boolean::New(info.Env(), GetFont().IsUnderlined());
 }
 void
 Font::SetUnderline(const Napi::CallbackInfo& info, const Napi::Value& value)
@@ -136,12 +134,12 @@ Font::SetUnderline(const Napi::CallbackInfo& info, const Napi::Value& value)
   if (!value.IsBoolean()) {
     throw Error::New(info.Env(), "underlined must be of type boolean");
   }
-  GetFont()->SetUnderlined(value.As<Boolean>());
+  GetFont().SetUnderlined(value.As<Boolean>());
 }
 Napi::Value
 Font::IsStrikeOut(const Napi::CallbackInfo& info)
 {
-  return Boolean::New(info.Env(), GetFont()->IsStrikeOut());
+  return Boolean::New(info.Env(), GetFont().IsStrikeOut());
 }
 void
 Font::SetStrikeOut(const Napi::CallbackInfo& info, const Napi::Value& value)
@@ -150,17 +148,17 @@ Font::SetStrikeOut(const Napi::CallbackInfo& info, const Napi::Value& value)
     throw Error::New(info.Env(), "strike out must be of type boolean");
   }
 
-  GetFont()->SetStrikeOut(value.As<Boolean>());
+  GetFont().SetStrikeOut(value.As<Boolean>());
 }
 Napi::Value
 Font::GetIdentifier(const Napi::CallbackInfo& info)
 {
-  return String::New(info.Env(), GetFont()->GetIdentifier().GetName());
+  return String::New(info.Env(), GetFont().GetIdentifier().GetName());
 }
 Napi::Value
 Font::GetEncoding(const Napi::CallbackInfo& info)
 {
-  const PdfEncoding* encoding = GetFont()->GetEncoding();
+  const PdfEncoding* encoding = GetFont().GetEncoding();
   return Encoding::constructor.New({ External<PdfEncoding>::New(
     info.Env(), const_cast<PdfEncoding*>(encoding)) });
 }
@@ -168,7 +166,7 @@ Napi::Value
 Font::GetFontMetric(const Napi::CallbackInfo& info)
 {
   auto obj = Object::New(info.Env());
-  const PdfFontMetrics* metrics = GetFont()->GetFontMetrics();
+  const PdfFontMetrics* metrics = GetFont().GetFontMetrics();
   obj.Set("lineSpacing", Number::New(info.Env(), metrics->GetLineSpacing()));
   obj.Set("underlineThickness",
           Number::New(info.Env(), metrics->GetUnderlineThickness()));
@@ -199,27 +197,26 @@ Font::GetFontMetric(const Napi::CallbackInfo& info)
 Napi::Value
 Font::IsBold(const Napi::CallbackInfo& info)
 {
-  return Boolean::New(info.Env(), GetFont()->IsBold());
+  return Boolean::New(info.Env(), GetFont().IsBold());
 }
 Napi::Value
 Font::IsItalic(const Napi::CallbackInfo& info)
 {
-  return Boolean::New(info.Env(), GetFont()->IsItalic());
+  return Boolean::New(info.Env(), GetFont().IsItalic());
 }
 
 Napi::Value
 Font::StringWidth(const CallbackInfo& info)
 {
   string text = info[0].As<String>().Utf8Value();
-  return Number::New(info.Env(),
-                     GetFont()->GetFontMetrics()->StringWidth(text));
+  return Number::New(info.Env(), GetFont().GetFontMetrics()->StringWidth(text));
 }
 
 Napi::Value
 Font::GetObject(const CallbackInfo& info)
 {
-  return Obj::constructor.New({ External<PdfObject>::New(
-    info.Env(), GetFont()->GetObject()) });
+  return Obj::constructor.New(
+    { External<PdfObject>::New(info.Env(), GetFont().GetObject()) });
 }
 void
 Font::WriteToStream(const Napi::CallbackInfo& info)
@@ -231,7 +228,7 @@ Font::WriteToStream(const Napi::CallbackInfo& info)
   }
   Stream* stream = Stream::Unwrap(streamWrap);
   try {
-    GetFont()->WriteStringToStream(PdfString(content), stream->GetStream());
+    GetFont().WriteStringToStream(PdfString(content), stream->GetStream());
   } catch (PdfError& err) {
     ErrorHandler(err, info);
   }
@@ -240,7 +237,7 @@ void
 Font::EmbedFont(const Napi::CallbackInfo& info)
 {
   try {
-    GetFont()->EmbedFont();
+    GetFont().EmbedFont();
   } catch (PdfError& err) {
     ErrorHandler(err, info);
   }

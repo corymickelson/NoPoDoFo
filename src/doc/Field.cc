@@ -47,21 +47,21 @@ Field::Field(EPdfField type, const CallbackInfo& info)
 {
   if (info[0].IsExternal()) {
     auto arg = info[0].As<External<PdfField>>().Data();
-    field = make_shared<PdfField>(*arg);
+    field = new PdfField(*arg);
   } else {
     auto arg1 = info[0].As<Object>();
     if (arg1.InstanceOf(Page::constructor.Value())) {
       auto page = Page::Unwrap(arg1);
       if (info[1].IsNumber()) {
         int index = info[1].As<Number>();
-        field = make_shared<PdfField>(page->page->GetField(index));
+        field = new PdfField(page->page.GetField(index));
       }
     } else if (arg1.InstanceOf(Annotation::constructor.Value())) {
       PdfAnnotation* annotation = &Annotation::Unwrap(arg1)->GetAnnotation();
       if (info[1].IsObject() &&
           info[1].As<Object>().InstanceOf(Form::constructor.Value())) {
         PdfAcroForm* form = Form::Unwrap(info[1].As<Object>())->GetForm();
-        field = make_shared<PdfField>(form->GetObject(), annotation);
+        field = new PdfField(form->GetObject(), annotation);
       }
     } else {
       TypeError::New(info.Env(), "Signature Mismatch")
@@ -69,15 +69,20 @@ Field::Field(EPdfField type, const CallbackInfo& info)
       return;
     }
   }
-  fieldName = field.get()->GetFieldName().GetStringUtf8();
+  fieldName = field->GetFieldName().GetStringUtf8();
   fieldType = TypeString();
+}
+
+Field::~Field()
+{
+  delete field;
 }
 
 string
 Field::TypeString()
 {
   string typeStr;
-  switch (field.get()->GetType()) {
+  switch (field->GetType()) {
     case PoDoFo::EPdfField::ePdfField_CheckBox:
       typeStr = "CheckBox";
       break;
@@ -120,67 +125,66 @@ Field::GetFieldName(const CallbackInfo& info)
 void
 Field::SetFieldName(const CallbackInfo&, const Napi::Value& value)
 {
-  field.get()->SetFieldName(value.As<String>().Utf8Value());
+  field->SetFieldName(value.As<String>().Utf8Value());
 }
 
 Napi::Value
 Field::GetAlternateName(const CallbackInfo& info)
 {
   return Napi::String::New(info.Env(),
-                           field.get()->GetAlternateName().GetStringUtf8());
+                           field->GetAlternateName().GetStringUtf8());
 }
 
 Napi::Value
 Field::GetMappingName(const CallbackInfo& info)
 {
-  return Napi::String::New(info.Env(),
-                           field.get()->GetMappingName().GetStringUtf8());
+  return Napi::String::New(info.Env(), field->GetMappingName().GetStringUtf8());
 }
 
 void
 Field::SetAlternateName(const CallbackInfo&, const Napi::Value& value)
 {
-  field.get()->SetAlternateName(value.As<String>().Utf8Value());
+  field->SetAlternateName(value.As<String>().Utf8Value());
 }
 
 void
 Field::SetMappingName(const CallbackInfo&, const Napi::Value& value)
 {
-  field.get()->SetMappingName(value.As<String>().Utf8Value());
+  field->SetMappingName(value.As<String>().Utf8Value());
 }
 
 void
 Field::SetRequired(const CallbackInfo&, const Napi::Value& value)
 {
-  field.get()->SetRequired(value.As<Boolean>());
+  field->SetRequired(value.As<Boolean>());
 }
 
 Napi::Value
 Field::IsRequired(const CallbackInfo& info)
 {
-  return Napi::Boolean::New(info.Env(), field.get()->IsRequired());
+  return Napi::Boolean::New(info.Env(), field->IsRequired());
 }
 
 Napi::Value
 Field::IsReadOnly(const Napi::CallbackInfo& info)
 {
-  return Boolean::New(info.Env(), field.get()->IsReadOnly());
+  return Boolean::New(info.Env(), field->IsReadOnly());
 }
 
 void
 Field::SetReadOnly(const Napi::CallbackInfo&, const Napi::Value& value)
 {
-  field.get()->SetReadOnly(value.As<Boolean>());
+  field->SetReadOnly(value.As<Boolean>());
 }
 void
 Field::SetExport(const Napi::CallbackInfo&, const Napi::Value& value)
 {
-  field.get()->SetExport(value.As<Boolean>());
+  field->SetExport(value.As<Boolean>());
 }
 Napi::Value
 Field::IsExport(const Napi::CallbackInfo& info)
 {
-  return Boolean::New(info.Env(), field.get()->IsExport());
+  return Boolean::New(info.Env(), field->IsExport());
 }
 /**
  * @note (color:Array<number>, transparent?: boolean)
@@ -193,18 +197,18 @@ Field::SetBackground(const Napi::CallbackInfo& info)
   auto js = info[0].As<Array>();
   if (js.Length() == 1) {
     double gray = js.Get(static_cast<uint32_t>(0)).As<Number>().DoubleValue();
-    field.get()->SetBackgroundColor(gray);
+    field->SetBackgroundColor(gray);
   } else if (js.Length() == 3) {
     double r = js.Get(static_cast<uint32_t>(0)).As<Number>().DoubleValue();
     double g = js.Get(static_cast<uint32_t>(1)).As<Number>().DoubleValue();
     double b = js.Get(static_cast<uint32_t>(2)).As<Number>().DoubleValue();
-    field.get()->SetBackgroundColor(r, g, b);
+    field->SetBackgroundColor(r, g, b);
   } else if (js.Length() == 4) {
     double c = js.Get(static_cast<uint32_t>(0)).As<Number>().DoubleValue();
     double m = js.Get(static_cast<uint32_t>(1)).As<Number>().DoubleValue();
     double y = js.Get(static_cast<uint32_t>(2)).As<Number>().DoubleValue();
     double k = js.Get(static_cast<uint32_t>(3)).As<Number>().DoubleValue();
-    field.get()->SetBackgroundColor(c, m, y, k);
+    field->SetBackgroundColor(c, m, y, k);
   } else {
     TypeError::New(info.Env(), "value must be [grayscale], [r,g,b], [c,m,y,k]")
       .ThrowAsJavaScriptException();
@@ -217,18 +221,18 @@ Field::SetBorder(const Napi::CallbackInfo& info)
   auto js = info[0].As<Array>();
   if (js.Length() == 1) {
     double gray = js.Get(static_cast<uint32_t>(0)).As<Number>().DoubleValue();
-    field.get()->SetBorderColor(gray);
+    field->SetBorderColor(gray);
   } else if (js.Length() == 3) {
     double r = js.Get(static_cast<uint32_t>(0)).As<Number>().DoubleValue();
     double g = js.Get(static_cast<uint32_t>(1)).As<Number>().DoubleValue();
     double b = js.Get(static_cast<uint32_t>(2)).As<Number>().DoubleValue();
-    field.get()->SetBorderColor(r, g, b);
+    field->SetBorderColor(r, g, b);
   } else if (js.Length() == 4) {
     double c = js.Get(static_cast<uint32_t>(0)).As<Number>().DoubleValue();
     double m = js.Get(static_cast<uint32_t>(1)).As<Number>().DoubleValue();
     double y = js.Get(static_cast<uint32_t>(2)).As<Number>().DoubleValue();
     double k = js.Get(static_cast<uint32_t>(3)).As<Number>().DoubleValue();
-    field.get()->SetBorderColor(c, m, y, k);
+    field->SetBorderColor(c, m, y, k);
   } else {
     TypeError::New(info.Env(), "value must be [grayscale], [r,g,b], [c,m,y,k]")
       .ThrowAsJavaScriptException();
@@ -240,7 +244,7 @@ Field::SetHighlightingMode(const Napi::CallbackInfo& info)
 {
   EPdfHighlightingMode mode =
     static_cast<EPdfHighlightingMode>(info[0].As<Number>().Uint32Value());
-  field.get()->SetHighlightingMode(mode);
+  field->SetHighlightingMode(mode);
   return info.Env().Undefined();
 }
 /**
@@ -255,16 +259,16 @@ Field::SetMouseAction(const Napi::CallbackInfo& info)
   PdfAction* action = Action::Unwrap(info[1].As<Object>())->GetAction();
   switch (onMouse) {
     case 0: // up
-      field.get()->SetMouseUpAction(*action);
+      field->SetMouseUpAction(*action);
       break;
     case 1: // down
-      field.get()->SetMouseDownAction(*action);
+      field->SetMouseDownAction(*action);
       break;
     case 2: // enter
-      field.get()->SetMouseEnterAction(*action);
+      field->SetMouseEnterAction(*action);
       break;
     case 3: // exit
-      field.get()->SetMouseLeaveAction(*action);
+      field->SetMouseLeaveAction(*action);
       break;
     default:
       TypeError::New(info.Env(), "Unknown mouse action. See NPDFMouseEvents")
@@ -279,16 +283,16 @@ Field::SetPageAction(const Napi::CallbackInfo& info)
   PdfAction* action = Action::Unwrap(info[1].As<Object>())->GetAction();
   switch (onMouse) {
     case 0: // open
-      field.get()->SetPageOpenAction(*action);
+      field->SetPageOpenAction(*action);
       break;
     case 1: // close
-      field.get()->SetPageCloseAction(*action);
+      field->SetPageCloseAction(*action);
       break;
     case 2: // visible
-      field.get()->SetPageVisibleAction(*action);
+      field->SetPageVisibleAction(*action);
       break;
     case 3: // invisible
-      field.get()->SetPageInvisibleAction(*action);
+      field->SetPageInvisibleAction(*action);
       break;
     default:
       TypeError::New(info.Env(), "Unknown mouse action. See NPDFMouseEvents")

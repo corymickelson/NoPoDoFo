@@ -36,17 +36,12 @@ FunctionReference Annotation::constructor; // NOLINT
 Annotation::Annotation(const CallbackInfo& info)
   : ObjectWrap(info)
   , annot(info[0].As<External<PdfAnnotation>>().Data())
+{}
+
+Annotation::~Annotation()
 {
-  auto base = info[0].As<Object>();
-  annot =
-    make_unique<PdfAnnotation>(*info[0].As<External<PdfAnnotation>>().Data());
-  if (base.InstanceOf(Document::constructor.Value())) {
-    doc = Document::Unwrap(base)->GetBaseDocument();
-  } else if (base.InstanceOf(StreamDocument::constructor.Value())) {
-    doc = StreamDocument::Unwrap(base)->GetBaseDocument();
-  } else {
-    Error::New(info.Env(), "Base Document required but not provided");
-  }
+  HandleScope scope(Env());
+  annot = nullptr;
 }
 
 void
@@ -180,7 +175,8 @@ Annotation::SetDestination(const CallbackInfo& info, const Napi::Value& value)
 Napi::Value
 Annotation::GetDestination(const CallbackInfo& info)
 {
-  PdfDestination d = annot->GetDestination(doc.get());
+  auto doc = Document::Unwrap(info[0].As<Object>())->base;
+  PdfDestination d = annot->GetDestination(doc);
   return Destination::constructor.New(
     { External<PdfDestination>::New(info.Env(), &d) });
 }

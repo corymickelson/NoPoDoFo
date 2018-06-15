@@ -42,11 +42,8 @@ public:
   Napi::Value IsChecked(const CallbackInfo&);
   void SetChecked(const CallbackInfo&, const Napi::Value&);
 
-  PoDoFo::PdfCheckBox GetCheckBox()
-  {
-    return PoDoFo::PdfCheckBox(*field.get());
-  }
-  std::shared_ptr<PoDoFo::PdfField> field;
+  PoDoFo::PdfCheckBox GetCheckBox() { return PoDoFo::PdfCheckBox(field); }
+  PoDoFo::PdfField& field;
 };
 }
 #endif // NPDF_CHECKBOX_H

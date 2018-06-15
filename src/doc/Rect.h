@@ -2,7 +2,7 @@
  * This file is part of the NoPoDoFo (R) project.
  * Copyright (c) 2017-2018
  * Authors: Cory Mickelson, et al.
- * 
+ *
  * NoPoDoFo is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -28,6 +28,7 @@ class Rect : public Napi::ObjectWrap<Rect>
 {
 public:
   explicit Rect(const Napi::CallbackInfo& callbackInfo);
+  ~Rect();
   static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
 
@@ -40,10 +41,10 @@ public:
   void SetBottom(const Napi::CallbackInfo&, const Napi::Value&);
   Napi::Value GetLeft(const Napi::CallbackInfo&);
   void SetLeft(const Napi::CallbackInfo&, const Napi::Value&);
-  PoDoFo::PdfRect* GetRect() { return rect.get(); }
+  PoDoFo::PdfRect& GetRect() { return *rect; }
 
 private:
-  std::shared_ptr<PoDoFo::PdfRect> rect;
+  PoDoFo::PdfRect* rect;
 };
 }
 #endif // NPDF_RECT_H

@@ -1,6 +1,6 @@
 {
   "name": "nopodofo",
-  "version": "0.6.0",
+  "version": "0.6.3",
   "description": "Node.js native module bindings for PoDoFo",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -42,19 +42,20 @@
     "nyc": "^11.9.0",
     "tap-summary": "^4.0.0",
     "tape": "^4.9.0",
-    "uuid": "^3.2.1"
-  },
-  "dependencies": {
+    "uuid": "^3.2.1",
     "@types/node": "^8.10.18",
     "@types/tape": "^4.2.32",
     "@types/uuid": "^3.4.3",
-    "node-addon-api": "1.3.0",
-    "node-pre-gyp": "^0.10.0",
-    "podofo": "github:corymickelson/podofo#nopodofo_0_7_0",
     "typescript": "~2.5.3"
   },
+  "dependencies": {
+    "node-addon-api": "1.3.0",
+    "node-pre-gyp": "^0.10.0",
+    "podofo": "github:corymickelson/podofo#nopodofo_0_7_0"
+  },
   "bundledDependencies": [
-    "node-pre-gyp"
+    "node-pre-gyp",
+    "podofo"
   ],
   "binary": {
     "module_name": "nopodofo",

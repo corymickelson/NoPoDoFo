@@ -47,16 +47,22 @@ Painter::Painter(const Napi::CallbackInfo& info)
   auto o = info[0].As<Object>();
   if (o.InstanceOf(Document::constructor.Value())) {
     isMemDoc = true;
-    document = Document::Unwrap(o)->GetBaseDocument();
+    document = Document::Unwrap(o)->base;
   } else if (o.InstanceOf(StreamDocument::constructor.Value())) {
     isMemDoc = false;
-    document = StreamDocument::Unwrap(o)->GetBaseDocument();
+    document = StreamDocument::Unwrap(o)->base;
   } else {
     TypeError::New(info.Env(), "requires an instance of BaseDocument")
       .ThrowAsJavaScriptException();
     return;
   }
   painter = make_unique<PdfPainter>();
+}
+
+Painter::~Painter()
+{
+  HandleScope scope(Env());
+  document = nullptr;
 }
 
 void
@@ -129,7 +135,7 @@ Painter::SetPage(const Napi::CallbackInfo& info)
     throw Napi::Error::New(info.Env(), "Page must be an instance of Page.");
   }
   auto page = Page::Unwrap(info[0].As<Object>());
-  painter->SetPage(page->page);
+  painter->SetPage(&page->page);
 }
 
 void
@@ -236,31 +242,28 @@ Painter::DrawText(const CallbackInfo& info)
 void
 Painter::DrawMultiLineText(const CallbackInfo& info)
 {
-// For some reason windows builds break with unresolved external symbol on
-// podofo's DrawMultiLineText method
-#ifndef WIN32
-  PdfRect rect = *Rect::Unwrap(info[0].As<Object>())->GetRect();
+  // For some reason windows builds break with unresolved external symbol on
+  // podofo's DrawMultiLineText method
+  //#ifndef WIN32
+  PdfRect rect = Rect::Unwrap(info[0].As<Object>())->GetRect();
   string text = info[1].As<String>().Utf8Value();
-  EPdfAlignment alignment =
-    static_cast<EPdfAlignment>(info[2].As<Number>().Int32Value());
-  EPdfVerticalAlignment verticalAlignment =
-    static_cast<EPdfVerticalAlignment>(info[3].As<Number>().Int32Value());
-  bool clip = info[4].As<Boolean>();
-  bool skipSpaces = info[5].As<Boolean>();
+  EPdfAlignment alignment = ePdfAlignment_Center;
+  if (info.Length() >= 3 && info[2].IsNumber()) {
+    alignment = static_cast<EPdfAlignment>(info[2].As<Number>().Int32Value());
+  }
+  EPdfVerticalAlignment verticalAlignment = ePdfVerticalAlignment_Center;
+  if (info.Length() >= 4 && info[3].IsNumber()) {
+    verticalAlignment =
+      static_cast<EPdfVerticalAlignment>(info[3].As<Number>().Int32Value());
+  }
   try {
-    painter->DrawMultiLineText(rect.GetBottom(),
-                               rect.GetLeft(),
-                               rect.GetWidth(),
-                               rect.GetHeight(),
-                               PdfString(text),
-                               alignment,
-                               verticalAlignment);
-
+    painter->DrawMultiLineText(
+      rect, PdfString(text), alignment, verticalAlignment);
   } catch (PdfError& err) {
     ErrorHandler(err, info);
   }
 
-#endif
+  //#endif
 }
 void
 Painter::DrawImage(const CallbackInfo& info)
@@ -348,7 +351,7 @@ Painter::SetFont(const Napi::CallbackInfo& info, const Napi::Value& value)
 {
   Font* font = Font::Unwrap(value.As<Object>());
   try {
-    painter->SetFont(font->GetFont());
+    painter->SetFont(&font->GetFont());
   } catch (PdfError& err) {
     ErrorHandler(err, info);
   }
@@ -366,7 +369,7 @@ void
 Painter::SetClipRect(const Napi::CallbackInfo& info)
 {
   Rect* r = Rect::Unwrap(info[0].As<Object>());
-  painter->SetClipRect(*r->GetRect());
+  painter->SetClipRect(r->GetRect());
 }
 
 void
@@ -381,7 +384,7 @@ Painter::Rectangle(const CallbackInfo& info)
 {
   Rect* r = Rect::Unwrap(info[0].As<Object>());
   try {
-    painter->Rectangle(*r->GetRect());
+    painter->Rectangle(r->GetRect());
   } catch (PdfError& err) {
     ErrorHandler(err, info);
   }
@@ -696,12 +699,6 @@ Painter::DrawTextAligned(const CallbackInfo& info)
 Napi::Value
 Painter::GetMultiLineText(const CallbackInfo& info)
 {
-  return info.Env().Undefined();
-  /*AssertFunctionArgs(info,
-                     3,
-                     { napi_valuetype::napi_number,
-                       napi_valuetype::napi_string,
-                       napi_valuetype::napi_boolean });
   double width = info[0].As<Number>();
   string text = info[1].As<String>().Utf8Value();
   bool skipSpaces = info[2].As<Boolean>();
@@ -718,7 +715,7 @@ Painter::GetMultiLineText(const CallbackInfo& info)
     js.Set(count, i.GetStringUtf8());
     count++;
   }
-  return js;*/
+  return js;
 }
 
 void
@@ -777,14 +774,14 @@ Painter::DrawGlyph(const CallbackInfo& info)
       .ThrowAsJavaScriptException();
     return;
   }
-  auto sharedMemDoc = std::static_pointer_cast<PdfMemDocument>(document);
+  auto sharedMemDoc = static_cast<PdfMemDocument*>(document);
   auto point = info[0].As<Object>();
   string glyph = info[1].As<String>().Utf8Value();
   double x, y;
   x = point.Get("x").As<Number>();
   y = point.Get("y").As<Number>();
   try {
-    painter->DrawGlyph(sharedMemDoc.get(), x, y, glyph.c_str());
+    painter->DrawGlyph(sharedMemDoc, x, y, glyph.c_str());
   } catch (PdfError& err) {
     ErrorHandler(err, info);
   }

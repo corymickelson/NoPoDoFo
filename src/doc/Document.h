@@ -42,6 +42,7 @@ public:
   static Napi::FunctionReference constructor;
   explicit Document(const Napi::CallbackInfo& callbackInfo); // constructor
   static void Initialize(Napi::Env& env, Napi::Object& target);
+  static Napi::Value GC(const Napi::CallbackInfo&);
   Napi::Value Load(const Napi::CallbackInfo&);
   Napi::Value CreatePage(const Napi::CallbackInfo&) override;
   void DeletePages(const Napi::CallbackInfo&);
@@ -52,21 +53,12 @@ public:
   Napi::Value GetEncrypt(const Napi::CallbackInfo&);
   Napi::Value GetTrailer(const Napi::CallbackInfo&);
   Napi::Value GetCatalog(const Napi::CallbackInfo&);
-  static Napi::Value GC(const Napi::CallbackInfo&);
-  Napi::Value GetSharedPtrCount(const Napi::CallbackInfo&);
   Napi::Value InsertPages(const Napi::CallbackInfo&);
-
-  std::shared_ptr<PoDoFo::PdfMemDocument> GetMemDocument()
-  {
-    auto shared = document;
-    cout << "PdfMemDocument count: " << document.use_count() << endl;
-    return shared;
-  }
   bool LoadedForIncrementalUpdates() { return loadForIncrementalUpdates; }
+  PoDoFo::PdfMemDocument& GetDocument();
 
 private:
   bool loadForIncrementalUpdates = false;
-  std::shared_ptr<PoDoFo::PdfMemDocument> document;
 };
 }
 #endif // NPDF_PDFMEMDOCUMENT_H

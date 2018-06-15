@@ -2,7 +2,7 @@
  * This file is part of the NoPoDoFo (R) project.
  * Copyright (c) 2017-2018
  * Authors: Cory Mickelson, et al.
- * 
+ *
  * NoPoDoFo is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -46,7 +46,7 @@ private:
   bool isMemDoc = false;
   std::shared_ptr<PoDoFo::PdfSignatureField> field;
   std::unique_ptr<PoDoFo::PdfData> signatureBuffer;
-  std::shared_ptr<PoDoFo::PdfDocument> doc;
+  PoDoFo::PdfDocument* doc;
 };
 }
 #endif

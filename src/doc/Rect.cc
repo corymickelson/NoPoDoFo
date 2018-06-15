@@ -33,7 +33,7 @@ Rect::Rect(const CallbackInfo& info)
   : ObjectWrap(info)
 {
   if (info.Length() == 0) {
-    rect = make_shared<PdfRect>();
+    rect = new PdfRect();
   }
   if (info.Length() == 1) {
     if (!info[0].IsObject()) {
@@ -46,7 +46,7 @@ Rect::Rect(const CallbackInfo& info)
                        "Rect requires Page as constructor parameter");
     }
     Page* page = Page::Unwrap(pageObj);
-    rect = make_shared<PdfRect>(page->page->GetPageSize());
+    rect = new PdfRect(page->page.GetPageSize());
   }
   if (info.Length() == 4) {
     double left, bottom, width, height;
@@ -61,8 +61,14 @@ Rect::Rect(const CallbackInfo& info)
     bottom = info[1].As<Number>();
     width = info[2].As<Number>();
     height = info[3].As<Number>();
-    rect = make_shared<PdfRect>(left, bottom, width, height);
+    rect = new PdfRect(left, bottom, width, height);
   }
+}
+
+Rect::~Rect()
+{
+  HandleScope scope(Env());
+  delete rect;
 }
 
 void
@@ -91,8 +97,8 @@ Rect::Intersect(const CallbackInfo& info)
   }
   auto rectObj = info[0].As<Object>();
   Rect* rectIntersect = Rect::Unwrap(rectObj);
-  PdfRect* _rect = rectIntersect->GetRect();
-  rect->Intersect(*_rect);
+  PdfRect _rect = rectIntersect->GetRect();
+  rect->Intersect(_rect);
 }
 Napi::Value
 Rect::GetWidth(const CallbackInfo& info)

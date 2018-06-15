@@ -40,10 +40,10 @@ Destination::Destination(const CallbackInfo& info)
     destination = make_unique<PdfDestination>(
       *info[0].As<External<PdfDestination>>().Data());
   } else if (info.Length() == 2 && info[0].IsObject() && info[1].IsNumber()) {
-    auto page = Page::Unwrap(info[0].As<Object>())->page;
+    PdfPage page = Page::Unwrap(info[0].As<Object>())->page;
     auto fit =
       static_cast<EPdfDestinationFit>(info[1].As<Number>().Int32Value());
-    destination = make_unique<PdfDestination>(page, fit);
+    destination = make_unique<PdfDestination>(&page, fit);
   } else {
     throw TypeError();
   }
