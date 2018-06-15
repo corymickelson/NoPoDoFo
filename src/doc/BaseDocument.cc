@@ -79,7 +79,6 @@ BaseDocument::BaseDocument(const Napi::CallbackInfo& info)
   }
 }
 
-
 Napi::Value
 BaseDocument::GetPageCount(const CallbackInfo& info)
 {
@@ -273,7 +272,7 @@ Napi::Value
 BaseDocument::GetObject(const CallbackInfo& info)
 {
   auto ref = Obj::Unwrap(info[0].As<Object>())->GetObject();
-  PdfObject* target = document->GetObjects()->GetObject(ref->GetReference());
+  PdfObject* target = document->GetObjects()->GetObject(ref.GetReference());
   return Obj::constructor.New({ External<PdfObject>::New(info.Env(), target) });
 }
 

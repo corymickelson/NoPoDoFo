@@ -42,7 +42,7 @@ Outline::Outline(const CallbackInfo& info)
   } else if (info[0].IsObject() &&
              info[0].As<Object>().InstanceOf(Obj::constructor.Value())) {
     outlines =
-      make_unique<PdfOutlines>(Obj::Unwrap(info[0].As<Object>())->GetObject());
+      make_unique<PdfOutlines>(&Obj::Unwrap(info[0].As<Object>())->GetObject());
   } else {
     TypeError::New(info.Env(),
                    "Outlines requires one of: Obj, External<PdfObject>")

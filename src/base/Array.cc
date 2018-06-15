@@ -39,7 +39,6 @@ Array::Array(const CallbackInfo& info)
 Array::~Array()
 {
   HandleScope scope(Env());
-  obj = nullptr;
   for (auto child : children) {
     delete child;
   }
@@ -138,7 +137,7 @@ Array::Push(const CallbackInfo& info)
   }
   try {
     auto item = Obj::Unwrap(wrapper);
-    GetArray().push_back(*item->GetObject());
+    GetArray().push_back(item->GetObject());
 
   } catch (PdfError& err) {
     ErrorHandler(err, info);
@@ -160,11 +159,13 @@ Array::GetObjAtIndex(const CallbackInfo& info)
   if (index > GetArray().size()) {
     throw Napi::RangeError();
   }
-  PdfObject item(GetArray()[index]);
-  if (item.IsReference()) {
-    item = *item.GetOwner()->GetObject(item.GetReference());
+  PdfObject* item;
+  if (GetArray()[index].IsReference()) {
+    item = obj.GetOwner()->GetObject(GetArray()[index].GetReference());
+  } else {
+    item = &GetArray()[index];
   }
-  auto child = new PdfObject(item);
+  auto child = new PdfObject(*item);
   children.push_back(child);
   auto initPtr = Napi::External<PdfObject>::New(info.Env(), child);
   auto instance = Obj::constructor.New({ initPtr });

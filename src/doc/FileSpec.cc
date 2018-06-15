@@ -52,7 +52,7 @@ FileSpec::FileSpec(const CallbackInfo& info)
   if (info.Length() == 1 && info[0].IsObject() &&
       info[0].As<Object>().InstanceOf(Obj::constructor.Value())) {
     spec =
-      make_unique<PdfFileSpec>(Obj::Unwrap(info[0].As<Object>())->GetObject());
+      make_unique<PdfFileSpec>(&Obj::Unwrap(info[0].As<Object>())->GetObject());
   } else if (info.Length() == 1 && info[0].Type() == napi_external) {
     auto pObj = info[0].As<External<PdfObject>>().Data();
     spec = make_unique<PdfFileSpec>(pObj);

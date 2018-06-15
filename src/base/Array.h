@@ -48,10 +48,10 @@ public:
   Napi::Value Pop(const Napi::CallbackInfo&);
   void Clear(const Napi::CallbackInfo&);
   Napi::Value Eq(const Napi::CallbackInfo&);
-  PoDoFo::PdfArray& GetArray() { return obj->GetArray(); }
+  PoDoFo::PdfArray& GetArray() { return obj.GetArray(); }
 
 private:
-  PoDoFo::PdfObject* obj;
+  PoDoFo::PdfObject& obj;
   vector<PoDoFo::PdfObject*> children;
   Napi::Value GetObjAtIndex(const Napi::CallbackInfo&);
 };

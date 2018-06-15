@@ -201,14 +201,14 @@ Form::SetResource(const CallbackInfo& info, const Napi::Value& value)
     try {
       auto formDict = doc->GetAcroForm()->GetObject()->GetDictionary();
       auto dr = Obj::Unwrap(value.As<Object>());
-      if (dr->GetObject()->GetDataType() != ePdfDataType_Dictionary)
+      if (dr->GetObject().GetDataType() != ePdfDataType_Dictionary)
         TypeError::New(
           info.Env(),
           "Default resource must be an instance of NoPoDoFo::Dictionary")
           .ThrowAsJavaScriptException();
       if (formDict.HasKey(Name::DR))
         formDict.RemoveKey(Name::DR);
-      formDict.AddKey(PdfName(Name::DR), dr->GetObject()->Reference());
+      formDict.AddKey(PdfName(Name::DR), dr->GetObject().Reference());
     } catch (PdfError& err) {
       ErrorHandler(err, info);
     }

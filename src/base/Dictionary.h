@@ -31,7 +31,6 @@ class Dictionary : public Napi::ObjectWrap<Dictionary>
 {
 public:
   explicit Dictionary(const Napi::CallbackInfo&);
-  ~Dictionary();
   static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
   void AddKey(const Napi::CallbackInfo&);
@@ -48,10 +47,10 @@ public:
   Napi::Value Write(const Napi::CallbackInfo&);
   void WriteSync(const Napi::CallbackInfo&);
   Napi::Value Eq(const Napi::CallbackInfo&);
-  PoDoFo::PdfDictionary& GetDictionary() { return obj->GetDictionary(); }
+  PoDoFo::PdfDictionary& GetDictionary() { return obj.GetDictionary(); }
 
 private:
-  PoDoFo::PdfObject* obj;
+  PoDoFo::PdfObject& obj;
 };
 }
 #endif
