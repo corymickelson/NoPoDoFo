@@ -6,6 +6,8 @@ if(!global.gc) {
     global.gc = () => {}
 }
 const filePath = join(__dirname, '../test-documents/iss.16.checkbox-field-state-options.pdf')
+const outfile = join(__dirname,'../tmp/npdf.values.test.pdf')
+
 tap('IField', t => {
     const doc = new npdf.Document()
     doc.load(filePath, (e: Error) => {
@@ -35,8 +37,6 @@ tap('IField', t => {
                 }
             })
             t.test('fields persist', t => {
-
-                let outfile = '/tmp/npdf.values.test.pdf'
                 doc.write(outfile, (err, data) => {
                     if (err) t.fail(err.message)
                     else {
@@ -62,7 +62,6 @@ tap('IField', t => {
                                 }
                             })
                             t.end()
-                            unlinkSync(outfile)
                         })
                     }
                 })
@@ -70,5 +69,9 @@ tap('IField', t => {
             t.end()
         }
     })
+
 })
 
+tap.onFinish(() => {
+    unlinkSync(outfile)
+})

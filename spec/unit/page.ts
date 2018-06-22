@@ -6,7 +6,7 @@ if (!global.gc) {
     global.gc = () => { }
 }
 const filePath = join(__dirname, '../test-documents/test.pdf'),
-    outFile = './test.out.pdf',
+    outFile = join(__dirname, '../tmp/test.out.pdf'),
     doc = new npdf.Document()
 
 let page: IPage;
@@ -41,7 +41,6 @@ function pageRotation() {
                 if (e instanceof Error) t.fail()
                 const testPage = testDoc.getPage(0)
                 t.assert(testPage.rotation === newRotation, 'Page rotation updated')
-                unlinkSync(outFile)
                 t.end()
             })
         })
@@ -180,4 +179,6 @@ export function runAll() {
         pageAddImg
     ].map(i => runTest(i))
 }
-
+test.onFinish(() => {
+    unlinkSync(outFile)
+})

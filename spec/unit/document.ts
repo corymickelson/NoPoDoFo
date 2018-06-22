@@ -60,7 +60,8 @@ tap('IDocument', (t: Test) => {
         global.gc()
         t.assert(doc.getPageCount() === 3)
         t.comment('create font')
-        let font = doc.createFont({italic: true, embed: false, fontName: 'Arial'})
+        let font = doc.createFont({italic: true, embed: false, fontName: 'Courier'})
+        //let font = doc.getFont('PoDoFoFt40')
 
         global.gc()
         t.assert(font.getMetrics().fontSize === 12, 'Default font size is 12')

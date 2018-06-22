@@ -36,7 +36,6 @@ class Annotation : public ObjectWrap<Annotation>
 {
 public:
   explicit Annotation(const CallbackInfo& callbackInfo);
-  ~Annotation();
   static FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
   Napi::Value HasAppearanceStream(const CallbackInfo&);
@@ -61,10 +60,10 @@ public:
   Napi::Value GetAttachment(const CallbackInfo&);
   void SetAttachment(const CallbackInfo&, const Napi::Value&);
 
-  PoDoFo::PdfAnnotation& GetAnnotation() { return *annot; }
+  PoDoFo::PdfAnnotation& GetAnnotation() { return annot; }
 
 private:
-  PoDoFo::PdfAnnotation* annot;
+  PoDoFo::PdfAnnotation& annot;
 };
 }
 #endif // NPDF_ANNOTATION_H

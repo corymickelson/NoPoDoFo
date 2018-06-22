@@ -35,14 +35,8 @@ FunctionReference Annotation::constructor; // NOLINT
 
 Annotation::Annotation(const CallbackInfo& info)
   : ObjectWrap(info)
-  , annot(info[0].As<External<PdfAnnotation>>().Data())
+  , annot(*info[0].As<External<PdfAnnotation>>().Data())
 {}
-
-Annotation::~Annotation()
-{
-  HandleScope scope(Env());
-  annot = nullptr;
-}
 
 void
 Annotation::Initialize(Napi::Env& env, Napi::Object& target)
@@ -165,7 +159,7 @@ Annotation::SetDestination(const CallbackInfo& info, const Napi::Value& value)
 {
   if (value.As<Object>().InstanceOf(Destination::constructor.Value())) {
     auto destination = Destination::Unwrap(value.As<Object>());
-    annot->SetDestination(*destination->GetDestinationPtr());
+    GetAnnotation().SetDestination(*destination->GetDestinationPtr());
   } else {
     TypeError::New(info.Env(), "Requires instance of Destination")
       .ThrowAsJavaScriptException();
@@ -176,7 +170,7 @@ Napi::Value
 Annotation::GetDestination(const CallbackInfo& info)
 {
   auto doc = Document::Unwrap(info[0].As<Object>())->base;
-  PdfDestination d = annot->GetDestination(doc);
+  PdfDestination d = GetAnnotation().GetDestination(doc);
   return Destination::constructor.New(
     { External<PdfDestination>::New(info.Env(), &d) });
 }
@@ -190,13 +184,13 @@ Annotation::SetAction(const CallbackInfo& info, const Napi::Value& value)
     return;
   }
   auto action = Action::Unwrap(value.As<Object>());
-  annot->SetAction(*action->GetAction());
+  GetAnnotation().SetAction(*action->GetAction());
 }
 
 Napi::Value
 Annotation::GetAction(const CallbackInfo& info)
 {
-  if (!annot->HasAction()) {
+  if (!GetAnnotation().HasAction()) {
     return info.Env().Null();
   }
   PdfAction* currentAction = GetAnnotation().GetAction();
@@ -395,7 +389,7 @@ Annotation::SetQuadPoints(const CallbackInfo& info, const Napi::Value& value)
     if (!item.IsNumber()) {
       throw Error::New(info.Env(), "QuadPoints must be integer values");
     }
-    points.push_back(PdfObject(item));
+    points.push_back(PdfObject(item.As<Number>().DoubleValue()));
   }
   try {
     GetAnnotation().SetQuadPoints(points);
@@ -419,10 +413,10 @@ Annotation::GetQuadPoints(const CallbackInfo& info)
 Napi::Value
 Annotation::GetAttachment(const CallbackInfo& info)
 {
-  if (!annot->HasFileAttachement()) {
+  if (!GetAnnotation().HasFileAttachement()) {
     return info.Env().Null();
   }
-  auto file = annot->GetFileAttachement()->GetObject();
+  auto file = GetAnnotation().GetFileAttachement()->GetObject();
   return FileSpec::constructor.New({ External<PdfObject>::New(
     info.Env(), new PdfObject(*file), [](Napi::Env env, PdfObject* data) {
       HandleScope scope(env);

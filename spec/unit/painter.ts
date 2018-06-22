@@ -23,6 +23,7 @@ tap('IPainter', t => {
                     encoding: NPDFFontEncoding.WinAnsi,
                     italic: true
                 })
+                
                 painter.font = font
                 const metric = font.getMetrics()
                 let x: number, y: number

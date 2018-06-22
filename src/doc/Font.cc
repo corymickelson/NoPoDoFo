@@ -66,7 +66,7 @@ Font::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceMethod("write", &Font::WriteToStream),
       InstanceMethod("embed", &Font::EmbedFont),
       InstanceMethod("stringWidth", &Font::StringWidth) });
-  constructor = Persistent(ctor);
+  constructor = Napi::Persistent(ctor);
   constructor.SuppressDestruct();
   target.Set("Font", ctor);
 }
@@ -177,7 +177,6 @@ Font::GetFontMetric(const Napi::CallbackInfo& info)
   obj.Set("strikeOutThickness",
           Number::New(info.Env(), metrics->GetStrikeoutThickness()));
   obj.Set("fileName", String::New(info.Env(), metrics->GetFilename()));
-  //  obj.Set("fontData", String::New(info.Env(), metrics->GetFontData()));
   obj.Set("fontName", String::New(info.Env(), metrics->GetFontname()));
   obj.Set("fontWeight", Number::New(info.Env(), metrics->GetWeight()));
   obj.Set("fontSize",
@@ -191,7 +190,6 @@ Font::GetFontMetric(const Napi::CallbackInfo& info)
   obj.Set(
     "wordSpace",
     Number::New(info.Env(), static_cast<double>(metrics->GetWordSpace())));
-  //    obj.Set("fontType", metrics->GetFontType());
   return obj;
 }
 Napi::Value
