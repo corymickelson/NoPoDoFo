@@ -13,8 +13,9 @@
     "docs": "typedoc --options ./tsconfig.docs.json --out ./docs",
     "coverage": "nyc node --expose-gc ./dist/_all.spec.js && nyc report --reporter=text-lcov | coveralls",
     "test": "tsc -p tsconfig.json && tsc -p tsconfig.spec.json && node --expose-gc ./node_modules/.bin/tape spec/unit/*.js",
-    "install": "node-pre-gyp install --fallback-to-build && tsc -p tsconfig.json",
-    "qt:debug": "cmake-js build -D -j 4 && cp build/Debug/nopodofo.node lib/binding/1/"
+    "install": "node-pre-gyp install --fallback-to-build",
+    "qt:debug": "cmake-js build -D -j 4 && cp build/Debug/nopodofo.node lib/binding/1/",
+    "prepublish": "tsc -p tsconfig.json && node-pre-gyp rebuild -j 4"
   },
   "nyc": {
     "exclude": [
@@ -65,5 +66,12 @@
     "napi_versions": [
       1
     ]
-  }
+  },
+  "files": [
+    "binding.gyp",
+    "src",
+    "dist",
+    "deps",
+    "tsconfig.json"
+  ]
 }
