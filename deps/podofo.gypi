@@ -152,7 +152,7 @@
             "type": "static_library",
           },
           "libraries": [
-            # '<!@(pkg-config openssl --libs)',
+            '<!@(pkg-config openssl --libs)',
             '<!@(pkg-config fontconfig --libs)',
             '<!@(pkg-config libpng --libs)',
             '<!@(pkg-config libjpeg --libs)',
@@ -162,8 +162,8 @@
             '<!@(pkg-config libtiff-4 --libs)',
           ],
           "include_dirs": [
-            # '<!@(pkg-config openssl --cflags-only-I | sed s/-I//g)',
-            '<(node_root_dir)/deps/openssl/openssl/include',
+            '<!@(pkg-config openssl --cflags-only-I | sed s/-I//g)',
+            # '<(node_root_dir)/deps/openssl/openssl/include',
             '<!@(pkg-config libpng --cflags-only-I | sed s/-I//g)',
             '<!@(pkg-config fontconfig --cflags-only-I | sed s/-I//g)',
             '<!@(pkg-config freetype2 --cflags-only-I | sed s/-I//g)',

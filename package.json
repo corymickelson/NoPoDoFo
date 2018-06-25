@@ -15,7 +15,7 @@
     "test": "tsc -p tsconfig.json && tsc -p tsconfig.spec.json && node --expose-gc ./node_modules/.bin/tape spec/unit/*.js",
     "install": "node-pre-gyp install --fallback-to-build",
     "qt:debug": "cmake-js build -D -j 4 && cp build/Debug/nopodofo.node lib/binding/1/",
-    "prepublish": "tsc -p tsconfig.json && node-pre-gyp rebuild -j 4"
+    "prepublish": "tsc -p tsconfig.json"
   },
   "nyc": {
     "exclude": [
