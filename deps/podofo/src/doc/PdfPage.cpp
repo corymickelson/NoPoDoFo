@@ -439,7 +439,7 @@ void PdfPage::DeleteAnnotation( int index )
     }
     else
     {
-        this->DeleteAnnotation( pItem->GetReference() );
+        this->DeleteAnnotation( PdfReference(pItem->GetReference()) );
     }
 }
 
