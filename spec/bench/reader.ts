@@ -1,6 +1,5 @@
 import { join } from 'path'
 import { Suite, Options } from 'benchmark'
-import { } from 'microtime'
 import { npdf } from '../../dist'
 import { readFileSync } from "fs";
 

@@ -11,7 +11,7 @@
   },
   "scripts": {
     "docs": "typedoc --options ./tsconfig.docs.json --out ./docs",
-    "coverage": "nyc node --expose-gc ./dist/_all.spec.js && nyc report --reporter=text-lcov | coveralls",
+    "coverage": "nyc tape spec/unit/*.js && nyc report --reporter=text-lcov | coveralls",
     "test": "mkdir -p spec/tmp && tsc -p tsconfig.json && tsc -p tsconfig.spec.json && node --expose-gc ./node_modules/.bin/tape spec/unit/*.js",
     "install": "node-pre-gyp install --fallback-to-build",
     "qt:debug": "cmake-js build -D -j 4 && cp build/Debug/nopodofo.node lib/binding/1/",
@@ -19,11 +19,12 @@
   },
   "nyc": {
     "exclude": [
-      "**/*.spec.*"
+      "spec/**"
     ]
   },
   "keywords": [
-    "pdf"
+    "pdf",
+    "node"
   ],
   "author": "Cory Mickelson <mickelsoncory@gmail.com> (http://corymickelson.github.io/)",
   "homepage": "https://github.com/corymickelson/NoPoDoFo#readme",
@@ -33,13 +34,11 @@
   "license": "ISC",
   "devDependencies": {
     "@types/benchmark": "^1.0.31",
-    "@types/microtime": "^2.1.0",
     "aws-sdk": "^2.252.1",
     "benchmark": "^2.1.4",
     "cmake-js": "^3.7.3",
     "coveralls": "^3.0.1",
     "husky": "^0.14.3",
-    "microtime": "^2.1.8",
     "nyc": "^11.9.0",
     "tap-summary": "^4.0.0",
     "tape": "^4.9.0",
