@@ -1,12 +1,10 @@
 # Using NoPoDoFo in AWS Lambda
 
-[NoPoDoFoLambda](https://github.com/corymickelson/NoPoDoFoLambda) provides a pre-built binary/library for installing into your lambda function.
-NoPoDoFoLambda will be updated with each new release of NoPoDoFo.
+[NoPoDoFoLambda](https://github.com/corymickelson/NoPoDoFoLambda) provides a pre-built library dependencies for running nopodofo in aws lambda.
 
 ## Installation
-This package is meant __only__ for use in AWS Lambda.
- - `npm install nopodofolambda`
- - require/import into your project, `const {npdf} = require('nopodofolambda')`
+ - `npm install nopodofolambda`, prebuilt library dependencies
+ - `npm install nopodofo@awslambda`, nopodofo compiled with the correct rpath for running in aws lambda. __Important__ please ensure pre-built binary is fetched and the project is NOT rebuilt 
 
 ## The Build
 Binaries are built on a Centos 7 image with the following dependencies:
@@ -27,14 +25,7 @@ Setup our build environment to have the correct compiler, and variables:
  - scl enable devtoolset-7 bash
  - export CC=$(which gcc)
  - export CXX=$(which g++)
- - export LDFLAGS=-Wl,-rpath=/var/task/node_modules/nopodofolambda/lib
-
-### Building NoPoDoFo
-Clone the repo and checkout the tag or branch or version desired.
- - git clone https://github.com/corymickelson/NoPoDoFo
- - npm install
- - tsc -p tsconfig.json
- - npm test (optional, test everything is built properly)
+ - LDFLAGS=-Wl,-rpath=/var/task/node_modules/nopodofolambda/lib node-pre-gyp rebuild
 
 ### Finished
 

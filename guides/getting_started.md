@@ -24,7 +24,8 @@ This build does not support AES encryption option, to enable AES you will need l
    - zlib
 
 The NoPoDoFo gyp file uses the environment variable `vcpkg_path` for linking the above libraries. This value should be set to your
-`{vcpkg root}/installed/{architecture}-windows-static` ex. `C:\vcpkg\installed\x86-windows-static
+`{vcpkg root}/installed/{architecture}-windows-static` ex. `C:\vcpkg\installed\x86-windows-static. Set the fontconfig config file path with
+`set FONTCONFIG_FILE={path to fonts.conf}` ex `set FONTCONFIG_FILE=C:\vcpkg\installed\x86-windows-static\tools\fontconfig\fonts\fonts.conf`
 
 ## Linux
 

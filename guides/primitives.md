@@ -7,13 +7,17 @@ Please familiarize yourself with the [PDF specification](http://wwwimages.adobe.
 
 NoPoDoFo provides handles to the following PDF data types:
  - PdfObject as [Obj](#NoPoDoFo.Obj)
- - PdfIndirectObject as [Ref](#NoPoDoFo.Ref)
  - PdfStream as [Stream](#NoPoDoFo.Stream)
- 
-PdfArray, PdfString, PdfNull, PdfNumber, PdfName, PdfDictionary and PdfBool are all returned as their native Javascript counterpart and are variants of NoPoDoFo.Obj.
+ - PdfDictionary
+ - PdfArray
+
+PdfString, PdfNull, PdfNumber, PdfName and PdfBool are all returned as their native Javascript counterpart and are variants of NoPoDoFo.Obj.
+
+NoPoDoFo will always resolve a PdfIndirectObject to the PdfObject referenced. In the case where a reference (PdfIndirectObject) can not be resolved
+an Error will be thrown.
 
 ### NoPoDoFo.Obj
-The Body of a PDF is composed of collection of PdfObjects, these may be in the format of an inline object or an indirect object, NoPoDoFo exposes indirect objects as [Ref](#NoPoDoFo.Ref). 
+The Body of a PDF is composed of collection of PdfObjects. 
 An Object is defined by an Object number and Generation number, Object and Generation numbers are read only properties ( for now, new document creation is a work in progress ).
 Objects typically contain a dictionary, but any Pdf data type is possible.
 The type of the Object is exposed via `Obj.type`.
@@ -53,7 +57,9 @@ if(o.type === 'Dictionary' && o.hasStream()) {
 }
 ```
 
-### NoPoDoFo.Obj.asArray
-See [proxied](https://github.com/corymickelson/NoPoDoFo/tree/master/guides/proxied.md)
-### NoPoDoFo.Obj.asObject
-See [proxied](https://github.com/corymickelson/NoPoDoFo/tree/master/guides/proxied.md)
+### NoPoDoFo.Array
+todo
+
+### NoPoDoFo.Dictionary
+todo
+

@@ -53,14 +53,14 @@ doc.load('/path/to/doc.pdf', (e) => {
     if(e.message.includes('Password required')) {
         // handle error or set password if password is known
     }
-    let encrypt:EncryptionOption = {
-        userPassword: 'secret',
+    let encrypt = npdf.Encrypt.createEncrypt({
         ownerPassword: 'secret',
-        protection: ['Copy', 'Print', 'Edit'],
-        algorithm: 'aesv2',
-        keyLength: 40
-    }
-    doc.createEncrypt(encrypt) // Creates a PdfEncrypt object and sets document encrypt to this object.
+        userPassword: 'secret',
+        keyLength: 40,
+        protection: ['Edit', 'FillAndSign'],
+        algorithm: 'rc4v1'
+    })
+    doc.encrypt = encrypt // set the encrypt object on  the document
     doc.write('output/path/doc.pdf', (e:Error) => {}) // write the document with new/updated encryption
 })
 
@@ -69,7 +69,7 @@ doc.load('/path/to/doc.pdf', (e) => {
 ### Pdf body (pdf object / pdf catalog)
 
 A PDF is comprised of an array of [NoPoDoFo.Obj](obj.md), each object contains a dictionary of key/value pairs. A PDF can be modified by adding, removing, or altering the contents of a PdfObject(s), an example of this can be seen [here](https://github.com/corymickelson/nopodofo/blob/master/lib/page.spec.ts#L145-L190).
-Document `.getObjects()` will return an array of [NoPoDoFo.Obj](https://corymickelson.github.io/NoPoDoFo/modules/_object_.html)
+Document `.body` will return an array of [NoPoDoFo.Obj](https://corymickelson.github.io/NoPoDoFo/modules/_object_.html)
 
 ``` typescript
 let doc = new NoPoDoFo.Document()
@@ -77,7 +77,6 @@ doc.load('/path/to/doc.pdf', () => {
     if(e.message.includes('Password required')) {
         doc.password = 'secret'
     }
-    let body = doc.getObjects()
-    // do something with pdf object
+    doc.body // do something with pdf object
 })
 ```

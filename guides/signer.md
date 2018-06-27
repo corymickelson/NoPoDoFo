@@ -35,7 +35,7 @@ const doc = new Document('path/to/doc', true)
 
 When NoPoDoFo signs a document, it takes the document, the signature, and the signature field, and optionally if an output path is provided the document will be written to the destination,
 otherwise the document will be returned as a nodejs buffer.
-Provided the above mentioned objects NoPoDoFo will handle allocating space for the signature on the document, and writing the signature to the document.
+NoPoDoFo will handle allocating space for the signature on the document, and writing the signature to the document.
 
 ```typescript
 const doc = new Document()
@@ -49,7 +49,7 @@ doc.load('/path/to/doc', {forUpdate: true}, e => {
         annot = page.createAnnotation(NPDFAnnotation.Widget, rect),
         form = new Form(doc)
     annot.flag = NPDFAnnotationFlag.Hidden | NPDFAnnotationFlag.Invisible
-    const field = new SignatureField(annot, form, doc)
+    const field = new SignatureField(annot, doc)
 
     // set signature properties
     field.setReason('example')
@@ -74,7 +74,7 @@ doc.load('/path/to/doc.pdf', {forUpdate: true}, e => {
         page = doc.getPage(1),
         annot = page.createAnnotation(NPDFAnnotation.Widget, rect)
     annot.flag = NPDFAnnotationFlag.Hidden | NPDFAnnotationFlag.Invisible
-    const field = new SignatureField(annot, form, doc)
+    const field = new SignatureField(annot, doc)
     //set field properties
     let data = signature('path/to/cert', 'path/to/privatekey')
     // create signer
