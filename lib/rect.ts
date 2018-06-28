@@ -19,7 +19,7 @@
 
 export interface IRect {
     new(): IRect
-    new(left: number, botton: number, width: number, height: number): IRect
+    new(left: number, bottom: number, width: number, height: number): IRect
     left: number
     bottom: number
     width: number

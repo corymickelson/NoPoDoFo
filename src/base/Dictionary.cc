@@ -127,7 +127,6 @@ Napi::Value
 Dictionary::GetKey(const CallbackInfo& info)
 {
   string k = info[0].As<String>().Utf8Value();
-  //  bool resolveValue = true;
   PdfObject* v = obj.MustGetIndirectKey(k);
   if (!v) {
     stringstream msg;
@@ -140,45 +139,6 @@ Dictionary::GetKey(const CallbackInfo& info)
     return Obj::constructor.New(
       { Napi::External<PdfObject>::New(info.Env(), v) });
   }
-
-  //  if (info.Length() == 2 && info[1].IsBoolean()) {
-  //    resolveValue = info[1].As<Boolean>();
-  //  }
-  //  if (!GetDictionary().HasKey(PdfName(k))) {
-  //    throw Napi::Error::New(info.Env(),
-  //                           "Key could not be found, please use "
-  //                           "Dictionary.HasKey before accessing key value");
-  //  }
-  //  try {
-  //    PdfObject* o = GetDictionary().GetKey(PdfName(k));
-  //    // try and resolve the reference
-  //    if (o->IsReference() && resolveValue) {
-  //      if (!o->GetOwner()->GetObject(o->GetReference())) {
-  //        if (!o->GetOwner()->GetParentDocument()->GetObjects()->GetObject(
-  //              o->GetReference())) {
-  //          stringstream msg;
-  //          msg << "Could not resolve object reference: "
-  //              << o->GetReference().ObjectNumber() << ", "
-  //              << o->GetReference().GenerationNumber() << endl;
-  //          Error::New(info.Env(), msg.str());
-  //          return info.Env().Undefined();
-  //        } else {
-  //          o = o->GetOwner()->GetParentDocument()->GetObjects()->GetObject(
-  //            o->GetReference());
-  //        }
-  //      } else {
-  //        o = o->GetOwner()->GetObject(o->GetReference());
-  //      }
-  //    }
-  //    auto objPtr = Napi::External<PdfObject>::New(info.Env(), o);
-  //    auto instance = Obj::constructor.New({ objPtr });
-  //    return instance;
-  //  } catch (PdfError& err) {
-  //    ErrorHandler(err, info);
-  //  } catch (Napi::Error& err) {
-  //    ErrorHandler(err, info);
-  //  }
-  //  return info.Env().Undefined();
 }
 
 Napi::Value
@@ -288,33 +248,28 @@ Dictionary::WriteSync(const CallbackInfo& info)
   }
 }
 
-// Napi::Value
-// Dictionary::ToObject(const CallbackInfo& info)
-//{
-//  try {
-//    auto js = Object::New(info.Env());
-//    auto keys = GetDictionary().GetKeys();
-//    map<PoDoFo::PdfName, PoDoFo::PdfObject*>::const_iterator it;
-//    for (it = keys.begin(); it != keys.end(); it++) {
-//      auto key = String::New(info.Env(), (*it).first.GetName());
-//      auto ptr = External<PdfObject>::New(
-//        info.Env(), new PdfObject((*it).second), [](Napi::Env env, PdfObject*
-//        data) {
-//          HandleScope scope(env);
-//          delete data;
-//          data = nullptr;
-//        });
-//      auto value = Obj::constructor.New({ ptr });
-//      js.Set(key, value);
-//    }
-//    return js;
-//  } catch (PdfError& err) {
-//    ErrorHandler(err, info);
-//  } catch (Napi::Error& err) {
-//    ErrorHandler(err, info);
-//  }
-//  return info.Env().Undefined();
-//}
+Napi::Value
+Dictionary::JsObject(const CallbackInfo& info)
+{
+  try {
+    auto js = Object::New(info.Env());
+    auto keys = GetDictionary().GetKeys();
+    map<PoDoFo::PdfName, PoDoFo::PdfObject*>::const_iterator it;
+    for (it = keys.begin(); it != keys.end(); it++) {
+      auto key = String::New(info.Env(), (*it).first.GetName());
+      PdfObject* v = obj.MustGetIndirectKey((*it).first);
+      auto ptr = External<PdfObject>::New(info.Env(), v);
+      auto value = Obj::constructor.New({ ptr });
+      js.Set(key, value);
+    }
+    return js;
+  } catch (PdfError& err) {
+    ErrorHandler(err, info);
+  } catch (Napi::Error& err) {
+    ErrorHandler(err, info);
+  }
+  return info.Env().Undefined();
+}
 
 class DictWriteAsync : public Napi::AsyncWorker
 {

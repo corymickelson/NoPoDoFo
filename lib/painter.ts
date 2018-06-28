@@ -83,11 +83,21 @@ export enum NPDFLineJoinStyle {
     Round,
     Bevel
 }
+/**
+ * Top - Align with the top of the containing Rect
+ * Center - Aligns Center, uses the set font's font metrics for calculating center
+ * Bottom - Aligns with the bottom of the containing Rect
+ */
 export enum NPDFVerticalAlignment {
     Top,
     Center,
     Bottom
 }
+/**
+ * Left - Does nothing, this is the default behaviour
+ * Center - Calculates center using font's font metrics stringWidth operation ( / 2)
+ * Right - Calculates center using font's font metrics stringWidth operation
+ */
 export enum NPDFAlignment {
     Left,
     Center,

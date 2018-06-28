@@ -47,6 +47,7 @@ public:
   Napi::Value Write(const Napi::CallbackInfo&);
   void WriteSync(const Napi::CallbackInfo&);
   Napi::Value Eq(const Napi::CallbackInfo&);
+  Napi::Value JsObject(const Napi::CallbackInfo&);
   PoDoFo::PdfDictionary& GetDictionary() { return obj.GetDictionary(); }
 
 private:

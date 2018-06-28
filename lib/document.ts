@@ -16,24 +16,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import {access, constants} from 'fs'
-import {IArray, IDictionary, IObj} from './object';
-import {IPage} from './page';
-import {EncryptOption, IEncrypt, ProtectionOption} from './encrypt';
-import {IEncoding, IExtGState, IFont, IPainter} from "./painter";
-import {ISigner} from './signer';
-import {F_OK, R_OK} from "constants";
-import {IForm} from "./form";
+import {access} from 'fs'
+import {IObj} from './object';
+import {IEncrypt} from './encrypt';
+import {IFont} from "./painter";
+import {F_OK} from "constants";
 import {IBase} from './base-document'
-import {ICheckBox, IComboBox, IField, IListBox, IListField, ISignatureField, ITextField} from "./field";
-import {IAction} from "./action";
-import {IStreamDocument} from "./stream-document";
-import {IImage} from "./image";
-import {IAnnotation} from "./annotation";
-import {IFileSpec} from "./file-spec";
-import {IContentsTokenizer} from "./parser";
-import {IRect} from "./rect";
-import {IData} from "./data";
 import { npdf } from '.';
 
 export declare enum NPDFVersion {
@@ -156,6 +144,11 @@ export interface IDocument extends IBase {
      * @param name - font name or font id
      */
     getFont(name: string): IFont
+
+    /**
+     * List all the fonts from the document.
+     */
+    listFonts(): {id: string, name: string}[]
 
     /**
      * Performs garbage collection on the document. All objects not

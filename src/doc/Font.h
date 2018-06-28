@@ -56,10 +56,10 @@ public:
   void WriteToStream(const Napi::CallbackInfo&);
   void EmbedFont(const Napi::CallbackInfo&);
 
-  PoDoFo::PdfFont& GetFont() { return *font; }
+  PoDoFo::PdfFont& GetFont() { return font; }
 
 private:
-  PoDoFo::PdfFont* font; // owned by the document
+  PoDoFo::PdfFont& font; // owned by the document
   PoDoFo::PdfEncoding* encoding;
 };
 }

@@ -11,7 +11,7 @@
 ### __Current Version 0.6.3__
 [![NPM](https://nodei.co/npm/nopodofo.png?downloads=true&downloadRank=true)](http://nodei.co/npm/nopodofo)
 
-### [Documentation](https://corymickelson.github.io/NoPoDoFo/index)
+### [Api Documentation](https://corymickelson.github.io/NoPoDoFo/index)
 
 #### **Guides**
  - [NoPoDoFo Installation and Setup](https://github.com/corymickelson/NoPoDoFo/blob/master/guides/getting_started.md)
@@ -22,8 +22,8 @@
  - [NoPoDoFo.Page](https://github.com/corymickelson/NoPoDoFo/blob/master/guides/page.md)
  - [NoPoDoFo.Signer](https://github.com/corymickelson/NoPoDoFo/blob/master/guides/signer.md)
  - [NoPoDoFo.Parsers](https://github.com/corymickelson/NoPoDoFo/blob/master/guides/parsers.md)
- - [NoPoDoFo.Proxies](https://github.com/corymickelson/NoPoDoFo/blob/master/guides/proxies.md)
  - [NoPoDoFo.Encrypt](https://github.com/corymickelson/NoPoDoFo/blob/master/guides/encrypt.md)
+ - [NoPoDoFo.Font](https://github.com/corymickelson/NoPoDoFo/blob/master/guides/font.md)
 
 For use with AWS Lambda read [AWS Lambda guide](https://github.com/corymickelson/NoPoDoFo/blob/master/guides/aws_lambda.md)
 

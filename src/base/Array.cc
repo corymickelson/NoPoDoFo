@@ -164,7 +164,7 @@ Array::GetObjAtIndex(const CallbackInfo& info)
   if (GetArray()[index].IsReference()) {
     item = obj.GetOwner()->GetObject(GetArray()[index].GetReference());
   } else {
-    item = &GetArray()[index];
+    item = &(GetArray()[index]);
   }
   auto child = new PdfObject(*item);
   children.push_back(child);

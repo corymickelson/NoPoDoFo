@@ -45,7 +45,7 @@ doc.write((e:Error, d:Buffer) => {
 ```
 
 ### [Document Encryption](https://github.com/corymickelson/NoPoDoFo/tree/master/guides/encrypt.md)
-NoPoDoFo provides the ability to encrypt a document through ```Document.createEncrypt```.
+NoPoDoFo provides the ability to encrypt a document through ```Encrypt.createEncrypt```.
 Encryption options are dependent on PoDoFo built with libidn and OpenSSL.
 ``` typescript
 let doc = new NoPoDoFo.Document()

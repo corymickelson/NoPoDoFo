@@ -67,6 +67,7 @@ Document::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceMethod("getPage", &Document::GetPage),
       InstanceMethod("splicePages", &Document::DeletePages),
       InstanceMethod("getFont", &Document::GetFont),
+      InstanceMethod("listFonts", &Document::ListFonts),
       InstanceMethod("hideToolbar", &Document::SetHideToolbar),
       InstanceMethod("hideMenubar", &Document::SetHideMenubar),
       InstanceMethod("hideWindowUI", &Document::SetHideWindowUI),
@@ -110,8 +111,55 @@ Document::GetFont(const CallbackInfo& info)
 {
   try {
     auto id = info[0].As<String>().Utf8Value();
+    auto fonts = GetFonts();
+    for (auto item : fonts) {
+      string itemId = item->GetIdentifier().GetName();
+      string itemName = item->GetFontMetrics()->GetFontname();
+      if (itemId == id || itemName == id) {
+        EscapableHandleScope scope(info.Env());
+        return scope.Escape(
+          Font::constructor.New({ External<PdfFont>::New(info.Env(), item) }));
+      }
+    }
+    return info.Env().Null();
+  } catch (PdfError& err) {
+    ErrorHandler(err, info);
+  }
+  return info.Env().Undefined();
+}
+
+Napi::Value
+Document::ListFonts(const CallbackInfo& info)
+{
+  auto fonts = GetFonts();
+  auto list = Array::New(info.Env());
+  uint32_t n = 0;
+  for (auto item : fonts) {
+    string itemId = item->GetIdentifier().GetName();
+    string itemName = item->GetFontMetrics()->GetFontname();
+    auto v = Object::New(info.Env());
+    v.Set("id", String::New(info.Env(), itemId));
+    v.Set("name", String::New(info.Env(), itemName));
+    list.Set(n, v);
+    n++;
+  }
+  return list;
+}
+
+Value
+Document::CreateFont(const CallbackInfo& info)
+{
+  Napi::Value font = BaseDocument::CreateFont(info);
+  fonts.clear();
+  GetFonts();
+  return font;
+}
+
+vector<PdfFont*>
+Document::GetFonts()
+{
+  if (fonts.empty()) {
     vector<PdfObject*> fontObjs;
-    vector<PdfFont*> fonts;
     for (auto item : GetDocument().GetObjects()) {
       if (item->IsDictionary()) {
         if (item->GetDictionary().HasKey(Name::TYPE) &&
@@ -141,22 +189,8 @@ Document::GetFont(const CallbackInfo& info)
         fonts.push_back(font);
       }
     }
-    for (auto item : fonts) {
-      string itemId = item->GetIdentifier().GetName();
-      string itemName = item->GetFontMetrics()->GetFontname();
-      cout << "Font Identifier: " << itemId << endl;
-      cout << "Font Name: " << itemName << endl;
-      if (itemId == id || itemName == id) {
-        EscapableHandleScope scope(info.Env());
-        return scope.Escape(
-          Font::constructor.New({ External<PdfFont>::New(info.Env(), item) }));
-      }
-    }
-    return info.Env().Null();
-  } catch (PdfError& err) {
-    ErrorHandler(err, info);
   }
-  return info.Env().Undefined();
+  return fonts;
 }
 
 void

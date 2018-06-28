@@ -39,7 +39,7 @@ public:
   Napi::Value GetObjects(const Napi::CallbackInfo&);
   Napi::Value GetObject(const Napi::CallbackInfo&);
   Napi::Value IsAllowed(const Napi::CallbackInfo&);
-  Napi::Value CreateFont(const Napi::CallbackInfo&);
+  virtual Napi::Value CreateFont(const Napi::CallbackInfo&);
   Napi::Value GetPageMode(const Napi::CallbackInfo&);
   Napi::Value GetForm(const Napi::CallbackInfo&);
   void SetPageMode(const Napi::CallbackInfo&, const Napi::Value&);

@@ -39,8 +39,8 @@ FunctionReference Font::constructor; // NOLINT
 
 Font::Font(const Napi::CallbackInfo& info)
   : ObjectWrap(info)
+  , font(*info[0].As<External<PdfFont>>().Data())
 {
-  font = info[0].As<External<PdfFont>>().Data();
 }
 
 void
