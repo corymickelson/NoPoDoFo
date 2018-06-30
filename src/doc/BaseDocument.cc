@@ -511,9 +511,6 @@ BaseDocument::AddNamedDestination(const Napi::CallbackInfo& info)
 Napi::Value
 BaseDocument::GetForm(const CallbackInfo& info)
 {
-  if (!base->GetAcroForm()) {
-    return info.Env().Null();
-  }
   Napi::Object instance =
     Form::constructor.New({ External<BaseDocument>::New(info.Env(), this),
                             Boolean::New(info.Env(), true) });

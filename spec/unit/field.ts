@@ -8,6 +8,14 @@ if(!global.gc) {
 const filePath = join(__dirname, '../test-documents/iss.16.checkbox-field-state-options.pdf')
 const outfile = join(__dirname,'../tmp/npdf.values.test.pdf')
 
+tap('IField Create', t => {
+    const testFile = join(__dirname, '../tmp/fields.create.pdf')
+    const doc = new npdf.StreamDocument(testFile)
+    const defaultPageMediaBox = new npdf.Rect(0,0,612, 792)
+    const page = doc.createPage(defaultPageMediaBox)
+    t.ok(doc.form)
+    t.end()
+})
 tap('IField', t => {
     const doc = new npdf.Document()
     doc.load(filePath, (e: Error) => {

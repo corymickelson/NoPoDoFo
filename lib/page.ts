@@ -22,7 +22,7 @@ import {
     IComboBox,
     IListBox,
     IPushButton,
-    ITextField
+    ITextField, NPDFFieldType
 } from './field'
 import { IRect } from './rect';
 import { IObj } from './object';
@@ -59,6 +59,7 @@ export interface IPage {
     getArtBox(): IRect
     annotationsCount(): number
     createAnnotation(type: NPDFAnnotation, rect: IRect): IAnnotation
+    createField(type: NPDFFieldType, rect: IRect): IField
     getAnnotation(index: number): IAnnotation
     deleteAnnotation(index: number): void
 }

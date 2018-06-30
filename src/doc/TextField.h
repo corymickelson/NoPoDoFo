@@ -37,7 +37,7 @@ public:
   explicit TextField(const Napi::CallbackInfo&);
   static void Initialize(Napi::Env& env, Napi::Object& target);
   void SetText(const Napi::CallbackInfo&, const Napi::Value&);
-  Napi::Value GetText(const Napi::CallbackInfo&);
+  Napi::Value Text(const Napi::CallbackInfo&);
   void SetMaxLen(const Napi::CallbackInfo&, const Napi::Value&);
   Napi::Value GetMaxLen(const Napi::CallbackInfo&);
   void SetMultiLine(const Napi::CallbackInfo&, const Napi::Value&);

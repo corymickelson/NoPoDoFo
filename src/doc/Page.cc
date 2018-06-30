@@ -29,6 +29,7 @@
 #include "PushButton.h"
 #include "SignatureField.h"
 #include "TextField.h"
+#include "Form.h"
 
 using namespace Napi;
 using namespace PoDoFo;
@@ -63,6 +64,7 @@ Page::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceAccessor("resources", &Page::GetResources, nullptr),
 
       InstanceMethod("getField", &Page::GetField),
+      InstanceMethod("createField", &Page::CreateField),
       InstanceMethod("deleteField", &Page::DeleteField),
       InstanceMethod("getFields", &Page::GetFields),
       InstanceMethod("flattenFields", &Page::FlattenFields),
@@ -337,6 +339,45 @@ Page::CreateAnnotation(const CallbackInfo& info)
   auto instance = Annotation::constructor.New(
     { External<PdfAnnotation>::New(info.Env(), annot) });
   return instance;
+}
+/**
+ * JS call(type: NPDFFieldType, widget: Annotation, form: Form): PdfField
+ * @param info
+ * @return
+ */
+Value
+Page::CreateField(const CallbackInfo &info)
+{
+  if(!info[1].As<Object>().InstanceOf(Annotation::constructor.Value())) {
+    TypeError::New(info.Env(), "Requires in instance of Annotation").ThrowAsJavaScriptException();
+    return info.Env().Undefined();
+  }
+  if(!info[2].As<Object>().InstanceOf(Form::constructor.Value())) {
+    TypeError::New(info.Env(), "Requires in instance of Form").ThrowAsJavaScriptException();
+    return info.Env().Undefined();
+  }
+  Napi::Value opts =  info.Length() == 4 && info[3].IsObject() ? info[3].As<Object>() : info.Env().Null();
+  int typeArg = info[0].As<Number>();
+  auto type = static_cast<EPdfField>(typeArg);
+  Form* form = Form::Unwrap(info[2].As<Object>());
+  Annotation* widget = Annotation::Unwrap(info[1].As<Object>());
+  switch (type) {
+  case ePdfField_PushButton:
+    return PushButton::constructor.New({widget->Value(), form->Value()});
+  case ePdfField_CheckBox:
+    return CheckBox::constructor.New({widget->Value(), form->Value()});
+  case ePdfField_RadioButton:break;
+  case ePdfField_TextField:
+    return TextField::constructor.New({widget->Value(), form->Value(), opts});
+  case ePdfField_ComboBox:
+    return ComboBox::constructor.New({widget->Value(), form->Value()});
+  case ePdfField_ListBox:
+    return ListBox::constructor.New({widget->Value(), form->Value()});
+  case ePdfField_Signature:break;
+  case ePdfField_Unknown:
+    Error::New(info.Env(), "Unknown Field Type").ThrowAsJavaScriptException();
+    return info.Env().Undefined();
+  }
 }
 void
 Page::DeleteField(const Napi::CallbackInfo& info)

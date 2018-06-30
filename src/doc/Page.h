@@ -58,6 +58,7 @@ public:
   Napi::Value GetArtBox(const Napi::CallbackInfo&);
   Napi::Value CreateAnnotation(const Napi::CallbackInfo&);
   Napi::Value GetAnnotation(const Napi::CallbackInfo&);
+  Napi::Value CreateField(const Napi::CallbackInfo&);
   Napi::Value GetNumAnnots(const Napi::CallbackInfo&);
   void DeleteAnnotation(const Napi::CallbackInfo&);
   void DeleteField(const Napi::CallbackInfo&);

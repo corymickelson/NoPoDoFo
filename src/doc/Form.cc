@@ -268,7 +268,7 @@ Form::GetFont(const CallbackInfo& info)
       .ThrowAsJavaScriptException();
     return info.Env().Undefined();
   }
-  auto memDoc = static_cast<PdfMemDocument*>(doc);
+  auto memDoc = dynamic_cast<PdfMemDocument*>(doc);
   auto js = Array::New(info.Env());
   uint32_t n = 0;
   if (GetDictionary()->HasKey(Name::DR)) {

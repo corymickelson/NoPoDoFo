@@ -88,7 +88,7 @@ TextField::Initialize(Napi::Env& env, Napi::Object& target)
   Function ctor = DefineClass(
     env,
     "TextField",
-    { InstanceAccessor("text", &TextField::GetText, &TextField::SetText),
+    { InstanceAccessor("text", &TextField::Text, &TextField::SetText),
       InstanceAccessor("maxLen", &TextField::GetMaxLen, &TextField::SetMaxLen),
       InstanceAccessor(
         "multiLine", &TextField::IsMultiLine, &TextField::SetMultiLine),
@@ -142,7 +142,7 @@ TextField::SetText(const CallbackInfo& info, const Napi::Value& value)
 }
 
 Napi::Value
-TextField::GetText(const CallbackInfo& info)
+TextField::Text(const CallbackInfo& info)
 {
   return Napi::String::New(info.Env(), GetText().GetText().GetStringUtf8());
 }
