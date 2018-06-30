@@ -27,6 +27,7 @@ import {
 import { IRect } from './rect';
 import { IObj } from './object';
 import { IAnnotation, NPDFAnnotation } from './annotation';
+import {IForm} from "./form";
 
 export interface IPage {
     rotation: number
@@ -59,7 +60,8 @@ export interface IPage {
     getArtBox(): IRect
     annotationsCount(): number
     createAnnotation(type: NPDFAnnotation, rect: IRect): IAnnotation
-    createField(type: NPDFFieldType, rect: IRect): IField
+    createField(type: NPDFFieldType, annot: IAnnotation, form: IForm, opts?: Object): IField
+    deleteField(index: number): void
     getAnnotation(index: number): IAnnotation
     deleteAnnotation(index: number): void
 }

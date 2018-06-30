@@ -61,7 +61,30 @@ Field::Field(EPdfField type, const CallbackInfo& info)
       if (info[1].IsObject() &&
           info[1].As<Object>().InstanceOf(Form::constructor.Value())) {
         PdfAcroForm* form = Form::Unwrap(info[1].As<Object>())->GetForm();
-        field = new PdfField(form->GetObject(), annotation);
+        switch (type) {
+          case PoDoFo::ePdfField_PushButton:
+            field = new PdfPushButton(annotation, form);
+            break;
+          case PoDoFo::ePdfField_CheckBox:
+            field = new PdfCheckBox(annotation, form);
+            break;
+          case PoDoFo::ePdfField_TextField:
+            field = new PdfTextField(annotation, form);
+            break;
+          case PoDoFo::ePdfField_ComboBox:
+            field = new PdfComboBox(annotation, form);
+            break;
+          case PoDoFo::ePdfField_ListBox:
+            field = new PdfListBox(annotation, form);
+            break;
+          case PoDoFo::ePdfField_Signature:
+          case PoDoFo::ePdfField_RadioButton:
+          case PoDoFo::ePdfField_Unknown:
+            Error::New(info.Env(),
+                       "Field type not yet implemented for new instances")
+              .ThrowAsJavaScriptException();
+            break;
+        }
       }
     } else {
       TypeError::New(info.Env(), "Signature Mismatch")

@@ -1,7 +1,7 @@
 import { existsSync, unlinkSync, writeFile } from 'fs'
 import { join } from 'path'
 import * as test from 'tape'
-import { IObj, IPage, npdf } from "../../dist";
+import { IObj, IPage, npdf, NPDFAnnotation, NPDFFieldType } from "../../dist";
 if (!global.gc) {
     global.gc = () => { }
 }
@@ -16,6 +16,17 @@ doc.load(filePath, e => {
     runAll()
 })
 
+function createField() {
+    test('create field', t => {
+        let doc = new npdf.StreamDocument('/tmp/test.pdf')
+        let page = doc.createPage(new npdf.Rect(0, 0, 612, 792))
+        let annot = page.createAnnotation(NPDFAnnotation.Widget, new npdf.Rect(0, 0, 100, 100))
+        let field = page.createField(NPDFFieldType.TextField, annot, doc.form)
+        t.ok(field)
+        t.assert(page.fieldsCount() === 1)
+        t.end()
+    })
+}
 function removeAnnotation() {
     test('remove annotation', t => {
         let annCount = page.annotationsCount()
@@ -169,6 +180,7 @@ function runTest(test: Function) {
 
 export function runAll() {
     [   removeAnnotation,
+        createField,
         pageRotation,
         pageProperties,
         pageTrimBox,
@@ -179,6 +191,3 @@ export function runAll() {
         pageAddImg
     ].map(i => runTest(i))
 }
-test.onFinish(() => {
-    unlinkSync(outFile)
-})

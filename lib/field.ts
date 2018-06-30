@@ -86,7 +86,7 @@ export interface ITextField extends IField {
     /**
      * @desc Creates a new TextField
      */
-    new(form: IForm, annotation: IAnnotation): ITextField
+    new(page: IPage, annotation: IAnnotation, form: IForm, opts?: Object): ITextField
 
     text: string
     maxLen: number
