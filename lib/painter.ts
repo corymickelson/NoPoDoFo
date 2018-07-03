@@ -23,6 +23,7 @@ import {IBase} from './base-document'
 import {IRect} from "./rect";
 import {NPDFPoint} from "./painter";
 import { IObj } from './object';
+import { IXObj } from './xobject';
 
 export type NPDFcmyk = [number, number, number, number]
 export type NPDFrgb = [number, number, number]
@@ -110,7 +111,7 @@ export interface IPainter {
     font?: IFont
     precision: number
     new(doc:IBase):IPainter
-    setPage(page: IPage): void
+    setPage(page: IPage|IXObj): void
     setColor(rgb:NPDFrgb):void
     setStrokeWidth(w:number):void
     setGrey(v:number): void

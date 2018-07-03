@@ -28,6 +28,7 @@
 #include "Page.h"
 #include "Rect.h"
 #include "StreamDocument.h"
+#include "../base/XObject.h"
 
 using namespace Napi;
 using namespace PoDoFo;
@@ -134,8 +135,17 @@ Painter::SetPage(const Napi::CallbackInfo& info)
   if (!info[0].IsObject()) {
     throw Napi::Error::New(info.Env(), "Page must be an instance of Page.");
   }
-  auto page = Page::Unwrap(info[0].As<Object>());
-  painter->SetPage(&page->page);
+  PdfCanvas* canvas;
+  if(info[0].As<Object>().InstanceOf(Page::constructor.Value())) {
+    canvas = &Page::Unwrap(info[0].As<Object>())->page;
+  }
+  else if(info[0].As<Object>().InstanceOf(XObject::constructor.Value())) {
+    canvas = &XObject::Unwrap(info[0].As<Object>())->GetXObject();
+  } else {
+    TypeError::New(info.Env(), "Painter must be an instance of PdfCanvas: XObject or Page").ThrowAsJavaScriptException();
+    return;
+  }
+  painter->SetPage(canvas);
 }
 
 void

@@ -19,6 +19,7 @@
 
 #include "Annotation.h"
 #include "../ErrorHandler.h"
+#include "../base/XObject.h"
 #include "Action.h"
 #include "Destination.h"
 #include "FileSpec.h"
@@ -63,6 +64,7 @@ Annotation::Initialize(Napi::Env& env, Napi::Object& target)
         "attachment", &Annotation::GetAttachment, &Annotation::SetAttachment),
 
       InstanceMethod("hasAppearanceStream", &Annotation::HasAppearanceStream),
+      InstanceMethod("setAppearanceStream", &Annotation::SetAppearanceStream),
       InstanceMethod("setBorderStyle", &Annotation::SetBorderStyle),
       InstanceMethod("getType", &Annotation::GetType),
     });
@@ -93,6 +95,20 @@ Napi::Value
 Annotation::HasAppearanceStream(const CallbackInfo& info)
 {
   return Napi::Boolean::New(info.Env(), GetAnnotation().HasAppearanceStream());
+}
+
+void
+Annotation::SetAppearanceStream(const CallbackInfo& info)
+{
+  if (info.Length() != 1 || !info[0].IsObject() ||
+      !info[0].As<Object>().InstanceOf(XObject::constructor.Value())) {
+    TypeError::New(info.Env(),
+                   "Requires an instance of XObject as the first argument")
+      .ThrowAsJavaScriptException();
+    return;
+  }
+  GetAnnotation().SetAppearanceStream(
+    &(XObject::Unwrap(info[0].As<Object>())->GetXObject()));
 }
 
 void

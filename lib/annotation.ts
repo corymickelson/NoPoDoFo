@@ -22,6 +22,7 @@ import {F_OK, R_OK} from "constants";
 import {IAction, IDestination} from "./action";
 import {IFileSpec} from "./file-spec";
 import {IBase} from "./base-document";
+import { IXObj } from './xobject';
 
 export enum NPDFAnnotationType {
     Text = 'Text',
@@ -132,6 +133,7 @@ export interface IAnnotation {
 
     setBorderStyle(v: NPDFAnnotationBorderStyle): void
     hasAppearanceStream(): boolean
+    setAppearanceStream(xobj:IXObj): void
     getType(): NPDFAnnotationType
 }
 

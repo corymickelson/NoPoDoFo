@@ -86,6 +86,7 @@ StreamDocument::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceMethod("getNames", &StreamDocument::GetNamesTree),
       InstanceMethod("createPage", &StreamDocument::CreatePage),
       InstanceMethod("createPages", &StreamDocument::CreatePages),
+      InstanceMethod("createXObject", &StreamDocument::CreateXObject),
       InstanceMethod("getAttachment", &StreamDocument::GetAttachment),
       InstanceMethod("addNamedDestination",
                      &StreamDocument::AddNamedDestination)

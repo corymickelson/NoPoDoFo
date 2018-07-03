@@ -22,6 +22,7 @@ import {IPage} from './page'
 import { IStreamDocument, NPDFWriteMode, NPDFVersion } from './stream-document'
 import { IObj, IDictionary,NPDFInternal,IArray,NPDFCoerceKeyType,NPDFDataType, NPDFDictionaryKeyType
 } from './object'
+import {IXObj} from './xobject'
 import {
     IAnnotation,
     NPDFAction,
@@ -171,7 +172,8 @@ export {
     NPDFPageMode,
     IStreamDocument,
     NPDFWriteMode,
-    NPDFVersion
+    NPDFVersion,
+    IXObj
 }
 export const CONVERSION = 0.0028346456693
 export type NPDFExternal<T> = Object

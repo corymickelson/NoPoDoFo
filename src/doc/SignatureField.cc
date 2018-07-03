@@ -26,6 +26,7 @@
 #include "../doc/Form.h"
 #include "Signer.h"
 #include "StreamDocument.h"
+#include "../base/XObject.h"
 
 using namespace Napi;
 using namespace PoDoFo;
@@ -44,6 +45,7 @@ SignatureField::SignatureField(const CallbackInfo& info)
   : ObjectWrap<SignatureField>(info)
 {
   try {
+    // Create a new Signature Field
     if (info.Length() == 2) {
       auto annot = Annotation::Unwrap(info[0].As<Object>());
       auto nObj = info[1].As<Object>();
@@ -60,7 +62,8 @@ SignatureField::SignatureField(const CallbackInfo& info)
       }
       field = make_shared<PdfSignatureField>(
         &annot->GetAnnotation(), doc->GetAcroForm(), doc);
-    } else if (info.Length() == 1 && info[0].IsExternal()) {
+    } // Copy an existing Signature field.
+    else if (info.Length() == 1 && info[0].IsExternal()) {
       field = make_shared<PdfSignatureField>(
         info[0].As<External<PdfAnnotation>>().Data());
     } else {
@@ -101,7 +104,8 @@ SignatureField::Initialize(Napi::Env& env, Napi::Object& target)
 void
 SignatureField::SetAppearanceStream(const CallbackInfo& info)
 {
-  throw Error::New(info.Env(), "unimplemented");
+  XObject* xobj = XObject::Unwrap(info[0].As<Object>());
+  field->SetAppearanceStream(&xobj->GetXObject());
 }
 
 void

@@ -24,6 +24,7 @@
 #include "../base/Obj.h"
 #include "Document.h"
 #include "Font.h"
+#include "StreamDocument.h"
 #include <iostream>
 
 using namespace Napi;
@@ -41,19 +42,12 @@ FunctionReference Form::constructor; // NOLINT
 Form::Form(const Napi::CallbackInfo& info)
   : ObjectWrap(info)
   , create(info[1].As<Boolean>())
-{
-  if (info[0].IsObject() &&
-      info[0].As<Object>().InstanceOf(Document::constructor.Value())) {
-    cout << "Using Document instance" << endl;
-    doc = Document::Unwrap(info[0].As<Object>())->base;
-    isMemDoc = true;
-  } else if (info[0].Type() == napi_external) {
-    cout << "Using BaseDocument" << endl;
-    auto base = info[0].As<External<BaseDocument>>().Data();
-    isMemDoc = !base->created();
-    doc = base->base;
-  }
-}
+  , doc(info[0].IsExternal()
+          ? *info[0].As<External<BaseDocument>>().Data()->base
+          : *(info[0].As<Object>().InstanceOf(Document::constructor.Value())
+               ? Document::Unwrap(info[0].As<Object>())->base
+               : StreamDocument::Unwrap(info[0].As<Object>())->base))
+{}
 
 void
 Form::Initialize(Napi::Env& env, Napi::Object& target)
@@ -71,8 +65,7 @@ Form::Initialize(Napi::Env& env, Napi::Object& target)
         "DA", &Form::GetDefaultAppearance, &Form::SetDefaultAppearance),
       InstanceAccessor(
         "CO", &Form::GetCalculationOrder, &Form::SetCalculationOrder),
-      InstanceAccessor("DR", &Form::GetResource, &Form::SetResource),
-      InstanceAccessor("Fonts", &Form::GetFont, &Form::SetFont) });
+      InstanceAccessor("DR", &Form::GetResource, &Form::SetResource) });
   constructor = Napi::Persistent(ctor);
   constructor.SuppressDestruct();
   target.Set("Form", ctor);
@@ -86,20 +79,19 @@ Form::SetNeedAppearances(const CallbackInfo& info, const Napi::Value& value)
   if (!value.IsBoolean()) {
     throw Napi::Error::New(info.Env(), "requires boolean value type");
   }
-  doc->GetAcroForm()->SetNeedAppearances(value.As<Boolean>());
+  GetForm()->SetNeedAppearances(value.As<Boolean>());
 }
 
 Napi::Value
 Form::GetNeedAppearances(const CallbackInfo& info)
 {
-  return Napi::Boolean::New(info.Env(),
-                            doc->GetAcroForm()->GetNeedAppearances());
+  return Napi::Boolean::New(info.Env(), GetForm()->GetNeedAppearances());
 }
 
 Napi::Value
 Form::GetFormDictionary(const CallbackInfo& info)
 {
-  auto obj = doc->GetAcroForm()->GetObject();
+  auto obj = GetForm()->GetObject();
   auto ptr =
     Dictionary::constructor.New({ External<PdfObject>::New(info.Env(), obj) });
   return ptr;
@@ -181,7 +173,7 @@ Form::GetResource(const CallbackInfo& info)
   if (GetDictionary()->HasKey(Name::DR)) {
     PdfObject* drObj = GetDictionary()->GetKey(Name::DR);
     if (drObj->IsReference()) {
-      drObj = doc->GetObjects()->GetObject(drObj->GetReference());
+      drObj = doc.GetObjects()->GetObject(drObj->GetReference());
     }
     return Dictionary::constructor.New(
       { External<PdfObject>::New(info.Env(), drObj) });
@@ -199,7 +191,7 @@ Form::SetResource(const CallbackInfo& info, const Napi::Value& value)
       .ThrowAsJavaScriptException();
   } else {
     try {
-      auto formDict = doc->GetAcroForm()->GetObject()->GetDictionary();
+      auto formDict = GetForm()->GetObject()->GetDictionary();
       auto dr = Obj::Unwrap(value.As<Object>());
       if (dr->GetObject().GetDataType() != ePdfDataType_Dictionary)
         TypeError::New(
@@ -220,7 +212,7 @@ Form::GetCalculationOrder(const CallbackInfo& info)
 {
   Array js = Array::New(info.Env());
   uint32_t n = 0;
-  auto d = doc->GetAcroForm()->GetObject()->GetDictionary();
+  auto d = GetForm()->GetObject()->GetDictionary();
   if (d.HasKey(Name::CO)) {
     auto co = d.GetKey(Name::CO);
     if (!co->IsArray()) {
@@ -229,7 +221,7 @@ Form::GetCalculationOrder(const CallbackInfo& info)
       auto arr = co->GetArray();
       for (const auto& item : arr) {
         if (item.IsReference()) {
-          auto value = doc->GetObjects()->GetObject(item.GetReference());
+          auto value = doc.GetObjects()->GetObject(item.GetReference());
           auto nObj = Obj::constructor.New(
             { External<PdfObject>::New(info.Env(), value) });
           if (!value->IsDictionary()) {
@@ -254,61 +246,6 @@ Form::SetCalculationOrder(const CallbackInfo& info, const Napi::Value& value)
   Error::New(info.Env(), "Not yet implemented").ThrowAsJavaScriptException();
 }
 
-/**
- * @todo: fix upcasting for PdfMemDocument::GetFont
- * @param info
- * @return
- */
-Napi::Value
-Form::GetFont(const CallbackInfo& info)
-{
-  if (!isMemDoc) {
-    TypeError::New(info.Env(),
-                   "GetFont is only available from a PdfMemDocument")
-      .ThrowAsJavaScriptException();
-    return info.Env().Undefined();
-  }
-  auto memDoc = dynamic_cast<PdfMemDocument*>(doc);
-  auto js = Array::New(info.Env());
-  uint32_t n = 0;
-  if (GetDictionary()->HasKey(Name::DR)) {
-    PdfObject* drObj = GetDictionary()->GetKey(Name::DR);
-    auto fd = drObj->GetDictionary().GetKey(Name::FONT)->GetDictionary();
-    for (auto k : fd.GetKeys()) {
-      PdfObject* fontObject;
-      if (k.second->IsReference()) {
-        fontObject = doc->GetObjects()->GetObject(k.second->GetReference());
-      } else {
-        fontObject = k.second;
-      }
-      auto font = memDoc->GetFont(fontObject);
-      cout << "Font: " << font->GetFontMetrics()->GetFontname() << endl;
-      js.Set(
-        n, Font::constructor.New({ External<PdfFont>::New(info.Env(), font) }));
-      n++;
-    }
-    return js;
-  }
-  return info.Env().Null();
-}
-
-void
-Form::SetFont(const CallbackInfo& info, const Napi::Value& value)
-{
-  if (!value.IsArray()) {
-    TypeError::New(info.Env(), "Requires an array of Font objects")
-      .ThrowAsJavaScriptException();
-  }
-  auto arr = value.As<Array>();
-  for (uint32_t i = 0; i < arr.Length(); i++) {
-    auto item = arr.Get(i);
-    if (item.As<Object>().InstanceOf(Font::constructor.Value())) {
-      auto font = Font::Unwrap(item.As<Object>());
-      AddFont(&font->GetFont());
-    }
-  }
-}
-
 void
 Form::AddFont(PdfFont* font)
 {
@@ -317,7 +254,7 @@ Form::AddFont(PdfFont* font)
     PdfObject* drObj = GetDictionary()->GetKey(Name::DR);
     //    auto dr = Dictionary::Resolve(doc->GetDocument(), drObj);
     auto fd = drObj->GetDictionary().GetKey(Name::FONT)->IsReference()
-                ? doc->GetObjects()
+                ? doc.GetObjects()
                     ->GetObject(
                       drObj->GetDictionary().GetKey(Name::FONT)->GetReference())
                     ->GetDictionary()

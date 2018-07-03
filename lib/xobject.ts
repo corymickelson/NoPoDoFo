@@ -1,3 +1,6 @@
+import { IRect, IObj, NPDFExternal } from ".";
+import { IBase } from "./base-document";
+
 /**
  * This file is part of the NoPoDoFo (R) project.
  * Copyright (c) 2017-2018
@@ -16,21 +19,20 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import { IDictionary } from './object';
-import { IFont } from './painter';
 
-export enum ISigFlags {
-    SignatureExists = 1,
-    AppendOnly = 2,
-    SignatureExistsAppendOnly = 3
-}
-export interface IForm {
-    needAppearances: boolean
-    dictionary: IDictionary
-    DA?: string
-    DR?: IDictionary
-    CO?: IDictionary
-    SigFlags?: ISigFlags
-}
+export interface IXObj {
+    readonly contents: IObj
+    readonly contentsForAppending: IObj
+    readonly resources: IObj
+    readonly pageMediaBox: IRect
 
+    /**
+     * Use IBase.createXObject instance method for creating new instance's and copy instance's of an XObject.
+     */
+    new(native: NPDFExternal<IXObj>): IXObj
+    /**
+     * Use IBase.createXObject instance method for creating new instance's and copy instance's of an XObject.
+     */
+    new(rect: IRect, native: NPDFExternal<IBase>): IXObj
+}
 

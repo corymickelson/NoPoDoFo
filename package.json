@@ -14,7 +14,7 @@
     "coverage": "nyc tape spec/unit/*.js && nyc report --reporter=text-lcov | coveralls",
     "test": "mkdir -p spec/tmp && tsc -p tsconfig.json && tsc -p tsconfig.spec.json && node --expose-gc ./node_modules/.bin/tape spec/unit/*.js",
     "install": "node-pre-gyp install --fallback-to-build",
-    "qt:debug": "cmake-js build -D -j 4 && cp build/Debug/nopodofo.node lib/binding/1/",
+    "qt:debug": "node debug.js",
     "prepublish": "tsc -p tsconfig.json"
   },
   "nyc": {

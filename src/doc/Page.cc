@@ -25,19 +25,22 @@
 #include "CheckBox.h"
 #include "ComboBox.h"
 #include "Field.h"
+#include "Form.h"
 #include "ListBox.h"
 #include "PushButton.h"
 #include "SignatureField.h"
 #include "TextField.h"
-#include "Form.h"
 
 using namespace Napi;
 using namespace PoDoFo;
 
 using std::cout;
 using std::endl;
+using std::get;
 using std::make_shared;
+using std::make_tuple;
 using std::stringstream;
+using std::tuple;
 
 namespace NoPoDoFo {
 
@@ -346,38 +349,46 @@ Page::CreateAnnotation(const CallbackInfo& info)
  * @return
  */
 Value
-Page::CreateField(const CallbackInfo &info)
+Page::CreateField(const CallbackInfo& info)
 {
-  if(!info[1].As<Object>().InstanceOf(Annotation::constructor.Value())) {
-    TypeError::New(info.Env(), "Requires in instance of Annotation").ThrowAsJavaScriptException();
+  if (!info[1].As<Object>().InstanceOf(Annotation::constructor.Value())) {
+    TypeError::New(info.Env(), "Requires in instance of Annotation")
+      .ThrowAsJavaScriptException();
     return info.Env().Undefined();
   }
-  if(!info[2].As<Object>().InstanceOf(Form::constructor.Value())) {
-    TypeError::New(info.Env(), "Requires in instance of Form").ThrowAsJavaScriptException();
+  if (!info[2].As<Object>().InstanceOf(Form::constructor.Value())) {
+    TypeError::New(info.Env(), "Requires in instance of Form")
+      .ThrowAsJavaScriptException();
     return info.Env().Undefined();
   }
-  Napi::Value opts =  info.Length() == 4 && info[3].IsObject() ? info[3].As<Object>() : info.Env().Null();
+  Napi::Value opts = info.Length() == 4 && info[3].IsObject()
+                       ? info[3].As<Object>()
+                       : info.Env().Null();
   int typeArg = info[0].As<Number>();
   auto type = static_cast<EPdfField>(typeArg);
   Form* form = Form::Unwrap(info[2].As<Object>());
   Annotation* widget = Annotation::Unwrap(info[1].As<Object>());
   switch (type) {
-  case ePdfField_PushButton:
-    return PushButton::constructor.New({widget->Value(), form->Value()});
-  case ePdfField_CheckBox:
-    return CheckBox::constructor.New({widget->Value(), form->Value()});
-  case ePdfField_RadioButton:break;
-  case ePdfField_TextField:
-    return TextField::constructor.New({widget->Value(), form->Value(), opts});
-  case ePdfField_ComboBox:
-    return ComboBox::constructor.New({widget->Value(), form->Value()});
-  case ePdfField_ListBox:
-    return ListBox::constructor.New({widget->Value(), form->Value()});
-  case ePdfField_Signature:break;
-  case ePdfField_Unknown:
-    Error::New(info.Env(), "Unknown Field Type").ThrowAsJavaScriptException();
-    return info.Env().Undefined();
+    case ePdfField_PushButton:
+      return PushButton::constructor.New({ widget->Value(), form->Value() });
+    case ePdfField_CheckBox:
+      return CheckBox::constructor.New({ widget->Value(), form->Value() });
+    case ePdfField_RadioButton:
+      break;
+    case ePdfField_TextField:
+      return TextField::constructor.New(
+        { widget->Value(), form->Value(), opts });
+    case ePdfField_ComboBox:
+      return ComboBox::constructor.New({ widget->Value(), form->Value() });
+    case ePdfField_ListBox:
+      return ListBox::constructor.New({ widget->Value(), form->Value() });
+    case ePdfField_Signature:
+      break;
+    case ePdfField_Unknown:
+      Error::New(info.Env(), "Unknown Field Type").ThrowAsJavaScriptException();
+      return info.Env().Undefined();
   }
+  return info.Env().Undefined();
 }
 void
 Page::DeleteField(const Napi::CallbackInfo& info)
@@ -427,7 +438,8 @@ Page::DeleteFormField(const Napi::Env env, PdfObject& item, PdfObject& coll)
         return true;
       }
     } else if (it->IsDictionary() && it->GetDictionary().HasKey(Name::KIDS)) {
-      if (env, item, it->MustGetIndirectKey(Name::KIDS)) {
+      if (this->DeleteFormField(
+            env, item, *it->MustGetIndirectKey(Name::KIDS))) {
         return true;
       }
     } else {
@@ -450,33 +462,58 @@ Page::FlattenFields(const Napi::CallbackInfo& info)
       .ThrowAsJavaScriptException();
     return;
   }
+  vector<tuple<int, PdfAnnotation>> fields;
   auto it = annots->GetArray().begin();
+  cout << annots->GetArray().GetSize() << endl;
   while (it != annots->GetArray().end()) {
     auto o = page.GetObject()->GetOwner()->GetObject(it->GetReference());
     PdfAnnotation a(o, &page);
     if (a.GetType() == ePdfAnnotation_Widget) {
       if (a.HasAppearanceStream()) {
-        PdfObject* normalAppearances =
-          a.GetObject()->MustGetIndirectKey(Name::AP)->MustGetIndirectKey(
-            Name::N);
-        PdfXObject xAppearances(normalAppearances);
-        painter.DrawXObject(
-          a.GetRect().GetLeft(), a.GetRect().GetBottom(), &xAppearances);
-        PdfObject* fieldObj = page.GetField(n).GetFieldObject();
-        this->DeleteFormField(info.Env(),
-                              *fieldObj,
-                              *page.GetObject()
-                                 ->GetOwner()
-                                 ->GetParentDocument()
-                                 ->GetAcroForm(false)
-                                 ->GetObject()
-                                 ->MustGetIndirectKey(Name::FIELDS));
-        page.DeleteAnnotation(fieldObj->Reference());
-        --n; // keep n in sync with index as fields are deleted
+        fields.push_back(make_tuple(n, a));
+        //        PdfObject* normalAppearances =
+        //          a.GetObject()->MustGetIndirectKey(Name::AP)->MustGetIndirectKey(
+        //            Name::N);
+        //        PdfXObject xAppearances(normalAppearances);
+        //        painter.DrawXObject(
+        //          a.GetRect().GetLeft(), a.GetRect().GetBottom(),
+        //          &xAppearances);
+        //        PdfObject* fieldObj = page.GetField(n).GetFieldObject();
+        //        this->DeleteFormField(info.Env(),
+        //                              *fieldObj,
+        //                              *page.GetObject()
+        //                                 ->GetOwner()
+        //                                 ->GetParentDocument()
+        //                                 ->GetAcroForm(false)
+        //                                 ->GetObject()
+        //                                 ->MustGetIndirectKey(Name::FIELDS));
+        //        page.DeleteAnnotation(fieldObj->Reference());
+        //        --n; // keep n in sync with index as fields are deleted
       }
       ++n;
     }
     ++it;
+  }
+  while (fields.size() > 0) {
+    PdfObject* appearance = get<1>(fields.at(0))
+                              .GetObject()
+                              ->MustGetIndirectKey(Name::AP)
+                              ->MustGetIndirectKey(Name::N);
+    PdfXObject xApp(appearance);
+    painter.DrawXObject(get<1>(fields.at(0)).GetRect().GetLeft(),
+                        get<1>(fields.at(0)).GetRect().GetBottom(),
+                        &xApp);
+    PdfObject* fieldObj = page.GetField(get<0>(fields.at(0))).GetFieldObject();
+    this->DeleteFormField(info.Env(),
+                          *fieldObj,
+                          *page.GetObject()
+                             ->GetOwner()
+                             ->GetParentDocument()
+                             ->GetAcroForm(false)
+                             ->GetObject()
+                             ->MustGetIndirectKey(Name::FIELDS));
+    page.DeleteAnnotation(fieldObj->Reference());
+    fields.erase(fields.begin());
   }
   painter.FinishPage();
 }

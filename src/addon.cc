@@ -23,7 +23,9 @@
 #include "base/Dictionary.h"
 #include "base/Obj.h"
 #include "base/Stream.h"
+#include "base/XObject.h"
 #include "crypto/Signature.h"
+#include "doc/Action.h"
 #include "doc/Annotation.h"
 #include "doc/CheckBox.h"
 #include "doc/ComboBox.h"
@@ -39,13 +41,12 @@
 #include "doc/ListField.h"
 #include "doc/Outline.h"
 #include "doc/Painter.h"
+#include "doc/PushButton.h"
 #include "doc/SignatureField.h"
 #include "doc/Signer.h"
 #include "doc/SimpleTable.h"
 #include "doc/StreamDocument.h"
 #include "doc/TextField.h"
-#include "doc/Action.h"
-#include "doc/PushButton.h"
 #include <napi.h>
 
 Napi::Object
@@ -81,6 +82,7 @@ init(Napi::Env env, Napi::Object exports)
   NoPoDoFo::Destination::Initialize(env, exports);
   NoPoDoFo::Action::Initialize(env, exports);
   NoPoDoFo::PushButton::Initialize(env, exports);
+  NoPoDoFo::XObject::Initialize(env, exports);
 
   exports["signature"] = Function::New(env, NPDFSignatureData);
 
