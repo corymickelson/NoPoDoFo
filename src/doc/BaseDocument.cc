@@ -22,6 +22,7 @@
 #include "../ValidateArguments.h"
 #include "../base/Names.h"
 #include "../base/Obj.h"
+#include "../base/XObject.h"
 #include "../doc/Rect.h"
 #include "Encrypt.h"
 #include "FileSpec.h"
@@ -507,6 +508,21 @@ BaseDocument::AddNamedDestination(const Napi::CallbackInfo& info)
   string name = info[2].As<String>().Utf8Value();
   PdfDestination destination(&page, fit);
   base->AddNamedDestination(destination, name);
+}
+
+Napi::Value
+BaseDocument::CreateXObject(const CallbackInfo& info)
+{
+  if (info.Length() != 1 || !info[0].IsObject() ||
+      !info[0].As<Object>().InstanceOf(Rect::constructor.Value())) {
+    TypeError::New(
+      info.Env(),
+      "CreateXObject requires an NoPoDoFo::Rect instance as the first argument")
+      .ThrowAsJavaScriptException();
+    return info.Env().Undefined();
+  }
+  return XObject::constructor.New(
+    { info[0].As<Object>(), External<PdfDocument>::New(info.Env(), base) });
 }
 Napi::Value
 BaseDocument::GetForm(const CallbackInfo& info)

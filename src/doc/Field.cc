@@ -142,13 +142,14 @@ Field::GetType(const Napi::CallbackInfo& info)
 Napi::Value
 Field::GetFieldName(const CallbackInfo& info)
 {
-  return Napi::String::New(info.Env(), fieldName);
+  return Napi::String::New(info.Env(), GetField().GetFieldName().GetStringUtf8());
 }
 
 void
 Field::SetFieldName(const CallbackInfo&, const Napi::Value& value)
 {
-  field->SetFieldName(value.As<String>().Utf8Value());
+  string name = value.As<String>().Utf8Value();
+  GetField().SetFieldName(PdfString(name));
 }
 
 Napi::Value

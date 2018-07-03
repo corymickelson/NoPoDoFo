@@ -69,7 +69,7 @@ export interface IArray {
     readonly length: number
     immutable: boolean
 
-    toJS(): Array<any>
+    JsArray(): Array<any>
 
     at(i: number): IObj
 

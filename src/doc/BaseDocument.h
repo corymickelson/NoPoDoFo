@@ -68,6 +68,8 @@ public:
   Napi::Value Append(const Napi::CallbackInfo&);
   Napi::Value GetAttachment(const Napi::CallbackInfo&);
   void AddNamedDestination(const Napi::CallbackInfo&);
+  Napi::Value CreateXObject(const Napi::CallbackInfo&);
+
   bool created() { return create; }
 
   bool create = false;

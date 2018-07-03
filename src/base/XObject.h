@@ -2,7 +2,7 @@
  * This file is part of the NoPoDoFo (R) project.
  * Copyright (c) 2017-2018
  * Authors: Cory Mickelson, et al.
- * 
+ *
  * NoPoDoFo is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -16,21 +16,29 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import { IDictionary } from './object';
-import { IFont } from './painter';
 
-export enum ISigFlags {
-    SignatureExists = 1,
-    AppendOnly = 2,
-    SignatureExistsAppendOnly = 3
+#ifndef NPDF_XOBJECT_H
+#define NPDF_XOBJECT_H
+
+#include <napi.h>
+#include <podofo/podofo.h>
+
+namespace NoPoDoFo {
+class XObject : public Napi::ObjectWrap<XObject>
+{
+public:
+  explicit XObject(const Napi::CallbackInfo& info);
+  ~XObject();
+  static Napi::FunctionReference constructor;
+  static void Initialize(Napi::Env& env, Napi::Object& target);
+  Napi::Value GetContents(const Napi::CallbackInfo&);
+  Napi::Value GetContentsForAppending(const Napi::CallbackInfo&);
+  Napi::Value GetResources(const Napi::CallbackInfo&);
+  Napi::Value GetPageSize(const Napi::CallbackInfo&);
+  PoDoFo::PdfXObject& GetXObject() { return *xobj; }
+
+private:
+  PoDoFo::PdfXObject* xobj;
+};
 }
-export interface IForm {
-    needAppearances: boolean
-    dictionary: IDictionary
-    DA?: string
-    DR?: IDictionary
-    CO?: IDictionary
-    SigFlags?: ISigFlags
-}
-
-
+#endif // NPDF_XOBJECT_H

@@ -378,6 +378,7 @@ Page::CreateField(const CallbackInfo &info)
     Error::New(info.Env(), "Unknown Field Type").ThrowAsJavaScriptException();
     return info.Env().Undefined();
   }
+  return info.Env().Undefined();
 }
 void
 Page::DeleteField(const Napi::CallbackInfo& info)
@@ -427,7 +428,7 @@ Page::DeleteFormField(const Napi::Env env, PdfObject& item, PdfObject& coll)
         return true;
       }
     } else if (it->IsDictionary() && it->GetDictionary().HasKey(Name::KIDS)) {
-      if (env, item, it->MustGetIndirectKey(Name::KIDS)) {
+      if (this->DeleteFormField(env, item, *it->MustGetIndirectKey(Name::KIDS))) {
         return true;
       }
     } else {

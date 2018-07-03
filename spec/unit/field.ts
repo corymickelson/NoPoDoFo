@@ -1,18 +1,38 @@
-import {join} from 'path'
+import { join } from 'path'
 import * as tap from 'tape'
-import {npdf, ICheckBox, IComboBox, IField, ITextField, NPDFFieldType} from '../../dist'
-import {unlinkSync} from "fs";
-if(!global.gc) {
-    global.gc = () => {}
+import { npdf, IAnnotation, ICheckBox, IComboBox, IField, ITextField, NPDFFieldType, NPDFAnnotation } from '../../dist'
+import { unlinkSync } from "fs";
+if (!global.gc) {
+    global.gc = () => { }
 }
 const filePath = join(__dirname, '../test-documents/iss.16.checkbox-field-state-options.pdf')
-const outfile = join(__dirname,'../tmp/npdf.values.test.pdf')
+const outfile = join(__dirname, '../tmp/npdf.values.test.pdf')
 
 tap('IField Create', t => {
+    // instantiate required objects: doc, painter, font, xobj, page, annot, and field
     const testFile = join(__dirname, '../tmp/fields.create.pdf')
     const doc = new npdf.StreamDocument(testFile)
-    const defaultPageMediaBox = new npdf.Rect(0,0,612, 792)
+    const font = doc.createFont({ fontName: 'Courier' })
+    const painter = new npdf.Painter(doc)
+    const defaultPageMediaBox = new npdf.Rect(0, 0, 612, 792)
     const page = doc.createPage(defaultPageMediaBox)
+    const appearanceStream = doc.createXObject(new npdf.Rect(0, 0, 612, 792))
+    const nameLabel = 'First name:'
+    const nameFieldAnnot = page.createAnnotation(
+            NPDFAnnotation.Widget,
+            new npdf.Rect(100 + font.stringWidth(nameLabel), 500, 100, 40))
+
+    painter.setPage(page)
+    font.size = 11
+    painter.font = font
+    painter.drawText({ x: 100, y: 500 }, nameLabel)
+    painter.finishPage()
+    painter.setPage(appearanceStream)
+    painter.finishPage();
+
+    nameFieldAnnot.setAppearanceStream(appearanceStream)
+    const nameField = page.createField( NPDFFieldType.TextField, nameFieldAnnot, doc.form)
+    nameField.fieldName = 'FirstName'
     t.ok(doc.form)
     t.end()
 })
@@ -32,7 +52,7 @@ tap('IField', t => {
                 t.ok(typeof field.required === 'boolean')
                 switch (field.type) {
                     case NPDFFieldType.TextField:
-                        (field  as ITextField).text = 'TEST'
+                        (field as ITextField).text = 'TEST'
                         break
                     case NPDFFieldType.CheckBox:
                         (field as ICheckBox).checked = true
@@ -62,7 +82,7 @@ tap('IField', t => {
                                         t.true(check.checked)
                                         break
                                     case NPDFFieldType.ComboBox:
-                                        let lf =field as IComboBox
+                                        let lf = field as IComboBox
                                         t.assert(lf.selected === 0)
                                         break
                                     default:

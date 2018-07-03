@@ -90,6 +90,7 @@ Document::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceMethod("getNames", &Document::GetNamesTree),
       InstanceMethod("createPage", &Document::CreatePage),
       InstanceMethod("createPages", &Document::CreatePages),
+      InstanceMethod("createXObject", &Document::CreateXObject),
       InstanceMethod("getAttachment", &Document::GetAttachment),
       InstanceMethod("addNamedDestination", &Document::AddNamedDestination) });
   constructor = Persistent(ctor);

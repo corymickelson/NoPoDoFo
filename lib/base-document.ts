@@ -24,6 +24,7 @@ import {IFont} from "./painter";
 import {IForm} from "./form";
 import {NPDFVersion, NPDFWriteMode} from "./stream-document";
 import {IRect} from "./rect";
+import { IXObj } from ".";
 
 export interface NPDFInfo {
     author:string
@@ -75,6 +76,7 @@ export interface IBase {
     createFont(opts: NPDFCreateFontOpts): IFont
     getOutlines(): IObj
     getNames(): IObj
+    createXObject(rect: IRect): IXObj
     createPage(rect: IRect): IPage
     createPages(rects: IRect[]): number
     getAttachment(uri: string): IFileSpec
