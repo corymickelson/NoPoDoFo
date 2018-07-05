@@ -62,6 +62,12 @@ export interface IPage {
     createAnnotation(type: NPDFAnnotation, rect: IRect): IAnnotation
     createField(type: NPDFFieldType, annot: IAnnotation, form: IForm, opts?: Object): IField
     deleteField(index: number): void
+    /**
+     * Flattening is the process of taking a fields appearance stream, appending that appearance stream
+     * to the page, and then removing the field object and annotation widget, and scrubbing all references 
+     * to the field from the document (scrub the page and acroform dictionary)
+     */
+    flattenFields(): void
     getAnnotation(index: number): IAnnotation
     deleteAnnotation(index: number): void
 }

@@ -21,7 +21,6 @@ tap('NPDF Form Accessors and Methods', standard => {
                 'AcroForm Dictionary contains all expected keys')
             t.assert((doc.form.DA as string).includes('Helv'), 'test.pdf DA should be set to Helv')
             t.assert((doc.form.DR as any) instanceof (npdf.Dictionary as any))
-            t.assert((doc.form.Fonts as Array<any>).length > 0, 'Fonts contains at least one font')
             t.assert(doc.form.needAppearances === false)
             t.end()
             global.gc()
@@ -36,7 +35,6 @@ tap('NPDF Form Accessors and Methods', standard => {
                 fontDict = fontObj.getDictionary()
                 fontDict.addKey(font.identifier, font.object)
                 t.assert(fontDict.getKeys().includes(font.identifier), 'font added to dictionary')
-                t.ok((doc.form.Fonts as Array<any>)[0].identifier, 'get font via form.Fonts')
                 let da = `0 0 0 rg /${font.identifier} ${font.size} Tf`
                 doc.form.DA = da
                 t.assert(doc.form.DA === da, 'DA set')
