@@ -16,12 +16,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import {access} from 'fs'
-import {IObj} from './object';
-import {IEncrypt} from './encrypt';
-import {IFont} from "./painter";
-import {F_OK} from "constants";
-import {IBase} from './base-document'
+import { access } from 'fs'
+import { IObj } from './object';
+import { IEncrypt } from './encrypt';
+import { IFont } from "./painter";
+import { F_OK } from "constants";
+import { IBase } from './base-document'
 import { npdf } from '.';
 
 export declare enum NPDFVersion {
@@ -100,12 +100,12 @@ export interface IDocument extends IBase {
     readonly catalog: IObj
 
     load(file: string | Buffer,
-         opts: {
-             forUpdate?: boolean,
-             fromBuffer?: boolean,
-             password?: string
-         },
-         cb: Callback): void
+        opts: {
+            forUpdate?: boolean,
+            fromBuffer?: boolean,
+            password?: string
+        },
+        cb: Callback): void
     load(file: string | Buffer, cb: Callback): void
 
     /**
@@ -148,7 +148,7 @@ export interface IDocument extends IBase {
     /**
      * List all the fonts from the document.
      */
-    listFonts(): {id: string, name: string}[]
+    listFonts(): { id: string, name: string }[]
 
     /**
      * Performs garbage collection on the document. All objects not

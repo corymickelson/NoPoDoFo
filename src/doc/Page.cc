@@ -464,37 +464,19 @@ Page::FlattenFields(const Napi::CallbackInfo& info)
   }
   vector<tuple<int, PdfAnnotation>> fields;
   auto it = annots->GetArray().begin();
-  cout << annots->GetArray().GetSize() << endl;
   while (it != annots->GetArray().end()) {
     auto o = page.GetObject()->GetOwner()->GetObject(it->GetReference());
     PdfAnnotation a(o, &page);
     if (a.GetType() == ePdfAnnotation_Widget) {
       if (a.HasAppearanceStream()) {
-        fields.push_back(make_tuple(n, a));
-        //        PdfObject* normalAppearances =
-        //          a.GetObject()->MustGetIndirectKey(Name::AP)->MustGetIndirectKey(
-        //            Name::N);
-        //        PdfXObject xAppearances(normalAppearances);
-        //        painter.DrawXObject(
-        //          a.GetRect().GetLeft(), a.GetRect().GetBottom(),
-        //          &xAppearances);
-        //        PdfObject* fieldObj = page.GetField(n).GetFieldObject();
-        //        this->DeleteFormField(info.Env(),
-        //                              *fieldObj,
-        //                              *page.GetObject()
-        //                                 ->GetOwner()
-        //                                 ->GetParentDocument()
-        //                                 ->GetAcroForm(false)
-        //                                 ->GetObject()
-        //                                 ->MustGetIndirectKey(Name::FIELDS));
-        //        page.DeleteAnnotation(fieldObj->Reference());
-        //        --n; // keep n in sync with index as fields are deleted
+        fields.emplace_back(n, a);
+        --n; // keep n in sync with index as fields are deleted
       }
       ++n;
     }
     ++it;
   }
-  while (fields.size() > 0) {
+  while (!fields.empty()) { // erase ALL fields added to fields array
     PdfObject* appearance = get<1>(fields.at(0))
                               .GetObject()
                               ->MustGetIndirectKey(Name::AP)

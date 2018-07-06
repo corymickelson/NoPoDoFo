@@ -145,7 +145,7 @@ Signer::Sign(const CallbackInfo& info)
 class SignAsync : public AsyncWorker
 {
 public:
-  SignAsync(Function& cb, Signer* self, string data)
+  SignAsync(Function& cb, Signer& self, string data)
     : AsyncWorker(cb)
     , self(self)
     , signature(std::move(data))
@@ -158,7 +158,7 @@ public:
   //  }
 
 private:
-  Signer* self;
+  Signer& self;
   string signature;
   string output;
   PdfRefCountedBuffer buffer;
@@ -169,16 +169,16 @@ protected:
   {
     try {
       auto sigStrLength = static_cast<pdf_long>(signature.size());
-      self->field->SetFieldName("signer.sign");
+      self.field->SetFieldName("signer.sign");
       PdfOutputDevice outputDevice =
-        self->output.empty() ? PdfOutputDevice(&buffer)
-                             : PdfOutputDevice(self->output.c_str(), true);
+        self.output.empty() ? PdfOutputDevice(&buffer)
+                             : PdfOutputDevice(self.output.c_str(), true);
       PdfSignOutputDevice signer(&outputDevice);
       signer.SetSignatureSize(static_cast<size_t>(sigStrLength));
 
-      self->field->SetSignatureDate(PdfDate());
-      self->field->SetSignature(*signer.GetSignatureBeacon());
-      self->doc.WriteUpdate(&signer, true);
+      self.field->SetSignatureDate(PdfDate());
+      self.field->SetSignature(*signer.GetSignatureBeacon());
+      self.doc.WriteUpdate(&signer, true);
 
       if (!signer.HasSignaturePosition())
         throw Error::New(Env(),
@@ -228,7 +228,7 @@ Signer::SignWorker(const CallbackInfo& info)
   string data, output;
   Function cb = info[1].As<Function>();
   data = info[0].As<String>().Utf8Value();
-  SignAsync* worker = new SignAsync(cb, this, data);
+  SignAsync* worker = new SignAsync(cb, *this, data);
   worker->Queue();
   return info.Env().Undefined();
 }

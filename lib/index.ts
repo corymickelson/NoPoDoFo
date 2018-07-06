@@ -17,12 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import { IData } from './data'
-import {IDocument, NPDFFontEncoding, NPDFPageLayout, NPDFPageMode} from './document'
-import {IPage} from './page'
+import { IDocument, NPDFFontEncoding, NPDFPageLayout, NPDFPageMode } from './document'
+import { IPage } from './page'
 import { IStreamDocument, NPDFWriteMode, NPDFVersion } from './stream-document'
-import { IObj, IDictionary,NPDFInternal,IArray,NPDFCoerceKeyType,NPDFDataType, NPDFDictionaryKeyType
+import {
+    IObj, IDictionary, NPDFInternal, IArray, NPDFCoerceKeyType, NPDFDataType, NPDFDictionaryKeyType
 } from './object'
-import {IXObj} from './xobject'
+import { IXObj } from './xobject'
 import {
     IAnnotation,
     NPDFAction,
@@ -68,8 +69,8 @@ import { Stream } from './stream'
 import { IForm } from './form'
 import { IContentsTokenizer } from './parser'
 import { Cell, Table } from './table'
-import {IEncrypt, ProtectionOption, EncryptOption, ProtectionSummary} from './encrypt'
-import {NPDFName} from './names'
+import { IEncrypt, ProtectionOption, EncryptOption, ProtectionSummary } from './encrypt'
+import { NPDFName } from './names'
 import { IFileSpec } from './file-spec';
 import { IAction } from './action';
 export interface INPDF {
@@ -102,13 +103,15 @@ export interface INPDF {
     ContentsTokenizer: IContentsTokenizer
     SimpleTable: any
     Action: IAction
+
     signature: Function
+    signatureSync: Function
 }
 
 const binary = require('node-pre-gyp')
-const {resolve, join} = require('path')
+const { resolve, join } = require('path')
 const __binary = binary.find(resolve(join(__dirname, '../package.json')))
-const npdf: INPDF = require(__binary) // require('./build/Debug/nopodofo.node')
+const npdf: INPDF = require(__binary)
 export {
     IDictionary,
     NPDFInternal,
@@ -176,6 +179,11 @@ export {
     IXObj
 }
 export const CONVERSION = 0.0028346456693
+/**
+ * A generic type representing a n-api external pointer type
+ * This can not be used in any way other than passing the external data type
+ * back into napi as function argument.
+ */
 export type NPDFExternal<T> = Object
 
 

@@ -14,7 +14,8 @@ test('get contents as string, contents tokenizer', t => {
             let tokenizer: IContentsTokenizer = new npdf.ContentsTokenizer(doc, 0)
 
         const pageContents = tokenizer.readAll()
-        t.assert(pageContents.length === 155) // fix this
+        t.assert(pageContents.next().value.startsWith('Form'))
+        t.assert(pageContents.next().done === false)
         t.end()
     })
 })

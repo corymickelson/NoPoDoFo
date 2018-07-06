@@ -34,7 +34,7 @@ public:
   static Napi::FunctionReference constructor;
   explicit StreamDocument(const Napi::CallbackInfo&);
   static void Initialize(Napi::Env& env, Napi::Object& target);
-  void Close(const Napi::CallbackInfo&);
+  Napi::Value Close(const Napi::CallbackInfo&);
   PoDoFo::PdfStreamedDocument& GetStreamedDocument()
   {
     return *static_cast<PoDoFo::PdfStreamedDocument*>(BaseDocument::base);

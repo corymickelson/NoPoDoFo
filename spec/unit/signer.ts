@@ -9,7 +9,7 @@ tap('Signer', sub => {
     const doc = new npdf.Document()
     doc.load(join(__dirname, '../test-documents/test.pdf'), {forUpdate: true}, async e => {
         sub.test('Sign Sync', async standard => {
-            standard.plan(3)
+            standard.plan(4)
             if (e instanceof Error) throw e
             try {
                 doc.form.SigFlags = 3
@@ -21,6 +21,7 @@ tap('Signer', sub => {
                 const field = new npdf.SignatureField(annot, doc),
                     signatureData = await signature(join(__dirname, '../test-documents/certificate.pem'), join(__dirname, '../test-documents/key.pem'))
                 standard.ok(signatureData)
+                standard.ok(signatureData !== '')
                 field.setReason('test')
                 field.setLocation('here')
                 field.setCreator('me')
@@ -36,16 +37,17 @@ tap('Signer', sub => {
                         let signed = new npdf.Document()
                         signed.load(signedPath, e => {
                             if (e instanceof Error) standard.fail(e.message)
-                            standard.assert(signed.getPage(1).getFields().filter(i => i instanceof npdf.SignatureField).length === 1)
-                            standard.assert(signed.form.SigFlags === 3)
+                            let writtenSignatureField = signed.getPage(1).getFields().filter(i => i instanceof npdf.SignatureField)[0]
+                            let docSignatureMode = signed.form.SigFlags
+                            standard.ok(writtenSignatureField)
+                            standard.assert(docSignatureMode === 3)
                             standard.end()
                         })
                     }
                 })
 
             }
-            catch
-                (e) {
+            catch (e) {
                 console.error(e)
             }
         })

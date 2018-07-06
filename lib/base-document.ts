@@ -17,23 +17,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import { IObj } from "./object";
-import {ProtectionOption} from "./encrypt";
-import {NPDFPageMode, NPDFPageLayout, NPDFCreateFontOpts, IDocument} from "./document";
-import {IPage} from "./page";
-import {IFont} from "./painter";
-import {IForm} from "./form";
-import {NPDFVersion, NPDFWriteMode} from "./stream-document";
-import {IRect} from "./rect";
+import { ProtectionOption } from "./encrypt";
+import { NPDFPageMode, NPDFPageLayout, NPDFCreateFontOpts, IDocument } from "./document";
+import { IPage } from "./page";
+import { IFont } from "./painter";
+import { IForm } from "./form";
+import { NPDFVersion, NPDFWriteMode } from "./stream-document";
+import { IRect } from "./rect";
 import { IXObj } from ".";
 
 export interface NPDFInfo {
-    author:string
-    createdAt:Date
-    creator:string
-    keywords:string
-    producer:string
-    subject:string
-    title:string
+    author: string
+    createdAt: Date
+    creator: string
+    keywords: string
+    producer: string
+    subject: string
+    title: string
 }
 
 export enum NPDFDestinationFit {
@@ -66,12 +66,12 @@ export interface IBase {
     centerWindow(): void
     displayDocTitle(): void
     useFullScreen(): void
-    attachFile(file:string, document:IBase): void
-    insertExistingPage(memDoc:IDocument, index: number, insertIndex: number): number
-    insertPage(rect: IRect, index:number): IPage
-    append(doc: string|IDocument): void
+    attachFile(file: string, document: IBase): void
+    insertExistingPage(memDoc: IDocument, index: number, insertIndex: number): number
+    insertPage(rect: IRect, index: number): IPage
+    append(doc: string | IDocument): void
     isLinearized(): boolean
-    getWriteMode():NPDFWriteMode
+    getWriteMode(): NPDFWriteMode
     isAllowed(perm: ProtectionOption): boolean
     createFont(opts: NPDFCreateFontOpts): IFont
     getOutlines(): IObj
@@ -80,10 +80,7 @@ export interface IBase {
     createPage(rect: IRect): IPage
     createPages(rects: IRect[]): number
     getAttachment(uri: string): IFileSpec
-    addDestination(page:IPage, destination: NPDFDestinationFit, name:string): void
-     
-    // debugging helper functions
-    __ptrCount(): number // Get the number of shared_ptr<PdfDocument> in use.
+    addDestination(page: IPage, destination: NPDFDestinationFit, name: string): void
 }
 export interface IFileSpec {
     readonly name: string

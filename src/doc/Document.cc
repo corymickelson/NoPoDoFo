@@ -93,13 +93,13 @@ Document::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceMethod("createXObject", &Document::CreateXObject),
       InstanceMethod("getAttachment", &Document::GetAttachment),
       InstanceMethod("addNamedDestination", &Document::AddNamedDestination) });
-  constructor = Persistent(ctor);
+  constructor = Napi::Persistent(ctor);
   constructor.SuppressDestruct();
   target.Set("Document", ctor);
 }
 Document::Document(const CallbackInfo& info)
   : ObjectWrap(info)
-  , BaseDocument(info)
+  , BaseDocument(DocumentStorageDevice::InMemory, info)
 {}
 
 /**

@@ -43,19 +43,21 @@ namespace NoPoDoFo {
 /**
  * @note JS Derived class instantiate new BaseDocument<T>(string: filePath,
  * opts: {version, writeMode, encrypt})
+ *
  * @brief BaseDocument::BaseDocument
  * @param info
  */
-BaseDocument::BaseDocument(const Napi::CallbackInfo& info)
+BaseDocument::BaseDocument(DocumentStorageDevice t, const Napi::CallbackInfo& info)
 {
-  if (info.Length() >= 1 && info[0].IsString()) {
-    create = true;
-    output = info[0].As<String>().Utf8Value();
-  }
-  if (create) {
+  switch(t) {
+  case InMemory:
+    base = new PdfMemDocument();
+    break;
+  case StreamToDisk:
     EPdfVersion version = ePdfVersion_1_7;
     EPdfWriteMode writeMode = ePdfWriteMode_Default;
     PdfEncrypt* encrypt = nullptr;
+
     if (info.Length() >= 2 && info[1].IsObject()) {
       auto nObj = info[1].As<Object>();
       if (nObj.Has("version")) {
@@ -71,17 +73,20 @@ BaseDocument::BaseDocument(const Napi::CallbackInfo& info)
         encrypt = const_cast<PdfEncrypt*>(nEncObj->encrypt);
       }
     }
-    base = new PdfStreamedDocument(output.c_str(), version, encrypt, writeMode);
-    cout << "Creating new StreamedDocument at " << output << endl;
-  } else {
-    base = new PdfMemDocument();
-    cout << "Creating new MemDocument" << endl;
+    if (info.Length() > 0 && info[0].IsString()) {
+      base = new PdfStreamedDocument(
+        info[0].As<String>().Utf8Value().c_str(), version, encrypt, writeMode);
+    } else {
+      PdfOutputDevice device(&refBuffer);
+      base = new PdfStreamedDocument(&device, version, encrypt, writeMode);
+      streamToBuffer = true;
+    }
+    break;
   }
 }
 
 BaseDocument::~BaseDocument()
 {
-  cout << "Clean up Base Document" << endl;
   delete base;
 }
 

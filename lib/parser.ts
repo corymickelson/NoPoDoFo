@@ -24,6 +24,5 @@ import {IBase} from "./base-document";
  */
 export interface IContentsTokenizer {
     new(doc: IBase, pageIndex: number): IContentsTokenizer
-    readAll(): string[]
+    readAll(): Iterator<string>
 }
-

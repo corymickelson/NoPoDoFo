@@ -43,10 +43,10 @@ public:
   std::shared_ptr<PoDoFo::PdfSignatureField> GetField() { return field; }
 
 private:
-  bool isMemDoc = false;
+//  bool isMemDoc = false;
   std::shared_ptr<PoDoFo::PdfSignatureField> field;
   std::unique_ptr<PoDoFo::PdfData> signatureBuffer;
-  PoDoFo::PdfDocument* doc;
+//  PoDoFo::PdfDocument* doc;
 };
 }
 #endif

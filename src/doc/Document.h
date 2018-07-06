@@ -40,7 +40,7 @@ class Document
 {
 public:
   static Napi::FunctionReference constructor;
-  explicit Document(const Napi::CallbackInfo& callbackInfo); // constructor
+  explicit Document(const Napi::CallbackInfo&); // constructor
   static void Initialize(Napi::Env& env, Napi::Object& target);
   static Napi::Value GC(const Napi::CallbackInfo&);
   Napi::Value Load(const Napi::CallbackInfo&);

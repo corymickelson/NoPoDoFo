@@ -30,7 +30,7 @@ tap('IPainter', t => {
                 x = CONVERSION * 10000
                 y = page.height - 10000 * CONVERSION
                 y -= metric.lineSpacing
-                t.doesNotThrow(() => painter.drawText({x, y}, 'DRAW TEXT TEST'))
+                t.doesNotThrow(() => painter.drawText({x, y}, 'SingleLineText'))
                 x = 0
                 let l: number, h: number, w: number, i: number
                 let msg = "Grayscale - Colospace"
@@ -77,10 +77,20 @@ tap('IPainter', t => {
                             if(e) t.fail(e.message)
                             else {
                                 let contentsParser = new npdf.ContentsTokenizer(doc, 0)
-                                let pageContents = contentsParser.readAll().join('');
-                                ['MULTILINETEST', 'DRAW TEXT TEST'].forEach(i => {
-                                    t.ok(pageContents.includes(i), 'page includes text')
-                                })
+                                let contents = contentsParser.readAll();
+                                let it = contents.next()
+                                let expects = ['MULTILINE', 'TEST', 'SingleLineText']
+                                let found = 0
+                                while(it.done === false) {
+                                    for(let i = 0; i < expects.length; i++) {
+                                        if(it.value.includes(expects[i])) {
+                                            t.comment(expects[i])
+                                            found++
+                                        }
+                                    }
+                                    it = contents.next()
+                                }
+                                t.assert(found === 3, 'All expected text is found on the document')
                                 t.end()
                             }
                         })

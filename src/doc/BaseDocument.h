@@ -23,16 +23,18 @@
 #include <iostream>
 #include <napi.h>
 #include <podofo/podofo.h>
+#include "../Defines.h"
 
 using std::cout;
 using std::endl;
 using std::string;
 
 namespace NoPoDoFo {
+
 class BaseDocument
 {
 public:
-  explicit BaseDocument(const Napi::CallbackInfo&);
+  explicit BaseDocument(DocumentStorageDevice, const Napi::CallbackInfo&);
   ~BaseDocument();
   Napi::Value GetPageCount(const Napi::CallbackInfo&);
   virtual Napi::Value GetPage(const Napi::CallbackInfo&);
@@ -70,11 +72,11 @@ public:
   void AddNamedDestination(const Napi::CallbackInfo&);
   Napi::Value CreateXObject(const Napi::CallbackInfo&);
 
-  bool created() { return create; }
-
+  PoDoFo::PdfDocument* base;
   bool create = false;
   string output;
-  PoDoFo::PdfDocument* base;
+  PoDoFo::PdfRefCountedBuffer refBuffer;
+  bool streamToBuffer = false;
 };
 }
 #endif

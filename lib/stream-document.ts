@@ -36,11 +36,17 @@ export enum NPDFWriteMode {
 export interface IStreamDocument extends IBase {
     /**
      *
-     * @param {string} file
+     * @param {string} [file]
      * @param {{version: NPDFVersion, writer: NPDFWriteMode, encrypt: IEncrypt}} [opts] -
      *      defaults to {pdf1.7, writeMode_default, null}
      * @returns {IStreamDocument}
      */
-    new(file: string, opts?: { version: NPDFVersion, writer: NPDFWriteMode, encrypt?: IEncrypt }): IStreamDocument
-    close(): void
+    new(file?: string, opts?: { version: NPDFVersion, writer: NPDFWriteMode, encrypt?: IEncrypt }): IStreamDocument
+    /**
+     * Closing a stream document will prevent any further writes to the document.
+     * If the object was instantiated with a file path, close will write to this file.
+     * If "new" was called without any args, the document is written to a nodejs buffer, close
+     *   will return the buffer.
+     */
+    close(): string | Buffer
 }

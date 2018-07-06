@@ -52,39 +52,40 @@
 Napi::Object
 init(Napi::Env env, Napi::Object exports)
 {
-  NoPoDoFo::Document::Initialize(env, exports);
-  NoPoDoFo::Page::Initialize(env, exports);
-  NoPoDoFo::TextField::Initialize(env, exports);
-  NoPoDoFo::Image::Initialize(env, exports);
+  NoPoDoFo::Action::Initialize(env, exports);
   NoPoDoFo::Annotation::Initialize(env, exports);
-  NoPoDoFo::Rect::Initialize(env, exports);
-  NoPoDoFo::Painter::Initialize(env, exports);
+  NoPoDoFo::Array::Initialize(env, exports);
   NoPoDoFo::CheckBox::Initialize(env, exports);
   NoPoDoFo::ComboBox::Initialize(env, exports);
-  NoPoDoFo::ListBox::Initialize(env, exports);
-  NoPoDoFo::Form::Initialize(env, exports);
+  NoPoDoFo::ContentsTokenizer::Initialize(env, exports);
+  NoPoDoFo::Data::Initialize(env, exports);
+  NoPoDoFo::Destination::Initialize(env, exports);
   NoPoDoFo::Dictionary::Initialize(env, exports);
-  NoPoDoFo::FileSpec::Initialize(env, exports);
-  NoPoDoFo::Obj::Initialize(env, exports);
-  NoPoDoFo::Array::Initialize(env, exports);
-  NoPoDoFo::Stream::Initialize(env, exports);
-  NoPoDoFo::Encrypt::Initialize(env, exports);
-  NoPoDoFo::Font::Initialize(env, exports);
-  NoPoDoFo::Encoding::Initialize(env, exports);
+  NoPoDoFo::Document::Initialize(env, exports);
   NoPoDoFo::ExtGState::Initialize(env, exports);
+  NoPoDoFo::Encoding::Initialize(env, exports);
+  NoPoDoFo::Encrypt::Initialize(env, exports);
+  NoPoDoFo::FileSpec::Initialize(env, exports);
+  NoPoDoFo::Font::Initialize(env, exports);
+  NoPoDoFo::Form::Initialize(env, exports);
+  NoPoDoFo::Image::Initialize(env, exports);
+  NoPoDoFo::ListBox::Initialize(env, exports);
+  NoPoDoFo::Obj::Initialize(env, exports);
+  NoPoDoFo::XObject::Initialize(env, exports);
+  NoPoDoFo::Outline::Initialize(env, exports);
+  NoPoDoFo::Page::Initialize(env, exports);
+  NoPoDoFo::Painter::Initialize(env, exports);
+  NoPoDoFo::PushButton::Initialize(env, exports);
+  NoPoDoFo::Rect::Initialize(env, exports);
+  NoPoDoFo::Stream::Initialize(env, exports);
   NoPoDoFo::Signer::Initialize(env, exports);
   NoPoDoFo::SignatureField::Initialize(env, exports);
-  NoPoDoFo::Data::Initialize(env, exports);
-  NoPoDoFo::ContentsTokenizer::Initialize(env, exports);
   NoPoDoFo::SimpleTable::Initialize(env, exports);
   NoPoDoFo::StreamDocument::Initialize(env, exports);
-  NoPoDoFo::Outline::Initialize(env, exports);
-  NoPoDoFo::Destination::Initialize(env, exports);
-  NoPoDoFo::Action::Initialize(env, exports);
-  NoPoDoFo::PushButton::Initialize(env, exports);
-  NoPoDoFo::XObject::Initialize(env, exports);
+  NoPoDoFo::TextField::Initialize(env, exports);
 
-  exports["signature"] = Function::New(env, NPDFSignatureData);
+  exports["signature"] = Function::New(env, NPDFSignatureDataAsync);
+  exports["signatureSync"] = Function::New(env, NPDFSignatureDataSync);
 
   return exports;
 }

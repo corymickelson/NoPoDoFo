@@ -21,12 +21,13 @@
 #include "../ErrorHandler.h"
 #include "../ValidateArguments.h"
 #include "../base/Data.h"
+#include "../base/Names.h"
+#include "../base/XObject.h"
 #include "../doc/Annotation.h"
 #include "../doc/Document.h"
 #include "../doc/Form.h"
 #include "Signer.h"
 #include "StreamDocument.h"
-#include "../base/XObject.h"
 
 using namespace Napi;
 using namespace PoDoFo;
@@ -50,18 +51,20 @@ SignatureField::SignatureField(const CallbackInfo& info)
       auto annot = Annotation::Unwrap(info[0].As<Object>());
       auto nObj = info[1].As<Object>();
       if (nObj.InstanceOf(Document::constructor.Value())) {
-        doc = Document::Unwrap(nObj)->base;
-        isMemDoc = true;
+        field = make_shared<PdfSignatureField>(
+          &annot->GetAnnotation(),
+          Document::Unwrap(nObj)->base->GetAcroForm(),
+          Document::Unwrap(nObj)->base);
       } else if (nObj.InstanceOf(StreamDocument::constructor.Value())) {
-        doc = StreamDocument::Unwrap(nObj)->base;
-        isMemDoc = false;
+        field = make_shared<PdfSignatureField>(
+          &annot->GetAnnotation(),
+          StreamDocument::Unwrap(nObj)->base->GetAcroForm(),
+          StreamDocument::Unwrap(nObj)->base);
       } else {
-        TypeError::New(info.Env(), "IBase required")
+        TypeError::New(info.Env(), "Document instance required")
           .ThrowAsJavaScriptException();
         return;
       }
-      field = make_shared<PdfSignatureField>(
-        &annot->GetAnnotation(), doc->GetAcroForm(), doc);
     } // Copy an existing Signature field.
     else if (info.Length() == 1 && info[0].IsExternal()) {
       field = make_shared<PdfSignatureField>(
@@ -149,15 +152,28 @@ SignatureField::SetFieldName(const CallbackInfo& info)
 void
 SignatureField::AddCertificateReference(const CallbackInfo& info)
 {
-  if (!isMemDoc) {
-    TypeError::New(info.Env(), "Requires instance of PdfMemDocument")
+  auto body =
+    field->GetFieldObject()->GetOwner()->GetParentDocument()->GetObjects();
+  auto it = body->begin();
+  PdfObject* catalog = nullptr;
+  while (!catalog || it != body->end()) {
+    if ((*it)->IsDictionary()) {
+      if ((*it)->GetDictionary().HasKey(NoPoDoFo::Name::TYPE) &&
+          (*it)->GetDictionary().GetKey(NoPoDoFo::Name::TYPE)->IsName() &&
+          (*it)->GetDictionary().GetKey(NoPoDoFo::Name::TYPE)->GetName() ==
+            NoPoDoFo::Name::CATALOG) {
+        catalog = (*it);
+      }
+    }
+  }
+  if (!catalog) {
+    Error::New(info.Env(), "Failed to parse PDF Catalog Object")
       .ThrowAsJavaScriptException();
     return;
   }
-  auto sharedMemDoc = static_cast<PdfMemDocument*>(doc);
   auto flag = static_cast<PdfSignatureField::EPdfCertPermission>(
     info[0].As<Number>().Int32Value());
-  GetField()->AddCertificationReference(sharedMemDoc->GetCatalog(), flag);
+  GetField()->AddCertificationReference(catalog, flag);
 }
 
 Napi::Value

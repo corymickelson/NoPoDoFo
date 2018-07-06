@@ -2,7 +2,7 @@
  * This file is part of the NoPoDoFo (R) project.
  * Copyright (c) 2017-2018
  * Authors: Cory Mickelson, et al.
- * 
+ *
  * NoPoDoFo is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -30,6 +30,10 @@
 #include <podofo/podofo.h>
 
 Napi::Value
-NPDFSignatureData(const Napi::CallbackInfo&);
+NPDFSignatureDataSync(const Napi::CallbackInfo&);
+Napi::Value
+NPDFSignatureDataAsync(const Napi::CallbackInfo&);
+std::string
+NPDFSignatureData(Napi::Env env, const std::string pub, const std::string priv, const std::string pwd);
 
 #endif // NPDF_SIGNATURE_H

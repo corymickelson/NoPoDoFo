@@ -25,7 +25,6 @@
 using namespace PoDoFo;
 using namespace Napi;
 
-using std::shared_ptr;
 using std::string;
 
 namespace NoPoDoFo {
@@ -40,7 +39,7 @@ FunctionReference StreamDocument::constructor; // NOLINT
  */
 StreamDocument::StreamDocument(const CallbackInfo& info)
   : ObjectWrap(info)
-  , BaseDocument(info)
+  , BaseDocument(DocumentStorageDevice::StreamToDisk, info)
 {}
 
 void
@@ -97,9 +96,15 @@ StreamDocument::Initialize(Napi::Env& env, Napi::Object& target)
   target.Set("StreamDocument", ctor);
 }
 
-void
-StreamDocument::Close(const CallbackInfo&)
+Napi::Value
+StreamDocument::Close(const CallbackInfo& info)
 {
   GetStreamedDocument().Close();
+  if (streamToBuffer) {
+    return Buffer<char>::Copy(
+      info.Env(), refBuffer.GetBuffer(), refBuffer.GetSize());
+  } else {
+    return String::New(info.Env(), output);
+  }
 }
 }

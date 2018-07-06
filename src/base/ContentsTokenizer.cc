@@ -94,9 +94,11 @@ ContentsTokenizer::ReadAll(const CallbackInfo& info)
           //          posY = stack.top().GetReal();
         } else {
           stringstream msg;
-          msg << "WARNING: Token '" << token << "' expects two arguments, but %"
-              << static_cast<pdf_int64>(stack.size()) << " given; ignoring\n"
-              << endl;
+          //          msg << "WARNING: Token '" << token << "' expects two
+          //          arguments, but %"
+          //              << static_cast<pdf_int64>(stack.size()) << " given;
+          //              ignoring\n"
+          //              << endl;
           std::cout << msg.str() << endl;
           //          throw Error::New(info.Env(), msg.str());
         }
@@ -160,7 +162,9 @@ ContentsTokenizer::ReadAll(const CallbackInfo& info)
       throw Error::New(info.Env(), "Something has gone terribly wrong :(");
     }
   }
-  return out;
+  return out.Get(Napi::Symbol::WellKnown(info.Env(), "iterator"))
+    .As<Napi::Function>()
+    .Call(out, {});
 }
 
 void
@@ -175,6 +179,5 @@ ContentsTokenizer::AddText(PdfFont* font,
   PdfString unicode = font->GetEncoding()->ConvertToUnicode(text, font);
   const char* chunk = unicode.GetStringUtf8().c_str();
   out.Set(out.Length(), chunk);
-  printf("%s \n", unicode.GetStringUtf8().c_str());
 }
 }
