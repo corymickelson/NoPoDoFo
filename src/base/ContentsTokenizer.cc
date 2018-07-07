@@ -80,7 +80,6 @@ ContentsTokenizer::ReadAll(const CallbackInfo& info)
   PdfVariant var;
   EPdfContentsType type;
   std::stack<PdfVariant> stack;
-  //  double posX = 0.0, posY = 0.0;
   bool blockText = false;
   PdfFont* font = nullptr;
   Napi::Array out = Array::New(info.Env());
@@ -89,25 +88,14 @@ ContentsTokenizer::ReadAll(const CallbackInfo& info)
     if (type == ePdfContentsType_Keyword) {
       if (strcmp(token, "l") == 0 || strcmp(token, "m") == 0) {
         if (stack.size() == 2) {
-          //          posX = stack.top().GetReal();
           stack.pop();
-          //          posY = stack.top().GetReal();
         } else {
           stringstream msg;
-          //          msg << "WARNING: Token '" << token << "' expects two
-          //          arguments, but %"
-          //              << static_cast<pdf_int64>(stack.size()) << " given;
-          //              ignoring\n"
-          //              << endl;
-          std::cout << msg.str() << endl;
-          //          throw Error::New(info.Env(), msg.str());
         }
       } else if (strcmp(token, "BT") == 0) {
         blockText = true;
       } else if (strcmp(token, "ET") == 0) {
         if (!blockText) {
-          //          throw Error::New(info.Env(), "WARNGIN: Found ET without
-          //          BT");
         }
       } else if (blockText) {
         if (strcmp(token, "Tf") == 0) {
