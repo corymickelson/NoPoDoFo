@@ -18,7 +18,7 @@
  */
 
 #include "Signature.h"
-#include "../ValidateArguments.h"
+#include <utility> #include "../ValidateArguments.h"
 
 using namespace PoDoFo;
 using namespace Napi;
@@ -48,12 +48,6 @@ NPDFSignatureData(Napi::Env env,
   OPENSSL_init_ssl(0, NULL);
   OPENSSL_init();
 #endif
-
-  //  OpenSSL_add_all_algorithms();
-  //  ERR_load_crypto_strings();
-  //  ERR_load_PEM_strings();
-  //  ERR_load_ASN1_strings();
-  //  ERR_load_EVP_strings();
 
   FILE* fp;
   fp = fopen(pub.c_str(), "rb");
@@ -186,9 +180,9 @@ class SignatureWorker : public AsyncWorker
 public:
   SignatureWorker(Function& cb, string pub, string priv, string pwd)
     : AsyncWorker(cb)
-    , signerPEMPath(pub)
-    , privateKeyPemPath(priv)
-    , pkeyPassword(pwd)
+    , signerPEMPath(std::move(pub))
+    , privateKeyPemPath(std::move(priv))
+    , pkeyPassword(std::move(pwd))
   {}
 
 private:

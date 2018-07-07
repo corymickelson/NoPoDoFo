@@ -41,24 +41,9 @@ FunctionReference ContentsTokenizer::constructor; // NOLINT
 ContentsTokenizer::ContentsTokenizer(const Napi::CallbackInfo& info)
   : ObjectWrap(info)
   , pIndex(info[1].As<Number>().Int32Value())
-{
-  auto dWrap = info[0].As<Object>();
-  if (dWrap.InstanceOf(Document::constructor.Value())) {
-    doc = Document::Unwrap(dWrap);
-  } else {
-    throw Error::New(info.Env(),
-                     "must be an instance of Document. This class does not "
-                     "work with StreamDocument currently.");
-  }
-
-  self = make_unique<PdfContentsTokenizer>(doc->GetDocument().GetPage(pIndex));
-}
-
-ContentsTokenizer::~ContentsTokenizer()
-{
-  HandleScope scope(Env());
-  doc = nullptr;
-}
+  , doc(*Document::Unwrap(info[0].As<Object>()))
+  , self(make_unique<PdfContentsTokenizer>(doc.GetDocument().GetPage(pIndex)))
+{}
 
 void
 ContentsTokenizer::Initialize(Napi::Env& env, Napi::Object& target)
@@ -67,8 +52,8 @@ ContentsTokenizer::Initialize(Napi::Env& env, Napi::Object& target)
   Function ctor =
     DefineClass(env,
                 "ContentsTokenizer",
-                { InstanceMethod("readAll", &ContentsTokenizer::ReadAll) });
-  constructor = Persistent(ctor);
+                { InstanceMethod("reader", &ContentsTokenizer::ReadAll) });
+  constructor = Napi::Persistent(ctor);
   constructor.SuppressDestruct();
   target.Set("ContentsTokenizer", ctor);
 }
@@ -106,12 +91,12 @@ ContentsTokenizer::ReadAll(const CallbackInfo& info)
           stack.pop();
           PdfName fontName = stack.top().GetName();
           PdfObject* pFont =
-            doc->GetDocument().GetPage(pIndex)->GetFromResources(
+            doc.GetDocument().GetPage(pIndex)->GetFromResources(
               PdfName("Font"), fontName);
           if (!pFont) {
             throw Error::New(info.Env(), "Failed to create font");
           }
-          font = doc->GetDocument().GetFont(pFont);
+          font = doc.GetDocument().GetFont(pFont);
           if (!font) {
             throw Error::New(info.Env(), "Failed to create font");
           }

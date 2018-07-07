@@ -150,17 +150,10 @@ public:
     , self(self)
     , signature(std::move(data))
   {}
-  //  ~SignAsync()
-  //  {
-  //    HandleScope scope(Env());
-  //    self = nullptr;
-  //    delete buffer;
-  //  }
 
 private:
   Signer& self;
   string signature;
-  string output;
   PdfRefCountedBuffer buffer;
 
   // AsyncWorker interface
@@ -199,13 +192,13 @@ protected:
   void OnOK() override
   {
     HandleScope scope(Env());
-    if (!output.empty()) {
-      if (FILE* file = fopen(output.c_str(), "r")) {
+    if (!self.output.empty()) {
+      if (FILE* file = fopen(self.output.c_str(), "r")) {
         fclose(file);
         Callback().Call({ Env().Undefined() });
       } else {
         stringstream msg;
-        msg << "Failed to write to: " << output << ", file exists check failed"
+        msg << "Failed to write to: " << self.output << ", file existence check failed."
             << endl;
         Callback().Call({ String::New(Env(), msg.str()) });
       }
