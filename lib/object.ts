@@ -113,9 +113,3 @@ export interface IDictionary {
 
     writeSync(destination: string): void
 }
-
-// export const resolveDictionary = (doc: Document, candidate: IObj): IDictionary | null => {
-//     if (candidate instanceof (__mod.Obj as any))
-//         return __mod.Dictionary.tryGetDictionary((doc as any)._instance, candidate)
-//     else return null
-// }

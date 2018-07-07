@@ -18,16 +18,12 @@
  */
 import {
     IField,
-    ICheckBox,
-    IComboBox,
-    IListBox,
-    IPushButton,
-    ITextField, NPDFFieldType
+    NPDFFieldType
 } from './field'
 import { IRect } from './rect';
 import { IObj } from './object';
 import { IAnnotation, NPDFAnnotation } from './annotation';
-import {IForm} from "./form";
+import { IForm } from "./form";
 
 export interface IPage {
     rotation: number
