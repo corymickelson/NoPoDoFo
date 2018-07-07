@@ -30,7 +30,10 @@ export interface ISigner {
 }
 
 /**
- * 
+ * Generate a signature to add to the document.
+ * Uses fs module async methods to verify file existence and permissions.
+ *
+ * @async
  * @param {string} certfile - public key file
  * @param {string} pkeyfile - private key file
  * @param {string|Function} [password] - password or callback
