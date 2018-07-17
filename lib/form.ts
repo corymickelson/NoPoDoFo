@@ -17,7 +17,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import { IDictionary } from './object';
-import { IFont } from './painter';
 
 export enum ISigFlags {
     SignatureExists = 1,

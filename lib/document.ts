@@ -102,7 +102,6 @@ export interface IDocument extends IBase {
     load(file: string | Buffer,
         opts: {
             forUpdate?: boolean,
-            fromBuffer?: boolean,
             password?: string
         },
         cb: Callback): void

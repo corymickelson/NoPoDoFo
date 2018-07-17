@@ -21,7 +21,6 @@ import { npdf } from './'
 import { ISignatureField } from "./field";
 import { access } from "fs";
 import { F_OK, R_OK } from 'constants'
-import { resolve } from 'path';
 
 export interface ISigner {
     new(doc: IDocument, output?: string): ISigner
@@ -30,10 +29,7 @@ export interface ISigner {
 }
 
 /**
- * Generate a signature to add to the document.
- * Uses fs module async methods to verify file existence and permissions.
- *
- * @async
+ * 
  * @param {string} certfile - public key file
  * @param {string} pkeyfile - private key file
  * @param {string|Function} [password] - password or callback

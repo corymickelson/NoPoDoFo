@@ -47,41 +47,44 @@ namespace NoPoDoFo {
  * @brief BaseDocument::BaseDocument
  * @param info
  */
-BaseDocument::BaseDocument(DocumentStorageDevice t, const Napi::CallbackInfo& info)
+BaseDocument::BaseDocument(DocumentStorageDevice t,
+                           const Napi::CallbackInfo& info)
 {
-  switch(t) {
-  case InMemory:
-    base = new PdfMemDocument();
-    break;
-  case StreamToDisk:
-    EPdfVersion version = ePdfVersion_1_7;
-    EPdfWriteMode writeMode = ePdfWriteMode_Default;
-    PdfEncrypt* encrypt = nullptr;
+  switch (t) {
+    case InMemory:
+      base = new PdfMemDocument();
+      break;
+    case StreamToDisk:
+      EPdfVersion version = ePdfVersion_1_7;
+      EPdfWriteMode writeMode = ePdfWriteMode_Default;
+      PdfEncrypt* encrypt = nullptr;
 
-    if (info.Length() >= 2 && info[1].IsObject()) {
-      auto nObj = info[1].As<Object>();
-      if (nObj.Has("version")) {
-        version = static_cast<EPdfVersion>(
-          nObj.Get("version").As<Number>().Uint32Value());
+      if (info.Length() >= 2 && info[1].IsObject()) {
+        auto nObj = info[1].As<Object>();
+        if (nObj.Has("version")) {
+          version = static_cast<EPdfVersion>(
+            nObj.Get("version").As<Number>().Uint32Value());
+        }
+        if (nObj.Has("writeMode")) {
+          writeMode = static_cast<EPdfWriteMode>(
+            nObj.Get("writeMode").As<Number>().Uint32Value());
+        }
+        if (nObj.Has("encrypt")) {
+          auto nEncObj = Encrypt::Unwrap(nObj.Get("encrypt").As<Object>());
+          encrypt = const_cast<PdfEncrypt*>(nEncObj->encrypt);
+        }
       }
-      if (nObj.Has("writeMode")) {
-        writeMode = static_cast<EPdfWriteMode>(
-          nObj.Get("writeMode").As<Number>().Uint32Value());
+      if (info.Length() > 0 && info[0].IsString()) {
+        base = new PdfStreamedDocument(info[0].As<String>().Utf8Value().c_str(),
+                                       version,
+                                       encrypt,
+                                       writeMode);
+      } else {
+        PdfOutputDevice device(&refBuffer);
+        base = new PdfStreamedDocument(&device, version, encrypt, writeMode);
+        streamToBuffer = true;
       }
-      if (nObj.Has("encrypt")) {
-        auto nEncObj = Encrypt::Unwrap(nObj.Get("encrypt").As<Object>());
-        encrypt = const_cast<PdfEncrypt*>(nEncObj->encrypt);
-      }
-    }
-    if (info.Length() > 0 && info[0].IsString()) {
-      base = new PdfStreamedDocument(
-        info[0].As<String>().Utf8Value().c_str(), version, encrypt, writeMode);
-    } else {
-      PdfOutputDevice device(&refBuffer);
-      base = new PdfStreamedDocument(&device, version, encrypt, writeMode);
-      streamToBuffer = true;
-    }
-    break;
+      break;
   }
 }
 
@@ -467,29 +470,12 @@ BaseDocument::InsertPage(const Napi::CallbackInfo& info)
   return Page::constructor.New(
     { External<PdfPage>::New(info.Env(), base->GetPage(index)) });
 }
+
 Napi::Value
 BaseDocument::Append(const Napi::CallbackInfo& info)
 {
-  string docPath = info[0].As<String>().Utf8Value();
-  PdfMemDocument mergedDoc;
-  try {
-    mergedDoc.Load(docPath.c_str());
-  } catch (PdfError& err) {
-    if (err.GetError() == ePdfError_InvalidPassword && info.Length() != 2) {
-      throw Error::New(info.Env(),
-                       "Password required to modify this document. Call "
-                       "MergeDocument(filePath, password)");
-    } else if (err.GetError() == ePdfError_InvalidPassword &&
-               info.Length() == 2 && info[1].IsString()) {
-      string password = info[1].As<String>().Utf8Value();
-      mergedDoc.SetPassword(password);
-    }
-  }
-  try {
-    base->Append(mergedDoc);
-  } catch (PdfError& err) {
-    ErrorHandler(err, info);
-  }
+  auto mergedDoc = Document::Unwrap(info[0].As<Object>());
+  base->Append(mergedDoc->GetDocument());
   return info.Env().Undefined();
 }
 /**

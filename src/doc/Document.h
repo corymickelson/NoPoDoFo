@@ -58,7 +58,10 @@ public:
   Napi::Value GetCatalog(const Napi::CallbackInfo&);
   Napi::Value InsertPages(const Napi::CallbackInfo&);
   bool LoadedForIncrementalUpdates() { return loadForIncrementalUpdates; }
-  PoDoFo::PdfMemDocument& GetDocument();
+  PoDoFo::PdfMemDocument& GetDocument()
+  {
+    return *dynamic_cast<PoDoFo::PdfMemDocument*>(base);
+  }
 
 private:
   bool loadForIncrementalUpdates = false;

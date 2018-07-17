@@ -91,7 +91,7 @@ StreamDocument::Initialize(Napi::Env& env, Napi::Object& target)
                      &StreamDocument::AddNamedDestination)
 
     });
-  constructor = Persistent(ctor);
+  constructor = Napi::Persistent(ctor);
   constructor.SuppressDestruct();
   target.Set("StreamDocument", ctor);
 }

@@ -27,12 +27,15 @@
 #include "Form.h"
 #include "Page.h"
 #include <iostream>
+#include <utility>
 
 using namespace Napi;
 using namespace PoDoFo;
 
 using std::cout;
 using std::endl;
+using std::map;
+using std::pair;
 using std::string;
 
 namespace NoPoDoFo {
@@ -104,7 +107,16 @@ Document::Document(const CallbackInfo& info)
 
 /**
  * @note PdfFont resource is managed by the PdfDocument
- * @param info
+ * @param info    // create appearance stream xobject for field
+    // Courier bold 11pt black
+    // painter.setPage(appearanceStream)
+    // painter.setColor([0.0, 0.0, 0.0])
+    // courier.size = 11
+    // painter.font = courier
+    // painter.finishPage();
+
+    // create a field with the appearance stream created above
+    // nameFieldAnnot.setAppearanceStream(appearanceStream)
  * @return
  */
 Value
@@ -151,8 +163,8 @@ Value
 Document::CreateFont(const CallbackInfo& info)
 {
   Napi::Value font = BaseDocument::CreateFont(info);
-  fonts.clear();
-  GetFonts();
+  //fonts.clear();
+  //GetFonts();
   return font;
 }
 
@@ -301,69 +313,76 @@ protected:
   }
 };
 
+class DocumentLoadBufferAsync : public AsyncWorker
+{
+public:
+  DocumentLoadBufferAsync(Function& cb,
+                          Document& doc,
+                          PdfRefCountedInputDevice* input,
+                          bool forUpdate,
+                          string pwd)
+    : AsyncWorker(cb)
+    , doc(doc)
+    , data(input)
+    , forUpdate(forUpdate)
+    , pwd(std::move(pwd))
+  {}
+  ~DocumentLoadBufferAsync() { delete data; }
+
+private:
+  Document& doc;
+  PdfRefCountedInputDevice* data;
+  bool forUpdate;
+  string pwd;
+
+protected:
+  void Execute() override
+  {
+    TryLoad(doc.GetDocument(),
+            string(""),
+            *data,
+            pwd,
+            forUpdate,
+            DocumentInputDevice::Memory);
+  }
+  void OnOK() override
+  {
+    HandleScope scope(Env());
+    Callback().Call({ Env().Null(), doc.Value() });
+  }
+};
+
 class DocumentLoadAsync : public AsyncWorker
 {
 public:
   DocumentLoadAsync(Function& cb,
                     Document& doc,
                     string arg,
-                    PdfRefCountedInputDevice* refBuffer)
+                    bool forUpdate,
+                    string pwd)
     : AsyncWorker(cb)
     , doc(doc)
-    , refBuffer(refBuffer)
     , arg(std::move(arg))
+    , pwd(std::move(pwd))
+    , forUpdate(forUpdate)
   {}
-
-  void ForUpdate(bool v) { update = v; }
-  void SetPassword(string v) { pwd = std::move(v); }
-  void SetUseBuffer(bool v) { useBuffer = v; }
 
 private:
   Document& doc;
-  PdfRefCountedInputDevice* refBuffer;
   string arg;
   string pwd;
-  bool update = false;
-  bool useBuffer = false;
+  bool forUpdate;
 
   // AsyncWorker interface
 protected:
   void Execute() override
   {
-    try {
-      if (!useBuffer)
-        doc.GetDocument().Load(arg.c_str(), update);
-      else {
-#if PODOFO_VERSION_MINOR >= 9 && PODOFO_VERSION_PATCH >= 6
-        doc.GetDocument().LoadFromDevice(*refBuffer);
-#else
-        Error::New(
-          Env(),
-          "This podofo build does not support loading a buffered document")
-          .ThrowAsJavaScriptException();
-        return;
-#endif
-      }
-    } catch (PdfError& e) {
-      if (e.GetError() == ePdfError_InvalidPassword) {
-        cout << "password missing" << endl;
-        if (pwd.empty())
-          SetError("Password required to modify this document");
-        else {
-          try {
-            doc.GetDocument().SetPassword(pwd);
-            cout << "password set" << endl;
-          } catch (PdfError& err) {
-            cout << "Invalid password" << endl;
-            stringstream msg;
-            msg << "Invalid password.\n" << err.what() << endl;
-            SetError(msg.str());
-          }
-        }
-      } else {
-        SetError(ErrorHandler::WriteMsg(e));
-      }
-    }
+    TryLoad(doc.GetDocument(),
+            arg,
+            nullptr,
+            pwd,
+            forUpdate,
+            DocumentInputDevice::Disk);
   }
   void OnOK() override
   {
@@ -381,51 +400,48 @@ protected:
 Napi::Value
 Document::Load(const CallbackInfo& info)
 {
+  if (info.Length() < 2) {
+    Error::New(info.Env(), "Requires a minimum of 2 argument")
+      .ThrowAsJavaScriptException();
+    return info.Env().Undefined();
+  }
   Function cb;
-  bool forUpdate = false, useBuffer = false;
-  string source, pwd;
-  DocumentLoadAsync* worker = nullptr;
-  if (info.Length() >= 2 && info[1].IsFunction()) {
-    cb = info[1].As<Function>();
-  } else if (info.Length() >= 2 && info[1].IsObject()) {
-    auto opts = info[1].As<Object>();
+  bool forUpdate = false;
+  AsyncWorker* worker;
+  string pwd;
+
+  if (info.Length() >= 2 && info[1].IsObject()) {
+    Object opts = info[1].As<Object>();
     if (opts.Has("forUpdate")) {
       forUpdate = opts.Get("forUpdate").As<Boolean>();
-    }
-    if (opts.Has("fromBuffer")) {
-      useBuffer = opts.Get("fromBuffer").As<Boolean>();
     }
     if (opts.Has("password")) {
       pwd = opts.Get("password").As<String>().Utf8Value();
     }
-  } else {
-    TypeError::New(
-      info.Env(),
-      "Expected an options object or callback function be received neither")
+  }
+  if (!info[info.Length() - 1].IsFunction()) {
+    Error::New(info.Env(), "Last argument must be a callback function")
       .ThrowAsJavaScriptException();
     return info.Env().Undefined();
   }
-  if (info.Length() == 3 && info[2].IsFunction()) {
-    cb = info[2].As<Function>();
-  }
-  if (useBuffer) {
-    auto buffer = info[0].As<Buffer<char>>();
-    //    new PdfRefCountedInputDevice(buffer.Data(), buffer.Length());
-    worker = new DocumentLoadAsync(
-      cb,
-      *this,
-      source,
-      new PdfRefCountedInputDevice(buffer.Data(), buffer.Length()));
-  } else {
-    source = info[0].As<String>().Utf8Value();
-    worker = new DocumentLoadAsync(cb, *this, source, nullptr);
-  }
+  cb = info[info.Length() - 1].As<Function>();
 
+  if (info[0].IsBuffer()) {
+    auto device = new PdfRefCountedInputDevice(
+      info[0].As<Buffer<char>>().Data(), info[0].As<Buffer<char>>().Length());
+    worker = new DocumentLoadBufferAsync(cb, *this, device, forUpdate, pwd);
+  } else if (info[0].IsString()) {
+    worker = new DocumentLoadAsync(
+      cb, *this, info[0].As<String>().Utf8Value(), forUpdate, pwd);
+  } else {
+    TypeError::New(info.Env(),
+                   "1st argument must be the file path, or the file buffer")
+      .ThrowAsJavaScriptException();
+    return info.Env().Undefined();
+  }
   loadForIncrementalUpdates = forUpdate;
-  worker->SetPassword(pwd);
-  worker->ForUpdate(forUpdate);
-  worker->SetUseBuffer(useBuffer);
   worker->Queue();
+
   return info.Env().Undefined();
 }
 
@@ -597,9 +613,4 @@ Document::InsertPages(const Napi::CallbackInfo& info)
   return Number::New(info.Env(), GetDocument().GetPageCount());
 }
 
-PdfMemDocument&
-Document::GetDocument()
-{
-  return *static_cast<PdfMemDocument*>(BaseDocument::base);
-}
 }

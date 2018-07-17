@@ -69,7 +69,7 @@ export interface IBase {
     attachFile(file: string, document: IBase): void
     insertExistingPage(memDoc: IDocument, index: number, insertIndex: number): number
     insertPage(rect: IRect, index: number): IPage
-    append(doc: string | IDocument): void
+    append(doc: IDocument): void
     isLinearized(): boolean
     getWriteMode(): NPDFWriteMode
     isAllowed(perm: ProtectionOption): boolean

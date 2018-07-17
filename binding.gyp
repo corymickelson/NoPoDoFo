@@ -14,9 +14,9 @@
       "target_name": "nopodofo",
       'include_dirs': ["<!@(node -p \"require('node-addon-api').include\")"],
       'dependencies': ["<!(node -p \"require('node-addon-api').gyp\")"],
-      'cflags_cc': ['-std=c++14'],
-      'cflags_cc!': [ '-fno-exceptions', '-fno-rtti', '-Wno-deprecated'],
-      'cflags!': [ '-fno-exceptions', '-fno-rtti', '-Wno-deprecated'],
+      'cflags_cc': ['-std=c++14', '-Wno-unused', '-Wno-deprecated'],
+      'cflags_cc!': [ '-fno-exceptions', '-fno-rtti'],
+      'cflags!': [ '-fno-exceptions', '-fno-rtti'],
       'msvs_settings': {
         'VCCLCompilerTool': {
           'ExceptionHandling': 1,

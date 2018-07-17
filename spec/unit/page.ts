@@ -132,7 +132,7 @@ function pageAddImg() {
         }
         doc.write((e, d) => {
             let sub = new npdf.Document()
-            sub.load(d, { fromBuffer: true }, e => {
+            sub.load(d, e => {
 
                 if (e instanceof Error) t.fail()
                 sub.body.forEach(o => {

@@ -18,7 +18,8 @@
  */
 
 #include "Signature.h"
-#include <utility> #include "../ValidateArguments.h"
+#include "../ValidateArguments.h"
+#include <utility>
 
 using namespace PoDoFo;
 using namespace Napi;
@@ -45,7 +46,7 @@ NPDFSignatureData(Napi::Env env,
   ERR_load_ASN1_strings();
   ERR_load_EVP_strings();
 #else
-  OPENSSL_init_ssl(0, NULL);
+  OPENSSL_init_ssl(0, nullptr);
   OPENSSL_init();
 #endif
 

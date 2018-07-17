@@ -71,7 +71,7 @@ tap('IDocument', (t: Test) => {
                 t.assert(Buffer.isBuffer(data), 'Persists document to new Buffer')
                 t.comment('Loading document from a node Buffer')
                 let childDoc = new npdf.Document()
-                childDoc.load(data, {fromBuffer: true}, e => {
+                childDoc.load(data, e => {
                     if (e) {
                         t.comment('load should fail, password required')
                         t.pass()
@@ -105,14 +105,7 @@ tap('IDocument password protected', (t: Test) => {
     })
 })
 
-tap('IDocument append doc', (t: Test) => {
-    let doc = new npdf.Document()
-    doc.load(filePath, (err) => {
-        if(err) t.fail(err.message)
-        else {
-            doc.append(filePath)
-            t.assert(doc.getPageCount() === 8, 'appended doc using file path')
-            t.end()
-        }
-    })
+tap.skip('IDocument append doc', (t: Test) => {
+    let doc = new npdf.StreamDocument('/tmp/append.test.pdf')
+    let page = doc.createPage(new npdf.Rect(0, 0, 612, 792))
 })

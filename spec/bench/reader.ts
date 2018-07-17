@@ -37,7 +37,7 @@ reader.add('Document load (from file) and iterate body', Object.assign({
     .add('Document load (from buffer) and iterate body', Object.assign({
         fn: (defer: PromiseConstructor) => {
             const doc = new npdf.Document()
-            doc.load(testDocData, { fromBuffer: true }, err => {
+            doc.load(testDocData, err => {
                 if (err) defer.reject(err)
                 else {
                     let work: { [key: string]: number } = {}

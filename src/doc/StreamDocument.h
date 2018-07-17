@@ -37,7 +37,7 @@ public:
   Napi::Value Close(const Napi::CallbackInfo&);
   PoDoFo::PdfStreamedDocument& GetStreamedDocument()
   {
-    return *static_cast<PoDoFo::PdfStreamedDocument*>(BaseDocument::base);
+    return *dynamic_cast<PoDoFo::PdfStreamedDocument*>(BaseDocument::base);
   }
 };
 };

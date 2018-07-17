@@ -40,10 +40,11 @@ FunctionReference ContentsTokenizer::constructor; // NOLINT
  */
 ContentsTokenizer::ContentsTokenizer(const Napi::CallbackInfo& info)
   : ObjectWrap(info)
-  , pIndex(info[1].As<Number>().Int32Value())
   , doc(*Document::Unwrap(info[0].As<Object>()))
-  , self(make_unique<PdfContentsTokenizer>(doc.GetDocument().GetPage(pIndex)))
-{}
+  , pIndex(info[1].As<Number>().Int32Value())
+{
+  self = make_unique<PdfContentsTokenizer>(doc.GetDocument().GetPage(pIndex));
+}
 
 void
 ContentsTokenizer::Initialize(Napi::Env& env, Napi::Object& target)
@@ -91,8 +92,8 @@ ContentsTokenizer::ReadAll(const CallbackInfo& info)
           stack.pop();
           PdfName fontName = stack.top().GetName();
           PdfObject* pFont =
-            doc.GetDocument().GetPage(pIndex)->GetFromResources(
-              PdfName("Font"), fontName);
+            doc.GetDocument().GetPage(pIndex)->GetFromResources(PdfName("Font"),
+                                                                fontName);
           if (!pFont) {
             throw Error::New(info.Env(), "Failed to create font");
           }

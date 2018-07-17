@@ -21,6 +21,7 @@
 #include "../ErrorHandler.h"
 #include "../ValidateArguments.h"
 #include "../base/Stream.h"
+#include "../base/XObject.h"
 #include "Document.h"
 #include "ExtGState.h"
 #include "Font.h"
@@ -28,7 +29,6 @@
 #include "Page.h"
 #include "Rect.h"
 #include "StreamDocument.h"
-#include "../base/XObject.h"
 
 using namespace Napi;
 using namespace PoDoFo;
@@ -136,13 +136,14 @@ Painter::SetPage(const Napi::CallbackInfo& info)
     throw Napi::Error::New(info.Env(), "Page must be an instance of Page.");
   }
   PdfCanvas* canvas;
-  if(info[0].As<Object>().InstanceOf(Page::constructor.Value())) {
+  if (info[0].As<Object>().InstanceOf(Page::constructor.Value())) {
     canvas = &Page::Unwrap(info[0].As<Object>())->page;
-  }
-  else if(info[0].As<Object>().InstanceOf(XObject::constructor.Value())) {
+  } else if (info[0].As<Object>().InstanceOf(XObject::constructor.Value())) {
     canvas = &XObject::Unwrap(info[0].As<Object>())->GetXObject();
   } else {
-    TypeError::New(info.Env(), "Painter must be an instance of PdfCanvas: XObject or Page").ThrowAsJavaScriptException();
+    TypeError::New(info.Env(),
+                   "Painter must be an instance of PdfCanvas: XObject or Page")
+      .ThrowAsJavaScriptException();
     return;
   }
   painter->SetPage(canvas);
@@ -240,6 +241,13 @@ Painter::DrawText(const CallbackInfo& info)
 {
   double x, y;
   string text = info[1].As<String>().Utf8Value();
+  if (text.empty()) {
+    Error::New(
+      info.Env(),
+      "Text value provided was empty, Painter can not draw empty text.")
+      .ThrowAsJavaScriptException();
+    return;
+  }
   auto d = info[0].As<Object>();
   x = d.Get("x").As<Number>();
   y = d.Get("y").As<Number>();
@@ -252,11 +260,15 @@ Painter::DrawText(const CallbackInfo& info)
 void
 Painter::DrawMultiLineText(const CallbackInfo& info)
 {
-  // For some reason windows builds break with unresolved external symbol on
-  // podofo's DrawMultiLineText method
-  //#ifndef WIN32
-  PdfRect rect = Rect::Unwrap(info[0].As<Object>())->GetRect();
   string text = info[1].As<String>().Utf8Value();
+  if (text.empty()) {
+    Error::New(
+      info.Env(),
+      "Text value provided was empty, Painter can not draw empty text.")
+      .ThrowAsJavaScriptException();
+    return;
+  }
+  PdfRect rect = Rect::Unwrap(info[0].As<Object>())->GetRect();
   EPdfAlignment alignment = ePdfAlignment_Center;
   if (info.Length() >= 3 && info[2].IsNumber()) {
     alignment = static_cast<EPdfAlignment>(info[2].As<Number>().Int32Value());
@@ -272,8 +284,6 @@ Painter::DrawMultiLineText(const CallbackInfo& info)
   } catch (PdfError& err) {
     ErrorHandler(err, info);
   }
-
-  //#endif
 }
 void
 Painter::DrawImage(const CallbackInfo& info)
@@ -694,6 +704,13 @@ Painter::DrawTextAligned(const CallbackInfo& info)
   double x, y, width;
   int alignmentIndex = info[2].As<Number>();
   string text = info[1].As<String>().Utf8Value();
+  if (text.empty()) {
+    Error::New(
+      info.Env(),
+      "Text value provided was empty, Painter can not draw empty text.")
+      .ThrowAsJavaScriptException();
+    return;
+  }
   auto alignment = static_cast<EPdfAlignment>(alignmentIndex);
   auto o = info[0].As<Object>();
   x = o.Get("x").As<Number>();
@@ -713,12 +730,7 @@ Painter::GetMultiLineText(const CallbackInfo& info)
   string text = info[1].As<String>().Utf8Value();
   bool skipSpaces = info[2].As<Boolean>();
   vector<PdfString> lines =
-#if PODOFO_VERSION_PATCH >= 6
     painter->GetMultiLineTextAsLines(width, PdfString(text), skipSpaces);
-#else
-    painter->GetMultiLineTextAsLines(width, PdfString(text));
-#endif
-
   auto js = Array::New(info.Env());
   uint32_t count = 0;
   for (auto& i : lines) {

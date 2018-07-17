@@ -35,16 +35,6 @@ tap('StreamDocument create simple form', t => {
     painter.drawText({ x: 100, y: 500 }, nameLabel)
     painter.finishPage()
 
-    // create appearance stream xobject for field
-    // Courier bold 11pt black
-    // painter.setPage(appearanceStream)
-    // painter.setColor([0.0, 0.0, 0.0])
-    // courier.size = 11
-    // painter.font = courier
-    // painter.finishPage();
-
-    // create a field with the appearance stream created above
-    // nameFieldAnnot.setAppearanceStream(appearanceStream)
     const nameField = page.createField( NPDFFieldType.TextField, nameFieldAnnot, doc.form)
     nameField.fieldName = 'FirstName'
 

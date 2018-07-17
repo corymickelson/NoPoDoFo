@@ -35,7 +35,7 @@ class BaseDocument
 {
 public:
   explicit BaseDocument(DocumentStorageDevice, const Napi::CallbackInfo&);
-  ~BaseDocument();
+  virtual ~BaseDocument();
   Napi::Value GetPageCount(const Napi::CallbackInfo&);
   virtual Napi::Value GetPage(const Napi::CallbackInfo&);
   Napi::Value GetObjects(const Napi::CallbackInfo&);
