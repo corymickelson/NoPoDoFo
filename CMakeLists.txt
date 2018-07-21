@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.8)
 project(nopodofo)
 
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 set(CMAKE_VISIBILITY_INLINES_HIDDEN)
@@ -49,6 +49,7 @@ else()
 endif()
 message(WARNING "Using napi: ${NAPI_MODULE}")
 target_include_directories(${PROJECT_NAME} PRIVATE
+        ${CMAKE_SOURCE_DIR}/deps/include
         ${NAPI_MODULE}
         ${NAPI_SRC}
         ${OPENSSL_INCLUDE_DIR}

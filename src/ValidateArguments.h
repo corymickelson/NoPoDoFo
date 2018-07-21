@@ -19,47 +19,86 @@
 #ifndef NPDF_VALIDATEARGUMENTS_H
 #define NPDF_VALIDATEARGUMENTS_H
 
+#include "Defines.h"
+
 #include <iostream>
+#include <map>
 #include <napi.h>
 #include <sstream>
+#include <string>
+#include <vector>
+#include <optional>
 
 using std::endl;
+using std::map;
 using std::stringstream;
+using std::vector;
+using std::optional;
 
-
-static int
-AssertFunctionArgs(
-  const Napi::CallbackInfo& info,
-  size_t minimumArgCount,
-  const std::vector<std::vector<napi_valuetype>>& expectedTypes,
-  const char* msg)
+namespace NoPoDoFo {
+/**
+ * Assert caller argument(s). Since arguments can be variable the assertion
+ * checks the type for each index and returns an int array of matching values.
+ *
+ * @example
+ *      std::map validOptions;
+ *      validOptions.insert(std::make_pair(0, {napi_valuetype::napi_external,
+ *          napi_valuetype::napi_object}))
+ *      validOptions.insert(std::make_pair(1,
+ *          {napi_valuetype::napi_string, napi_valuetype::napi_function}))
+ *      validOptions.insert(std::make_pair(2, {napi_valuetype::napi_null,
+ *          napi_valuetype::napi_function}))
+ *      vector<int> opt = AssertCallbackInfo(info,
+ *          validOptions) // {0,0,0} == napi_external, napi_string, napi_null
+ *
+ * @param info
+ * @param vars
+ * @return
+ */
+inline std::vector<int>
+AssertCallbackInfo(const Napi::CallbackInfo& info,
+                   std::map<int, std::vector<napi_valuetype>> vars)
 {
-  stringstream eMsg;
-  int index = -1;
-  if (info.Length() < minimumArgCount) {
-    eMsg << "Expected " << minimumArgCount << " but received " << info.Length()
-         << endl;
-    msg = eMsg.str().c_str();
-  } else {
-    for (const auto& opt : expectedTypes) {
-      for (size_t i = 0; i < opt.size(); ++i) {
-        if (info[i].Type() != opt[i]) {
-          break;
-        } else {
-          if (i == info.Length() - 1) { // last iteration
-            index = static_cast<int>(i);
-          }
-        }
+  int validSize = 0;
+  for (auto item : vars) {
+    for (auto inner : item.second) {
+      if (inner.emptyOk) {
+        validSize--;
+      } else {
+        validSize++;
       }
     }
   }
-  if (index == -1) {
-    if(strcmp(msg, "") == 0) {
-      msg = "Validation Error";
-    }
-    Napi::Error::New(info.Env(), msg).ThrowAsJavaScriptException();
+  if (info.Length() < validSize) {
+    stringstream eMsg;
+    eMsg << "Expected " << vars.size() << " argument parameters but received "
+         << info.Length() << endl;
+    Napi::Error::New(info.Env(), eMsg.str()).ThrowAsJavaScriptException();
+    return {};
   }
-  return index;
+  vector<int> argIndex;
+  for (auto item : vars) {
+    bool valid = false;
+    for (int typeIndex = 0; typeIndex < item.second.size(); typeIndex++) {
+      if (item.second[typeIndex].emptyOk && typeIndex > info.Length()) {
+        argIndex[item.first] = -1;
+        valid = true;
+      } else {
+        napi_valuetype t = item.second[typeIndex].T;
+        if (t == info[item.first].Type()) {
+          argIndex[item.first] = typeIndex;
+          valid = true;
+        }
+      }
+    }
+    if (!valid) {
+      stringstream eMsg;
+      eMsg << "Invalid function argument at index " << item.first << endl;
+      Napi::TypeError::New(info.Env(), eMsg.str());
+    }
+  }
+  return argIndex;
+}
 }
 
 #endif // NPDF_VALIDATEARGUMENTS_H

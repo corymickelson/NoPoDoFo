@@ -17,45 +17,38 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import { Callback, IDocument } from './document'
-import { npdf } from './'
 import { ISignatureField } from "./field";
-import { access } from "fs";
-import { F_OK, R_OK } from 'constants'
+
 
 export interface ISigner {
+    signatureField: ISignatureField
+
+    /**
+     * Creates a new instance of Signer. Signer is the only way to
+     * @param {IDocument} doc
+     * @param {string} [output] - optional if provided writes to this path, otherwise
+     *      a buffer is returned
+     * @returns {ISigner}
+     */
     new(doc: IDocument, output?: string): ISigner
-    setField(field: ISignatureField): void
-    sign(signature: string, cb: Callback): void
+
+    /**
+     * Loads the Certificate and Private Key and stores the values into the Signer instance.
+     * Values are not retrievable but are stored for use in Signer.sign
+     *
+     * @param {string} certificate
+     * @param {string} pkey
+     * @param {string | Callback} p - either the pkey password or callback
+     * @param {Callback} [cb] - callback
+     */
+    loadCertificateAndKey(certificate:string, pkey: string, p:string|Callback, cb?:Callback)
+
+    /**
+     * Signs the document output to disk or a node buffer
+     * The loadCertificateAndKey must be loaded prior to calling sign
+     * @see loadCertificateAndKey
+     * @param {Callback} cb
+     */
+    sign(cb: Callback): void
 }
 
-/**
- * 
- * @param {string} certfile - public key file
- * @param {string} pkeyfile - private key file
- * @param {string|Function} [password] - password or callback
- */
-export function signature(
-    certfile: string,
-    pkeyfile: string,
-    password: string = ''
-): Promise<string> {
-    return new Promise((resolve, reject) => {
-        const check = (file: string) => {
-            return new Promise((resolve, reject) => {
-                access(file, F_OK | R_OK, err => {
-                    err ? reject(err) : resolve()
-                })
-            })
-        }
-        Promise.all([check(certfile), check(pkeyfile)])
-            .then(() => {
-                npdf.signature(certfile, pkeyfile, password, (err: Error, data: string) => {
-                    return err ? reject(err) : resolve(data)
-                })
-            })
-            .catch(err => {
-                reject(err)
-            })
-    })
-
-}

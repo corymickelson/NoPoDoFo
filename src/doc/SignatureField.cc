@@ -155,25 +155,19 @@ SignatureField::AddCertificateReference(const CallbackInfo& info)
   auto body =
     field->GetFieldObject()->GetOwner()->GetParentDocument()->GetObjects();
   auto it = body->begin();
-  PdfObject* catalog = nullptr;
-  while (!catalog || it != body->end()) {
+  while (it != body->end()) {
     if ((*it)->IsDictionary()) {
       if ((*it)->GetDictionary().HasKey(NoPoDoFo::Name::TYPE) &&
           (*it)->GetDictionary().GetKey(NoPoDoFo::Name::TYPE)->IsName() &&
           (*it)->GetDictionary().GetKey(NoPoDoFo::Name::TYPE)->GetName() ==
             NoPoDoFo::Name::CATALOG) {
-        catalog = (*it);
+        auto flag = static_cast<PdfSignatureField::EPdfCertPermission>(
+          info[0].As<Number>().Int32Value());
+        GetField()->AddCertificationReference((*it), flag);
+        return;
       }
     }
   }
-  if (!catalog) {
-    Error::New(info.Env(), "Failed to parse PDF Catalog Object")
-      .ThrowAsJavaScriptException();
-    return;
-  }
-  auto flag = static_cast<PdfSignatureField::EPdfCertPermission>(
-    info[0].As<Number>().Int32Value());
-  GetField()->AddCertificationReference(catalog, flag);
 }
 
 Napi::Value

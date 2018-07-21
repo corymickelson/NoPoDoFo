@@ -18,21 +18,19 @@
  */
 
 #include "Signer.h"
+#include "../base/Names.h"
 #include "../ErrorHandler.h"
 #include "../ValidateArguments.h"
 #include "Document.h"
 #include "SignatureField.h"
 #include "StreamDocument.h"
+#include <map>
+#include <vector>
 
 using namespace Napi;
 using namespace PoDoFo;
 
-using std::make_shared;
-using std::make_unique;
-using std::shared_ptr;
-using std::static_pointer_cast;
 using std::string;
-using std::unique_ptr;
 
 namespace NoPoDoFo {
 
@@ -61,26 +59,36 @@ Signer::Signer(const Napi::CallbackInfo& info)
   }
 }
 
+Signer::~Signer()
+{
+  HandleScope scope(Env());
+  if (cert != nullptr) {
+    X509_free(cert);
+  }
+  delete pkey;
+}
+
 void
 Signer::Initialize(Napi::Env& env, Napi::Object& target)
 {
   HandleScope scope(env);
-  Function ctor =
-    DefineClass(env,
-                "Signer",
-                { InstanceMethod("signSync", &Signer::Sign),
-                  InstanceMethod("sign", &Signer::SignWorker),
-                  InstanceMethod("getField", &Signer::GetField),
-                  InstanceMethod("setField", &Signer::SetField) });
+  Function ctor = DefineClass(
+    env,
+    "Signer",
+    {
+      InstanceAccessor("signatureField", &Signer::GetField, &Signer::SetField),
+      InstanceMethod("sign", &Signer::SignWorker),
+      InstanceMethod("loadCertificateAndKey", &Signer::LoadCertificateAndKey),
+    });
   constructor = Persistent(ctor);
   constructor.SuppressDestruct();
   target.Set("Signer", ctor);
 }
 
 void
-Signer::SetField(const CallbackInfo& info)
+Signer::SetField(const CallbackInfo& info, const Napi::Value& value)
 {
-  field = SignatureField::Unwrap(info[0].As<Object>())->GetField();
+  field = SignatureField::Unwrap(value.As<Object>())->GetField();
   try {
     field->EnsureSignatureObject();
   } catch (PdfError& err) {
@@ -95,52 +103,6 @@ Signer::GetField(const CallbackInfo& info)
     { External<PdfSignatureField>::New(info.Env(), field.get()) });
 }
 
-Napi::Value
-Signer::Sign(const CallbackInfo& info)
-{
-  try {
-
-    string data, output;
-    string sigStr = info[0].As<String>().Utf8Value();
-    auto sigStrLength = static_cast<pdf_long>(sigStr.size());
-
-    if (field->GetFieldName().GetStringUtf8().empty()) {
-      field->SetFieldName("NoPoDoFo::SignatureField");
-    }
-
-    PdfRefCountedBuffer r;
-    PdfOutputDevice outputDevice;
-    if (info.Length() == 2 && info[1].IsString()) {
-      output = info[1].As<String>().Utf8Value();
-      outputDevice = *new PdfOutputDevice(output.c_str(), true);
-    } else {
-      outputDevice = *new PdfOutputDevice(&r);
-    }
-    PdfSignOutputDevice signer(&outputDevice);
-    signer.SetSignatureSize(static_cast<size_t>(sigStrLength));
-
-    field->SetSignatureDate(PdfDate());
-    field->SetSignature(*signer.GetSignatureBeacon());
-    doc.WriteUpdate(&signer, true);
-
-    if (!signer.HasSignaturePosition())
-      throw Error::New(info.Env(),
-                       "Cannot find signature position in the document data");
-
-    signer.AdjustByteRange();
-    signer.Seek(0);
-
-    PdfData signature(sigStr.c_str(), static_cast<size_t>(sigStrLength));
-    signer.SetSignature(signature);
-    signer.Flush();
-    return info.Env().Undefined();
-  } catch (PdfError& err) {
-    ErrorHandler(err, info);
-  } catch (Error& err) {
-    ErrorHandler(err, info);
-  }
-  return info.Env().Undefined();
-}
 
 class SignAsync : public AsyncWorker
 {
@@ -161,11 +123,31 @@ protected:
   void Execute() override
   {
     try {
+      PdfObject* acroform = self.doc.GetAcroForm(false)->GetObject();
+      if(acroform->GetDictionary().HasKey(PdfName(Name::SIG_FLAGS))) {
+
+      }
+      const auto flags = PKCS7_DETACHED | PKCS7_BINARY;
+
+#if OPENSSL_VERSION_NUMBER < 0x10100000L
+      SSL_library_init();
+      OpenSSL_add_all_algorithms();
+      ERR_load_crypto_strings();
+      ERR_load_PEM_strings();
+      ERR_load_ASN1_strings();
+      ERR_load_EVP_strings();
+#else
+      OPENSSL_init_ssl(0, nullptr);
+      OPENSSL_init();
+#endif
+
       auto sigStrLength = static_cast<pdf_long>(signature.size());
-      self.field->SetFieldName("signer.sign");
+      if (self.field->GetFieldName().GetStringUtf8().empty()) {
+        self.field->SetFieldName("NoPoDoFo.SignatureField");
+      }
       PdfOutputDevice outputDevice =
         self.output.empty() ? PdfOutputDevice(&buffer)
-                             : PdfOutputDevice(self.output.c_str(), true);
+                            : PdfOutputDevice(self.output.c_str(), true);
       PdfSignOutputDevice signer(&outputDevice);
       signer.SetSignatureSize(static_cast<size_t>(sigStrLength));
 
@@ -180,7 +162,7 @@ protected:
       signer.AdjustByteRange();
       signer.Seek(0);
 
-      PdfData data(signature.c_str(), static_cast<size_t>(sigStrLength));
+      PdfData data(signature.c_str());
       signer.SetSignature(data);
       signer.Flush();
     } catch (PdfError& err) {
@@ -198,8 +180,8 @@ protected:
         Callback().Call({ Env().Undefined() });
       } else {
         stringstream msg;
-        msg << "Failed to write to: " << self.output << ", file existence check failed."
-            << endl;
+        msg << "Failed to write to: " << self.output
+            << ", file existence check failed." << endl;
         Callback().Call({ String::New(Env(), msg.str()) });
       }
     } else {
@@ -222,6 +204,115 @@ Signer::SignWorker(const CallbackInfo& info)
   Function cb = info[1].As<Function>();
   data = info[0].As<String>().Utf8Value();
   SignAsync* worker = new SignAsync(cb, *this, data);
+  worker->Queue();
+  return info.Env().Undefined();
+}
+
+/**
+ * @brief The LoadCertificateAndKeyWorker class
+ * Load the private key and certificate and set as properties of the Signer
+ * object as EVP_PKEY and X509 respectively.
+ */
+class LoadCertificateAndKeyWorker : public AsyncWorker
+{
+public:
+  Signer& signer;
+  string cert;
+  string key;
+  string pwd;
+  pdf_int32 minSigSize = 0;
+
+  LoadCertificateAndKeyWorker(Function& cb,
+                              Signer& signer,
+                              string cert,
+                              string key,
+                              string pwd)
+    : AsyncWorker(cb)
+    , signer(signer)
+    , cert(std::move(cert))
+    , key(std::move(key))
+    , pwd(std::move(pwd))
+  {}
+
+protected:
+  pdf_int32 minimumSignerSize(FILE* file)
+  {
+    pdf_int32 size = 0;
+    if (fseeko(file, 0, SEEK_END) != -1) {
+      size += ftello(file);
+    } else {
+      size += 3072;
+    }
+    return size;
+  }
+  void Execute() override
+  {
+    FILE* file;
+
+    // Load Certificate
+    if (!(file = fopen(cert.c_str(), "rb"))) {
+      SetError("Failed to open Certificate file");
+      return;
+    }
+    signer.cert = PEM_read_X509(file, nullptr, nullptr, nullptr);
+    minSigSize += minimumSignerSize(file);
+    if (!signer.cert) {
+      SetError("Failed to decode Certificate file");
+    }
+    fclose(file);
+
+    // Load Private key
+    if (!(file = fopen(key.c_str(), "rb"))) {
+      SetError("Failed to open Private key file");
+      X509_free(signer.cert);
+      return;
+    }
+    signer.pkey =
+      PEM_read_PrivateKey(file,
+                          nullptr,
+                          [](char* buf,
+                             int bufSize,
+                             int PODOFO_UNUSED_PARAM(rwflag),
+                             void* userData) {
+                            const char* password = static_cast<char*>(userData);
+                            if (!password)
+                              return 0;
+                            auto res = static_cast<int>(strlen(password));
+                            if (res > bufSize)
+                              res = bufSize;
+                            memcpy(buf, password, static_cast<size_t>(res));
+                            return res;
+                          },
+                          static_cast<void*>(&pwd));
+    if (!signer.pkey) {
+      SetError("Failed to decode Private key file");
+      X509_free(signer.cert);
+      return;
+    }
+    minSigSize += minimumSignerSize(file);
+    fclose(file);
+  }
+  void OnOK() override
+  {
+    Callback().Call({ Env().Undefined(), Number::New(Env(), minSigSize) });
+  }
+};
+
+Value
+Signer::LoadCertificateAndKey(const CallbackInfo& info)
+{
+  string cert, key, pwd;
+  Function cb;
+  if (info.Length() == 4 && info[3].IsFunction()) {
+    cb = info[3].As<Function>();
+    pwd = info[2].As<String>().Utf8Value();
+  } else if (info.Length() < 4 && info[2].IsFunction()) {
+    cb = info[2].As<Function>();
+  }
+  cert = info[0].As<String>().Utf8Value();
+  key = info[1].As<String>().Utf8Value();
+  AsyncWorker* worker =
+    new LoadCertificateAndKeyWorker(cb, *this, cert, key, pwd);
   worker->Queue();
   return info.Env().Undefined();
 }

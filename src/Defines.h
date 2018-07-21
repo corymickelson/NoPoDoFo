@@ -8,9 +8,6 @@
 #include <napi.h>
 #include <podofo/podofo.h>
 
-using PoDoFo::PdfError;
-using PoDoFo::PdfMemDocument;
-
 namespace NoPoDoFo {
 
 enum DocumentStorageDevice {
@@ -21,6 +18,12 @@ enum DocumentStorageDevice {
 enum DocumentInputDevice {
   Disk,
   Memory
+};
+
+struct OptionalArgument
+{
+  bool emptyOk = false;
+  napi_valuetype T;
 };
 
 #define TryLoad(doc, file, buffer, pwd, forUpdate, typeE) {\

@@ -400,12 +400,12 @@ BaseDocument::InsertExistingPage(const CallbackInfo& info)
   if (base->GetPageCount() + 1 < atN) {
     RangeError::New(info.Env(), "at index out of range")
       .ThrowAsJavaScriptException();
-    return Value();
+    return {};
   }
   if (memPageN < 0 || memPageN > memDoc->base->GetPageCount() - 1) {
     RangeError::New(info.Env(), "parameter document page range exception")
       .ThrowAsJavaScriptException();
-    return Value();
+    return {};
   }
   base->InsertExistingPageAt(memDoc->GetDocument(), memPageN, atN);
   return Number::New(info.Env(), base->GetPageCount());

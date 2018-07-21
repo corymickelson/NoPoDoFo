@@ -1,16 +1,17 @@
-import {join} from 'path'
+import { join } from 'path'
 import * as tap from 'tape'
-import {Test} from 'tape'
-import {NPDFVersion, IDocument, npdf, NPDFPageMode} from '../../dist';
-if(!global.gc) {
-    global.gc = () => {}
+import { Test } from 'tape'
+import { NPDFVersion, IDocument, npdf, NPDFPageMode } from '../../dist';
+import { NPDFAlignment } from "../../lib";
+if (!global.gc) {
+    global.gc = () => { }
 }
 const filePath = join(__dirname, '../test-documents/test.pdf'),
     pwdDoc = join(__dirname, '../test-documents/pwd.pdf')
 
 export const end = (...tests: Test[]) => tests.forEach(t => t.end())
 
-tap('IStreamDocument', (t:Test) => {
+tap('IStreamDocument', (t: Test) => {
     let strPath = join(__dirname, './stream.tmp.pdf')
     const doc = new npdf.StreamDocument(strPath)
     t.comment('StreamDocument default values')
@@ -60,7 +61,7 @@ tap('IDocument', (t: Test) => {
         global.gc()
         t.assert(doc.getPageCount() === 3)
         t.comment('create font')
-        let font = doc.createFont({italic: true, embed: false, fontName: 'Courier'})
+        let font = doc.createFont({ italic: true, embed: false, fontName: 'Courier' })
         //let font = doc.getFont('PoDoFoFt40')
 
         global.gc()
@@ -87,7 +88,7 @@ tap('IDocument', (t: Test) => {
 })
 tap('IDocument password protected', (t: Test) => {
     let doc = new npdf.Document()
-    doc.load(pwdDoc, {password: 'secret'}, e => {
+    doc.load(pwdDoc, { password: 'secret' }, e => {
         if (e) t.fail(e.message)
         else {
             t.pass('Loaded password protected document (provided a valid password on load)')
@@ -105,7 +106,27 @@ tap('IDocument password protected', (t: Test) => {
     })
 })
 
-tap.skip('IDocument append doc', (t: Test) => {
-    let doc = new npdf.StreamDocument('/tmp/append.test.pdf')
-    let page = doc.createPage(new npdf.Rect(0, 0, 612, 792))
+tap('IDocument append doc', (t: Test) => {
+    // let doc = new npdf.StreamDocument('/tmp/append.test.pdf')
+    // let page = doc.createPage(new npdf.Rect(0, 0, 612, 792))
+    // let painter = new npdf.Painter(doc)
+    // let font = doc.createFont({fontName: 'Courier'})
+    // painter.setPage(page)
+    // painter.font = font
+    // painter.drawTextAligned({x:365, y: 690, width: 40}, 'Testing', NPDFAlignment.Center)
+    // painter.finishPage()
+    let doc = new npdf.Document()
+    doc.load(filePath, e => {
+        if (e) t.fail(e.message)
+        let mergeDoc = new npdf.Document()
+        mergeDoc.load(filePath, e => {
+            if (e) t.fail(e.message)
+            else {
+                doc.append(mergeDoc)
+                t.assert(doc.getPageCount() === mergeDoc.getPageCount() * 2)
+                t.end()
+            }
+        })
+    })
+
 })
