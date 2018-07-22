@@ -24,7 +24,6 @@
 #include "base/Obj.h"
 #include "base/Stream.h"
 #include "base/XObject.h"
-#include "crypto/Signature.h"
 #include "doc/Action.h"
 #include "doc/Annotation.h"
 #include "doc/CheckBox.h"
@@ -83,9 +82,6 @@ init(Napi::Env env, Napi::Object exports)
   NoPoDoFo::SimpleTable::Initialize(env, exports);
   NoPoDoFo::StreamDocument::Initialize(env, exports);
   NoPoDoFo::TextField::Initialize(env, exports);
-
-  exports["signature"] = Function::New(env, NPDFSignatureDataAsync);
-  exports["signatureSync"] = Function::New(env, NPDFSignatureDataSync);
 
   return exports;
 }
