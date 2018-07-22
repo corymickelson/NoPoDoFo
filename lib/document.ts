@@ -22,7 +22,7 @@ import { IEncrypt } from './encrypt';
 import { IFont } from "./painter";
 import { F_OK } from "constants";
 import { IBase } from './base-document'
-import { npdf } from '.';
+import {ISignatureField, npdf} from '.';
 
 export declare enum NPDFVersion {
     Pdf11 = 0,
@@ -39,7 +39,7 @@ export declare enum NPDFWriteMode {
     Compact = 2,
 }
 
-export type Callback = (err: Error, data: Buffer | string) => void
+export type Callback<T> = (err: Error, data: T ) => void
 
 export enum NPDFFontEncoding {
     WinAnsi = 1,
@@ -104,8 +104,8 @@ export interface IDocument extends IBase {
             forUpdate?: boolean,
             password?: string
         },
-        cb: Callback): void
-    load(file: string | Buffer, cb: Callback): void
+        cb: Callback<void>): void
+    load(file: string | Buffer, cb: Callback<void>): void
 
     /**
      * Deletes one or more pages from the document by removing the pages reference
@@ -134,10 +134,10 @@ export interface IDocument extends IBase {
      * @param destination - file path or callback function
      * @param cb - if file path was provided as destination, this must be a callback function
      */
-    write(destination: Callback | string, cb?: Callback): void
+    write(destination: Callback<Buffer> | string, cb?: Callback<string>): void
 
     /**
-     * Looks for a font containg the provided name or id.
+     * Looks for a font with the provided name or id.
      * This operation may be expensive as it iterates all pdf object searching for the font.
      * If nothing is found null is returned
      * @param name - font name or font id
@@ -157,10 +157,22 @@ export interface IDocument extends IBase {
      * @param output - file location
      * @param cb - function
      */
-    gc(file: string, pwd: string, output: string, cb: Callback): void
+    gc(file: string, pwd: string, output: string, cb: Callback<string|Buffer>): void
+
+    /**
+     * Check for the existence of a signature field(s)
+     * @returns {boolean}
+     */
+    hasSignatures(): boolean
+
+    /**
+     * Iterate each page annotations array for an annotation of type signature.
+     * @returns {ISignatureField[]}
+     */
+    getSignatures(): ISignatureField[]
 }
 
-export const documentGc = (file: string, pwd: string, output: string, cb: Callback) => {
+export const documentGc = (file: string, pwd: string, output: string, cb: Callback<string|Buffer>) => {
     access(file, F_OK, err => {
         if (err) {
             throw Error('File not found')

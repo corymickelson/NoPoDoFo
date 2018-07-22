@@ -12,9 +12,9 @@
   "targets": [
     {
       "target_name": "nopodofo",
-      'include_dirs': ["<!@(node -p \"require('node-addon-api').include\")"],
+      'include_dirs': ["<!@(node -p \"require('node-addon-api').include\")", "deps/include"],
       'dependencies': ["<!(node -p \"require('node-addon-api').gyp\")"],
-      'cflags_cc': ['-std=c++14', '-Wno-unused', '-Wno-deprecated'],
+      'cflags_cc': ['-std=c++17', '-Wno-unused', '-Wno-deprecated'],
       'cflags_cc!': [ '-fno-exceptions', '-fno-rtti'],
       'cflags!': [ '-fno-exceptions', '-fno-rtti'],
       'msvs_settings': {
@@ -27,14 +27,15 @@
       ],
       "sources": [
         "src/addon.cc",
+        "src/ValidateArguments.cc",
         "src/ErrorHandler.cc",
-   		"src/doc/Action.cc",
+     		"src/doc/Action.cc",
         "src/doc/Annotation.cc",
-   		"src/doc/BaseDocument.cc",
-   		"src/doc/Button.cc",
+     		"src/doc/BaseDocument.cc",
+    		"src/doc/Button.cc",
         "src/doc/CheckBox.cc",
         "src/doc/Document.cc",
-   		"src/doc/Destination.cc",
+    		"src/doc/Destination.cc",
         "src/doc/Encoding.cc",
         "src/doc/Encrypt.cc",
         "src/doc/ExtGState.cc",
@@ -44,14 +45,14 @@
         "src/doc/Form.cc",
         "src/doc/Image.cc",
         "src/doc/ListField.cc",
-   		"src/doc/Outline.cc",
+     		"src/doc/Outline.cc",
         "src/doc/Page.cc",
         "src/doc/Painter.cc",
-   		"src/doc/PushButton.cc",
+    		"src/doc/PushButton.cc",
         "src/doc/Rect.cc",
         "src/doc/SignatureField.cc",
         "src/doc/Signer.cc",
-   		"src/doc/StreamDocument.cc",
+    		"src/doc/StreamDocument.cc",
         "src/doc/TextField.cc",
         "src/doc/SimpleTable.cc",
         "src/doc/ComboBox.cc",
@@ -60,7 +61,6 @@
         "src/base/Dictionary.cc",
         "src/base/Obj.cc",
         "src/base/Stream.cc",
-        "src/crypto/Signature.cc",
         "src/base/Data.cc",
         "src/base/ContentsTokenizer.cc",
         "src/base/XObject.cc"
@@ -71,7 +71,7 @@
             'GCC_ENABLE_CPP_EXCEPTIONS': 'YES',
             'CLANG_CXX_LIBRARY': 'libc++',
             'MACOSX_DEPLOYMENT_TARGET': '10.9',
-            'CLANG_CXX_LANGUAGE_STANDARD': 'c++14'
+            'CLANG_CXX_LANGUAGE_STANDARD': 'c++17'
           },
         }],
         ["OS==\"win\"", {

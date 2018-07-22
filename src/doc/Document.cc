@@ -26,7 +26,9 @@
 #include "Font.h"
 #include "Form.h"
 #include "Page.h"
+#include "SignatureField.h"
 #include <iostream>
+#include <sstream>
 #include <utility>
 
 using namespace Napi;
@@ -37,6 +39,7 @@ using std::endl;
 using std::map;
 using std::pair;
 using std::string;
+using std::stringstream;
 
 namespace NoPoDoFo {
 
@@ -65,6 +68,8 @@ Document::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceAccessor("language", nullptr, &Document::SetLanguage),
       InstanceAccessor("info", &Document::GetInfo, nullptr),
 
+      InstanceMethod("hasSignatures", &Document::HasSignature),
+      InstanceMethod("getSignatures", &Document::GetSignatures),
       InstanceMethod("load", &Document::Load),
       InstanceMethod("getPageCount", &Document::GetPageCount),
       InstanceMethod("getPage", &Document::GetPage),
@@ -163,8 +168,8 @@ Value
 Document::CreateFont(const CallbackInfo& info)
 {
   Napi::Value font = BaseDocument::CreateFont(info);
-  //fonts.clear();
-  //GetFonts();
+  // fonts.clear();
+  // GetFonts();
   return font;
 }
 
@@ -613,4 +618,39 @@ Document::InsertPages(const Napi::CallbackInfo& info)
   return Number::New(info.Env(), GetDocument().GetPageCount());
 }
 
+Napi::Value
+Document::HasSignature(const CallbackInfo& info)
+{
+  for (int i = 0; i < base->GetPageCount(); i++) {
+    auto page = base->GetPage(i);
+    for (int j = 0; j < page->GetNumFields(); j++) {
+      auto field = page->GetField(j);
+      if (field.GetType() == ePdfField_Signature) {
+        return Boolean::New(info.Env(), true);
+      }
+    }
+  }
+  return Boolean::New(info.Env(), false);
+}
+Napi::Value
+Document::GetSignatures(const CallbackInfo& info)
+{
+  auto js = Array::New(info.Env());
+  uint32_t jsIndex = 0;
+  for (int i = 0; i < base->GetPageCount(); i++) {
+    auto page = base->GetPage(i);
+    for (int j = 0; j < page->GetNumFields(); j++) {
+      auto field = page->GetField(j);
+      if (field.GetType() == ePdfField_Signature) {
+        cout << "Found field " << field.GetFieldName().GetStringUtf8() << endl;
+        js.Set(jsIndex,
+               SignatureField::constructor.New({ External<PdfAnnotation>::New(
+                 info.Env(), field.GetWidgetAnnotation()) }));
+        jsIndex++;
+      }
+    }
+  }
+
+  return js;
+}
 }

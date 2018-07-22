@@ -18,19 +18,28 @@
  */
 
 #include "Signer.h"
-#include "../base/Names.h"
 #include "../ErrorHandler.h"
 #include "../ValidateArguments.h"
+#include "../base/Names.h"
 #include "Document.h"
 #include "SignatureField.h"
 #include "StreamDocument.h"
 #include <map>
+#include <openssl/err.h>
+#include <openssl/pem.h>
+#include <openssl/pkcs7.h>
+#include <openssl/ssl.h>
+#include <optional>
+#include <sstream>
 #include <vector>
 
 using namespace Napi;
 using namespace PoDoFo;
 
+using std::make_pair;
+using std::optional;
 using std::string;
+using std::stringstream;
 
 namespace NoPoDoFo {
 
@@ -65,7 +74,9 @@ Signer::~Signer()
   if (cert != nullptr) {
     X509_free(cert);
   }
-  delete pkey;
+  if (pkey) {
+    EVP_PKEY_free(pkey);
+  }
 }
 
 void
@@ -77,7 +88,7 @@ Signer::Initialize(Napi::Env& env, Napi::Object& target)
     "Signer",
     {
       InstanceAccessor("signatureField", &Signer::GetField, &Signer::SetField),
-      InstanceMethod("sign", &Signer::SignWorker),
+      InstanceMethod("write", &Signer::SignWorker),
       InstanceMethod("loadCertificateAndKey", &Signer::LoadCertificateAndKey),
     });
   constructor = Persistent(ctor);
@@ -103,68 +114,157 @@ Signer::GetField(const CallbackInfo& info)
     { External<PdfSignatureField>::New(info.Env(), field.get()) });
 }
 
-
 class SignAsync : public AsyncWorker
 {
 public:
-  SignAsync(Function& cb, Signer& self, string data)
+  SignAsync(Function& cb, Signer& self, pdf_int32 minSigSize)
     : AsyncWorker(cb)
     , self(self)
-    , signature(std::move(data))
+    , minSigSize(minSigSize)
   {}
 
 private:
   Signer& self;
-  string signature;
   PdfRefCountedBuffer buffer;
+  pdf_int32 minSigSize;
 
   // AsyncWorker interface
 protected:
   void Execute() override
   {
+#if OPENSSL_VERSION_NUMBER < 0x10100000L
+    SSL_library_init();
+    OpenSSL_add_all_algorithms();
+    ERR_load_crypto_strings();
+    ERR_load_PEM_strings();
+    ERR_load_ASN1_strings();
+    ERR_load_EVP_strings();
+#else
+    OPENSSL_init_ssl(0, nullptr);
+    OPENSSL_init();
+#endif
     try {
       PdfObject* acroform = self.doc.GetAcroForm(false)->GetObject();
-      if(acroform->GetDictionary().HasKey(PdfName(Name::SIG_FLAGS))) {
+      size_t sigBuffer = 65535, sigBufferLen;
+      int rc;
+      char* sigData;
+      char* outBuffer;
+      long outBufferLen;
+      BIO* memory;
+      BIO* out;
+      PKCS7* p7;
 
+      // Set SigFlags in AcroForm as Signed in AppendOnly mode (3)
+
+      if (acroform->GetDictionary().HasKey(PdfName(Name::SIG_FLAGS))) {
+        acroform->GetDictionary().RemoveKey(PdfName(Name::SIG_FLAGS));
       }
-      const auto flags = PKCS7_DETACHED | PKCS7_BINARY;
+      pdf_int64 signedAppendModeFlag = 3;
+      acroform->GetDictionary().AddKey(PdfName(Name::SIG_FLAGS),
+                                       PdfObject(signedAppendModeFlag));
 
-#if OPENSSL_VERSION_NUMBER < 0x10100000L
-      SSL_library_init();
-      OpenSSL_add_all_algorithms();
-      ERR_load_crypto_strings();
-      ERR_load_PEM_strings();
-      ERR_load_ASN1_strings();
-      ERR_load_EVP_strings();
-#else
-      OPENSSL_init_ssl(0, nullptr);
-      OPENSSL_init();
-#endif
-
-      auto sigStrLength = static_cast<pdf_long>(signature.size());
-      if (self.field->GetFieldName().GetStringUtf8().empty()) {
-        self.field->SetFieldName("NoPoDoFo.SignatureField");
-      }
+      // Create an output device for the signed document
       PdfOutputDevice outputDevice =
         self.output.empty() ? PdfOutputDevice(&buffer)
                             : PdfOutputDevice(self.output.c_str(), true);
       PdfSignOutputDevice signer(&outputDevice);
-      signer.SetSignatureSize(static_cast<size_t>(sigStrLength));
 
+      // minimally ensure signature field name property is filled, defaults to
+      // "NoPoDoFo.SignatureField"
+      if (self.field->GetFieldName().GetStringUtf8().empty()) {
+        self.field->SetFieldName("NoPoDoFo.SignatureField");
+      }
+      /**
+       * todo: Add user facing support for creating/modifying PdfDate objects.
+       */
       self.field->SetSignatureDate(PdfDate());
+
+      // Set output device to write signature to designated area.
+      signer.SetSignatureSize(static_cast<size_t>(minSigSize));
+
       self.field->SetSignature(*signer.GetSignatureBeacon());
       self.doc.WriteUpdate(&signer, true);
 
-      if (!signer.HasSignaturePosition())
-        throw Error::New(Env(),
-                         "Cannot find signature position in the document data");
+      if (!signer.HasSignaturePosition()) {
+        SetError("Cannot find signature position in the document data");
+        return;
+      }
 
       signer.AdjustByteRange();
       signer.Seek(0);
 
-      PdfData data(signature.c_str());
-      signer.SetSignature(data);
-      signer.Flush();
+      // Create signature
+      while (static_cast<void>(sigData = reinterpret_cast<char*>(
+                                 podofo_malloc(sizeof(char) * sigBuffer))),
+             !sigData) {
+        sigBuffer = sigBuffer / 2;
+        if (!sigBuffer)
+          break;
+      }
+      if (!sigData) {
+        SetError("PdfError: Out of Memory.");
+        return;
+      }
+
+      memory = BIO_new(BIO_s_mem());
+      if (!memory) {
+        podofo_free(sigData);
+        SetError("Failed to create input BIO");
+        return;
+      }
+      p7 = PKCS7_sign(
+        self.cert, self.pkey, nullptr, memory, PKCS7_DETACHED | PKCS7_BINARY);
+      if (!p7) {
+        BIO_free(memory);
+        podofo_free(sigData);
+        SetError("PKCS7 Sign failed");
+        return;
+      }
+      while (sigBufferLen = signer.ReadForSignature(sigData, sigBuffer),
+             sigBufferLen > 0) {
+        rc = BIO_write(memory, sigData, static_cast<int>(sigBufferLen));
+        if (static_cast<unsigned int>(rc) != sigBufferLen) {
+          PKCS7_free(p7);
+          BIO_free(memory);
+          podofo_free(sigData);
+          SetError("BIO write failed");
+          return;
+        }
+      }
+
+      podofo_free(sigData);
+      if (PKCS7_final(p7, memory, PKCS7_DETACHED | PKCS7_BINARY) <= 0) {
+        PKCS7_free(p7);
+        BIO_free(memory);
+        SetError("pkcs7 final failed");
+        return;
+      }
+
+      out = BIO_new(BIO_s_mem());
+      if (!out) {
+        PKCS7_free(p7);
+        BIO_free(memory);
+        SetError("Failed to create output bio");
+        return;
+      }
+      i2d_PKCS7_bio(memory, p7);
+      outBufferLen = BIO_get_mem_data(memory, &outBuffer);
+      if (outBufferLen > 0 && outBuffer) {
+        if (static_cast<size_t>(outBufferLen) > signer.GetSignatureSize()) {
+          PKCS7_free(p7);
+          BIO_free(memory);
+          BIO_free(out);
+          SetError("Signature value out of prescribed range");
+          return;
+        }
+        PdfData signature(outBuffer, static_cast<size_t>(outBufferLen));
+        signer.SetSignature(signature);
+        signer.Flush();
+        return;
+      } else {
+        SetError("Invalid Signature was generated");
+        return;
+      }
     } catch (PdfError& err) {
       SetError(ErrorHandler::WriteMsg(err));
     } catch (Error& err) {
@@ -180,8 +280,7 @@ protected:
         Callback().Call({ Env().Undefined() });
       } else {
         stringstream msg;
-        msg << "Failed to write to: " << self.output
-            << ", file existence check failed." << endl;
+        msg << "Failed to write to: " << self.output << endl;
         Callback().Call({ String::New(Env(), msg.str()) });
       }
     } else {
@@ -193,17 +292,16 @@ protected:
 };
 
 /**
- * @note JS sign(signature:string|Buffer, cb: Function)
+ * @note JS sign(signatureSize: int, cb: Function)
  * @param info
  * @return
  */
 Value
 Signer::SignWorker(const CallbackInfo& info)
 {
-  string data, output;
+  pdf_int32 minSigSize = info[0].As<Number>();
   Function cb = info[1].As<Function>();
-  data = info[0].As<String>().Utf8Value();
-  SignAsync* worker = new SignAsync(cb, *this, data);
+  SignAsync* worker = new SignAsync(cb, *this, minSigSize);
   worker->Queue();
   return info.Env().Undefined();
 }
@@ -294,6 +392,7 @@ protected:
   }
   void OnOK() override
   {
+    HandleScope scope(Env());
     Callback().Call({ Env().Undefined(), Number::New(Env(), minSigSize) });
   }
 };
@@ -303,14 +402,19 @@ Signer::LoadCertificateAndKey(const CallbackInfo& info)
 {
   string cert, key, pwd;
   Function cb;
-  if (info.Length() == 4 && info[3].IsFunction()) {
-    cb = info[3].As<Function>();
-    pwd = info[2].As<String>().Utf8Value();
-  } else if (info.Length() < 4 && info[2].IsFunction()) {
-    cb = info[2].As<Function>();
-  }
+
+  vector<int> optsIndices = AssertCallbackInfo(
+    info,
+    { { 0, { optional(napi_string) } },
+      { 1, { optional(napi_string) } },
+      { 2, { optional(napi_string), optional(napi_function) } },
+      { 3, { std::nullopt, optional(napi_function) } } });
+
   cert = info[0].As<String>().Utf8Value();
   key = info[1].As<String>().Utf8Value();
+  pwd = optsIndices[2] == 0 ? info[2].As<String>().Utf8Value() : std::string();
+  cb = optsIndices[3] == 0 ? info[2].As<Function>() : info[3].As<Function>();
+
   AsyncWorker* worker =
     new LoadCertificateAndKeyWorker(cb, *this, cert, key, pwd);
   worker->Queue();

@@ -35,20 +35,25 @@ export interface ISigner {
     /**
      * Loads the Certificate and Private Key and stores the values into the Signer instance.
      * Values are not retrievable but are stored for use in Signer.sign
+     * After both cert and pkey are loaded, a minimal signature size is calculated and returned to
+     * the caller. To complete the signing process this minimum signature size value needs to be
+     * provided to the sign method.
      *
      * @param {string} certificate
      * @param {string} pkey
      * @param {string | Callback} p - either the pkey password or callback
      * @param {Callback} [cb] - callback
+     * @returns {Number} - minimum signature size
      */
-    loadCertificateAndKey(certificate:string, pkey: string, p:string|Callback, cb?:Callback)
+    loadCertificateAndKey(certificate:string, pkey: string, p:string|Callback<Number>, cb?:Callback<Number>): number
 
     /**
      * Signs the document output to disk or a node buffer
      * The loadCertificateAndKey must be loaded prior to calling sign
      * @see loadCertificateAndKey
+     * @param {Number} minSignatureSize
      * @param {Callback} cb
      */
-    sign(cb: Callback): void
+    write(minSignatureSize: Number, cb: Callback<Buffer|string>): void
 }
 

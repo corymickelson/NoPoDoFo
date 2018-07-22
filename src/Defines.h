@@ -10,12 +10,14 @@
 
 namespace NoPoDoFo {
 
-enum DocumentStorageDevice {
+enum DocumentStorageDevice
+{
   InMemory,
   StreamToDisk
 };
 
-enum DocumentInputDevice {
+enum DocumentInputDevice
+{
   Disk,
   Memory
 };
@@ -26,29 +28,32 @@ struct OptionalArgument
   napi_valuetype T;
 };
 
-#define TryLoad(doc, file, buffer, pwd, forUpdate, typeE) {\
-  try {\
-    switch(typeE) {\
-      case DocumentInputDevice::Disk:\
-        (doc).Load((file).c_str(), forUpdate);\
-        break;\
-      case DocumentInputDevice::Memory:\
-        (doc).LoadFromDevice(buffer, forUpdate);\
-        break;\
-    }\
-  } catch(PdfError& e) {\
-      if (e.GetError() == ePdfError_InvalidPassword) {\
-        if((pwd).empty()) {\
-          SetError("Password required to modify this document");\
-        } else {\
-          try {\
-            (doc).SetPassword(pwd);\
-          } catch(...) {\
-            SetError("Password Invalid");}\
-        }\
-      } else { SetError(ErrorHandler::WriteMsg(e)); }\
-  }\
-}\
-
+#define TryLoad(doc, file, buffer, pwd, forUpdate, typeE)                      \
+  {                                                                            \
+    try {                                                                      \
+      switch (typeE) {                                                         \
+        case DocumentInputDevice::Disk:                                        \
+          (doc).Load((file).c_str(), forUpdate);                               \
+          break;                                                               \
+        case DocumentInputDevice::Memory:                                      \
+          (doc).LoadFromDevice(buffer, forUpdate);                             \
+          break;                                                               \
+      }                                                                        \
+    } catch (PdfError & e) {                                                   \
+      if (e.GetError() == ePdfError_InvalidPassword) {                         \
+        if ((pwd).empty()) {                                                   \
+          SetError("Password required to modify this document");               \
+        } else {                                                               \
+          try {                                                                \
+            (doc).SetPassword(pwd);                                            \
+          } catch (...) {                                                      \
+            SetError("Password Invalid");                                      \
+          }                                                                    \
+        }                                                                      \
+      } else {                                                                 \
+        SetError(ErrorHandler::WriteMsg(e));                                   \
+      }                                                                        \
+    }                                                                          \
+  }
 }
-#endif //NOPODOFO_DEFINES_H
+#endif // NOPODOFO_DEFINES_H

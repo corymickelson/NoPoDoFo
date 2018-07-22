@@ -57,8 +57,10 @@ public:
   Napi::Value GetTrailer(const Napi::CallbackInfo&);
   Napi::Value GetCatalog(const Napi::CallbackInfo&);
   Napi::Value InsertPages(const Napi::CallbackInfo&);
+  Napi::Value HasSignature(const Napi::CallbackInfo&);
+  Napi::Value GetSignatures(const Napi::CallbackInfo&);
   bool LoadedForIncrementalUpdates() { return loadForIncrementalUpdates; }
-  PoDoFo::PdfMemDocument& GetDocument()
+  inline PoDoFo::PdfMemDocument& GetDocument()
   {
     return *dynamic_cast<PoDoFo::PdfMemDocument*>(base);
   }

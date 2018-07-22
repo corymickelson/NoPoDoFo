@@ -64,7 +64,7 @@ import {
     NPDFVerticalAlignment
 } from './painter'
 import { IRect } from './rect'
-import { ISigner, signature } from './signer'
+import { ISigner } from './signer'
 import { Stream } from './stream'
 import { IForm } from './form'
 import { IContentsTokenizer } from './parser'
@@ -167,7 +167,6 @@ export {
     NPDFTextRenderingMode,
     NPDFVerticalAlignment,
     ISigner,
-    signature,
     Cell,
     Table,
     npdf,

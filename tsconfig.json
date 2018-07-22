@@ -11,7 +11,7 @@
     "rootDir": "./lib",
     "strict": true,
     "removeComments": false,
-    "target": "es6",
+    "target": "esnext",
     "types": [
       "node"
     ],

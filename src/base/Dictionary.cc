@@ -22,6 +22,7 @@
 #include "../ValidateArguments.h"
 #include "Obj.h"
 #include <algorithm>
+#include <sstream>
 
 using namespace Napi;
 using namespace PoDoFo;
@@ -30,6 +31,7 @@ using std::cout;
 using std::endl;
 using std::map;
 using std::string;
+using std::stringstream;
 using std::vector;
 
 namespace NoPoDoFo {

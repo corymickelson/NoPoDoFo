@@ -106,6 +106,9 @@ tap('IDocument password protected', (t: Test) => {
     })
 })
 
+/**
+ * @todo: Append only works with Document + Document, fix to support StreamDocument as well
+ */
 tap('IDocument append doc', (t: Test) => {
     // let doc = new npdf.StreamDocument('/tmp/append.test.pdf')
     // let page = doc.createPage(new npdf.Rect(0, 0, 612, 792))
@@ -129,4 +132,18 @@ tap('IDocument append doc', (t: Test) => {
         })
     })
 
+})
+
+tap('IDocument has/get signatures', t => {
+    let doc = new npdf.Document()
+    doc.load(join(__dirname, '../test-documents/signed.pdf'), e => {
+        if(e) {
+            t.fail(e.message)
+            return
+        }
+        t.assert(doc.hasSignatures(), 'Found signature(s) fields')
+        t.ok(doc.getSignatures(), 'can get signatures')
+        t.assert(doc.getSignatures().length === 1, 'has one signature')
+        t.end()
+    })
 })

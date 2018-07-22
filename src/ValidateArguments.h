@@ -21,19 +21,10 @@
 
 #include "Defines.h"
 
-#include <iostream>
 #include <map>
 #include <napi.h>
-#include <sstream>
-#include <string>
-#include <vector>
 #include <optional>
-
-using std::endl;
-using std::map;
-using std::stringstream;
-using std::vector;
-using std::optional;
+#include <vector>
 
 namespace NoPoDoFo {
 /**
@@ -55,50 +46,10 @@ namespace NoPoDoFo {
  * @param vars
  * @return
  */
-inline std::vector<int>
-AssertCallbackInfo(const Napi::CallbackInfo& info,
-                   std::map<int, std::vector<napi_valuetype>> vars)
-{
-  int validSize = 0;
-  for (auto item : vars) {
-    for (auto inner : item.second) {
-      if (inner.emptyOk) {
-        validSize--;
-      } else {
-        validSize++;
-      }
-    }
-  }
-  if (info.Length() < validSize) {
-    stringstream eMsg;
-    eMsg << "Expected " << vars.size() << " argument parameters but received "
-         << info.Length() << endl;
-    Napi::Error::New(info.Env(), eMsg.str()).ThrowAsJavaScriptException();
-    return {};
-  }
-  vector<int> argIndex;
-  for (auto item : vars) {
-    bool valid = false;
-    for (int typeIndex = 0; typeIndex < item.second.size(); typeIndex++) {
-      if (item.second[typeIndex].emptyOk && typeIndex > info.Length()) {
-        argIndex[item.first] = -1;
-        valid = true;
-      } else {
-        napi_valuetype t = item.second[typeIndex].T;
-        if (t == info[item.first].Type()) {
-          argIndex[item.first] = typeIndex;
-          valid = true;
-        }
-      }
-    }
-    if (!valid) {
-      stringstream eMsg;
-      eMsg << "Invalid function argument at index " << item.first << endl;
-      Napi::TypeError::New(info.Env(), eMsg.str());
-    }
-  }
-  return argIndex;
-}
+std::vector<int>
+AssertCallbackInfo(
+  const Napi::CallbackInfo& info,
+  std::map<int, std::vector<std::optional<napi_valuetype>>> vars);
 }
 
 #endif // NPDF_VALIDATEARGUMENTS_H

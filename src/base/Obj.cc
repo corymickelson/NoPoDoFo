@@ -29,6 +29,7 @@ using namespace PoDoFo;
 using std::cout;
 using std::endl;
 using std::string;
+using std::stringstream;
 
 namespace NoPoDoFo {
 

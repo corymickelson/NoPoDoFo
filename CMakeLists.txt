@@ -31,9 +31,7 @@ file(GLOB SOURCE_FILES
         "src/base/*.cc"
         "src/base/*.h"
         "src/doc/*.h"
-        "src/doc/*.cc"
-        "src/crypto/*.h"
-        "src/crypto/*.cc" )
+        "src/doc/*.cc")
 
 add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES})
 set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "" SUFFIX ".node")

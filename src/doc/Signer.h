@@ -21,11 +21,7 @@
 #define NPDF_SIGNER_H
 
 #include <napi.h>
-#include <openssl/err.h>
 #include <openssl/evp.h>
-#include <openssl/pem.h>
-#include <openssl/pkcs7.h>
-#include <openssl/ssl.h>
 #include <openssl/x509.h>
 #include <podofo/podofo.h>
 
@@ -43,8 +39,8 @@ public:
   Napi::Value LoadCertificateAndKey(const Napi::CallbackInfo&);
 
   PoDoFo::PdfMemDocument& doc;
-  std::shared_ptr<PoDoFo::PdfSignatureField> field;
   std::string output;
+  std::shared_ptr<PoDoFo::PdfSignatureField> field;
   EVP_PKEY* pkey = nullptr;
   X509* cert = nullptr;
 

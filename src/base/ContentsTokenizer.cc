@@ -23,11 +23,13 @@
 #include "../doc/Page.h"
 #include "../doc/StreamDocument.h"
 #include <iostream>
+#include <sstream>
 #include <stack>
 
 using namespace Napi;
 using namespace PoDoFo;
 using std::make_unique;
+using std::stringstream;
 using std::unique_ptr;
 
 namespace NoPoDoFo {
