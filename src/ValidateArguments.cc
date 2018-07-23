@@ -25,7 +25,6 @@
 using std::cout;
 using std::endl;
 using std::map;
-using std::optional;
 using std::stringstream;
 using std::vector;
 
@@ -33,7 +32,7 @@ namespace NoPoDoFo {
 
 std::vector<int>
 AssertCallbackInfo(const Napi::CallbackInfo& info,
-                   std::map<int, std::vector<optional<napi_valuetype>>> vars)
+                   std::map<int, std::vector<option>> vars)
 {
   vector<int> argIndex;
   for (auto item : vars) {

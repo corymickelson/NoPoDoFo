@@ -23,8 +23,11 @@
 
 #include <map>
 #include <napi.h>
-#include <optional>
+//#include <optional>
 #include <vector>
+#include <optional/optional.hpp>
+
+using option = tl::optional<napi_valuetype>;
 
 namespace NoPoDoFo {
 /**
@@ -49,7 +52,7 @@ namespace NoPoDoFo {
 std::vector<int>
 AssertCallbackInfo(
   const Napi::CallbackInfo& info,
-  std::map<int, std::vector<std::optional<napi_valuetype>>> vars);
+  std::map<int, std::vector<option>> vars);
 }
 
 #endif // NPDF_VALIDATEARGUMENTS_H

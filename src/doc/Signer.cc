@@ -29,15 +29,13 @@
 #include <openssl/pem.h>
 #include <openssl/pkcs7.h>
 #include <openssl/ssl.h>
-#include <optional>
 #include <sstream>
 #include <vector>
 
 using namespace Napi;
 using namespace PoDoFo;
 
-using std::make_pair;
-using std::optional;
+using tl::nullopt;
 using std::string;
 using std::stringstream;
 
@@ -405,10 +403,10 @@ Signer::LoadCertificateAndKey(const CallbackInfo& info)
 
   vector<int> optsIndices = AssertCallbackInfo(
     info,
-    { { 0, { optional(napi_string) } },
-      { 1, { optional(napi_string) } },
-      { 2, { optional(napi_string), optional(napi_function) } },
-      { 3, { std::nullopt, optional(napi_function) } } });
+    { { 0, { option(napi_string) } },
+      { 1, { option(napi_string) } },
+      { 2, { option(napi_string), option(napi_function) } },
+      { 3, { nullopt, option(napi_function) } } });
 
   cert = info[0].As<String>().Utf8Value();
   key = info[1].As<String>().Utf8Value();
