@@ -18,6 +18,7 @@
  */
 
 #include "base/Array.h"
+#include "base/Date.h"
 #include "base/ContentsTokenizer.h"
 #include "base/Data.h"
 #include "base/Dictionary.h"
@@ -52,6 +53,7 @@ Napi::Object
 init(Napi::Env env, Napi::Object exports)
 {
   NoPoDoFo::Action::Initialize(env, exports);
+  NoPoDoFo::Date::Initialize(env, exports);
   NoPoDoFo::Annotation::Initialize(env, exports);
   NoPoDoFo::Array::Initialize(env, exports);
   NoPoDoFo::CheckBox::Initialize(env, exports);

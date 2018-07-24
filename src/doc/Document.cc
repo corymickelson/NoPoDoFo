@@ -110,20 +110,6 @@ Document::Document(const CallbackInfo& info)
   , BaseDocument(DocumentStorageDevice::InMemory, info)
 {}
 
-/**
- * @note PdfFont resource is managed by the PdfDocument
- * @param info    // create appearance stream xobject for field
-    // Courier bold 11pt black
-    // painter.setPage(appearanceStream)
-    // painter.setColor([0.0, 0.0, 0.0])
-    // courier.size = 11
-    // painter.font = courier
-    // painter.finishPage();
-
-    // create a field with the appearance stream created above
-    // nameFieldAnnot.setAppearanceStream(appearanceStream)
- * @return
- */
 Value
 Document::GetFont(const CallbackInfo& info)
 {
@@ -230,7 +216,6 @@ Document::SetPassword(const CallbackInfo& info, const Napi::Value& value)
 void
 Document::DeletePages(const CallbackInfo& info)
 {
-  // AssertFunctionArgs(info, 2, { { napi_number, napi_number } }, nullptr);
   int pageIndex = info[0].As<Number>();
   int count = info[1].As<Number>();
   if (GetDocument().GetPageCount() < pageIndex + count) {

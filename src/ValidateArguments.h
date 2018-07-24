@@ -23,13 +23,13 @@
 
 #include <map>
 #include <napi.h>
-//#include <optional>
 #include <vector>
 #include <optional/optional.hpp>
 
-using option = tl::optional<napi_valuetype>;
 
 namespace NoPoDoFo {
+
+using option = tl::optional<napi_valuetype>;
 /**
  * Assert caller argument(s). Since arguments can be variable the assertion
  * checks the type for each index and returns an int array of matching values.

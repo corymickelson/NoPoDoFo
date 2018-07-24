@@ -17,6 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import { IData } from './data'
+import {IDate} from './date'
 import { IDocument, NPDFFontEncoding, NPDFPageLayout, NPDFPageMode } from './document'
 import { IPage } from './page'
 import { IStreamDocument, NPDFWriteMode, NPDFVersion } from './stream-document'
@@ -103,9 +104,7 @@ export interface INPDF {
     ContentsTokenizer: IContentsTokenizer
     SimpleTable: any
     Action: IAction
-
-    signature: Function
-    signatureSync: Function
+    Date: IDate
 }
 
 const binary = require('node-pre-gyp')
@@ -113,6 +112,7 @@ const { resolve, join } = require('path')
 const __binary = binary.find(resolve(join(__dirname, '../package.json')))
 const npdf: INPDF = require(__binary)
 export {
+    IDate,
     IDictionary,
     NPDFInternal,
     IArray,

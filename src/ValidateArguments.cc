@@ -37,13 +37,11 @@ AssertCallbackInfo(const Napi::CallbackInfo& info,
   vector<int> argIndex;
   for (auto item : vars) {
     bool valid = false;
-
-    if (info.Length() - 1 < static_cast<size_t>(item.first)) {
+    if (static_cast<int>(info.Length()) -1 < item.first) {
       for (size_t i = 0; i < item.second.size(); i++) {
         if (!item.second[i].has_value()) {
           valid = true;
           argIndex.emplace_back(i);
-          cout << "validated at options index: " << i << endl;
           break;
         }
       }
@@ -61,7 +59,6 @@ AssertCallbackInfo(const Napi::CallbackInfo& info,
         if (opt.has_value() && opt.value() == t) {
           valid = true;
           argIndex.emplace_back(i);
-          cout << "validated at options index: " << i << endl;
           break;
         }
       }
