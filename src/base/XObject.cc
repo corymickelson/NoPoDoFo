@@ -29,7 +29,7 @@ using namespace PoDoFo;
 
 namespace NoPoDoFo {
 
-FunctionReference XObject::constructor;
+FunctionReference XObject::constructor; // NOLINT
 
 XObject::XObject(const CallbackInfo& info)
   : ObjectWrap(info)

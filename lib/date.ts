@@ -23,3 +23,18 @@ export interface IDate {
      */
     toString(): string
 }
+
+function doubleDigit(v: number): string {
+    return `${v}`.length === 1 ? `0${v}` : `${v}`
+}
+
+/**
+ * Convert node Date to Pdf Date string
+ * @param {Date} d - The Date to convert
+ * @returns {string} - d (Date) in pdf string format
+ */
+export function toPDFFormat(d: Date) {
+    const offset = d.getTimezoneOffset() / 60
+    let dateString = d.toISOString().replace(/-|T|\.|:/g, '').substr(0, 14)
+    return `${dateString}-${doubleDigit(offset)}'00'`
+}

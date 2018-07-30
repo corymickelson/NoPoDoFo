@@ -28,7 +28,6 @@
       "sources": [
         "src/addon.cc",
         "src/ValidateArguments.cc",
-        "src/base/Date.cc",
         "src/ErrorHandler.cc",
      		"src/doc/Action.cc",
         "src/doc/Annotation.cc",

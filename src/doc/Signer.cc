@@ -299,7 +299,7 @@ Signer::SignWorker(const CallbackInfo& info)
 {
   pdf_int32 minSigSize = info[0].As<Number>();
   Function cb = info[1].As<Function>();
-  SignAsync* worker = new SignAsync(cb, *this, minSigSize);
+  auto * worker = new SignAsync(cb, *this, minSigSize);
   worker->Queue();
   return info.Env().Undefined();
 }

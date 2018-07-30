@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import { IData } from './data'
-import {IDate} from './date'
+import { IDate, toPDFFormat } from './date'
 import { IDocument, NPDFFontEncoding, NPDFPageLayout, NPDFPageMode } from './document'
 import { IPage } from './page'
 import { IStreamDocument, NPDFWriteMode, NPDFVersion } from './stream-document'
@@ -175,7 +175,8 @@ export {
     IStreamDocument,
     NPDFWriteMode,
     NPDFVersion,
-    IXObj
+    IXObj,
+    toPDFFormat
 }
 export const CONVERSION = 0.0028346456693
 /**

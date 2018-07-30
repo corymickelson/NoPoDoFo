@@ -22,12 +22,6 @@ enum DocumentInputDevice
   Memory
 };
 
-struct OptionalArgument
-{
-  bool emptyOk = false;
-  napi_valuetype T;
-};
-
 #define TryLoad(doc, file, buffer, pwd, forUpdate, typeE)                      \
   {                                                                            \
     try {                                                                      \
