@@ -34,7 +34,7 @@ namespace NoPoDoFo {
 class BaseDocument
 {
 public:
-  explicit BaseDocument(DocumentStorageDevice, const Napi::CallbackInfo&);
+  explicit BaseDocument(DocumentStreamDevice, const Napi::CallbackInfo&);
   virtual ~BaseDocument();
   Napi::Value GetPageCount(const Napi::CallbackInfo&);
   virtual Napi::Value GetPage(const Napi::CallbackInfo&);

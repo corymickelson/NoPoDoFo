@@ -52,6 +52,10 @@
 Napi::Object
 init(Napi::Env env, Napi::Object exports)
 {
+#if PODOFO_VERSION_MINOR < 9 && PODOFO_VERSION_PATCH < 6
+Napi::Error::New(env, "PoDoFo Version must be >= 0.9.6").ThrowAsJavaScriptException();
+return;
+#endif
   NoPoDoFo::Action::Initialize(env, exports);
   NoPoDoFo::Date::Initialize(env, exports);
   NoPoDoFo::Annotation::Initialize(env, exports);

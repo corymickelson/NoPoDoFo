@@ -107,7 +107,7 @@ Document::Initialize(Napi::Env& env, Napi::Object& target)
 }
 Document::Document(const CallbackInfo& info)
   : ObjectWrap(info)
-  , BaseDocument(DocumentStorageDevice::InMemory, info)
+  , BaseDocument(DocumentStreamDevice::InMemory, info)
 {}
 
 Value

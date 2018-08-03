@@ -107,10 +107,11 @@ export interface INPDF {
     Date: IDate
 }
 
-const binary = require('node-pre-gyp')
-const { resolve, join } = require('path')
-const __binary = binary.find(resolve(join(__dirname, '../package.json')))
-const npdf: INPDF = require(__binary)
+// const binary = require('node-pre-gyp')
+// const { resolve, join } = require('path')
+const npdf: INPDF = require('bindings')('nopodofo.node')
+// const __binary = binary.find(resolve(join(__dirname, '../package.json')))
+// const npdf: INPDF = require(__binary)
 export {
     IDate,
     IDictionary,

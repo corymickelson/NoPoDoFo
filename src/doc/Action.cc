@@ -12,7 +12,6 @@ using namespace PoDoFo;
 using namespace Napi;
 
 using std::make_unique;
-using std::unique_ptr;
 
 namespace NoPoDoFo {
 

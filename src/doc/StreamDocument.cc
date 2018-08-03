@@ -39,7 +39,7 @@ FunctionReference StreamDocument::constructor; // NOLINT
  */
 StreamDocument::StreamDocument(const CallbackInfo& info)
   : ObjectWrap(info)
-  , BaseDocument(DocumentStorageDevice::StreamToDisk, info)
+  , BaseDocument(DocumentStreamDevice::StreamToDisk, info)
 {}
 
 void

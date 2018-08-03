@@ -17,6 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "../Defines.h"
 #include "Signer.h"
 #include "../ErrorHandler.h"
 #include "../ValidateArguments.h"
@@ -38,6 +39,14 @@ using namespace PoDoFo;
 using tl::nullopt;
 using std::string;
 using std::stringstream;
+
+#if defined(_WIN64)
+#define fseeko _fseeki64
+#define ftello _ftelli64
+#else
+#define fseeko fseek
+#define ftello ftell
+#endif
 
 namespace NoPoDoFo {
 

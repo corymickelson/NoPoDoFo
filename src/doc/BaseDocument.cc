@@ -47,7 +47,7 @@ namespace NoPoDoFo {
  * @brief BaseDocument::BaseDocument
  * @param info
  */
-BaseDocument::BaseDocument(DocumentStorageDevice t,
+BaseDocument::BaseDocument(DocumentStreamDevice t,
                            const Napi::CallbackInfo& info)
 {
   switch (t) {
