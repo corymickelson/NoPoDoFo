@@ -4,7 +4,31 @@
 #
 version: 2
 jobs:
-  build:
+#  aws:
+#    docker:
+#      - image: nopodofo/aws:latest
+#
+#      working_directory: /home/source
+#      steps:
+#        - checkout
+#        - restore_cache:
+#            keys:
+#              - v1-dependencies-{{ checksum "package.json" }}
+#              - v1-dependencies-
+#        - run: source /opt/rh/devtoolset-7/enable
+#        - run: yum -y install awscli
+#        - run: npm install --ignore-scripts
+#        - run: LDFLAGS=-Wl,-rpath=/var/task/node_modules/nopodofolambda/lib ./node_modules/.bin/cmake-js build
+#        - run: npm i nopodofolambda
+#        - run: npm test
+#        - run: npm run dist-package
+#        - run: aws s3 sync s3://nopodofo/aws/latest dist
+
+  spec:
+    filters:
+      branches:
+        only: develop
+
     docker:
       # specify the version you desire here
       - image: corymickelson/nopodofo-alpine:latest
@@ -26,11 +50,12 @@ jobs:
           # fallback to using the latest cache if no exact match is found
           - v1-dependencies-
 
-      - run: npm install
+      - run: npm install --ignore-scripts
       - run: apk add ttf-freefont
       - save_cache:
           paths:
             - node_modules
           key: v1-dependencies-{{ checksum "package.json" }}
-      - run: ./node_modules/.bin/node-pre-gyp rebuild
+#      - run: ./node_modules/.bin/node-pre-gyp rebuild
+      - run: ./node_modules/.bin/cmake-js build
       - run: npm test
