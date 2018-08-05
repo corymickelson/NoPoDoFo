@@ -24,10 +24,7 @@ jobs:
 #        - run: npm run dist-package
 #        - run: aws s3 sync s3://nopodofo/aws/latest dist
 
-  spec:
-    filters:
-      branches:
-        only: develop
+  build:
 
     docker:
       # specify the version you desire here
