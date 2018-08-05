@@ -179,12 +179,12 @@ function runTest(test: Function) {
 }
 
 export function runAll() {
-    [   removeAnnotation,
+    [   // removeAnnotation,
         createField,
         pageRotation,
         pageProperties,
         pageTrimBox,
-        pageGetAnnotsCount,
+        // pageGetAnnotsCount,
         pageGetAnnot,
         pageContents,
         pageResources,
