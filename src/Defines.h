@@ -29,12 +29,6 @@
 
 namespace NoPoDoFo {
 
-enum DocumentStreamDevice
-{
-  InMemory,
-  StreamToDisk
-};
-
 enum DocumentInputDevice
 {
   Disk,

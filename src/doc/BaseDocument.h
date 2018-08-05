@@ -34,7 +34,7 @@ namespace NoPoDoFo {
 class BaseDocument
 {
 public:
-  explicit BaseDocument(DocumentStreamDevice, const Napi::CallbackInfo&);
+  explicit BaseDocument(const Napi::CallbackInfo&, bool);
   virtual ~BaseDocument();
   Napi::Value GetPageCount(const Napi::CallbackInfo&);
   virtual Napi::Value GetPage(const Napi::CallbackInfo&);
@@ -75,7 +75,7 @@ public:
   PoDoFo::PdfDocument* base;
   bool create = false;
   string output;
-  PoDoFo::PdfRefCountedBuffer refBuffer;
+  PoDoFo::PdfRefCountedBuffer* refBuffer = new PoDoFo::PdfRefCountedBuffer();
   bool streamToBuffer = false;
 };
 }

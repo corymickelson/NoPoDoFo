@@ -1,3 +1,5 @@
+const buildType = process.config.target_defaults.default_configuration;
+const npdf: INPDF = require(`../build/${buildType}/nopodofo.node`)
 /**
  * This file is part of the NoPoDoFo (R) project.
  * Copyright (c) 2017-2018
@@ -109,7 +111,8 @@ export interface INPDF {
 
 // const binary = require('node-pre-gyp')
 // const { resolve, join } = require('path')
-const npdf: INPDF = require('bindings')('nopodofo.node')
+// const npdf: INPDF = require('bindings')('nopodofo.node')
+
 // const __binary = binary.find(resolve(join(__dirname, '../package.json')))
 // const npdf: INPDF = require(__binary)
 export {

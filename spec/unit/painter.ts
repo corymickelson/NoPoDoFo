@@ -8,6 +8,13 @@ const filePath = join(__dirname, '../test-documents/test.pdf'),
     outFile = '/tmp/painter.out.pdf',
     doc = new npdf.Document()
 
+tap('Stream Painter SetPage', t => {
+    const doc = new npdf.StreamDocument(join(__dirname, '../tmp/streamPainterSetPage.pdf'))
+    const painter = new npdf.Painter(doc)
+    const page = doc.createPage(new npdf.Rect(0, 0, 612, 792))
+    t.doesNotThrow(() => painter.setPage(page))
+    t.end()
+})
 tap('IPainter', t => {
     t.test('Document [MemDocument]', t => {
         doc.load(filePath, (err: Error) => {
@@ -23,7 +30,7 @@ tap('IPainter', t => {
                     encoding: NPDFFontEncoding.WinAnsi,
                     italic: true
                 })
-                
+
                 painter.font = font
                 const metric = font.getMetrics()
                 let x: number, y: number

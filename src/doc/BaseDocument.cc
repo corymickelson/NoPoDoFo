@@ -47,50 +47,49 @@ namespace NoPoDoFo {
  * @brief BaseDocument::BaseDocument
  * @param info
  */
-BaseDocument::BaseDocument(DocumentStreamDevice t,
-                           const Napi::CallbackInfo& info)
+BaseDocument::BaseDocument(const Napi::CallbackInfo& info, bool inMem)
 {
-  switch (t) {
-    case InMemory:
-      base = new PdfMemDocument();
-      break;
-    case StreamToDisk:
-      EPdfVersion version = ePdfVersion_1_7;
-      EPdfWriteMode writeMode = ePdfWriteMode_Default;
-      PdfEncrypt* encrypt = nullptr;
+  if (inMem) {
+    base = new PdfMemDocument();
+  } else {
+    EPdfVersion version = ePdfVersion_1_7;
+    EPdfWriteMode writeMode = ePdfWriteMode_Default;
+    PdfEncrypt* encrypt = nullptr;
 
-      if (info.Length() >= 2 && info[1].IsObject()) {
-        auto nObj = info[1].As<Object>();
-        if (nObj.Has("version")) {
-          version = static_cast<EPdfVersion>(
-            nObj.Get("version").As<Number>().Uint32Value());
-        }
-        if (nObj.Has("writeMode")) {
-          writeMode = static_cast<EPdfWriteMode>(
-            nObj.Get("writeMode").As<Number>().Uint32Value());
-        }
-        if (nObj.Has("encrypt")) {
-          auto nEncObj = Encrypt::Unwrap(nObj.Get("encrypt").As<Object>());
-          encrypt = const_cast<PdfEncrypt*>(nEncObj->encrypt);
-        }
+    if (info.Length() >= 2 && info[1].IsObject()) {
+      auto nObj = info[1].As<Object>();
+      if (nObj.Has("version")) {
+        version = static_cast<EPdfVersion>(
+          nObj.Get("version").As<Number>().Uint32Value());
       }
-      if (info.Length() > 0 && info[0].IsString()) {
-        base = new PdfStreamedDocument(info[0].As<String>().Utf8Value().c_str(),
-                                       version,
-                                       encrypt,
-                                       writeMode);
-      } else {
-        PdfOutputDevice device(&refBuffer);
-        base = new PdfStreamedDocument(&device, version, encrypt, writeMode);
-        streamToBuffer = true;
+      if (nObj.Has("writeMode")) {
+        writeMode = static_cast<EPdfWriteMode>(
+          nObj.Get("writeMode").As<Number>().Uint32Value());
       }
-      break;
+      if (nObj.Has("encrypt")) {
+        auto nEncObj = Encrypt::Unwrap(nObj.Get("encrypt").As<Object>());
+        encrypt = const_cast<PdfEncrypt*>(nEncObj->encrypt);
+      }
+    }
+    if (info.Length() > 0 && info[0].IsString()) {
+      base = new PdfStreamedDocument(
+        info[0].As<String>().Utf8Value().c_str(), version, encrypt, writeMode);
+    } else {
+#ifdef EXPERIMENTAL
+      PdfOutputDevice device(refBuffer);
+      base = new PdfStreamedDocument(&device, version, encrypt, writeMode);
+      streamToBuffer = true;
+#else
+      cout << "Streaming to buffer is not supported in this build" << endl;
+#endif
+    }
   }
 }
 
 BaseDocument::~BaseDocument()
 {
   delete base;
+  delete refBuffer;
 }
 
 Napi::Value

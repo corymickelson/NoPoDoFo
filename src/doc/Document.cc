@@ -107,8 +107,10 @@ Document::Initialize(Napi::Env& env, Napi::Object& target)
 }
 Document::Document(const CallbackInfo& info)
   : ObjectWrap(info)
-  , BaseDocument(DocumentStreamDevice::InMemory, info)
-{}
+  , BaseDocument(info, true)
+{
+  cout << "Memory Document" << endl;
+}
 
 Value
 Document::GetFont(const CallbackInfo& info)

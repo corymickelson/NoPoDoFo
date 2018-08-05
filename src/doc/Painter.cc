@@ -135,18 +135,18 @@ Painter::SetPage(const Napi::CallbackInfo& info)
   if (!info[0].IsObject()) {
     throw Napi::Error::New(info.Env(), "Page must be an instance of Page.");
   }
-  PdfCanvas* canvas;
   if (info[0].As<Object>().InstanceOf(Page::constructor.Value())) {
-    canvas = &Page::Unwrap(info[0].As<Object>())->page;
+    auto canvas = Page::Unwrap(info[0].As<Object>());
+    painter->SetPage(&canvas->page);
   } else if (info[0].As<Object>().InstanceOf(XObject::constructor.Value())) {
-    canvas = &XObject::Unwrap(info[0].As<Object>())->GetXObject();
+    auto canvas = &XObject::Unwrap(info[0].As<Object>())->GetXObject();
+    painter->SetPage(canvas);
   } else {
     TypeError::New(info.Env(),
                    "Painter must be an instance of PdfCanvas: XObject or Page")
       .ThrowAsJavaScriptException();
     return;
   }
-  painter->SetPage(canvas);
 }
 
 void

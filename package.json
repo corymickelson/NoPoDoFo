@@ -1,10 +1,9 @@
 {
   "name": "nopodofo",
-  "version": "0.6.3",
+  "version": "0.7.0",
   "description": "Node.js native module bindings for PoDoFo",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "gypfile": true,
   "repository": {
     "type": "git",
     "url": "git+https://github.com/corymickelson/NoPoDoFo.git"
@@ -13,7 +12,6 @@
     "docs": "typedoc --options ./tsconfig.docs.json --out ./docs",
     "coverage": "nyc tape spec/unit/*.js && nyc report --reporter=text-lcov | coveralls",
     "test": "mkdir -p spec/tmp && tsc -p tsconfig.json && tsc -p tsconfig.spec.json && node --expose-gc ./node_modules/.bin/tape spec/unit/*.js",
-    "install": "node-pre-gyp install --fallback-to-build",
     "tsc:spec": "tsc -p tsconfig.spec.json",
     "prepublish": "tsc -p tsconfig.json"
   },
@@ -49,28 +47,15 @@
   },
   "dependencies": {
     "bindings": "^1.3.0",
-    "node-addon-api": "1.4.0",
-    "node-pre-gyp": "^0.10.0"
-  },
-  "bundledDependencies": [
-    "node-pre-gyp"
-  ],
-  "binary": {
-    "module_name": "nopodofo",
-    "module_path": "./lib/binding/{napi_build_version}/",
-    "remote_path": "napi{napi_build_version}/v{version}",
-    "host": "https://nopodofo.s3-us-west-2.amazonaws.com",
-    "napi_versions": [
-      1,
-      2,
-      3
-    ]
+    "node-addon-api": "1.4.0"
   },
   "files": [
     "build/Release",
+    "build/Debug",
     "src",
     "dist",
     "deps",
-    "tsconfig.json"
+    "tsconfig.json",
+    "CMakeLists.txt"
   ]
 }

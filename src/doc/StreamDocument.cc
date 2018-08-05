@@ -39,8 +39,10 @@ FunctionReference StreamDocument::constructor; // NOLINT
  */
 StreamDocument::StreamDocument(const CallbackInfo& info)
   : ObjectWrap(info)
-  , BaseDocument(DocumentStreamDevice::StreamToDisk, info)
-{}
+  , BaseDocument(info, false)
+{
+  cout << "Stream Document" << endl;
+}
 
 void
 StreamDocument::Initialize(Napi::Env& env, Napi::Object& target)
@@ -102,7 +104,7 @@ StreamDocument::Close(const CallbackInfo& info)
   GetStreamedDocument().Close();
   if (streamToBuffer) {
     return Buffer<char>::Copy(
-      info.Env(), refBuffer.GetBuffer(), refBuffer.GetSize());
+      info.Env(), refBuffer->GetBuffer(), refBuffer->GetSize());
   } else {
     return String::New(info.Env(), output);
   }
