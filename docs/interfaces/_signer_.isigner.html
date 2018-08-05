@@ -88,10 +88,16 @@
 							</ul>
 						</section>
 						<section class="tsd-index-section ">
+							<h3>Properties</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_signer_.isigner.html#signaturefield" class="tsd-kind-icon">signature<wbr>Field</a></li>
+							</ul>
+						</section>
+						<section class="tsd-index-section ">
 							<h3>Methods</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_signer_.isigner.html#setfield" class="tsd-kind-icon">set<wbr>Field</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_signer_.isigner.html#sign" class="tsd-kind-icon">sign</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_signer_.isigner.html#loadcertificateandkey" class="tsd-kind-icon">load<wbr>Certificate<wbr>And<wbr>Key</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_signer_.isigner.html#write" class="tsd-kind-icon">write</a></li>
 							</ul>
 						</section>
 					</div>
@@ -109,9 +115,14 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/71624ea/lib/signer.ts#L25">signer.ts:25</a></li>
+									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/e7cf374/lib/signer.ts#L24">signer.ts:24</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Creates a new instance of Signer. Signer is the only way to</p>
+								</div>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
@@ -127,50 +138,100 @@
 				</section>
 			</section>
 			<section class="tsd-panel-group tsd-member-group ">
+				<h2>Properties</h2>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
+					<a name="signaturefield" class="tsd-anchor"></a>
+					<h3>signature<wbr>Field</h3>
+					<div class="tsd-signature tsd-kind-icon">signature<wbr>Field<span class="tsd-signature-symbol">:</span> <a href="_field_.isignaturefield.html" class="tsd-signature-type">ISignatureField</a></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/e7cf374/lib/signer.ts#L24">signer.ts:24</a></li>
+						</ul>
+					</aside>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Methods</h2>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
-					<a name="setfield" class="tsd-anchor"></a>
-					<h3>set<wbr>Field</h3>
+					<a name="loadcertificateandkey" class="tsd-anchor"></a>
+					<h3>load<wbr>Certificate<wbr>And<wbr>Key</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
-						<li class="tsd-signature tsd-kind-icon">set<wbr>Field<span class="tsd-signature-symbol">(</span>field<span class="tsd-signature-symbol">: </span><a href="_field_.isignaturefield.html" class="tsd-signature-type">ISignatureField</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+						<li class="tsd-signature tsd-kind-icon">load<wbr>Certificate<wbr>And<wbr>Key<span class="tsd-signature-symbol">(</span>certificate<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, pkey<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, p<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><a href="../modules/_document_.html#callback" class="tsd-signature-type">Callback</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Number</span><span class="tsd-signature-symbol">&gt;</span>, cb<span class="tsd-signature-symbol">?: </span><a href="../modules/_document_.html#callback" class="tsd-signature-type">Callback</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Number</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/71624ea/lib/signer.ts#L27">signer.ts:27</a></li>
+									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/e7cf374/lib/signer.ts#L48">signer.ts:48</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Loads the Certificate and Private Key and stores the values into the Signer instance.
+										Values are not retrievable but are stored for use in Signer.sign
+										After both cert and pkey are loaded, a minimal signature size is calculated and returned to
+										the caller. To complete the signing process this minimum signature size value needs to be
+									provided to the sign method.</p>
+								</div>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>field: <a href="_field_.isignaturefield.html" class="tsd-signature-type">ISignatureField</a></h5>
+									<h5>certificate: <span class="tsd-signature-type">string</span></h5>
+								</li>
+								<li>
+									<h5>pkey: <span class="tsd-signature-type">string</span></h5>
+								</li>
+								<li>
+									<h5>p: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><a href="../modules/_document_.html#callback" class="tsd-signature-type">Callback</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Number</span><span class="tsd-signature-symbol">&gt;</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>either the pkey password or callback</p>
+									</div>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> cb: <a href="../modules/_document_.html#callback" class="tsd-signature-type">Callback</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Number</span><span class="tsd-signature-symbol">&gt;</span></h5>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
+							<ul>
+								<li>minimum signature size</li>
+							</ul>
 						</li>
 					</ul>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
-					<a name="sign" class="tsd-anchor"></a>
-					<h3>sign</h3>
+					<a name="write" class="tsd-anchor"></a>
+					<h3>write</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
-						<li class="tsd-signature tsd-kind-icon">sign<span class="tsd-signature-symbol">(</span>signature<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, cb<span class="tsd-signature-symbol">: </span><a href="../modules/_document_.html#callback" class="tsd-signature-type">Callback</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+						<li class="tsd-signature tsd-kind-icon">write<span class="tsd-signature-symbol">(</span>minSignatureSize<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Number</span>, cb<span class="tsd-signature-symbol">: </span><a href="../modules/_document_.html#callback" class="tsd-signature-type">Callback</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Buffer</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/71624ea/lib/signer.ts#L28">signer.ts:28</a></li>
+									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/e7cf374/lib/signer.ts#L57">signer.ts:57</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Signs the document output to disk or a node buffer
+									The loadCertificateAndKey must be loaded prior to calling sign</p>
+								</div>
+								<dl class="tsd-comment-tags">
+									<dt>see</dt>
+									<dd><p>loadCertificateAndKey</p>
+									</dd>
+								</dl>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>signature: <span class="tsd-signature-type">string</span></h5>
+									<h5>minSignatureSize: <span class="tsd-signature-type">Number</span></h5>
 								</li>
 								<li>
-									<h5>cb: <a href="../modules/_document_.html#callback" class="tsd-signature-type">Callback</a></h5>
+									<h5>cb: <a href="../modules/_document_.html#callback" class="tsd-signature-type">Callback</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Buffer</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></h5>
+									<div class="tsd-comment tsd-typography">
+									</div>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -196,6 +257,9 @@
 					</li>
 					<li class=" tsd-kind-external-module">
 						<a href="../modules/_data_.html">"data"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="../modules/_date_.html">"date"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
 						<a href="../modules/_document_.html">"document"</a>
@@ -254,6 +318,9 @@
 					<li class=" tsd-kind-external-module">
 						<a href="../modules/_table_.html">"table"</a>
 					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="../modules/_xobject_.html">"xobject"</a>
+					</li>
 				</ul>
 			</nav>
 			<nav class="tsd-navigation secondary menu-sticky">
@@ -266,19 +333,19 @@
 							<li class=" tsd-kind-constructor tsd-parent-kind-interface">
 								<a href="_signer_.isigner.html#constructor" class="tsd-kind-icon">constructor</a>
 							</li>
-							<li class=" tsd-kind-method tsd-parent-kind-interface">
-								<a href="_signer_.isigner.html#setfield" class="tsd-kind-icon">set<wbr>Field</a>
+							<li class=" tsd-kind-property tsd-parent-kind-interface">
+								<a href="_signer_.isigner.html#signaturefield" class="tsd-kind-icon">signature<wbr>Field</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-interface">
-								<a href="_signer_.isigner.html#sign" class="tsd-kind-icon">sign</a>
+								<a href="_signer_.isigner.html#loadcertificateandkey" class="tsd-kind-icon">load<wbr>Certificate<wbr>And<wbr>Key</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-interface">
+								<a href="_signer_.isigner.html#write" class="tsd-kind-icon">write</a>
 							</li>
 						</ul>
 					</li>
 				</ul>
 				<ul class="after-current">
-					<li class=" tsd-kind-function tsd-parent-kind-external-module">
-						<a href="../modules/_signer_.html#signature" class="tsd-kind-icon">signature</a>
-					</li>
 				</ul>
 			</nav>
 		</div>

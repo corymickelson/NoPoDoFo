@@ -90,7 +90,7 @@
 						<section class="tsd-index-section ">
 							<h3>Type aliases</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-type-alias tsd-parent-kind-external-module"><a href="_document_.html#callback" class="tsd-kind-icon">Callback</a></li>
+								<li class="tsd-kind-type-alias tsd-parent-kind-external-module tsd-has-type-parameter"><a href="_document_.html#callback" class="tsd-kind-icon">Callback</a></li>
 							</ul>
 						</section>
 						<section class="tsd-index-section ">
@@ -104,13 +104,13 @@
 			</section>
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Type aliases</h2>
-				<section class="tsd-panel tsd-member tsd-kind-type-alias tsd-parent-kind-external-module">
+				<section class="tsd-panel tsd-member tsd-kind-type-alias tsd-parent-kind-external-module tsd-has-type-parameter">
 					<a name="callback" class="tsd-anchor"></a>
 					<h3>Callback</h3>
 					<div class="tsd-signature tsd-kind-icon">Callback<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">function</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/71624ea/lib/document.ts#L54">document.ts:54</a></li>
+							<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/e7cf374/lib/document.ts#L42">document.ts:42</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-type-declaration">
@@ -118,7 +118,7 @@
 						<ul class="tsd-parameters">
 							<li class="tsd-parameter-siganture">
 								<ul class="tsd-signatures tsd-kind-type-literal tsd-parent-kind-type-alias tsd-is-not-exported">
-									<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>err<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Error</span>, data<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Buffer</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+									<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>err<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Error</span>, data<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
 								</ul>
 								<ul class="tsd-descriptions">
 									<li class="tsd-description">
@@ -128,7 +128,7 @@
 												<h5>err: <span class="tsd-signature-type">Error</span></h5>
 											</li>
 											<li>
-												<h5>data: <span class="tsd-signature-type">Buffer</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span></h5>
+												<h5>data: <span class="tsd-signature-type">T</span></h5>
 											</li>
 										</ul>
 										<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -145,13 +145,13 @@
 					<a name="documentgc" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagConst">Const</span> document<wbr>Gc</h3>
 					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-external-module">
-						<li class="tsd-signature tsd-kind-icon">document<wbr>Gc<span class="tsd-signature-symbol">(</span>file<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, pwd<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, output<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, cb<span class="tsd-signature-symbol">: </span><a href="_document_.html#callback" class="tsd-signature-type">Callback</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+						<li class="tsd-signature tsd-kind-icon">document<wbr>Gc<span class="tsd-signature-symbol">(</span>file<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, pwd<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, output<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, cb<span class="tsd-signature-symbol">: </span><a href="_document_.html#callback" class="tsd-signature-type">Callback</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Buffer</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/71624ea/lib/document.ts#L171">document.ts:171</a></li>
+									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/e7cf374/lib/document.ts#L175">document.ts:175</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -166,7 +166,7 @@
 									<h5>output: <span class="tsd-signature-type">string</span></h5>
 								</li>
 								<li>
-									<h5>cb: <a href="_document_.html#callback" class="tsd-signature-type">Callback</a></h5>
+									<h5>cb: <a href="_document_.html#callback" class="tsd-signature-type">Callback</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Buffer</span><span class="tsd-signature-symbol">&gt;</span></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -192,6 +192,9 @@
 					</li>
 					<li class=" tsd-kind-external-module">
 						<a href="_data_.html">"data"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="_date_.html">"date"</a>
 					</li>
 					<li class="current tsd-kind-external-module">
 						<a href="_document_.html">"document"</a>
@@ -250,6 +253,9 @@
 					<li class=" tsd-kind-external-module">
 						<a href="_table_.html">"table"</a>
 					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="_xobject_.html">"xobject"</a>
+					</li>
 				</ul>
 			</nav>
 			<nav class="tsd-navigation secondary menu-sticky">
@@ -275,7 +281,7 @@
 					<li class=" tsd-kind-interface tsd-parent-kind-external-module">
 						<a href="../interfaces/_document_.npdfcreatefontopts.html" class="tsd-kind-icon">NPDFCreate<wbr>Font<wbr>Opts</a>
 					</li>
-					<li class=" tsd-kind-type-alias tsd-parent-kind-external-module">
+					<li class=" tsd-kind-type-alias tsd-parent-kind-external-module tsd-has-type-parameter">
 						<a href="_document_.html#callback" class="tsd-kind-icon">Callback</a>
 					</li>
 					<li class=" tsd-kind-function tsd-parent-kind-external-module">

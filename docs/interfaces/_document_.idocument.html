@@ -128,7 +128,6 @@
 						<section class="tsd-index-section ">
 							<h3>Methods</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-method tsd-parent-kind-interface tsd-is-inherited"><a href="_document_.idocument.html#__ptrcount" class="tsd-kind-icon">__ptr<wbr>Count</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-interface tsd-is-inherited"><a href="_document_.idocument.html#adddestination" class="tsd-kind-icon">add<wbr>Destination</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-interface tsd-is-inherited"><a href="_document_.idocument.html#append" class="tsd-kind-icon">append</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-interface tsd-is-inherited"><a href="_document_.idocument.html#attachfile" class="tsd-kind-icon">attach<wbr>File</a></li>
@@ -136,6 +135,7 @@
 								<li class="tsd-kind-method tsd-parent-kind-interface tsd-is-inherited"><a href="_document_.idocument.html#createfont" class="tsd-kind-icon">create<wbr>Font</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-interface tsd-is-inherited"><a href="_document_.idocument.html#createpage" class="tsd-kind-icon">create<wbr>Page</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-interface tsd-is-inherited"><a href="_document_.idocument.html#createpages" class="tsd-kind-icon">create<wbr>Pages</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-interface tsd-is-inherited"><a href="_document_.idocument.html#createxobject" class="tsd-kind-icon">createXObject</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-interface tsd-is-inherited"><a href="_document_.idocument.html#displaydoctitle" class="tsd-kind-icon">display<wbr>Doc<wbr>Title</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-interface tsd-is-inherited"><a href="_document_.idocument.html#fitwindow" class="tsd-kind-icon">fit<wbr>Window</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_document_.idocument.html#gc" class="tsd-kind-icon">gc</a></li>
@@ -145,7 +145,9 @@
 								<li class="tsd-kind-method tsd-parent-kind-interface tsd-is-inherited"><a href="_document_.idocument.html#getoutlines" class="tsd-kind-icon">get<wbr>Outlines</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-interface tsd-is-inherited"><a href="_document_.idocument.html#getpage" class="tsd-kind-icon">get<wbr>Page</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-interface tsd-is-inherited"><a href="_document_.idocument.html#getpagecount" class="tsd-kind-icon">get<wbr>Page<wbr>Count</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_document_.idocument.html#getsignatures" class="tsd-kind-icon">get<wbr>Signatures</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-interface tsd-is-inherited"><a href="_document_.idocument.html#getwritemode" class="tsd-kind-icon">get<wbr>Write<wbr>Mode</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_document_.idocument.html#hassignatures" class="tsd-kind-icon">has<wbr>Signatures</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-interface tsd-is-inherited"><a href="_document_.idocument.html#hidemenubar" class="tsd-kind-icon">hide<wbr>Menubar</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-interface tsd-is-inherited"><a href="_document_.idocument.html#hidetoolbar" class="tsd-kind-icon">hide<wbr>Toolbar</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-interface tsd-is-inherited"><a href="_document_.idocument.html#hidewindowui" class="tsd-kind-icon">hide<wbr>WindowUI</a></li>
@@ -154,6 +156,7 @@
 								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_document_.idocument.html#insertpages" class="tsd-kind-icon">insert<wbr>Pages</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-interface tsd-is-inherited"><a href="_document_.idocument.html#isallowed" class="tsd-kind-icon">is<wbr>Allowed</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-interface tsd-is-inherited"><a href="_document_.idocument.html#islinearized" class="tsd-kind-icon">is<wbr>Linearized</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_document_.idocument.html#listfonts" class="tsd-kind-icon">list<wbr>Fonts</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_document_.idocument.html#load" class="tsd-kind-icon">load</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_document_.idocument.html#splicepages" class="tsd-kind-icon">splice<wbr>Pages</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-interface tsd-is-inherited"><a href="_document_.idocument.html#usefullscreen" class="tsd-kind-icon">use<wbr>Full<wbr>Screen</a></li>
@@ -175,7 +178,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/71624ea/lib/document.ts#L106">document.ts:106</a></li>
+									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/e7cf374/lib/document.ts#L94">document.ts:94</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <a href="_document_.idocument.html" class="tsd-signature-type">IDocument</a></h4>
@@ -192,7 +195,7 @@
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="_base_document_.ibase.html">IBase</a>.<a href="_base_document_.ibase.html#baseuri">baseUri</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/71624ea/lib/base-document.ts#L55">base-document.ts:55</a></li>
+							<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/e7cf374/lib/base-document.ts#L56">base-document.ts:56</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -203,7 +206,7 @@
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="_base_document_.ibase.html">IBase</a>.<a href="_base_document_.ibase.html#body">body</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/71624ea/lib/base-document.ts#L50">base-document.ts:50</a></li>
+							<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/e7cf374/lib/base-document.ts#L51">base-document.ts:51</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -213,7 +216,7 @@
 					<div class="tsd-signature tsd-kind-icon">catalog<span class="tsd-signature-symbol">:</span> <a href="_object_.iobj.html" class="tsd-signature-type">IObj</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/71624ea/lib/document.ts#L112">document.ts:112</a></li>
+							<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/e7cf374/lib/document.ts#L100">document.ts:100</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -223,7 +226,7 @@
 					<div class="tsd-signature tsd-kind-icon">encrypt<span class="tsd-signature-symbol">:</span> <a href="_encrypt_.iencrypt.html" class="tsd-signature-type">IEncrypt</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/71624ea/lib/document.ts#L110">document.ts:110</a></li>
+							<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/e7cf374/lib/document.ts#L98">document.ts:98</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -234,7 +237,7 @@
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="_base_document_.ibase.html">IBase</a>.<a href="_base_document_.ibase.html#form">form</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/71624ea/lib/base-document.ts#L49">base-document.ts:49</a></li>
+							<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/e7cf374/lib/base-document.ts#L50">base-document.ts:50</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -245,7 +248,7 @@
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="_base_document_.ibase.html">IBase</a>.<a href="_base_document_.ibase.html#info">info</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/71624ea/lib/base-document.ts#L57">base-document.ts:57</a></li>
+							<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/e7cf374/lib/base-document.ts#L58">base-document.ts:58</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -256,7 +259,7 @@
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="_base_document_.ibase.html">IBase</a>.<a href="_base_document_.ibase.html#language">language</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/71624ea/lib/base-document.ts#L56">base-document.ts:56</a></li>
+							<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/e7cf374/lib/base-document.ts#L57">base-document.ts:57</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -267,7 +270,7 @@
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="_base_document_.ibase.html">IBase</a>.<a href="_base_document_.ibase.html#pagelayout">pageLayout</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/71624ea/lib/base-document.ts#L53">base-document.ts:53</a></li>
+							<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/e7cf374/lib/base-document.ts#L54">base-document.ts:54</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -278,7 +281,7 @@
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="_base_document_.ibase.html">IBase</a>.<a href="_base_document_.ibase.html#pagemode">pageMode</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/71624ea/lib/base-document.ts#L52">base-document.ts:52</a></li>
+							<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/e7cf374/lib/base-document.ts#L53">base-document.ts:53</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -288,7 +291,7 @@
 					<div class="tsd-signature tsd-kind-icon">password<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/71624ea/lib/document.ts#L109">document.ts:109</a></li>
+							<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/e7cf374/lib/document.ts#L97">document.ts:97</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -299,7 +302,7 @@
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="_base_document_.ibase.html">IBase</a>.<a href="_base_document_.ibase.html#printingscale">printingScale</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/71624ea/lib/base-document.ts#L54">base-document.ts:54</a></li>
+							<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/e7cf374/lib/base-document.ts#L55">base-document.ts:55</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -309,7 +312,7 @@
 					<div class="tsd-signature tsd-kind-icon">trailer<span class="tsd-signature-symbol">:</span> <a href="_object_.iobj.html" class="tsd-signature-type">IObj</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/71624ea/lib/document.ts#L111">document.ts:111</a></li>
+							<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/e7cf374/lib/document.ts#L99">document.ts:99</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -320,31 +323,13 @@
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="_base_document_.ibase.html">IBase</a>.<a href="_base_document_.ibase.html#version">version</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/71624ea/lib/base-document.ts#L51">base-document.ts:51</a></li>
+							<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/e7cf374/lib/base-document.ts#L52">base-document.ts:52</a></li>
 						</ul>
 					</aside>
 				</section>
 			</section>
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Methods</h2>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface tsd-is-inherited">
-					<a name="__ptrcount" class="tsd-anchor"></a>
-					<h3>__ptr<wbr>Count</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface tsd-is-inherited">
-						<li class="tsd-signature tsd-kind-icon">__ptr<wbr>Count<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></li>
-					</ul>
-					<ul class="tsd-descriptions">
-						<li class="tsd-description">
-							<aside class="tsd-sources">
-								<p>Inherited from <a href="_base_document_.ibase.html">IBase</a>.<a href="_base_document_.ibase.html#__ptrcount">__ptrCount</a></p>
-								<ul>
-									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/71624ea/lib/base-document.ts#L84">base-document.ts:84</a></li>
-								</ul>
-							</aside>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
-						</li>
-					</ul>
-				</section>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface tsd-is-inherited">
 					<a name="adddestination" class="tsd-anchor"></a>
 					<h3>add<wbr>Destination</h3>
@@ -356,7 +341,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="_base_document_.ibase.html">IBase</a>.<a href="_base_document_.ibase.html#adddestination">addDestination</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/71624ea/lib/base-document.ts#L81">base-document.ts:81</a></li>
+									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/e7cf374/lib/base-document.ts#L83">base-document.ts:83</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -379,20 +364,20 @@
 					<a name="append" class="tsd-anchor"></a>
 					<h3>append</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface tsd-is-inherited">
-						<li class="tsd-signature tsd-kind-icon">append<span class="tsd-signature-symbol">(</span>doc<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><a href="_document_.idocument.html" class="tsd-signature-type">IDocument</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+						<li class="tsd-signature tsd-kind-icon">append<span class="tsd-signature-symbol">(</span>doc<span class="tsd-signature-symbol">: </span><a href="_document_.idocument.html" class="tsd-signature-type">IDocument</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="_base_document_.ibase.html">IBase</a>.<a href="_base_document_.ibase.html#append">append</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/71624ea/lib/base-document.ts#L71">base-document.ts:71</a></li>
+									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/e7cf374/lib/base-document.ts#L72">base-document.ts:72</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>doc: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><a href="_document_.idocument.html" class="tsd-signature-type">IDocument</a></h5>
+									<h5>doc: <a href="_document_.idocument.html" class="tsd-signature-type">IDocument</a></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -410,7 +395,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="_base_document_.ibase.html">IBase</a>.<a href="_base_document_.ibase.html#attachfile">attachFile</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/71624ea/lib/base-document.ts#L68">base-document.ts:68</a></li>
+									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/e7cf374/lib/base-document.ts#L69">base-document.ts:69</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -437,7 +422,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="_base_document_.ibase.html">IBase</a>.<a href="_base_document_.ibase.html#centerwindow">centerWindow</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/71624ea/lib/base-document.ts#L65">base-document.ts:65</a></li>
+									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/e7cf374/lib/base-document.ts#L66">base-document.ts:66</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -455,7 +440,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="_base_document_.ibase.html">IBase</a>.<a href="_base_document_.ibase.html#createfont">createFont</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/71624ea/lib/base-document.ts#L75">base-document.ts:75</a></li>
+									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/e7cf374/lib/base-document.ts#L76">base-document.ts:76</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -479,7 +464,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="_base_document_.ibase.html">IBase</a>.<a href="_base_document_.ibase.html#createpage">createPage</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/71624ea/lib/base-document.ts#L78">base-document.ts:78</a></li>
+									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/e7cf374/lib/base-document.ts#L80">base-document.ts:80</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -503,7 +488,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="_base_document_.ibase.html">IBase</a>.<a href="_base_document_.ibase.html#createpages">createPages</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/71624ea/lib/base-document.ts#L79">base-document.ts:79</a></li>
+									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/e7cf374/lib/base-document.ts#L81">base-document.ts:81</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -513,6 +498,30 @@
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface tsd-is-inherited">
+					<a name="createxobject" class="tsd-anchor"></a>
+					<h3>createXObject</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface tsd-is-inherited">
+						<li class="tsd-signature tsd-kind-icon">createXObject<span class="tsd-signature-symbol">(</span>rect<span class="tsd-signature-symbol">: </span><a href="_rect_.irect.html" class="tsd-signature-type">IRect</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_xobject_.ixobj.html" class="tsd-signature-type">IXObj</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="_base_document_.ibase.html">IBase</a>.<a href="_base_document_.ibase.html#createxobject">createXObject</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/e7cf374/lib/base-document.ts#L79">base-document.ts:79</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>rect: <a href="_rect_.irect.html" class="tsd-signature-type">IRect</a></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="_xobject_.ixobj.html" class="tsd-signature-type">IXObj</a></h4>
 						</li>
 					</ul>
 				</section>
@@ -527,7 +536,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="_base_document_.ibase.html">IBase</a>.<a href="_base_document_.ibase.html#displaydoctitle">displayDocTitle</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/71624ea/lib/base-document.ts#L66">base-document.ts:66</a></li>
+									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/e7cf374/lib/base-document.ts#L67">base-document.ts:67</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -545,7 +554,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="_base_document_.ibase.html">IBase</a>.<a href="_base_document_.ibase.html#fitwindow">fitWindow</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/71624ea/lib/base-document.ts#L64">base-document.ts:64</a></li>
+									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/e7cf374/lib/base-document.ts#L65">base-document.ts:65</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -556,13 +565,13 @@
 					<a name="gc" class="tsd-anchor"></a>
 					<h3>gc</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
-						<li class="tsd-signature tsd-kind-icon">gc<span class="tsd-signature-symbol">(</span>file<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, pwd<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, output<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, cb<span class="tsd-signature-symbol">: </span><a href="../modules/_document_.html#callback" class="tsd-signature-type">Callback</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+						<li class="tsd-signature tsd-kind-icon">gc<span class="tsd-signature-symbol">(</span>file<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, pwd<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, output<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, cb<span class="tsd-signature-symbol">: </span><a href="../modules/_document_.html#callback" class="tsd-signature-type">Callback</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Buffer</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/71624ea/lib/document.ts#L168">document.ts:168</a></li>
+									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/e7cf374/lib/document.ts#L160">document.ts:160</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -592,7 +601,7 @@
 									</div>
 								</li>
 								<li>
-									<h5>cb: <a href="../modules/_document_.html#callback" class="tsd-signature-type">Callback</a></h5>
+									<h5>cb: <a href="../modules/_document_.html#callback" class="tsd-signature-type">Callback</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Buffer</span><span class="tsd-signature-symbol">&gt;</span></h5>
 									<div class="tsd-comment tsd-typography">
 										<p>function</p>
 									</div>
@@ -613,7 +622,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="_base_document_.ibase.html">IBase</a>.<a href="_base_document_.ibase.html#getattachment">getAttachment</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/71624ea/lib/base-document.ts#L80">base-document.ts:80</a></li>
+									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/e7cf374/lib/base-document.ts#L82">base-document.ts:82</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -636,12 +645,12 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/71624ea/lib/document.ts#L158">document.ts:158</a></li>
+									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/e7cf374/lib/document.ts#L145">document.ts:145</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
-									<p>Looks for a font containg the provided name or id.
+									<p>Looks for a font with the provided name or id.
 										This operation may be expensive as it iterates all pdf object searching for the font.
 									If nothing is found null is returned</p>
 								</div>
@@ -670,7 +679,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="_base_document_.ibase.html">IBase</a>.<a href="_base_document_.ibase.html#getnames">getNames</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/71624ea/lib/base-document.ts#L77">base-document.ts:77</a></li>
+									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/e7cf374/lib/base-document.ts#L78">base-document.ts:78</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <a href="_object_.iobj.html" class="tsd-signature-type">IObj</a></h4>
@@ -688,7 +697,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="_base_document_.ibase.html">IBase</a>.<a href="_base_document_.ibase.html#getoutlines">getOutlines</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/71624ea/lib/base-document.ts#L76">base-document.ts:76</a></li>
+									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/e7cf374/lib/base-document.ts#L77">base-document.ts:77</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <a href="_object_.iobj.html" class="tsd-signature-type">IObj</a></h4>
@@ -706,7 +715,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="_base_document_.ibase.html">IBase</a>.<a href="_base_document_.ibase.html#getpage">getPage</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/71624ea/lib/base-document.ts#L60">base-document.ts:60</a></li>
+									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/e7cf374/lib/base-document.ts#L61">base-document.ts:61</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -730,10 +739,32 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="_base_document_.ibase.html">IBase</a>.<a href="_base_document_.ibase.html#getpagecount">getPageCount</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/71624ea/lib/base-document.ts#L59">base-document.ts:59</a></li>
+									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/e7cf374/lib/base-document.ts#L60">base-document.ts:60</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
+					<a name="getsignatures" class="tsd-anchor"></a>
+					<h3>get<wbr>Signatures</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
+						<li class="tsd-signature tsd-kind-icon">get<wbr>Signatures<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_field_.isignaturefield.html" class="tsd-signature-type">ISignatureField</a><span class="tsd-signature-symbol">[]</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/e7cf374/lib/document.ts#L172">document.ts:172</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Iterate each page annotations array for an annotation of type signature.</p>
+								</div>
+							</div>
+							<h4 class="tsd-returns-title">Returns <a href="_field_.isignaturefield.html" class="tsd-signature-type">ISignatureField</a><span class="tsd-signature-symbol">[]</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -748,10 +779,32 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="_base_document_.ibase.html">IBase</a>.<a href="_base_document_.ibase.html#getwritemode">getWriteMode</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/71624ea/lib/base-document.ts#L73">base-document.ts:73</a></li>
+									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/e7cf374/lib/base-document.ts#L74">base-document.ts:74</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <a href="../enums/_stream_document_.npdfwritemode.html" class="tsd-signature-type">NPDFWriteMode</a></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
+					<a name="hassignatures" class="tsd-anchor"></a>
+					<h3>has<wbr>Signatures</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
+						<li class="tsd-signature tsd-kind-icon">has<wbr>Signatures<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/e7cf374/lib/document.ts#L166">document.ts:166</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Check for the existence of a signature field(s)</p>
+								</div>
+							</div>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -766,7 +819,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="_base_document_.ibase.html">IBase</a>.<a href="_base_document_.ibase.html#hidemenubar">hideMenubar</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/71624ea/lib/base-document.ts#L62">base-document.ts:62</a></li>
+									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/e7cf374/lib/base-document.ts#L63">base-document.ts:63</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -784,7 +837,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="_base_document_.ibase.html">IBase</a>.<a href="_base_document_.ibase.html#hidetoolbar">hideToolbar</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/71624ea/lib/base-document.ts#L61">base-document.ts:61</a></li>
+									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/e7cf374/lib/base-document.ts#L62">base-document.ts:62</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -802,7 +855,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="_base_document_.ibase.html">IBase</a>.<a href="_base_document_.ibase.html#hidewindowui">hideWindowUI</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/71624ea/lib/base-document.ts#L63">base-document.ts:63</a></li>
+									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/e7cf374/lib/base-document.ts#L64">base-document.ts:64</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -820,7 +873,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="_base_document_.ibase.html">IBase</a>.<a href="_base_document_.ibase.html#insertexistingpage">insertExistingPage</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/71624ea/lib/base-document.ts#L69">base-document.ts:69</a></li>
+									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/e7cf374/lib/base-document.ts#L70">base-document.ts:70</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -850,7 +903,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="_base_document_.ibase.html">IBase</a>.<a href="_base_document_.ibase.html#insertpage">insertPage</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/71624ea/lib/base-document.ts#L70">base-document.ts:70</a></li>
+									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/e7cf374/lib/base-document.ts#L71">base-document.ts:71</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -876,7 +929,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/71624ea/lib/document.ts#L143">document.ts:143</a></li>
+									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/e7cf374/lib/document.ts#L130">document.ts:130</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -929,7 +982,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="_base_document_.ibase.html">IBase</a>.<a href="_base_document_.ibase.html#isallowed">isAllowed</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/71624ea/lib/base-document.ts#L74">base-document.ts:74</a></li>
+									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/e7cf374/lib/base-document.ts#L75">base-document.ts:75</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -953,7 +1006,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="_base_document_.ibase.html">IBase</a>.<a href="_base_document_.ibase.html#islinearized">isLinearized</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/71624ea/lib/base-document.ts#L72">base-document.ts:72</a></li>
+									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/e7cf374/lib/base-document.ts#L73">base-document.ts:73</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
@@ -961,17 +1014,39 @@
 					</ul>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
-					<a name="load" class="tsd-anchor"></a>
-					<h3>load</h3>
+					<a name="listfonts" class="tsd-anchor"></a>
+					<h3>list<wbr>Fonts</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
-						<li class="tsd-signature tsd-kind-icon">load<span class="tsd-signature-symbol">(</span>file<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Buffer</span>, opts<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">object</span>, cb<span class="tsd-signature-symbol">: </span><a href="../modules/_document_.html#callback" class="tsd-signature-type">Callback</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
-						<li class="tsd-signature tsd-kind-icon">load<span class="tsd-signature-symbol">(</span>file<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Buffer</span>, cb<span class="tsd-signature-symbol">: </span><a href="../modules/_document_.html#callback" class="tsd-signature-type">Callback</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+						<li class="tsd-signature tsd-kind-icon">list<wbr>Fonts<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">object</span><span class="tsd-signature-symbol">[]</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/71624ea/lib/document.ts#L114">document.ts:114</a></li>
+									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/e7cf374/lib/document.ts#L150">document.ts:150</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>List all the fonts from the document.</p>
+								</div>
+							</div>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">object</span><span class="tsd-signature-symbol">[]</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
+					<a name="load" class="tsd-anchor"></a>
+					<h3>load</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
+						<li class="tsd-signature tsd-kind-icon">load<span class="tsd-signature-symbol">(</span>file<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Buffer</span>, opts<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">object</span>, cb<span class="tsd-signature-symbol">: </span><a href="../modules/_document_.html#callback" class="tsd-signature-type">Callback</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+						<li class="tsd-signature tsd-kind-icon">load<span class="tsd-signature-symbol">(</span>file<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Buffer</span>, cb<span class="tsd-signature-symbol">: </span><a href="../modules/_document_.html#callback" class="tsd-signature-type">Callback</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/e7cf374/lib/document.ts#L102">document.ts:102</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -986,15 +1061,12 @@
 											<h5><span class="tsd-flag ts-flagOptional">Optional</span> for<wbr>Update<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">true</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">false</span></h5>
 										</li>
 										<li class="tsd-parameter">
-											<h5><span class="tsd-flag ts-flagOptional">Optional</span> from<wbr>Buffer<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">true</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">false</span></h5>
-										</li>
-										<li class="tsd-parameter">
 											<h5><span class="tsd-flag ts-flagOptional">Optional</span> password<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span></h5>
 										</li>
 									</ul>
 								</li>
 								<li>
-									<h5>cb: <a href="../modules/_document_.html#callback" class="tsd-signature-type">Callback</a></h5>
+									<h5>cb: <a href="../modules/_document_.html#callback" class="tsd-signature-type">Callback</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -1002,7 +1074,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/71624ea/lib/document.ts#L121">document.ts:121</a></li>
+									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/e7cf374/lib/document.ts#L108">document.ts:108</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1011,7 +1083,7 @@
 									<h5>file: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Buffer</span></h5>
 								</li>
 								<li>
-									<h5>cb: <a href="../modules/_document_.html#callback" class="tsd-signature-type">Callback</a></h5>
+									<h5>cb: <a href="../modules/_document_.html#callback" class="tsd-signature-type">Callback</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -1028,7 +1100,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/71624ea/lib/document.ts#L130">document.ts:130</a></li>
+									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/e7cf374/lib/document.ts#L117">document.ts:117</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1068,7 +1140,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="_base_document_.ibase.html">IBase</a>.<a href="_base_document_.ibase.html#usefullscreen">useFullScreen</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/71624ea/lib/base-document.ts#L67">base-document.ts:67</a></li>
+									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/e7cf374/lib/base-document.ts#L68">base-document.ts:68</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -1079,13 +1151,13 @@
 					<a name="write" class="tsd-anchor"></a>
 					<h3>write</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
-						<li class="tsd-signature tsd-kind-icon">write<span class="tsd-signature-symbol">(</span>destination<span class="tsd-signature-symbol">: </span><a href="../modules/_document_.html#callback" class="tsd-signature-type">Callback</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span>, cb<span class="tsd-signature-symbol">?: </span><a href="../modules/_document_.html#callback" class="tsd-signature-type">Callback</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+						<li class="tsd-signature tsd-kind-icon">write<span class="tsd-signature-symbol">(</span>destination<span class="tsd-signature-symbol">: </span><a href="../modules/_document_.html#callback" class="tsd-signature-type">Callback</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Buffer</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span>, cb<span class="tsd-signature-symbol">?: </span><a href="../modules/_document_.html#callback" class="tsd-signature-type">Callback</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/71624ea/lib/document.ts#L150">document.ts:150</a></li>
+									<li>Defined in <a href="https://github.com/corymickelson/NoPoDoFo/blob/e7cf374/lib/document.ts#L137">document.ts:137</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1096,13 +1168,13 @@
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>destination: <a href="../modules/_document_.html#callback" class="tsd-signature-type">Callback</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span></h5>
+									<h5>destination: <a href="../modules/_document_.html#callback" class="tsd-signature-type">Callback</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Buffer</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span></h5>
 									<div class="tsd-comment tsd-typography">
 										<p>file path or callback function</p>
 									</div>
 								</li>
 								<li>
-									<h5><span class="tsd-flag ts-flagOptional">Optional</span> cb: <a href="../modules/_document_.html#callback" class="tsd-signature-type">Callback</a></h5>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> cb: <a href="../modules/_document_.html#callback" class="tsd-signature-type">Callback</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></h5>
 									<div class="tsd-comment tsd-typography">
 										<p>if file path was provided as destination, this must be a callback function</p>
 									</div>
@@ -1131,6 +1203,9 @@
 					</li>
 					<li class=" tsd-kind-external-module">
 						<a href="../modules/_data_.html">"data"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="../modules/_date_.html">"date"</a>
 					</li>
 					<li class="current tsd-kind-external-module">
 						<a href="../modules/_document_.html">"document"</a>
@@ -1188,6 +1263,9 @@
 					</li>
 					<li class=" tsd-kind-external-module">
 						<a href="../modules/_table_.html">"table"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="../modules/_xobject_.html">"xobject"</a>
 					</li>
 				</ul>
 			</nav>
@@ -1256,9 +1334,6 @@
 								<a href="_document_.idocument.html#version" class="tsd-kind-icon">version</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-interface tsd-is-inherited">
-								<a href="_document_.idocument.html#__ptrcount" class="tsd-kind-icon">__ptr<wbr>Count</a>
-							</li>
-							<li class=" tsd-kind-method tsd-parent-kind-interface tsd-is-inherited">
 								<a href="_document_.idocument.html#adddestination" class="tsd-kind-icon">add<wbr>Destination</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-interface tsd-is-inherited">
@@ -1278,6 +1353,9 @@
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-interface tsd-is-inherited">
 								<a href="_document_.idocument.html#createpages" class="tsd-kind-icon">create<wbr>Pages</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-interface tsd-is-inherited">
+								<a href="_document_.idocument.html#createxobject" class="tsd-kind-icon">createXObject</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-interface tsd-is-inherited">
 								<a href="_document_.idocument.html#displaydoctitle" class="tsd-kind-icon">display<wbr>Doc<wbr>Title</a>
@@ -1306,8 +1384,14 @@
 							<li class=" tsd-kind-method tsd-parent-kind-interface tsd-is-inherited">
 								<a href="_document_.idocument.html#getpagecount" class="tsd-kind-icon">get<wbr>Page<wbr>Count</a>
 							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-interface">
+								<a href="_document_.idocument.html#getsignatures" class="tsd-kind-icon">get<wbr>Signatures</a>
+							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-interface tsd-is-inherited">
 								<a href="_document_.idocument.html#getwritemode" class="tsd-kind-icon">get<wbr>Write<wbr>Mode</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-interface">
+								<a href="_document_.idocument.html#hassignatures" class="tsd-kind-icon">has<wbr>Signatures</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-interface tsd-is-inherited">
 								<a href="_document_.idocument.html#hidemenubar" class="tsd-kind-icon">hide<wbr>Menubar</a>
@@ -1334,6 +1418,9 @@
 								<a href="_document_.idocument.html#islinearized" class="tsd-kind-icon">is<wbr>Linearized</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-interface">
+								<a href="_document_.idocument.html#listfonts" class="tsd-kind-icon">list<wbr>Fonts</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-interface">
 								<a href="_document_.idocument.html#load" class="tsd-kind-icon">load</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-interface">
@@ -1352,7 +1439,7 @@
 					<li class=" tsd-kind-interface tsd-parent-kind-external-module">
 						<a href="_document_.npdfcreatefontopts.html" class="tsd-kind-icon">NPDFCreate<wbr>Font<wbr>Opts</a>
 					</li>
-					<li class=" tsd-kind-type-alias tsd-parent-kind-external-module">
+					<li class=" tsd-kind-type-alias tsd-parent-kind-external-module tsd-has-type-parameter">
 						<a href="../modules/_document_.html#callback" class="tsd-kind-icon">Callback</a>
 					</li>
 					<li class=" tsd-kind-function tsd-parent-kind-external-module">
