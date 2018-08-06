@@ -4,7 +4,7 @@
 
 ## Installation
  - `npm install nopodofolambda`, prebuilt library dependencies
- - `npm install nopodofo@awslambda`, nopodofo compiled with the correct rpath for running in aws lambda. __Important__ please ensure pre-built binary is fetched and the project is NOT rebuilt 
+ - `npm install https://github.com/corymickelson/NoPoDoFo/releases/download/{version}/nopodofo-{version}-linux-aws-x64.tar.gz`, nopodofo compiled with the correct rpath for running in aws lambda. __Important__ please ensure pre-built binary is fetched and the project is NOT rebuilt 
 
 ## The Build
 Binaries are built on a Centos 7 image with the following dependencies:

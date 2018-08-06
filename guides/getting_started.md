@@ -1,8 +1,6 @@
 # Getting Started
 PoDoFo is a cross-platform low-level pdf library. NoPoDoFo is a nodejs bindings library to PoDoFo.
-NoPoDoFo is built against PoDoFo trunk(master) and requires you have a the necessary library dependencies
-installed on your system before trying to `npm install` or `git clone` this library. 
-Instructions for installing required libraries follow.
+NoPoDoFo requires PoDoFo 0.9.6 (latest release). PoDoFo installation instructions for Windows and Linux follows.
 
 ## Build Dependencies
 
@@ -10,22 +8,22 @@ Note: Please use your platforms native package manager
 
 ## Windows
 
-Building podofo on windows is made much simpler with the help of vcpkg. Vcpkg does offer a podofo pacakage but for nopodofo we will want to build podofo from source with additional libraries that are not included in the vcpkg compiled podofo.
-This build does not support AES encryption option, to enable AES you will need libidn v1 (which unfortunately is not available via vcpkg).
- - Install [vcpkg](https://github.com/Microsoft/vcpkg)
- - Install libraries `vcpkg install {lib}:x86-windows-static` (or x64-windows-static if using 64 bit node)
-   - tiff
-   - libpng
-   - jpeg 
-   - boost
-   - fontconfig
-   - freetype
-   - openssl
-   - zlib
 
-The NoPoDoFo gyp file uses the environment variable `vcpkg_path` for linking the above libraries. This value should be set to your
-`{vcpkg root}/installed/{architecture}-windows-static` ex. `C:\vcpkg\installed\x86-windows-static. Set the fontconfig config file path with
-`set FONTCONFIG_FILE={path to fonts.conf}` ex `set FONTCONFIG_FILE=C:\vcpkg\installed\x86-windows-static\tools\fontconfig\fonts\fonts.conf`
+Building podofo on windows is made much simpler with the help of vcpkg. 
+This build does not support AES encryption option, to enable AES you will need libidn v1 (which unfortunately is not available via vcpkg).
+PoDoFo can use fontconfig, this build does not include fontconfig, what this means for you is that in order to use a font you must provide the
+path to the font. Please see [Fonts](https://github.com/corymickelson/NoPoDoFo/tree/master/guides/font.md) for more information.
+ - Install [vcpkg](https://github.com/Microsoft/vcpkg)
+ - Run `vcpkg install podofo:x64-windows`
+
+Building NoPoDoFo from source requires CMake.
+ - Set environment variable `vcpkg_path` to the root of your vcpkg installation, ex: `set vcpkg_path=C:\\vcpkg`
+ - run `git clone https://github.com/corymickelson/NoPoDoFo`
+ - run `npm install`
+ - run `./node_modules/.bin/cmake-js build`
+ - run `./node_modules/.bin/tsc -p tsconfig.json`
+
+NoPoDoFo also provides pre-built binaries. To install a pre-built in your npm project run `npm install https://github.com/corymickelson/NoPoDoFo/releases/download/{version}/nopodofo-{version}-win-x86_64.tar.gz`
 
 ## Linux
 
@@ -44,6 +42,23 @@ dependencies:
  - zlib-dev
 
 Install dependencies with `pacman -S [dependencies]`
+
+Install PoDoFo from source.
+Below is a small bash script for easy installation.
+```bash 
+git clone https://github.com/svn2github/podofo $HOME/podofo && \
+cd $HOME/podofo && \
+mkdir $HOME/podofo/build && \
+cd $HOME/podofo/build && \
+cmake .. -DCMAKE_INSTALL_PREFIX=$HOME/  && \
+make && make install
+```
+
+Building NoPoDoFo from source.
+ - run `git clone https://github.com/corymickelson/NoPoDoFo`
+ - run `npm install`
+ - run `./node_modules/.bin/cmake-js build`
+ - run `./node_modules/.bin/tsc -p tsconfig.json`
 
 ## Mac
 todo

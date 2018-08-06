@@ -42,7 +42,7 @@
     "nyc": "^11.9.0",
     "tap-summary": "^4.0.0",
     "tape": "^4.9.0",
-    "typescript": "~2.5.3",
+    "typescript": "^2.5.3",
     "uuid": "^3.2.1"
   },
   "dependencies": {

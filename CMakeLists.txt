@@ -31,7 +31,7 @@ if (MSVC)
     set(PODOFO_INCLUDE_DIR "${VCPKG_PATH}\\include")
     message("PODOFO_INCLUDE_DIR: ${PODOFO_INCLUDE_DIR}")
 
-    set(CMAKE_SHARED_LINKER_FLAGS "-Wl,-rpath=${VCPKG_PATH}\\bin")
+    # set(CMAKE_SHARED_LINKER_FLAGS "-Wl,-rpath=${VCPKG_PATH}\\bin")
     set(CMAKE_CXX_FLAGS /EH)
     set(CMAKE_CXX_FLAGS /EHsc)
     set(CMAKE_TOOLCHAIN_FILE "${VCPKG_PATH}\\scripts\\buildsystems\\vcpkg.cmake")
@@ -111,11 +111,12 @@ else ()
     find_library(PODOFO_LIBRARY NAMES podofo PATHS /usr/lib64 /usr/lib /usr/local/lib)
     target_include_directories(${PROJECT_NAME} PRIVATE ${PODOFO_INCLUDE_DIR})
     target_link_libraries(${PROJECT_NAME} PRIVATE ${PODOFO_LIBRARY})
+    add_custom_command(TARGET nopodofo
+            POST_BUILD
+            COMMAND "${CMAKE_COMMAND}"
+            -E copy $<TARGET_FILE:nopodofo> ${CMAKE_SOURCE_DIR}/build/${CMAKE_BUILD_TYPE})
+
 endif (MSVC)
 
-add_custom_command(TARGET nopodofo
-        POST_BUILD
-        COMMAND "${CMAKE_COMMAND}"
-        -E copy $<TARGET_FILE:nopodofo> ${CMAKE_SOURCE_DIR}/build/${CMAKE_BUILD_TYPE})
 
 
