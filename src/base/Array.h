@@ -47,7 +47,6 @@ public:
   void Push(const Napi::CallbackInfo&);
   Napi::Value Pop(const Napi::CallbackInfo&);
   void Clear(const Napi::CallbackInfo&);
-  Napi::Value Eq(const Napi::CallbackInfo&);
   PoDoFo::PdfArray& GetArray() { return obj.GetArray(); }
 
 private:

@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import { IObj } from "./object";
+import {IObj, Ref} from "./object";
 import { ProtectionOption } from "./encrypt";
 import { NPDFPageMode, NPDFPageLayout, NPDFCreateFontOpts, IDocument } from "./document";
 import { IPage } from "./page";
@@ -75,6 +75,7 @@ export interface IBase {
     isAllowed(perm: ProtectionOption): boolean
     createFont(opts: NPDFCreateFontOpts): IFont
     getOutlines(create: boolean): IObj|null
+    getObject(ref: Ref): IObj
     getNames(create: boolean): IObj|null
     createXObject(rect: IRect): IXObj
     createPage(rect: IRect): IPage

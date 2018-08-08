@@ -149,8 +149,8 @@ function pageAddImg() {
                                 if (imgObj && imgObj.type === 'Array') {
                                     const imgObjArr = imgObj.getArray()
                                     if (imgObjArr.length === 1) {
-                                        if (imgObjArr.at(0).type === 'Name') {
-                                            if (imgObjArr.at(0).getName() === 'DCTDecode') {
+                                        if ((imgObjArr.at(0) as IObj).type === 'Name') {
+                                            if ((imgObjArr.at(0) as IObj).getName() === 'DCTDecode') {
                                                 extractImg(o, true)
                                                 return
                                             }

@@ -64,6 +64,11 @@ export interface IObj {
     clear(): void
 }
 
+/**
+ * Indirect object reference [GenerationNumber, ObjectNumber]
+ */
+export type Ref = [number, number]
+
 export interface IArray {
     dirty: boolean
     readonly length: number
@@ -71,7 +76,13 @@ export interface IArray {
 
     JsArray(): Array<any>
 
-    at(i: number): IObj
+    /**
+     * If the item at the index is a Reference that can not be resolved by the array object owner.
+     * A Ref will be returned, the Ref can be resolved using getObject on the document itself.
+     * @todo Fix null owner when trying to resolve Reference type
+     * @param i
+     */
+    at(i: number): Ref | IObj
 
     pop(): IObj
 

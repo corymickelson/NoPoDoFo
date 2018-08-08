@@ -284,6 +284,16 @@ BaseDocument::GetObjects(const CallbackInfo& info)
 Napi::Value
 BaseDocument::GetObject(const CallbackInfo& info)
 {
+  if (info[0].IsArray()) {
+    unsigned long g =
+      info[0].As<Array>().Get(static_cast<uint32_t>(0)).As<Number>().Uint32Value();
+    pdf_objnum o =
+      info[0].As<Array>().Get(static_cast<uint32_t>(1)).As<Number>();
+    auto gen = static_cast<pdf_gennum>(g);
+    PdfReference ref(o, gen);
+    return Obj::constructor.New({ External<PdfObject>::New(
+      info.Env(), base->GetObjects()->GetObject(ref)) });
+  }
   auto ref = Obj::Unwrap(info[0].As<Object>())->GetObject();
   PdfObject* target = base->GetObjects()->GetObject(ref.GetReference());
   return Obj::constructor.New({ External<PdfObject>::New(info.Env(), target) });

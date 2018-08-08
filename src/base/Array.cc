@@ -162,7 +162,16 @@ Array::GetObjAtIndex(const CallbackInfo& info)
   }
   PdfObject* item;
   if (GetArray()[index].IsReference()) {
+    PdfReference indirect = GetArray()[index].GetReference();
+    auto owner = obj.GetOwner();
+    if (!owner) {
+      Napi::Array ref = Napi::Array::New(info.Env(), 2);
+      ref.Set(static_cast<uint32_t>(0), indirect.GenerationNumber());
+      ref.Set(static_cast<uint32_t>(1), indirect.ObjectNumber());
+      return ref;
+    }
     item = obj.GetOwner()->GetObject(GetArray()[index].GetReference());
+
   } else {
     item = &(GetArray()[index]);
   }

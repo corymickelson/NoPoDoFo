@@ -1,10 +1,14 @@
-import { join } from 'path'
+import {join} from 'path'
+import {writeFileSync} from 'fs'
 import * as tap from 'tape'
-import { Test } from 'tape'
-import { NPDFName, IDocument, npdf, NPDFPageMode } from '../../dist';
-import { NPDFAlignment } from "../../lib";
+import {Test} from 'tape'
+import {NPDFName, IDocument, npdf, NPDFPageMode} from '../../dist';
+import {NPDFAlignment} from "../../lib";
+import {Ref,IObj} from "../../lib/object";
+
 if (!global.gc) {
-    global.gc = () => { }
+    global.gc = () => {
+    }
 }
 const filePath = join(__dirname, '../test-documents/test.pdf'),
     pwdDoc = join(__dirname, '../test-documents/pwd.pdf')
@@ -23,7 +27,7 @@ tap('IStreamDocument', (t: Test) => {
 })
 tap('IDocument', (t: Test) => {
     const doc: IDocument = new npdf.Document()
-    doc.load(filePath, e => {
+    doc.load(filePath, async e => {
         if (e) t.fail(e.message)
         t.comment("Document instance accessors [GET]")
         t.assert(doc.getPage(0) instanceof (npdf.Page as any), "Get Page returns a Page")
@@ -43,14 +47,20 @@ tap('IDocument', (t: Test) => {
         let outline = doc.getOutlines(true)
         t.assert(outline && outline.type === 'Dictionary', 'creates an outlines object with create true')
 
-        t.doesNotThrow(() => {doc.attachFile(join(__dirname, '../test-documents/scratch.txt'))})
+        t.doesNotThrow(() => {
+            doc.attachFile(join(__dirname, '../test-documents/scratch.txt'))
+        })
         let names = doc.getNames(false)
-        if(!names) {t.fail(); return}
+        if (!names) {
+            t.fail();
+            return
+        }
         t.assert(names && names.type === 'Dictionary')
         t.assert(names.getDictionary().getKeys().includes(NPDFName.EMBEDDED_FILES))
         let embeddedFiles = names.getDictionary().getKey(NPDFName.EMBEDDED_FILES).getDictionary().getKey(NPDFName.KIDS)
-        let fileSpec = embeddedFiles.getArray().at(0)
-        t.assert(fileSpec.getDictionary().getKey(NPDFName.NAMES).getArray().at(0).getString().includes('scratch2Etxt'), 'embedded file path correct')
+        let fileSpecArray: IObj = embeddedFiles.getArray().at(0) as any
+        t.assert((fileSpecArray.getDictionary().getKey(NPDFName.NAMES).getArray().at(0)as IObj).getString().includes('scratch2Etxt'), 'embedded file path correct')
+
         t.comment("Document instance accessors [SET]")
         t.comment('Can create an encrypt instance and set to Document')
         let encrypt = npdf.Encrypt.createEncrypt({
@@ -73,11 +83,11 @@ tap('IDocument', (t: Test) => {
         global.gc()
         t.assert(doc.getPageCount() === 3)
         t.comment('create font')
-        let font = doc.createFont({ italic: true, embed: false, fontName: 'Courier' })
-        //let font = doc.getFont('PoDoFoFt40')
+        let font = doc.createFont({italic: true, embed: false, fontName: 'Courier'})
 
         global.gc()
         t.assert(font.getMetrics().fontSize === 12, 'Default font size is 12')
+
         doc.write((err, data) => {
             if (err) t.fail(err.message)
             else {
@@ -88,6 +98,7 @@ tap('IDocument', (t: Test) => {
                     if (e) {
                         t.comment('load should fail, password required')
                         t.pass()
+                        writeFileSync(join(__dirname, '../test-documents/attachment.pdf'), data)
                         t.end()
                     }
                     else {
@@ -98,9 +109,36 @@ tap('IDocument', (t: Test) => {
         })
     })
 })
+
+tap('File Spec attachment', (t: Test) => {
+    const fDoc = new npdf.Document()
+    fDoc.load(join(__dirname, '../test-documents/attachment.pdf'),{password: 'secret'}, e => {
+        if (e) {
+            fDoc.password = 'secret'
+        }
+        let names = fDoc.getNames(false)
+        if (!names) {
+            t.fail();
+            return
+        }
+        t.assert(names && names.type === 'Dictionary')
+        t.assert(names.getDictionary().getKeys().includes(NPDFName.EMBEDDED_FILES))
+        let embeddedFiles = names.getDictionary().getKey(NPDFName.EMBEDDED_FILES).getDictionary().getKey(NPDFName.KIDS)
+        let fileSpecArray: IObj = embeddedFiles.getArray().at(0) as any
+        let fileSpecObj = fileSpecArray.getDictionary().getKey(NPDFName.NAMES).getArray().at(1) as any
+        if(Array.isArray(fileSpecObj)) {
+            fileSpecObj = fDoc.getObject(fileSpecObj as Ref)
+        }
+        t.assert((fileSpecObj as IObj).getDictionary().getKey(NPDFName.TYPE).getName() === NPDFName.FILESPEC, 'FileSpec object')
+        let npdfFileSpec = new npdf.FileSpec(fileSpecObj)
+        t.ok(npdfFileSpec, 'copy constructor')
+        t.end()
+    })
+
+})
 tap('IDocument password protected', (t: Test) => {
     let doc = new npdf.Document()
-    doc.load(pwdDoc, { password: 'secret' }, e => {
+    doc.load(pwdDoc, {password: 'secret'}, e => {
         if (e) t.fail(e.message)
         else {
             t.pass('Loaded password protected document (provided a valid password on load)')
@@ -149,7 +187,7 @@ tap('IDocument append doc', (t: Test) => {
 tap('IDocument has/get signatures', t => {
     let doc = new npdf.Document()
     doc.load(join(__dirname, '../test-documents/signed.pdf'), e => {
-        if(e) {
+        if (e) {
             t.fail(e.message)
             return
         }
