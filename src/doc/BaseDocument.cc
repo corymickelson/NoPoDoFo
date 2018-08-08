@@ -334,6 +334,17 @@ BaseDocument::CreateFont(const CallbackInfo& info)
   const PdfEncoding* encoding = nullptr;
   string filename =
     opts.Has("fileName") ? opts.Get("fileName").As<String>().Utf8Value() : "";
+#ifndef PODOFO_HAVE_FONTCONFIG
+  std::cout << "This build does not include fontconfig. To load a font you "
+               "must provide the full path to the font file"
+            << std::endl;
+  if (filename == "") {
+    Error::New(info.Env(),
+               "This build requires any font creation to pass the full path to "
+               "the font file")
+      .ThrowAsJavaScriptException();
+  }
+#endif
   int n = opts.Has("encoding") ? opts.Get("encoding").As<Number>() : 1;
   switch (n) {
     case 1:
@@ -431,15 +442,22 @@ BaseDocument::GetInfo(const CallbackInfo& info)
 Napi::Value
 BaseDocument::GetOutlines(const CallbackInfo& info)
 {
-  auto outline = base->GetOutlines(info[0].As<Boolean>())->GetObject();
-  return Obj::constructor.New(
-    { External<PdfObject>::New(info.Env(), outline) });
+  auto outline = base->GetOutlines(info[0].As<Boolean>());
+  if (!outline) {
+    return info.Env().Null();
+  } else {
+    return Obj::constructor.New(
+      { External<PdfObject>::New(info.Env(), outline->GetObject()) });
+  }
 }
 Napi::Value
 BaseDocument::GetNamesTree(const CallbackInfo& info)
 {
-  return Obj::constructor.New({ External<PdfObject>::New(
-    info.Env(), base->GetNamesTree(info[0].As<Boolean>())->GetObject()) });
+  auto names = base->GetNamesTree(info[0].As<Boolean>());
+  if (!names)
+    return info.Env().Null();
+  return Obj::constructor.New(
+    { External<PdfObject>::New(info.Env(), names->GetObject()) });
 }
 Napi::Value
 BaseDocument::CreatePage(const CallbackInfo& info)
@@ -454,7 +472,8 @@ BaseDocument::CreatePages(const Napi::CallbackInfo& info)
   auto coll = info[0].As<Array>();
   vector<PdfRect> rects;
   for (int n = coll.Length(); n >= 0; n++) {
-    PdfRect r = Rect::Unwrap(coll.Get(n).As<Object>())->GetRect();
+    PdfRect r =
+      Rect::Unwrap(coll.Get(static_cast<uint32_t>(n)).As<Object>())->GetRect();
     rects.push_back(r);
   }
   base->CreatePages(rects);

@@ -31,7 +31,6 @@ if (MSVC)
     set(PODOFO_INCLUDE_DIR "${VCPKG_PATH}\\include")
     message("PODOFO_INCLUDE_DIR: ${PODOFO_INCLUDE_DIR}")
 
-    # set(CMAKE_SHARED_LINKER_FLAGS "-Wl,-rpath=${VCPKG_PATH}\\bin")
     set(CMAKE_CXX_FLAGS /EH)
     set(CMAKE_CXX_FLAGS /EHsc)
     set(CMAKE_TOOLCHAIN_FILE "${VCPKG_PATH}\\scripts\\buildsystems\\vcpkg.cmake")

@@ -66,7 +66,7 @@ export interface IBase {
     centerWindow(): void
     displayDocTitle(): void
     useFullScreen(): void
-    attachFile(file: string, document: IBase): void
+    attachFile(file: string): void
     insertExistingPage(memDoc: IDocument, index: number, insertIndex: number): number
     insertPage(rect: IRect, index: number): IPage
     append(doc: IDocument): void
@@ -74,8 +74,8 @@ export interface IBase {
     getWriteMode(): NPDFWriteMode
     isAllowed(perm: ProtectionOption): boolean
     createFont(opts: NPDFCreateFontOpts): IFont
-    getOutlines(): IObj
-    getNames(): IObj
+    getOutlines(create: boolean): IObj|null
+    getNames(create: boolean): IObj|null
     createXObject(rect: IRect): IXObj
     createPage(rect: IRect): IPage
     createPages(rects: IRect[]): number

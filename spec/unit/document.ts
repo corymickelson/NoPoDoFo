@@ -1,7 +1,7 @@
 import { join } from 'path'
 import * as tap from 'tape'
 import { Test } from 'tape'
-import { NPDFVersion, IDocument, npdf, NPDFPageMode } from '../../dist';
+import { NPDFName, IDocument, npdf, NPDFPageMode } from '../../dist';
 import { NPDFAlignment } from "../../lib";
 if (!global.gc) {
     global.gc = () => { }
@@ -39,6 +39,18 @@ tap('IDocument', (t: Test) => {
             'document body returns an array of objects')
 
         global.gc()
+        t.assert(doc.getOutlines(false) === null, 'returns null when outline does not exist')
+        let outline = doc.getOutlines(true)
+        t.assert(outline && outline.type === 'Dictionary', 'creates an outlines object with create true')
+
+        t.doesNotThrow(() => {doc.attachFile(join(__dirname, '../test-documents/scratch.txt'))})
+        let names = doc.getNames(false)
+        if(!names) {t.fail(); return}
+        t.assert(names && names.type === 'Dictionary')
+        t.assert(names.getDictionary().getKeys().includes(NPDFName.EMBEDDED_FILES))
+        let embeddedFiles = names.getDictionary().getKey(NPDFName.EMBEDDED_FILES).getDictionary().getKey(NPDFName.KIDS)
+        let fileSpec = embeddedFiles.getArray().at(0)
+        t.assert(fileSpec.getDictionary().getKey(NPDFName.NAMES).getArray().at(0).getString().includes('scratch2Etxt'), 'embedded file path correct')
         t.comment("Document instance accessors [SET]")
         t.comment('Can create an encrypt instance and set to Document')
         let encrypt = npdf.Encrypt.createEncrypt({

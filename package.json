@@ -35,7 +35,6 @@
     "@types/node": "^8.10.18",
     "@types/tape": "^4.2.32",
     "@types/uuid": "^3.4.3",
-    "aws-sdk": "^2.252.1",
     "benchmark": "^2.1.4",
     "cmake-js": "^3.7.3",
     "coveralls": "^3.0.1",
@@ -51,6 +50,7 @@
   "files": [
     "build/Release",
     "build/Debug",
+    "scripts",
     "src",
     "dist",
     "deps",
