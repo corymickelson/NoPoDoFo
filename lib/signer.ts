@@ -16,8 +16,9 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import { Callback, IDocument } from './document'
+import { IDocument } from './document'
 import { ISignatureField } from "./field";
+import {Callback} from "./index";
 
 
 export interface ISigner {
@@ -37,7 +38,7 @@ export interface ISigner {
      * Values are not retrievable but are stored for use in Signer.sign
      * After both cert and pkey are loaded, a minimal signature size is calculated and returned to
      * the caller. To complete the signing process this minimum signature size value needs to be
-     * provided to the sign method.
+     * provided to the write method.
      *
      * @param {string} certificate
      * @param {string} pkey
@@ -49,7 +50,7 @@ export interface ISigner {
 
     /**
      * Signs the document output to disk or a node buffer
-     * The loadCertificateAndKey must be loaded prior to calling sign
+     * The loadCertificateAndKey must be loaded prior to calling write
      * @see loadCertificateAndKey
      * @param {Number} minSignatureSize
      * @param {Callback} cb

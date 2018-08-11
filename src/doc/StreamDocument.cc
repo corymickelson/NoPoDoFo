@@ -102,11 +102,11 @@ Napi::Value
 StreamDocument::Close(const CallbackInfo& info)
 {
   GetStreamedDocument().Close();
-  if (streamToBuffer) {
-    return Buffer<char>::Copy(
-      info.Env(), refBuffer->GetBuffer(), refBuffer->GetSize());
-  } else {
+//  if (streamToBuffer) {
+//    return Buffer<char>::Copy(
+//      info.Env(), refBuffer->GetBuffer(), refBuffer->GetSize());
+//  } else {
     return String::New(info.Env(), output);
-  }
+//  }
 }
 }

@@ -18,8 +18,20 @@
  */
 
 export interface IRect {
+    /**
+     * Create a new PdfRect with values set to zero.
+     */
     new(): IRect
+
+    /**
+     * Create a new PdfRect with values provided
+     * @param left
+     * @param bottom
+     * @param width
+     * @param height
+     */
     new(left: number, bottom: number, width: number, height: number): IRect
+
     left: number
     bottom: number
     width: number

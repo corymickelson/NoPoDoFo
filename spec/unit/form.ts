@@ -1,6 +1,6 @@
 import {join} from 'path'
 import * as tap from 'tape'
-import { NPDFName as name, npdf, NPDFFontEncoding, IDictionary, IObj} from '../../dist';
+import { NPDFName as name, npdf, NPDFFontEncoding, IDictionary} from '../../lib';
 if(!global.gc) {
     global.gc = () => {}
 }
@@ -40,7 +40,6 @@ tap('NPDF Form Accessors and Methods', standard => {
                 t.assert(doc.form.DA === da, 'DA set')
                 t.end()
             }
-
             global.gc()
         })
     })

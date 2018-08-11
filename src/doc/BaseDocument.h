@@ -73,10 +73,10 @@ public:
   Napi::Value CreateXObject(const Napi::CallbackInfo&);
 
   PoDoFo::PdfDocument* base;
-  bool create = false;
+//  bool create = false;
   string output;
-  PoDoFo::PdfRefCountedBuffer* refBuffer = new PoDoFo::PdfRefCountedBuffer();
-  bool streamToBuffer = false;
+//  PoDoFo::PdfRefCountedBuffer* refBuffer = new PoDoFo::PdfRefCountedBuffer();
+//  bool streamToBuffer = false;
 };
 }
 #endif

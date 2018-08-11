@@ -1,5 +1,6 @@
-const buildType = process.config.target_defaults.default_configuration;
-const npdf: INPDF = require(`../build/${buildType}/nopodofo.node`)
+// let buildType = process.config.target_defaults.default_configuration
+const npdf: INPDF = require('bindings')('nopodofo')
+
 /**
  * This file is part of the NoPoDoFo (R) project.
  * Copyright (c) 2017-2018
@@ -22,14 +23,14 @@ import { IData } from './data'
 import { IDate, toPDFFormat } from './date'
 import { IDocument, NPDFFontEncoding, NPDFPageLayout, NPDFPageMode } from './document'
 import { IPage } from './page'
-import { IStreamDocument, NPDFWriteMode, NPDFVersion } from './stream-document'
+import { IStreamDocument } from './stream-document'
 import {
     IObj, IDictionary, NPDFInternal, IArray, NPDFCoerceKeyType, NPDFDataType, NPDFDictionaryKeyType
 } from './object'
 import { IXObj } from './xobject'
+import {NPDFActions} from './action'
 import {
     IAnnotation,
-    NPDFAction,
     NPDFAnnotation,
     NPDFAnnotationFlag,
     NPDFAnnotationType
@@ -75,7 +76,11 @@ import { Cell, Table } from './table'
 import { IEncrypt, ProtectionOption, EncryptOption, ProtectionSummary } from './encrypt'
 import { NPDFName } from './names'
 import { IFileSpec } from './file-spec';
-import { IAction } from './action';
+import {IAction} from './action';
+import {IDestination, NPDFDestinationFit, NPDFDestinationType} from './destination'
+import {IOutline} from "./outlines";
+import {NPDFVersion, NPDFWriteMode} from './base-document';
+
 export interface INPDF {
     Document: IDocument
     StreamDocument: IStreamDocument
@@ -107,14 +112,10 @@ export interface INPDF {
     SimpleTable: any
     Action: IAction
     Date: IDate
+    OutLine: IOutline
+    Destination: IDestination
 }
 
-// const binary = require('node-pre-gyp')
-// const { resolve, join } = require('path')
-// const npdf: INPDF = require('bindings')('nopodofo.node')
-
-// const __binary = binary.find(resolve(join(__dirname, '../package.json')))
-// const npdf: INPDF = require(__binary)
 export {
     IDate,
     IDictionary,
@@ -147,7 +148,6 @@ export {
     IObj,
     IPage,
     IAnnotation,
-    NPDFAction,
     NPDFAnnotation,
     NPDFAnnotationFlag,
     NPDFAnnotationType,
@@ -161,6 +161,7 @@ export {
     IExtGState,
     IFont,
     NPDFAlignment,
+    NPDFActions,
     NPDFBlendMode,
     NPDFColorSpace,
     NPDFFontType,
@@ -180,14 +181,14 @@ export {
     NPDFWriteMode,
     NPDFVersion,
     IXObj,
-    toPDFFormat
+    toPDFFormat,
+    IDestination,
+    NPDFDestinationFit,
+    NPDFDestinationType
 }
 export const CONVERSION = 0.0028346456693
-/**
- * A generic type representing a n-api external pointer type
- * This can not be used in any way other than passing the external data type
- * back into napi as function argument.
- */
+
 export type NPDFExternal<T> = Object
+export type Callback<T> = (err: Error, data: T ) => void
 
 

@@ -16,23 +16,10 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import { IBase } from "./base-document";
+import {IBase, NPDFVersion, NPDFWriteMode} from "./base-document";
 import { IEncrypt } from "./encrypt";
 
-export enum NPDFVersion {
-    Pdf11,
-    Pdf12,
-    Pdf13,
-    Pdf14,
-    Pdf15,
-    Pdf16,
-    Pdf17,
-}
 
-export enum NPDFWriteMode {
-    Default = 0x01,
-    Compact = 0x02
-}
 export interface IStreamDocument extends IBase {
     /**
      *

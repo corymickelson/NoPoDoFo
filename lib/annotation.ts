@@ -16,12 +16,10 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import {NPDFColor, NPDFrgb} from './painter';
-import {access} from "fs";
-import {F_OK, R_OK} from "constants";
-import {IAction, IDestination} from "./action";
+import {NPDFColor} from './painter';
+import {IAction} from "./action";
+import {IDestination} from './destination'
 import {IFileSpec} from "./file-spec";
-import {IBase} from "./base-document";
 import { IXObj } from './xobject';
 
 export enum NPDFAnnotationType {
@@ -97,30 +95,14 @@ export enum NPDFAnnotationFlag {
     LockedContents = 0x0200
 }
 
-export enum NPDFAction {
-    GoTo = 0,
-    GoToR,
-    GoToE,
-    Launch,
-    Thread,
-    URI,
-    Sound,
-    Movie,
-    Hide,
-    Named,
-    SubmitForm,
-    ResetForm,
-    ImportData,
-    JavaScript,
-    SetOCGState,
-    Rendition,
-    Trans,
-    GoTo3DView,
-    RichMediaExecute,
-}
-
+/**
+ * Annotations are the core of all pdf widgets, this includes AcroForm fields, sticky notes, links, etc...
+ * An Annotation is created via document page.createAnnotation. There is no other way to create a new annotation.
+ * Annotations are a lower level PDF object, please familiarize yourself with the PDF Spec for usage.
+ * {@link https://www.adobe.com/content/dam/acom/en/devnet/pdf/pdfs/PDF32000_2008.pdf}
+ * @see IPage
+ */
 export interface IAnnotation {
-    new(doc: IBase): IAnnotation
     flags: NPDFAnnotationFlag
     title: string
     content: string

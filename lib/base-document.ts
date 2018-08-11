@@ -22,9 +22,11 @@ import { NPDFPageMode, NPDFPageLayout, NPDFCreateFontOpts, IDocument } from "./d
 import { IPage } from "./page";
 import { IFont } from "./painter";
 import { IForm } from "./form";
-import { NPDFVersion, NPDFWriteMode } from "./stream-document";
 import { IRect } from "./rect";
 import { IXObj } from ".";
+import {IOutline} from "./outlines";
+import {NPDFDestinationFit} from './destination'
+import {IFileSpec} from "./file-spec";
 
 export interface NPDFInfo {
     author: string
@@ -36,14 +38,19 @@ export interface NPDFInfo {
     title: string
 }
 
-export enum NPDFDestinationFit {
-    Fit,
-    FitH,
-    FitV,
-    FitB,
-    FitBH,
-    FitBV,
-    Unknown = 0xFF
+export enum NPDFVersion {
+    Pdf11,
+    Pdf12,
+    Pdf13,
+    Pdf14,
+    Pdf15,
+    Pdf16,
+    Pdf17,
+}
+
+export enum NPDFWriteMode {
+    Default = 0x01,
+    Compact = 0x02
 }
 
 export interface IBase {
@@ -74,16 +81,20 @@ export interface IBase {
     getWriteMode(): NPDFWriteMode
     isAllowed(perm: ProtectionOption): boolean
     createFont(opts: NPDFCreateFontOpts): IFont
-    getOutlines(create: boolean): IObj|null
+
+    /**
+     * Get an existing outline or create a new outline and new root node
+     * @param {boolean} [create] - Create a new outline if one does not already exist
+     * @param {string} [root] - Create a Root node with the provided name
+     */
+    getOutlines(create?: boolean, root?: string): null | IOutline
     getObject(ref: Ref): IObj
     getNames(create: boolean): IObj|null
     createXObject(rect: IRect): IXObj
     createPage(rect: IRect): IPage
     createPages(rects: IRect[]): number
     getAttachment(uri: string): IFileSpec
-    addDestination(page: IPage, destination: NPDFDestinationFit, name: string): void
+    addNamedDestination(page: IPage, destination: NPDFDestinationFit, name: string): void
 }
-export interface IFileSpec {
-    readonly name: string
-}
+
 

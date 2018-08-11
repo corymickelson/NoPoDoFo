@@ -28,6 +28,7 @@
 #include "FileSpec.h"
 #include "Font.h"
 #include "Form.h"
+#include "Outline.h"
 #include "Page.h"
 
 using namespace Napi;
@@ -37,6 +38,7 @@ using std::cout;
 using std::endl;
 using std::make_shared;
 using std::string;
+using tl::nullopt;
 
 namespace NoPoDoFo {
 
@@ -89,7 +91,7 @@ BaseDocument::BaseDocument(const Napi::CallbackInfo& info, bool inMem)
 BaseDocument::~BaseDocument()
 {
   delete base;
-  delete refBuffer;
+//  delete refBuffer;
 }
 
 Napi::Value
@@ -285,8 +287,11 @@ Napi::Value
 BaseDocument::GetObject(const CallbackInfo& info)
 {
   if (info[0].IsArray()) {
-    unsigned long g =
-      info[0].As<Array>().Get(static_cast<uint32_t>(0)).As<Number>().Uint32Value();
+    unsigned long g = info[0]
+                        .As<Array>()
+                        .Get(static_cast<uint32_t>(0))
+                        .As<Number>()
+                        .Uint32Value();
     pdf_objnum o =
       info[0].As<Array>().Get(static_cast<uint32_t>(1)).As<Number>();
     auto gen = static_cast<pdf_gennum>(g);
@@ -452,13 +457,39 @@ BaseDocument::GetInfo(const CallbackInfo& info)
 Napi::Value
 BaseDocument::GetOutlines(const CallbackInfo& info)
 {
-  auto outline = base->GetOutlines(info[0].As<Boolean>());
-  if (!outline) {
-    return info.Env().Null();
-  } else {
-    return Obj::constructor.New(
-      { External<PdfObject>::New(info.Env(), outline->GetObject()) });
+  vector<int> opts = AssertCallbackInfo(
+    info,
+    { { 0, { nullopt, option(napi_boolean), option(napi_string) } },
+      { 1, { nullopt, option(napi_string) } } });
+  PdfOutlines* outlines = nullptr;
+  // Create with default options
+  if (opts[0] == 0) {
+    outlines = base->GetOutlines();
+  } // Create with create option provided
+  else if (opts[0] == 1) {
+    outlines = base->GetOutlines(info[0].As<Boolean>());
   }
+  // Create with default option and create a new root
+  else if (opts[0] == 2) {
+    outlines = base->GetOutlines();
+    if (!outlines)
+      return info.Env().Null();
+//    outlines->CreateRoot(info[0].As<String>().Utf8Value());
+    return Outline::constructor.New({External<PdfOutlineItem>::New(info.Env(),outlines->CreateRoot(info[0].As<String>().Utf8Value()))});
+  }
+  // Create with create option and new root
+  else if (opts[0] == 1 && opts[1] == 1) {
+    outlines = base->GetOutlines(info[0].As<Boolean>());
+    if (!outlines)
+      return info.Env().Null();
+//    outlines->CreateRoot(info[1].As<String>().Utf8Value());
+    return Outline::constructor.New({External<PdfOutlineItem>::New(info.Env(),outlines->CreateRoot(info[0].As<String>().Utf8Value()))});
+  }
+
+  if (!outlines)
+    return info.Env().Null();
+  return Outline::constructor.New(
+    { External<PdfOutlineItem>::New(info.Env(), outlines) });
 }
 Napi::Value
 BaseDocument::GetNamesTree(const CallbackInfo& info)
@@ -525,8 +556,8 @@ BaseDocument::AddNamedDestination(const Napi::CallbackInfo& info)
   EPdfDestinationFit fit =
     static_cast<EPdfDestinationFit>(info[1].As<Number>().Int32Value());
   string name = info[2].As<String>().Utf8Value();
-  PdfDestination destination(&page, fit);
-  base->AddNamedDestination(destination, name);
+  PdfDestination* destination = new PdfDestination(&page, fit);
+  base->AddNamedDestination(*destination, name);
 }
 
 Napi::Value

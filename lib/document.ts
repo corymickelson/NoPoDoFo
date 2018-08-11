@@ -23,23 +23,8 @@ import { IFont } from "./painter";
 import { F_OK } from "constants";
 import { IBase } from './base-document'
 import {ISignatureField, npdf} from '.';
+import {Callback} from "./index";
 
-export declare enum NPDFVersion {
-    Pdf11 = 0,
-    Pdf12 = 1,
-    Pdf13 = 2,
-    Pdf14 = 3,
-    Pdf15 = 4,
-    Pdf16 = 5,
-    Pdf17 = 6,
-}
-
-export declare enum NPDFWriteMode {
-    Default = 1,
-    Compact = 2,
-}
-
-export type Callback<T> = (err: Error, data: T ) => void
 
 export enum NPDFFontEncoding {
     WinAnsi = 1,

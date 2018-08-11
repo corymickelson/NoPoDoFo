@@ -3,6 +3,7 @@
 //
 
 #include "Action.h"
+#include "../ValidateArguments.h"
 #include "../base/Dictionary.h"
 #include "../base/Obj.h"
 #include "Document.h"
@@ -12,6 +13,8 @@ using namespace PoDoFo;
 using namespace Napi;
 
 using std::make_unique;
+using std::vector;
+using tl::nullopt;
 
 namespace NoPoDoFo {
 
@@ -20,24 +23,32 @@ FunctionReference Action::constructor; // NOLINT
 Action::Action(const Napi::CallbackInfo& info)
   : ObjectWrap(info)
 {
-  if (info[0].As<Object>().InstanceOf(Document::constructor.Value())) {
-    doc = Document::Unwrap(info[0].As<Object>())->base;
-  } else if (info[0].As<Object>().InstanceOf(
-               StreamDocument::constructor.Value())) {
-    doc = StreamDocument::Unwrap(info[0].As<Object>())->base;
-  } else {
-    TypeError::New(info.Env(), "Instance of BaseDocument required")
-      .ThrowAsJavaScriptException();
-    return;
+  vector<int> opts =
+    AssertCallbackInfo(info,
+                       { { 0, { option(napi_external), option(napi_object) } },
+                         { 1, { nullopt, option(napi_number) } } });
+  // Create Copy Constructor Action
+  if (opts[0] == 0) {
+    action = make_unique<PdfAction>(
+      info[0].As<External<PdfAction>>().Data()->GetObject());
   }
-  EPdfAction t = static_cast<EPdfAction>(info[0].As<Number>().Uint32Value());
-  action = make_unique<PdfAction>(t, doc);
-}
-
-Action::~Action()
-{
-  HandleScope scope(Env());
-  doc = nullptr;
+  // Create a new Action
+  else if (opts[0] == 1 && opts[1] == 1) {
+    PdfDocument* doc;
+    if (info[0].As<Object>().InstanceOf(Document::constructor.Value())) {
+      doc = Document::Unwrap(info[0].As<Object>())->base;
+    } else if (info[0].As<Object>().InstanceOf(
+                 StreamDocument::constructor.Value())) {
+      doc = StreamDocument::Unwrap(info[0].As<Object>())->base;
+    }
+    EPdfAction t = static_cast<EPdfAction>(info[0].As<Number>().Uint32Value());
+    action = make_unique<PdfAction>(t, doc);
+  } else {
+    TypeError::New(
+      info.Env(),
+      "Invalid Action constructor args. Please see the docs for more info.")
+      .ThrowAsJavaScriptException();
+  }
 }
 
 void
@@ -93,9 +104,6 @@ Napi::Value
 Action::GetObject(const Napi::CallbackInfo& info)
 {
   PdfObject* o = GetAction()->GetObject();
-  if (GetAction()->GetObject()->IsReference()) {
-    o = doc->GetObjects()->GetObject(GetAction()->GetObject()->GetReference());
-  }
   return Obj::constructor.New({ External<PdfObject>::New(info.Env(), o) });
 }
 void

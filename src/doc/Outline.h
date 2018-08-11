@@ -23,6 +23,8 @@
 #include <napi.h>
 #include <podofo/podofo.h>
 
+using std::vector;
+
 namespace NoPoDoFo {
 
 /**
@@ -33,8 +35,10 @@ class Outline : public Napi::ObjectWrap<Outline>
 {
 public:
   explicit Outline(const Napi::CallbackInfo& info);
+  ~Outline();
   static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
+//  void CreateRoot(const Napi::CallbackInfo&);
   Napi::Value CreateChild(const Napi::CallbackInfo&);
   Napi::Value CreateNext(const Napi::CallbackInfo&);
   Napi::Value InsertChild(const Napi::CallbackInfo&);
@@ -54,8 +58,7 @@ public:
   void SetTextFormat(const Napi::CallbackInfo&, const Napi::Value&);
   Napi::Value GetTextColor(const Napi::CallbackInfo&);
   void SetTextColor(const Napi::CallbackInfo&, const Napi::Value&);
-
-  PoDoFo::PdfOutlines& outlines; // owned by the document
+  PoDoFo::PdfOutlineItem& outline; // owned by the document
 };
 }
 #endif // NPDF_OUTLINE_H

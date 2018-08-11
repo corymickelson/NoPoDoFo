@@ -175,7 +175,7 @@ Annotation::SetDestination(const CallbackInfo& info, const Napi::Value& value)
 {
   if (value.As<Object>().InstanceOf(Destination::constructor.Value())) {
     auto destination = Destination::Unwrap(value.As<Object>());
-    GetAnnotation().SetDestination(*destination->GetDestinationPtr());
+    GetAnnotation().SetDestination(destination->GetDestination());
   } else {
     TypeError::New(info.Env(), "Requires instance of Destination")
       .ThrowAsJavaScriptException();

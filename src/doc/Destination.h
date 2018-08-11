@@ -29,8 +29,8 @@ class Destination: public Napi::ObjectWrap<Destination> {
 public:
   static Napi::FunctionReference constructor;
   explicit Destination(const Napi::CallbackInfo &info);
+  ~Destination();
   static void Initialize(Napi::Env& env, Napi::Object& target);
-  Napi::Value GetPage(const Napi::CallbackInfo&);
   Napi::Value GetType(const Napi::CallbackInfo&);
   Napi::Value GetZoom(const Napi::CallbackInfo&);
   Napi::Value GetRect(const Napi::CallbackInfo&);
@@ -38,12 +38,9 @@ public:
   Napi::Value GetLeft(const Napi::CallbackInfo&);
   Napi::Value GetDValue(const Napi::CallbackInfo&);
   Napi::Value GetObject(const Napi::CallbackInfo&);
-  Napi::Value GetArray(const Napi::CallbackInfo&);
   void AddToDictionary(const Napi::CallbackInfo&);
-  PoDoFo::PdfDestination* GetDestinationPtr() { return destination.get(); }
-private:
-  std::unique_ptr<PoDoFo::PdfDestination> destination;
-
+  PoDoFo::PdfDestination GetDestination() { return *destination; }
+  PoDoFo::PdfDestination* destination;
 };
 
 }

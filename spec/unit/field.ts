@@ -1,6 +1,6 @@
 import { join } from 'path'
 import * as tap from 'tape'
-import { npdf, IAnnotation, ICheckBox, IComboBox, IField, ITextField, NPDFFieldType, NPDFAnnotation } from '../../dist'
+import { npdf, ICheckBox, IComboBox, ITextField, NPDFFieldType, NPDFAnnotation } from '../../lib'
 import { unlinkSync } from "fs";
 if (!global.gc) {
     global.gc = () => { }

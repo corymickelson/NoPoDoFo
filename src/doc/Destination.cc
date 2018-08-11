@@ -18,7 +18,14 @@
  */
 
 #include "Destination.h"
+#include "../Defines.h"
+#include "../ValidateArguments.h"
+#include "../base/Dictionary.h"
+#include "../base/Obj.h"
 #include "./Page.h"
+#include "./Rect.h"
+#include "Document.h"
+#include "StreamDocument.h"
 #include <iostream>
 
 using namespace PoDoFo;
@@ -26,8 +33,9 @@ using namespace Napi;
 
 using std::cout;
 using std::endl;
-using std::make_unique;
 using std::string;
+using std::vector;
+using tl::nullopt;
 
 namespace NoPoDoFo {
 
@@ -36,19 +44,56 @@ FunctionReference Destination::constructor; // NOLINT
 Destination::Destination(const CallbackInfo& info)
   : ObjectWrap(info)
 {
-  if (info.Length() == 1 && info[0].Type() == napi_external) {
-    destination = make_unique<PdfDestination>(
-      *info[0].As<External<PdfDestination>>().Data());
-  } else if (info.Length() == 2 && info[0].IsObject() && info[1].IsNumber()) {
+  vector<int> opts = AssertCallbackInfo(
+    info,
+    { { 0, { option(napi_external), option(napi_object) } },
+      { 1, { option(napi_number), option(napi_object), nullopt } },
+      { 2, { option(napi_number), nullopt } },
+      { 3, { option(napi_number), nullopt } } });
+  // Create a copy of an existing object
+  if (opts[0] == 0) {
+    destination =
+      new PdfDestination(*info[0].As<External<PdfDestination>>().Data());
+  }
+  // Create a new Destination object
+  else if (opts[0] == 1) {
     PdfPage page = Page::Unwrap(info[0].As<Object>())->page;
-    auto fit =
-      static_cast<EPdfDestinationFit>(info[1].As<Number>().Int32Value());
-    destination = make_unique<PdfDestination>(&page, fit);
-  } else {
-    throw TypeError();
+    if (opts[1] == 0) {
+      // PdfDestination(PdfPage, EPdfDestinationFit)
+      if (opts[2] == 1) {
+        destination = new PdfDestination(
+          &page,
+          static_cast<EPdfDestinationFit>(info[1].As<Number>().Int32Value()));
+      }
+      // PdfDestination(PdfPage, EPdfDestinationFit, FitArgument)
+      else if (opts[2] == 0) {
+        destination = new PdfDestination(
+          &page,
+          static_cast<EPdfDestinationFit>(info[1].As<Number>().Int32Value()),
+          info[2].As<Number>().DoubleValue());
+      }
+      // PdfDestination(PdfPage, left, top, zoom)
+      else if (opts[2] == 0 && opts[3] == 0) {
+        destination =
+          new PdfDestination(&page,
+                             info[1].As<Number>().DoubleValue(),  // left
+                             info[2].As<Number>().DoubleValue(),  // top
+                             info[3].As<Number>().DoubleValue()); // zoom
+      }
+
+    } else if (opts[1] == 1) {
+      destination = new PdfDestination(
+        &page, Rect::Unwrap(info[1].As<Object>())->GetRect());
+    } else {
+      Error::New(info.Env()).ThrowAsJavaScriptException();
+    }
   }
 }
-
+Destination::~Destination()
+{
+  HandleScope scope(Env());
+  delete destination;
+}
 void
 Destination::Initialize(Napi::Env& env, Napi::Object& target)
 {
@@ -56,67 +101,97 @@ Destination::Initialize(Napi::Env& env, Napi::Object& target)
   Function ctor = DefineClass(
     env,
     "Destination",
-    { InstanceAccessor("page", &Destination::GetPage, nullptr),
-      InstanceAccessor("type", &Destination::GetType, nullptr),
-      InstanceAccessor("zoom", &Destination::GetZoom, nullptr),
-      InstanceAccessor("rect", &Destination::GetRect, nullptr),
-      InstanceAccessor("top", &Destination::GetTop, nullptr),
-      InstanceAccessor("left", &Destination::GetLeft, nullptr),
-      InstanceAccessor("d", &Destination::GetDValue, nullptr),
+    { InstanceMethod("type", &Destination::GetType),
+      InstanceMethod("zoom", &Destination::GetZoom),
+      InstanceMethod("rect", &Destination::GetRect),
+      InstanceMethod("top", &Destination::GetTop),
+      InstanceMethod("left", &Destination::GetLeft),
+      InstanceMethod("d", &Destination::GetDValue),
       InstanceMethod("getObject", &Destination::GetObject),
-      InstanceMethod("getArray", &Destination::GetArray),
       InstanceMethod("addToDictionary", &Destination::AddToDictionary) });
   constructor = Napi::Persistent(ctor);
   constructor.SuppressDestruct();
   target.Set("Destination", ctor);
 }
 Napi::Value
-Destination::GetPage(const Napi::CallbackInfo& info)
-{
-  //  destination->GetPage()->GetObject()->GetOwner()->GetParentDocument();
-  return Value();
-}
-Napi::Value
 Destination::GetType(const Napi::CallbackInfo& info)
 {
-  return Number::New(info.Env(), destination->GetType());
+  return Number::New(info.Env(), GetDestination().GetType());
 }
 Napi::Value
-Destination::GetZoom(const Napi::CallbackInfo&)
+Destination::GetZoom(const Napi::CallbackInfo& info)
 {
-  return Value();
+  if (GetDestination().GetType() != ePdfDestinationType_XYZ) {
+    Error::New(info.Env(), "Destination must be of type XYZ to get zoom value.")
+      .ThrowAsJavaScriptException();
+    return {};
+  }
+  return Number::New(info.Env(), GetDestination().GetZoom());
 }
 Napi::Value
-Destination::GetRect(const Napi::CallbackInfo&)
+Destination::GetRect(const Napi::CallbackInfo& info)
 {
-  return Value();
+  if (GetDestination().GetType() != ePdfDestinationType_FitR) {
+    Error::New(info.Env(), "Destination must be of type FitR to get Rect value")
+      .ThrowAsJavaScriptException();
+    return {};
+  }
+  auto r = GetDestination().GetRect();
+  return Rect::constructor.New({ External<PdfRect>::New(info.Env(), &r) });
 }
 Napi::Value
-Destination::GetTop(const Napi::CallbackInfo&)
+Destination::GetTop(const Napi::CallbackInfo& info)
 {
-  return Value();
+  EPdfDestinationType t = GetDestination().GetType();
+  if (t == ePdfDestinationType_FitR || t == ePdfDestinationType_FitH ||
+      t == ePdfDestinationType_XYZ || t == ePdfDestinationType_FitBH) {
+    return Number::New(info.Env(), GetDestination().GetTop());
+  } else {
+    Error::New(info.Env(),
+               "Destination must be of type FitH, FitR, FitBH or FitXYZ")
+      .ThrowAsJavaScriptException();
+    return Value();
+  }
 }
 Napi::Value
-Destination::GetLeft(const Napi::CallbackInfo&)
+Destination::GetLeft(const Napi::CallbackInfo& info)
 {
-  return Value();
+  EPdfDestinationType t = GetDestination().GetType();
+  if (t == ePdfDestinationType_FitR || t == ePdfDestinationType_FitV ||
+      t == ePdfDestinationType_XYZ) {
+    return Number::New(info.Env(), GetDestination().GetLeft());
+  } else {
+    Error::New(info.Env(), "Destination must be of type FitV, FitR or FitXYZ")
+      .ThrowAsJavaScriptException();
+    return Value();
+  }
 }
 Napi::Value
-Destination::GetDValue(const Napi::CallbackInfo&)
+Destination::GetDValue(const Napi::CallbackInfo& info)
 {
-  return Value();
+  EPdfDestinationType t = GetDestination().GetType();
+  if (t == ePdfDestinationType_FitH || t == ePdfDestinationType_FitV ||
+      t == ePdfDestinationType_FitBH) {
+    return Number::New(info.Env(), GetDestination().GetDValue());
+  } else {
+    Error::New(info.Env(), "Destination must be of type FitV, FitH or FitBH")
+      .ThrowAsJavaScriptException();
+    return Value();
+  }
 }
 Napi::Value
-Destination::GetObject(const Napi::CallbackInfo&)
+Destination::GetObject(const Napi::CallbackInfo& info)
 {
-  return Value();
+  return Obj::constructor.New(
+    { External<PdfObject>::New(info.Env(), GetDestination().GetObject()) });
 }
-Napi::Value
-Destination::GetArray(const Napi::CallbackInfo&)
-{
-  return Value();
-}
+
 void
-Destination::AddToDictionary(const Napi::CallbackInfo&)
-{}
+Destination::AddToDictionary(const Napi::CallbackInfo& info)
+{
+  if (info[0].As<Object>().InstanceOf(Dictionary::constructor.Value())) {
+    PdfDictionary d = Dictionary::Unwrap(info[0].As<Object>())->GetDictionary();
+    GetDestination().AddToDictionary(d);
+  }
+}
 }

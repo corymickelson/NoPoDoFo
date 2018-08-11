@@ -19,7 +19,6 @@
 import { Stream } from "stream";
 import { IDictionary } from "./object";
 import { IObj } from "./object"
-import { IDocument } from "./document"
 
 export type NPDFInternal = any
 
@@ -74,7 +73,7 @@ export interface IArray {
     readonly length: number
     immutable: boolean
 
-    JsArray(): Array<any>
+    // JsArray(): Array<any>
 
     /**
      * If the item at the index is a Reference that can not be resolved by the array object owner.
@@ -98,8 +97,6 @@ export type NPDFDictionaryKeyType = 'boolean' | 'long' | 'name' | 'real'
 export interface IDictionary {
     dirty: boolean
     immutable: boolean
-
-    tryGet(doc: IDocument, candidate: IObj): IDictionary | null
 
     /**
      * @param {string} k

@@ -1,4 +1,5 @@
 const {execSync: run} = require('child_process')
+const {platform } = require('os')
 const {join} = require('path')
 const {readdirSync} = require('fs')
 
@@ -20,12 +21,18 @@ function findModules(dir = './', depth = 0) {
     }
 }
 
-
-let cmd = 'cmake-js'
+if(platform() === 'win32') {
+    if(!process.env.VCPKG_PATH) {
+        console.warn('Windows installation requires environment variable VCPKG_PATH to be set to the root of your' +
+            'vcpkg installation')
+        process.exit(1)
+    }
+}
+let cmd = `${join(__dirname, '../node_modules/.bin/cmake-js')} build`
 if (process.argv.length >= 3) {
     if (process.argv[2] === '-D') cmd += ' -D'
 }
 
-cmd += ` --CDPROJECT_DIR=${findModules()} --prefer-clang --s=c++14`
+cmd += ` --CDPROJECT_DIR=${findModules()} -s=c++14`
 console.log('CMD: ', cmd)
 run(cmd, {"stdio": "inherit"})

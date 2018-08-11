@@ -2,9 +2,9 @@ import {join} from 'path'
 import {writeFileSync} from 'fs'
 import * as tap from 'tape'
 import {Test} from 'tape'
-import {NPDFName, IDocument, npdf, NPDFPageMode} from '../../dist';
-import {NPDFAlignment} from "../../lib";
-import {Ref,IObj} from "../../lib/object";
+import {IDocument, npdf, NPDFDestinationFit, NPDFName, NPDFPageMode} from '../../lib';
+import {IObj, Ref} from "../../lib/object";
+import {IOutline} from "../../lib/outlines";
 
 if (!global.gc) {
     global.gc = () => {
@@ -33,7 +33,6 @@ tap('IDocument', (t: Test) => {
         t.assert(doc.getPage(0) instanceof (npdf.Page as any), "Get Page returns a Page")
         doc.splicePages(0, 1)
         t.comment('Pages spliced')
-        global.gc()
         t.assert(doc.getPageCount() === 3, 'Page zero removed from document')
         t.assert(doc.form instanceof (npdf.Form as any), "Get Form returns an AcroForm")
         t.assert(doc.catalog instanceof (npdf.Obj as any), "Catalog as Obj")
@@ -42,11 +41,9 @@ tap('IDocument', (t: Test) => {
             && doc.body.filter(i => i.type === 'Reference').length === 0,
             'document body returns an array of objects')
 
-        global.gc()
         t.assert(doc.getOutlines(false) === null, 'returns null when outline does not exist')
-        let outline = doc.getOutlines(true)
-        t.assert(outline && outline.type === 'Dictionary', 'creates an outlines object with create true')
-
+        let outline: IOutline = doc.getOutlines(true) as any
+        t.ok(outline, 'create a new outline object with create = true')
         t.doesNotThrow(() => {
             doc.attachFile(join(__dirname, '../test-documents/scratch.txt'))
         })
@@ -71,21 +68,17 @@ tap('IDocument', (t: Test) => {
             algorithm: 'rc4v1'
         })
 
-        global.gc()
         t.doesNotThrow(() => {
             doc.encrypt = encrypt
         }, 'Can set the Document Encrypt instance from CreateEncrypt value')
         t.comment("Document instance methods")
         let docFont = doc.getFont('PoDoFoFt31')
         t.assert(docFont instanceof (npdf.Font as any))
-        global.gc()
         t.assert(docFont.getMetrics().fontSize > 0)
-        global.gc()
         t.assert(doc.getPageCount() === 3)
         t.comment('create font')
         let font = doc.createFont({italic: true, embed: false, fontName: 'Courier'})
 
-        global.gc()
         t.assert(font.getMetrics().fontSize === 12, 'Default font size is 12')
 
         doc.write((err, data) => {
@@ -112,7 +105,7 @@ tap('IDocument', (t: Test) => {
 
 tap('File Spec attachment', (t: Test) => {
     const fDoc = new npdf.Document()
-    fDoc.load(join(__dirname, '../test-documents/attachment.pdf'),{password: 'secret'}, e => {
+    fDoc.load(join(__dirname, '../test-documents/attachment.pdf'), {password: 'secret'}, e => {
         if (e) {
             fDoc.password = 'secret'
         }
@@ -126,7 +119,8 @@ tap('File Spec attachment', (t: Test) => {
         let embeddedFiles = names.getDictionary().getKey(NPDFName.EMBEDDED_FILES).getDictionary().getKey(NPDFName.KIDS)
         let fileSpecArray: IObj = embeddedFiles.getArray().at(0) as any
         let fileSpecObj = fileSpecArray.getDictionary().getKey(NPDFName.NAMES).getArray().at(1) as any
-        if(Array.isArray(fileSpecObj)) {
+        global.gc()
+        if (Array.isArray(fileSpecObj)) {
             fileSpecObj = fDoc.getObject(fileSpecObj as Ref)
         }
         t.assert((fileSpecObj as IObj).getDictionary().getKey(NPDFName.TYPE).getName() === NPDFName.FILESPEC, 'FileSpec object')
@@ -195,5 +189,41 @@ tap('IDocument has/get signatures', t => {
         t.ok(doc.getSignatures(), 'can get signatures')
         t.assert(doc.getSignatures().length === 1, 'has one signature')
         t.end()
+    })
+})
+
+tap('IDocument Destinations, Outline', t => {
+    let doc = new npdf.Document()
+    doc.load(filePath, e => {
+        if (e) t.fail()
+        else {
+            let outline: IOutline = doc.getOutlines(true, 'Test') as any
+            let dest = new npdf.Destination(doc.getPage(0), NPDFDestinationFit.Fit)
+            // outline.createChild('First', doc.getPage(0) as any);
+            // outline.createChild('First', new npdf.Destination(doc.getPage(0), NPDFDestinationFit.Fit));
+            // (outline.last as IOutline).createNext('Second', new npdf.Destination(doc.getPage(1), NPDFDestinationFit.Fit))
+            // let destinationPage = doc.getPage(doc.getPageCount() - 1)
+            // doc.addNamedDestination(destinationPage, NPDFDestinationFit.Fit, "LastPage")
+            doc.write((err, data) => {
+                if (err) t.fail('Failed to write document with named destination')
+                else {
+                    let inn = new npdf.Document()
+                    inn.load(data, e => {
+                        if (e) t.fail('Failed to load new document with named destination')
+                        else {
+                            // let outlines: IOutline = inn.getOutlines() as any
+                            // t.assert((outlines.first as IOutline).title === 'First', 'Outlines persist with title data')
+                            // t.assert((outlines.first as IOutline).next === null, 'null returned when there is no next node')
+                            // let names: IObj = inn.getNames(false) as any
+                            // let dests = names.getDictionary().getKey(NPDFName.DESTS)
+                            // let kid: IObj = dests.getDictionary().getKey(NPDFName.KIDS).getArray().at(0) as any
+                            // t.assert((kid.getDictionary().getKey(NPDFName.NAMES).getArray().at(0) as IObj)
+                            //     .getString() === 'LastPage', 'named destination saved')
+                            t.end()
+                        }
+                    })
+                }
+            })
+        }
     })
 })

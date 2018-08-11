@@ -1,17 +1,14 @@
-import {IDate, IDocument, npdf} from '../../dist'
+import {npdf} from '../../lib'
 import * as test from 'tape'
-import {join} from 'path';
-if(!global.gc) {
-    global.gc = () => {}
+
+if (!global.gc) {
+    global.gc = () => {
+    }
 }
 test('document objects instance of nopodofo.Obj', t => {
-    const filePath = join(__dirname, '../test-documents/test.pdf'),
-          doc      = new npdf.Document()
-    doc.load(filePath, e => {
-        if (e instanceof Error) t.fail()
-        t.ok(new npdf.Date().toString().match(/^D:/))
-        t.end()
-    })
+    // const doc = new npdf.StreamDocument()
+    t.ok(new npdf.Date().toString().match(/^D:/))
+    t.end()
 })
 
 

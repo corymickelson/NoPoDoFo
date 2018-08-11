@@ -11,7 +11,7 @@
   "scripts": {
     "docs": "typedoc --options ./tsconfig.docs.json --out ./docs",
     "coverage": "nyc tape spec/unit/*.js && nyc report --reporter=text-lcov | coveralls",
-    "test": "mkdir -p spec/tmp && tsc -p tsconfig.json && tsc -p tsconfig.spec.json && node --expose-gc ./node_modules/.bin/tape spec/unit/*.js",
+    "test": "mkdir -p spec/tmp && tsc -p tsconfig.json && tsc -p tsconfig.spec.json && node ./node_modules/.bin/tape spec/unit/*.js",
     "tsc:spec": "tsc -p tsconfig.spec.json",
     "prepublish": "tsc -p tsconfig.json"
   },
@@ -41,10 +41,11 @@
     "nyc": "^11.9.0",
     "tap-summary": "^4.0.0",
     "tape": "^4.9.0",
-    "typescript": "^2.5.3",
+    "typescript": "^3.0.1",
     "uuid": "^3.2.1"
   },
   "dependencies": {
+    "bindings": "^1.3.0",
     "node-addon-api": "1.4.0"
   },
   "files": [
