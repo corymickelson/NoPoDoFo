@@ -39,7 +39,7 @@ public:
   Napi::Value GetDValue(const Napi::CallbackInfo&);
   Napi::Value GetObject(const Napi::CallbackInfo&);
   void AddToDictionary(const Napi::CallbackInfo&);
-  PoDoFo::PdfDestination GetDestination() { return *destination; }
+  PoDoFo::PdfDestination& GetDestination() { return *destination; }
   PoDoFo::PdfDestination* destination;
 };
 

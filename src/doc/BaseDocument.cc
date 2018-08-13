@@ -90,8 +90,8 @@ BaseDocument::BaseDocument(const Napi::CallbackInfo& info, bool inMem)
 
 BaseDocument::~BaseDocument()
 {
+  cout << "Destructing Base" << endl;
   delete base;
-//  delete refBuffer;
 }
 
 Napi::Value
@@ -461,35 +461,34 @@ BaseDocument::GetOutlines(const CallbackInfo& info)
     info,
     { { 0, { nullopt, option(napi_boolean), option(napi_string) } },
       { 1, { nullopt, option(napi_string) } } });
-  PdfOutlines* outlines = nullptr;
+
+  PdfOutlineItem* outlines = nullptr;
   // Create with default options
   if (opts[0] == 0) {
     outlines = base->GetOutlines();
   } // Create with create option provided
-  else if (opts[0] == 1) {
-    outlines = base->GetOutlines(info[0].As<Boolean>());
-  }
-  // Create with default option and create a new root
-  else if (opts[0] == 2) {
-    outlines = base->GetOutlines();
-    if (!outlines)
-      return info.Env().Null();
-//    outlines->CreateRoot(info[0].As<String>().Utf8Value());
-    return Outline::constructor.New({External<PdfOutlineItem>::New(info.Env(),outlines->CreateRoot(info[0].As<String>().Utf8Value()))});
-  }
-  // Create with create option and new root
-  else if (opts[0] == 1 && opts[1] == 1) {
-    outlines = base->GetOutlines(info[0].As<Boolean>());
-    if (!outlines)
-      return info.Env().Null();
-//    outlines->CreateRoot(info[1].As<String>().Utf8Value());
-    return Outline::constructor.New({External<PdfOutlineItem>::New(info.Env(),outlines->CreateRoot(info[0].As<String>().Utf8Value()))});
+  if (opts[0] == 1) {
+    bool create = info[0].As<Boolean>();
+    outlines = base->GetOutlines(create);
   }
 
   if (!outlines)
     return info.Env().Null();
+
+  string root;
+  if (opts[0] == 2) {
+    root = info[0].As<String>().Utf8Value();
+  }
+  if (opts[1] == 1) {
+    root = info[1].As<String>().Utf8Value();
+  }
+  if(!root.empty()) {
+    dynamic_cast<PdfOutlines*>(outlines)->CreateRoot(PdfString(root));
+  }
+
   return Outline::constructor.New(
-    { External<PdfOutlineItem>::New(info.Env(), outlines) });
+    { External<PdfOutlineItem>::New(info.Env(), outlines),
+      External<BaseDocument>::New(info.Env(), this) });
 }
 Napi::Value
 BaseDocument::GetNamesTree(const CallbackInfo& info)
@@ -556,7 +555,7 @@ BaseDocument::AddNamedDestination(const Napi::CallbackInfo& info)
   EPdfDestinationFit fit =
     static_cast<EPdfDestinationFit>(info[1].As<Number>().Int32Value());
   string name = info[2].As<String>().Utf8Value();
-  PdfDestination* destination = new PdfDestination(&page, fit);
+  auto destination = new PdfDestination(&page, fit);
   base->AddNamedDestination(*destination, name);
 }
 

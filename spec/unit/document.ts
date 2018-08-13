@@ -40,9 +40,9 @@ tap('IDocument', (t: Test) => {
         t.assert(Array.isArray(doc.body)
             && doc.body.filter(i => i.type === 'Reference').length === 0,
             'document body returns an array of objects')
-
-        t.assert(doc.getOutlines(false) === null, 'returns null when outline does not exist')
-        let outline: IOutline = doc.getOutlines(true) as any
+        let outline: IOutline = doc.getOutlines(false) as any
+        t.assert(outline  === null, 'returns null when outline does not exist')
+        outline = doc.getOutlines(true) as any
         t.ok(outline, 'create a new outline object with create = true')
         t.doesNotThrow(() => {
             doc.attachFile(join(__dirname, '../test-documents/scratch.txt'))
@@ -199,11 +199,10 @@ tap('IDocument Destinations, Outline', t => {
         else {
             let outline: IOutline = doc.getOutlines(true, 'Test') as any
             let dest = new npdf.Destination(doc.getPage(0), NPDFDestinationFit.Fit)
-            // outline.createChild('First', doc.getPage(0) as any);
-            // outline.createChild('First', new npdf.Destination(doc.getPage(0), NPDFDestinationFit.Fit));
-            // (outline.last as IOutline).createNext('Second', new npdf.Destination(doc.getPage(1), NPDFDestinationFit.Fit))
-            // let destinationPage = doc.getPage(doc.getPageCount() - 1)
-            // doc.addNamedDestination(destinationPage, NPDFDestinationFit.Fit, "LastPage")
+            let first = outline.createChild('First', dest);
+            t.ok(first.title)
+            let sec = new npdf.Destination(doc.getPage(1), NPDFDestinationFit.Fit)
+            let firstSecond = first.createNext('Second', sec)
             doc.write((err, data) => {
                 if (err) t.fail('Failed to write document with named destination')
                 else {
@@ -211,14 +210,9 @@ tap('IDocument Destinations, Outline', t => {
                     inn.load(data, e => {
                         if (e) t.fail('Failed to load new document with named destination')
                         else {
-                            // let outlines: IOutline = inn.getOutlines() as any
-                            // t.assert((outlines.first as IOutline).title === 'First', 'Outlines persist with title data')
-                            // t.assert((outlines.first as IOutline).next === null, 'null returned when there is no next node')
-                            // let names: IObj = inn.getNames(false) as any
-                            // let dests = names.getDictionary().getKey(NPDFName.DESTS)
-                            // let kid: IObj = dests.getDictionary().getKey(NPDFName.KIDS).getArray().at(0) as any
-                            // t.assert((kid.getDictionary().getKey(NPDFName.NAMES).getArray().at(0) as IObj)
-                            //     .getString() === 'LastPage', 'named destination saved')
+                            let outlines: IOutline = inn.getOutlines() as any
+                            t.assert((outlines.first as IOutline).title === 'Test', 'Outlines persist with title data')
+                            t.assert((outlines.last as IOutline).title === 'Second', 'Outlines persist with title data')
                             t.end()
                         }
                     })

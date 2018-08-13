@@ -22,6 +22,7 @@
 
 #include <napi.h>
 #include <podofo/podofo.h>
+#include "BaseDocument.h"
 
 using std::vector;
 
@@ -58,6 +59,8 @@ public:
   void SetTextFormat(const Napi::CallbackInfo&, const Napi::Value&);
   Napi::Value GetTextColor(const Napi::CallbackInfo&);
   void SetTextColor(const Napi::CallbackInfo&, const Napi::Value&);
+  PoDoFo::PdfOutlineItem& GetOutline() { return outline; }
+private:
   PoDoFo::PdfOutlineItem& outline; // owned by the document
 };
 }
