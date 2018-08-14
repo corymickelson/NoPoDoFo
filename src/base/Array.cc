@@ -54,7 +54,6 @@ Array::Initialize(Napi::Env& env, Napi::Object& target)
     { InstanceAccessor("dirty", &Array::IsDirty, &Array::SetDirty),
       InstanceAccessor("length", &Array::Length, nullptr),
       InstanceAccessor("immutable", &Array::GetImmutable, &Array::SetImmutable),
-      InstanceMethod("toJS", &Array::ToArray),
       InstanceMethod("at", &Array::At),
       InstanceMethod("containsString", &Array::ContainsString),
       InstanceMethod("indexOf", &Array::GetStringIndex),
@@ -180,32 +179,6 @@ Array::GetObjAtIndex(const CallbackInfo& info)
   auto initPtr = Napi::External<PdfObject>::New(info.Env(), child);
   auto instance = Obj::constructor.New({ initPtr });
   return instance;
-}
-
-Napi::Value
-Array::ToArray(const Napi::CallbackInfo& info)
-{
-  auto js = Napi::Array::New(info.Env());
-  try {
-    uint32_t counter = 0;
-    for (auto& it : GetArray()) {
-      PdfObject* item;
-      if (it.IsReference()) {
-        item = it.GetOwner()->GetObject(it.GetReference());
-      } else {
-        item = &it;
-      }
-      auto initPtr = Napi::External<PdfObject>::New(info.Env(), item);
-      const auto instance = Obj::constructor.New({ initPtr });
-      js.Set(counter, instance);
-      counter++;
-    }
-  } catch (PdfError& err) {
-    ErrorHandler(err, info);
-  } catch (Napi::Error& err) {
-    ErrorHandler(err, info);
-  }
-  return js;
 }
 
 void
