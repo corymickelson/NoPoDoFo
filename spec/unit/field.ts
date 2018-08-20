@@ -1,6 +1,6 @@
 import { join } from 'path'
 import * as tap from 'tape'
-import { npdf, ICheckBox, IComboBox, ITextField, NPDFFieldType, NPDFAnnotation } from '../../lib'
+import { nopodofo as npdf, NPDFFieldType, NPDFAnnotation } from '../../'
 import { unlinkSync } from "fs";
 if (!global.gc) {
     global.gc = () => { }
@@ -51,7 +51,7 @@ tap.skip('fill and flatten fields', t => {
         doc.form.needAppearances = true
         t.assert(fields.length > 0) // fields should have one item
         t.assert(fields[0].type === NPDFFieldType.TextField);
-        (fields[0] as ITextField).text = 'TEST'
+        (fields[0] as npdf.TextField).text = 'TEST'
         // NOTE: doc.form appearances has NOT been set to true, this is using the annotations appearances stream
         doc.write(simpleFormTestFile, e => {
             if(e) t.fail(e.message)
@@ -97,13 +97,13 @@ tap('IField', t => {
                 t.ok(typeof field.required === 'boolean')
                 switch (field.type) {
                     case NPDFFieldType.TextField:
-                        (field as ITextField).text = 'TEST'
+                        (field as npdf.TextField).text = 'TEST'
                         break
                     case NPDFFieldType.CheckBox:
-                        (field as ICheckBox).checked = true
+                        (field as npdf.CheckBox).checked = true
                         break
                     case NPDFFieldType.ComboBox:
-                        (field as IComboBox).selected = 0 // set to first value
+                        (field as npdf.ComboBox).selected = 0 // set to first value
                         break
                     default:
                         break
@@ -119,15 +119,15 @@ tap('IField', t => {
                             tPage.getFields().forEach(field => {
                                 switch (field.type) {
                                     case NPDFFieldType.TextField:
-                                        let text = field as ITextField
+                                        let text = field as npdf.TextField
                                         t.assert(text.text === 'TEST')
                                         break
                                     case NPDFFieldType.CheckBox:
-                                        let check = field as ICheckBox
+                                        let check = field as npdf.CheckBox
                                         t.true(check.checked)
                                         break
                                     case NPDFFieldType.ComboBox:
-                                        let lf = field as IComboBox
+                                        let lf = field as npdf.ComboBox
                                         t.assert(lf.selected === 0)
                                         break
                                     default:

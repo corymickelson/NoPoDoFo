@@ -2,18 +2,16 @@
   "name": "nopodofo",
   "version": "0.7.0",
   "description": "Node.js native module bindings for PoDoFo",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "index.js",
+  "types": "index.d.ts",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/corymickelson/NoPoDoFo.git"
   },
   "scripts": {
-    "docs": "typedoc --options ./tsconfig.docs.json --out ./docs",
     "coverage": "nyc tape spec/unit/*.js && nyc report --reporter=text-lcov | coveralls",
-    "test": "mkdir -p spec/tmp && tsc -p tsconfig.json && tsc -p tsconfig.spec.json && node ./node_modules/.bin/tape spec/unit/*.js",
-    "tsc:spec": "tsc -p tsconfig.spec.json",
-    "prepublish": "tsc -p tsconfig.json"
+    "test": "mkdir -p spec/tmp && tsc -p tsconfig.json && node ./node_modules/.bin/tape spec/unit/*.js",
+    "tsc:spec": "tsc -p tsconfig.json"
   },
   "nyc": {
     "exclude": [
@@ -38,6 +36,7 @@
     "benchmark": "^2.1.4",
     "cmake-js": "^3.7.3",
     "coveralls": "^3.0.1",
+    "gitbook-cli": "2.3.2",
     "nyc": "^11.9.0",
     "tap-summary": "^4.0.0",
     "tape": "^4.9.0",

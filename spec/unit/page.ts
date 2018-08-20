@@ -1,7 +1,7 @@
 import { existsSync, unlinkSync, writeFile } from 'fs'
 import { join } from 'path'
 import * as test from 'tape'
-import { IObj, IPage, npdf, NPDFAnnotation, NPDFFieldType } from "../../dist";
+import { nopodofo as npdf, NPDFAnnotation, NPDFFieldType } from "../../";
 if (!global.gc) {
     global.gc = () => { }
 }
@@ -9,7 +9,7 @@ const filePath = join(__dirname, '../test-documents/test.pdf'),
     outFile = join(__dirname, '../tmp/test.out.pdf'),
     doc = new npdf.Document()
 
-let page: IPage;
+let page: npdf.Page;
 
 doc.load(filePath, e => {
     page = doc.getPage(0)
@@ -97,7 +97,7 @@ function pageGetAnnot() {
 function pageContents() {
     test('page contents', t => {
         const contents = page.contents
-        t.assert(contents instanceof (npdf.Obj as any), 'is an instance of Obj')
+        t.assert(contents instanceof (npdf.Object), 'is an instance of Obj')
         t.assert(contents.length > 0, 'content is not null or empty')
         t.end()
     })
@@ -106,7 +106,7 @@ function pageContents() {
 function pageResources() {
     test('page resources', t => {
         const resources = page.resources
-        t.assert(resources instanceof (npdf.Obj as any), 'is instance ob Obj')
+        t.assert(resources instanceof (npdf.Object), 'is instance ob Obj')
         t.assert(resources.length > 0, 'is not null or empty')
         t.end()
     })
@@ -120,7 +120,7 @@ function pageAddImg() {
         painter.setPage(page)
         painter.drawImage(img, 0, page.height - img.height)
         painter.finishPage()
-        function extractImg(obj: IObj, jpg: Boolean) {
+        function extractImg(obj: npdf.Object, jpg: Boolean) {
             let ext = jpg ? '.jpg' : '.ppm'
             writeFile(`/tmp/test.img.extract.${ext}`, obj.stream, err => {
                 if (err instanceof Error)
@@ -149,8 +149,8 @@ function pageAddImg() {
                                 if (imgObj && imgObj.type === 'Array') {
                                     const imgObjArr = imgObj.getArray()
                                     if (imgObjArr.length === 1) {
-                                        if ((imgObjArr.at(0) as IObj).type === 'Name') {
-                                            if ((imgObjArr.at(0) as IObj).getName() === 'DCTDecode') {
+                                        if ((imgObjArr.at(0) as npdf.Object).type === 'Name') {
+                                            if ((imgObjArr.at(0) as npdf.Object).getName() === 'DCTDecode') {
                                                 extractImg(o, true)
                                                 return
                                             }

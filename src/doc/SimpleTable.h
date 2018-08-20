@@ -35,9 +35,9 @@ public:
   static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env&, Napi::Object&);
   Napi::Value GetFont(const Napi::CallbackInfo&);
-  void SetFont(const Napi::CallbackInfo&, const Napi::Value&);
+  void SetFont(const Napi::CallbackInfo&);
   Napi::Value GetText(const Napi::CallbackInfo&);
-  void SetText(const Napi::CallbackInfo&, const Napi::Value&);
+  void SetText(const Napi::CallbackInfo&);
   Napi::Value GetBorderWidth(const Napi::CallbackInfo&);
   void SetBorderWidth(const Napi::CallbackInfo&, const Napi::Value&);
   Napi::Value GetBorderColor(const Napi::CallbackInfo&);

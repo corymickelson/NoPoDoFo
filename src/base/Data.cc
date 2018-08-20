@@ -26,7 +26,6 @@ using namespace Napi;
 
 using std::string;
 using std::make_unique;
-using std::unique_ptr;
 
 namespace NoPoDoFo {
 
@@ -43,7 +42,7 @@ Data::Data(const Napi::CallbackInfo& info)
     TypeError::New(info.Env(), "Requires a string or Buffer")
       .ThrowAsJavaScriptException();
     return;
-  } else {
+  }
     if (info[0].IsString()) {
     string strData = info[0].As<String>().Utf8Value();
     self = make_unique<PdfData>(strData.c_str());
@@ -55,7 +54,7 @@ Data::Data(const Napi::CallbackInfo& info)
         .ThrowAsJavaScriptException();
       return;
     }
-  }
+
 }
 
 //Data::~Data()

@@ -64,7 +64,6 @@ Document::Initialize(Napi::Env& env, Napi::Object& target)
         "pageMode", &Document::GetPageMode, &Document::SetPageMode),
       InstanceAccessor("pageLayout", nullptr, &Document::SetPageLayout),
       InstanceAccessor("printingScale", nullptr, &Document::SetPrintingScale),
-      InstanceAccessor("baseURI", nullptr, &Document::SetBaseURI),
       InstanceAccessor("language", nullptr, &Document::SetLanguage),
       InstanceAccessor("info", &Document::GetInfo, nullptr),
 

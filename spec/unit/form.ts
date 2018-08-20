@@ -1,6 +1,6 @@
 import {join} from 'path'
 import * as tap from 'tape'
-import { NPDFName as name, npdf, NPDFFontEncoding, IDictionary} from '../../lib';
+import { NPDFName as name, nopodofo as npdf, NPDFFontEncoding} from '../../';
 if(!global.gc) {
     global.gc = () => {}
 }
@@ -26,10 +26,10 @@ tap('NPDF Form Accessors and Methods', standard => {
             global.gc()
         })
         standard.test('Creating Default Appearance', t => {
-            let dr = doc.form.DR as IDictionary
+            let dr = doc.form.DR as npdf.Dictionary
             let font = doc.createFont({fontName: 'Helvetica', encoding: NPDFFontEncoding.WinAnsi})
             let fontObj = dr.hasKey(name.FONT) ? dr.getKey(name.FONT) : null
-            let fontDict: IDictionary
+            let fontDict: npdf.Dictionary
             if (!fontObj) t.fail()
             else {
                 fontDict = fontObj.getDictionary()

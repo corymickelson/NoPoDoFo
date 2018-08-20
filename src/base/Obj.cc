@@ -41,7 +41,7 @@ Obj::Initialize(Napi::Env& env, Napi::Object& target)
   HandleScope scope(env);
   Function ctor = DefineClass(
     env,
-    "Obj",
+    "Object",
     { InstanceAccessor("stream", &Obj::GetStream, nullptr),
       InstanceAccessor("type", &Obj::GetDataType, nullptr),
       InstanceAccessor("length", &Obj::GetObjectLength, nullptr),
@@ -63,15 +63,14 @@ Obj::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceMethod("clear", &Obj::Clear) });
   constructor = Persistent(ctor);
   constructor.SuppressDestruct();
-  target.Set("Obj", ctor);
+  target.Set("Object", ctor);
 }
 
 Obj::Obj(const Napi::CallbackInfo& info)
   : ObjectWrap<Obj>(info)
   , obj(*info[0].As<External<PdfObject>>().Data())
 {
-  // Objects are managed by the Document.
-  // This class will NOT manage Obj resources.
+  // Object resource(s) are managed by the Document; will be removed by the Document
 }
 
 void

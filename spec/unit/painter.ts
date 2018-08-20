@@ -1,8 +1,8 @@
-import {npdf, CONVERSION, IPainter, NPDFFontEncoding, Cell, Table, NPDFAlignment, NPDFVerticalAlignment} from '../../dist'
+import { nopodofo as npdf, CONVERSION, NPDFFontEncoding } from '../../'
 import * as tap from 'tape'
-import {join} from 'path';
-if(!global.gc) {
-    global.gc = () => {}
+import { join } from 'path';
+if (!global.gc) {
+    global.gc = () => { }
 }
 const filePath = join(__dirname, '../test-documents/test.pdf'),
     outFile = '/tmp/painter.out.pdf',
@@ -37,7 +37,7 @@ tap('IPainter', t => {
                 x = CONVERSION * 10000
                 y = page.height - 10000 * CONVERSION
                 y -= metric.lineSpacing
-                t.doesNotThrow(() => painter.drawText({x, y}, 'SingleLineText'))
+                t.doesNotThrow(() => painter.drawText({ x, y }, 'SingleLineText'))
                 x = 0
                 let l: number, h: number, w: number, i: number
                 let msg = "Grayscale - Colospace"
@@ -45,7 +45,7 @@ tap('IPainter', t => {
                 w = font.stringWidth(msg)
                 y = page.height - 10000 * CONVERSION
 
-                t.doesNotThrow(() => painter.drawText({x: 12000 * CONVERSION, y: y - h}, msg))
+                t.doesNotThrow(() => painter.drawText({ x: 12000 * CONVERSION, y: y - h }, msg))
                 let rect = new npdf.Rect(12000 * CONVERSION, y - h, w, h)
                 painter.rectangle(rect)
                 t.doesNotThrow(() => painter.stroke())
@@ -56,22 +56,21 @@ tap('IPainter', t => {
                     x += 10000 * CONVERSION
                     painter.setStrokeWidth((s * 1000) * CONVERSION)
                     painter.setStrokingGrey(s / 10.0)
-                    t.doesNotThrow(() => painter.drawLine({x, y}, {x, y: y - lineLength}))
+                    t.doesNotThrow(() => painter.drawLine({ x, y }, { x, y: y - lineLength }))
                 }
 
                 const table = new npdf.SimpleTable(doc, 5, 5)
                 painter.setColor([0.0, 0.0, 0.0])
-                table.font = font
+                table.setFont(font)
                 table.foregroundColor = [0.0, 0.0, 0.0]
                 for (let c = 0; c < 5; c++) {
                     for (let r = 0; r < 5; r++) {
-                        const cell = new Cell(table, c, r)
-                        cell.text = 'A'
+                        table.setText(c, r, 'A') 
                     }
                 }
                 table.tableWidth = 200
                 table.tableHeight = 200
-                t.doesNotThrow(() => table.draw({x: 300, y: 300}, painter))
+                t.doesNotThrow(() => table.draw({ x: 300, y: 300 }, painter))
 
                 let multiLineContainer = new npdf.Rect(300, 300, 150, 50)
                 painter.drawMultiLineText(multiLineContainer, 'MULTILINE\nTEST')
@@ -81,16 +80,16 @@ tap('IPainter', t => {
                     else {
                         let subject = new npdf.Document()
                         subject.load(outFile, e => {
-                            if(e) t.fail(e.message)
+                            if (e) t.fail(e.message)
                             else {
                                 let contentsParser = new npdf.ContentsTokenizer(doc, 0)
                                 let contents = contentsParser.reader();
                                 let it = contents.next()
                                 let expects = ['MULTILINE', 'TEST', 'SingleLineText']
                                 let found = 0
-                                while(it.done === false) {
-                                    for(let i = 0; i < expects.length; i++) {
-                                        if(it.value.includes(expects[i])) {
+                                while (it.done === false) {
+                                    for (let i = 0; i < expects.length; i++) {
+                                        if (it.value.includes(expects[i])) {
                                             t.comment(expects[i])
                                             found++
                                         }

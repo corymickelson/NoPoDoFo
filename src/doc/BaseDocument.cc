@@ -180,12 +180,6 @@ BaseDocument::SetPrintingScale(const CallbackInfo&, const Napi::Value& value)
 }
 
 void
-BaseDocument::SetBaseURI(const CallbackInfo&, const Napi::Value& value)
-{
-  base->SetBaseURI(value.As<String>().Utf8Value());
-}
-
-void
 BaseDocument::SetLanguage(const CallbackInfo&, const Napi::Value& value)
 {
   base->SetLanguage(value.As<String>().Utf8Value());
@@ -536,12 +530,7 @@ BaseDocument::Append(const Napi::CallbackInfo& info)
   base->Append(mergedDoc->GetDocument());
   return info.Env().Undefined();
 }
-/**
- * @note Javascript args (page::Page, Destination: NPDFDestinationFit,
- * attachmentName:string)
- * @param info
- * @return
- */
+
 Napi::Value
 BaseDocument::GetAttachment(const CallbackInfo& info)
 {

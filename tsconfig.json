@@ -6,12 +6,11 @@
       "esnext"
     ],
     "module": "commonjs",
-    "outDir": "./dist",
     "sourceMap": true,
-    "rootDir": "./lib",
+    "rootDir": "./spec",
     "strict": true,
     "removeComments": false,
-    "target": "esnext",
+    "target": "es6",
     "types": [
       "node"
     ],
@@ -19,5 +18,5 @@
       "node_modules/@types"
     ]
   },
-  "include": ["lib/*.ts"]
+  "include": ["spec/bench/*.ts", "spec/unit/*.ts"]
 }

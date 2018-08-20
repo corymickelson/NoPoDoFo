@@ -3,28 +3,43 @@
 [![CircleCI](https://circleci.com/gh/corymickelson/NoPoDoFo.svg?style=svg)](https://circleci.com/gh/corymickelson/NoPoDoFo)
 [![Coverage Status](https://coveralls.io/repos/github/corymickelson/NoPoDoFo/badge.svg?branch=master)](https://coveralls.io/github/corymickelson/NoPoDoFo?branch=master)
 
- - NoPoDoFo aims to provide the Node.js ecosystem a complete solution for PDF modification and creation. 
- - NoPoDoFo is a bindings library to
- [PoDoFo](http://podofo.sourceforge.net/index.html).
- - NoPoDoFo is still in <mark>early development.</mark> 
+NoPoDoFo is a bindings library to [PoDoFo](http://podofo.sourceforge.net/index.html), hence the name No(de)PoDoFo. The aim of this project it to bring a complete PDF solution
+to the Nodejs ecosystem. NoPoDoFo provides low level PDF api's for creating new PDF documents, and reading and modifying 
+existing PDF documents. Features also include encryption, signing, and drawing api's. Please take note that this project
+is currently in <mark>early development</mark>. 
+
+To get started please read [the book]()
 
 ### __Current Version 0.7.0__
 [![NPM](https://nodei.co/npm/nopodofo.png?downloads=true&downloadRank=true)](http://nodei.co/npm/nopodofo)
 
-### [Api Documentation](https://corymickelson.github.io/NoPoDoFo/index)
+### [Typescript Api Documentation](https://corymickelson.github.io/NoPoDoFo/index)<small>, generated via typedoc</small>
 
-#### **Guides**
- - [NoPoDoFo Installation and Setup](https://github.com/corymickelson/NoPoDoFo/blob/master/guides/getting_started.md)
- - [NoPoDoFo.Document](https://github.com/corymickelson/NoPoDoFo/blob/master/guides/document.md)
- - [NoPoDoFo.StreamDocument](https://github.com/corymickelson/NoPoDoFo/blob/master/guids/stream_document.md)
- - [NoPoDoFo.Primitives](https://github.com/corymickelson/NoPoDoFo/blob/master/guides/primitives.md)
- - [NoPoDoFo.Painter](https://github.com/corymickelson/NoPoDoFo/blob/master/guides/painter.md)
- - [NoPoDoFo.Page](https://github.com/corymickelson/NoPoDoFo/blob/master/guides/page.md)
- - [NoPoDoFo.Signer](https://github.com/corymickelson/NoPoDoFo/blob/master/guides/signer.md)
- - [NoPoDoFo.Parsers](https://github.com/corymickelson/NoPoDoFo/blob/master/guides/parsers.md)
- - [NoPoDoFo.Encrypt](https://github.com/corymickelson/NoPoDoFo/blob/master/guides/encrypt.md)
- - [NoPoDoFo.Font](https://github.com/corymickelson/NoPoDoFo/blob/master/guides/font.md)
+## A Brief Introduction
 
-For use with AWS Lambda read [AWS Lambda guide](https://github.com/corymickelson/NoPoDoFo/blob/master/guides/aws_lambda.md)
+NoPoDoFo is a bindings library for NodeJS to PoDoFo. The project began mid 2017 stemming from my own frustration at the lack of 
+open source options in the NodeJS ecosystem for handling PDF creation and modifications. I had at the time written many scripts
+for invoking command line utilities from node, such as pdftk and poppler to perform one-off tasks, but as the company I was with
+at the time started adopting more and more NodeJS the need for a complete PDF library was becoming increasingly apparent, and nobody
+at the time, at least in the open, was doing any work to fill this void, and thus NoPoDoFo was born. 
+PoDoFo was chosen as the underlying engine (not really sure if engine is the correct term but it's what we will use for now) after 
+considering the ease of building PoDoFo, and the completeness of the api compared to similar lower lever libraries. 
+NoPoDoFo is licensed under AGPL, a copy of which is available at the root directory of the project.
 
-Setting up a development environment for native addons can be found [here](https://corymickelson.github.io)
+## Project Structure
+
+NoPoDoFo bindings `/src` follow as closely as possible the same folder structure as PoDoFo. 
+The library `/lib` provides a signature map from native bindings to typescript definitions, as interfaces and enums.
+These types are exported when NoPoDoFo is included as a dependency, `import {} from 'nopodofo'`.
+Using NoPoDoFo as a stand alone library is possible, but the api is faily low level requiring some familiarity
+with the PDF specification. It is my hope that NoPoDoFo will used as a building block for higher level PDF libraries
+for the NodeJS ecosystem.
+
+### Conventions
+
+NoPoDoFo exports class definitions with the `I` prefix, ex `IDocument` is the typescript interface to NoPoDoFo::Document, which 
+is a wrapper around PoDoFo::PdfMemDocument.
+
+NoPoDoFo exports enum's and other static values with the `NPDF` prefix, ex `NPDFWriteMode` is an enumerable, that has been copied from 
+PoDoFo::ePdfWriteMode for NoPoDoFo ease of use. If NoPoDoFo did not create and copy such values the end user would have to have an 
+intimate knowledge of PoDoFo.

@@ -149,7 +149,10 @@ Array::Push(const CallbackInfo& info)
 Value
 Array::Pop(const CallbackInfo& info)
 {
-  return GetObjAtIndex(info);
+  Napi::Value item = GetObjAtIndex(info);
+  size_t index = info[0].As<Number>().Uint32Value();
+  GetArray().erase(GetArray().begin() + index);
+  return item;
 }
 
 Value

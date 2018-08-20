@@ -1,4 +1,4 @@
-import {npdf} from '../../lib'
+import {nopodofo as npdf} from '../../'
 import * as test from 'tape'
 
 if (!global.gc) {

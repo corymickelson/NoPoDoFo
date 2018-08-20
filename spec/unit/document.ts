@@ -2,9 +2,7 @@ import {join} from 'path'
 import {writeFileSync} from 'fs'
 import * as tap from 'tape'
 import {Test} from 'tape'
-import {IDocument, npdf, NPDFDestinationFit, NPDFName, NPDFPageMode} from '../../lib';
-import {IObj, Ref} from "../../lib/object";
-import {IOutline} from "../../lib/outlines";
+import {nopodofo as npdf, NPDFDestinationFit, NPDFName, NPDFPageMode, Ref} from '../../'
 
 if (!global.gc) {
     global.gc = () => {
@@ -26,7 +24,7 @@ tap('IStreamDocument', (t: Test) => {
     t.end()
 })
 tap('IDocument', (t: Test) => {
-    const doc: IDocument = new npdf.Document()
+    const doc = new npdf.Document()
     doc.load(filePath, async e => {
         if (e) t.fail(e.message)
         t.comment("Document instance accessors [GET]")
@@ -35,12 +33,12 @@ tap('IDocument', (t: Test) => {
         t.comment('Pages spliced')
         t.assert(doc.getPageCount() === 3, 'Page zero removed from document')
         t.assert(doc.form instanceof (npdf.Form as any), "Get Form returns an AcroForm")
-        t.assert(doc.catalog instanceof (npdf.Obj as any), "Catalog as Obj")
-        t.assert(doc.trailer instanceof (npdf.Obj as any), "Catalog as Obj")
+        t.assert(doc.catalog instanceof (npdf.Object), "Catalog as Obj")
+        t.assert(doc.trailer instanceof (npdf.Object), "Catalog as Obj")
         t.assert(Array.isArray(doc.body)
             && doc.body.filter(i => i.type === 'Reference').length === 0,
             'document body returns an array of objects')
-        let outline: IOutline = doc.getOutlines(false) as any
+        let outline = doc.getOutlines(false)
         t.assert(outline  === null, 'returns null when outline does not exist')
         outline = doc.getOutlines(true) as any
         t.ok(outline, 'create a new outline object with create = true')
@@ -55,8 +53,8 @@ tap('IDocument', (t: Test) => {
         t.assert(names && names.type === 'Dictionary')
         t.assert(names.getDictionary().getKeys().includes(NPDFName.EMBEDDED_FILES))
         let embeddedFiles = names.getDictionary().getKey(NPDFName.EMBEDDED_FILES).getDictionary().getKey(NPDFName.KIDS)
-        let fileSpecArray: IObj = embeddedFiles.getArray().at(0) as any
-        t.assert((fileSpecArray.getDictionary().getKey(NPDFName.NAMES).getArray().at(0)as IObj).getString().includes('scratch2Etxt'), 'embedded file path correct')
+        let fileSpecArray = embeddedFiles.getArray().at(0) as npdf.Object
+        t.assert((fileSpecArray.getDictionary().getKey(NPDFName.NAMES).getArray().at(0) as npdf.Object).getString().includes('scratch2Etxt'), 'embedded file path correct')
 
         t.comment("Document instance accessors [SET]")
         t.comment('Can create an encrypt instance and set to Document')
@@ -69,7 +67,7 @@ tap('IDocument', (t: Test) => {
         })
 
         t.doesNotThrow(() => {
-            doc.encrypt = encrypt
+            doc.encrypt = encrypt as npdf.Encrypt
         }, 'Can set the Document Encrypt instance from CreateEncrypt value')
         t.comment("Document instance methods")
         let docFont = doc.getFont('PoDoFoFt31')
@@ -117,13 +115,13 @@ tap('File Spec attachment', (t: Test) => {
         t.assert(names && names.type === 'Dictionary')
         t.assert(names.getDictionary().getKeys().includes(NPDFName.EMBEDDED_FILES))
         let embeddedFiles = names.getDictionary().getKey(NPDFName.EMBEDDED_FILES).getDictionary().getKey(NPDFName.KIDS)
-        let fileSpecArray: IObj = embeddedFiles.getArray().at(0) as any
+        let fileSpecArray = embeddedFiles.getArray().at(0) as npdf.Object
         let fileSpecObj = fileSpecArray.getDictionary().getKey(NPDFName.NAMES).getArray().at(1) as any
         global.gc()
         if (Array.isArray(fileSpecObj)) {
             fileSpecObj = fDoc.getObject(fileSpecObj as Ref)
         }
-        t.assert((fileSpecObj as IObj).getDictionary().getKey(NPDFName.TYPE).getName() === NPDFName.FILESPEC, 'FileSpec object')
+        t.assert((fileSpecObj as npdf.Object).getDictionary().getKey(NPDFName.TYPE).getName() === NPDFName.FILESPEC, 'FileSpec object')
         let npdfFileSpec = new npdf.FileSpec(fileSpecObj)
         t.ok(npdfFileSpec, 'copy constructor')
         t.end()
@@ -197,7 +195,7 @@ tap('IDocument Destinations, Outline', t => {
     doc.load(filePath, e => {
         if (e) t.fail()
         else {
-            let outline: IOutline = doc.getOutlines(true, 'Test') as any
+            let outline: npdf.Outline = doc.getOutlines(true, 'Test') as any
             let dest = new npdf.Destination(doc.getPage(0), NPDFDestinationFit.Fit)
             let first = outline.createChild('First', dest);
             t.ok(first.title)
@@ -210,9 +208,9 @@ tap('IDocument Destinations, Outline', t => {
                     inn.load(data, e => {
                         if (e) t.fail('Failed to load new document with named destination')
                         else {
-                            let outlines: IOutline = inn.getOutlines() as any
-                            t.assert((outlines.first as IOutline).title === 'Test', 'Outlines persist with title data')
-                            t.assert((outlines.last as IOutline).title === 'Second', 'Outlines persist with title data')
+                            let outlines: npdf.Outline = inn.getOutlines() as any
+                            t.assert((outlines.first as npdf.Outline).title === 'Test', 'Outlines persist with title data')
+                            t.assert((outlines.last as npdf.Outline).title === 'Second', 'Outlines persist with title data')
                             t.end()
                         }
                     })

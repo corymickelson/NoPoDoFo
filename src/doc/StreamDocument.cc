@@ -61,7 +61,6 @@ StreamDocument::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceAccessor("pageLayout", nullptr, &StreamDocument::SetPageLayout),
       InstanceAccessor(
         "printingScale", nullptr, &StreamDocument::SetPrintingScale),
-      InstanceAccessor("baseURI", nullptr, &StreamDocument::SetBaseURI),
       InstanceAccessor("language", nullptr, &StreamDocument::SetLanguage),
       InstanceAccessor("info", &StreamDocument::GetInfo, nullptr),
 

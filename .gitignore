@@ -20,6 +20,7 @@ lib/binding/
 build*
 cmake-build-debug/
 CMakeSettings.json
+_book
 node_modules/
 generators/
 *.user

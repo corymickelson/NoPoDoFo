@@ -27,9 +27,6 @@
 using namespace PoDoFo;
 using namespace Napi;
 
-using std::cout;
-using std::endl;
-
 namespace NoPoDoFo {
 
 FunctionReference SimpleTable::constructor; // NOLINT
@@ -61,25 +58,33 @@ SimpleTable::Initialize(Napi::Env& env, Napi::Object& target)
   const auto ctor = DefineClass(
     env,
     "SimpleTable",
-    { InstanceAccessor("font", nullptr, &SimpleTable::SetFont),
-      InstanceAccessor("text", nullptr, &SimpleTable::SetText),
-      InstanceAccessor("borderWidth",
+    { InstanceAccessor("borderWidth",
                        &SimpleTable::GetBorderWidth,
                        &SimpleTable::SetBorderWidth),
+      InstanceAccessor("foregroundColor",
+                       &SimpleTable::GetForegroundColor,
+                       &SimpleTable::SetForegroundColor),
+      InstanceAccessor("backgroundColor",
+                       &SimpleTable::GetBackgroundColor,
+                       &SimpleTable::SetBackgroundColor),
       InstanceAccessor(
-        "foregroundColor", nullptr, &SimpleTable::SetForegroundColor),
+        "alignment", &SimpleTable::GetAlignment, &SimpleTable::SetAlignment),
+      InstanceAccessor("wordWrap",
+                       &SimpleTable::HasWordWrap,
+                       &SimpleTable::SetWordWrapEnabled),
       InstanceAccessor(
-        "backgroundColor", nullptr, &SimpleTable::SetBackgroundColor),
-      InstanceAccessor("alignment", nullptr, &SimpleTable::SetAlignment),
-      InstanceAccessor("wordWrap", nullptr, &SimpleTable::SetWordWrapEnabled),
+        "tableWidth", &SimpleTable::GetWidth, &SimpleTable::SetTableWidth),
+      InstanceAccessor(
+        "tableHeight", &SimpleTable::GetHeight, &SimpleTable::SetTableHeight),
+      InstanceAccessor("autoPageBreak",
+                       &SimpleTable::GetAutoPageBreak,
+                       &SimpleTable::SetAutoPageBreak),
       InstanceMethod("getFont", &SimpleTable::GetFont),
+      InstanceMethod("setFont", &SimpleTable::SetFont),
       InstanceMethod("getText", &SimpleTable::GetText),
-      InstanceMethod("getForegroundColor", &SimpleTable::GetForegroundColor),
-      InstanceMethod("getBackgroundColor", &SimpleTable::GetBackgroundColor),
-      InstanceMethod("getAlignment", &SimpleTable::GetAlignment),
+      InstanceMethod("setText", &SimpleTable::SetText),
       InstanceMethod("getVerticalAlignment",
                      &SimpleTable::GetVerticalAlignment),
-      InstanceMethod("getWordWrap", &SimpleTable::HasWordWrap),
       InstanceMethod("borderEnable", &SimpleTable::SetBorderEnabled),
       InstanceMethod("hasBorders", &SimpleTable::HasBorders),
       InstanceMethod("getImage", &SimpleTable::GetImage),
@@ -87,14 +92,7 @@ SimpleTable::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceMethod("hasBackgroundColor", &SimpleTable::HasBackgroundColor),
       InstanceMethod("enableBackground", &SimpleTable::SetBackgroundEnabled),
       InstanceMethod("getBorderColor", &SimpleTable::GetBorderColor),
-      InstanceAccessor("tableWidth", nullptr, &SimpleTable::SetTableWidth),
-      InstanceAccessor("tableHeight", nullptr, &SimpleTable::SetTableHeight),
-      InstanceAccessor("autoPageBreak",
-                       &SimpleTable::GetAutoPageBreak,
-                       &SimpleTable::SetAutoPageBreak),
       InstanceMethod("draw", &SimpleTable::Draw),
-      InstanceMethod("getTableWidth", &SimpleTable::GetWidth),
-      InstanceMethod("getTableHeight", &SimpleTable::GetHeight),
       InstanceMethod("columnCount", &SimpleTable::GetCols),
       InstanceMethod("rowCount", &SimpleTable::GetRows),
       InstanceMethod("setColumnWidths", &SimpleTable::SetColumnWidths),
@@ -116,8 +114,9 @@ SimpleTable::GetFont(const CallbackInfo& info)
 }
 
 void
-SimpleTable::SetFont(const CallbackInfo& info, const Napi::Value& value)
+SimpleTable::SetFont(const CallbackInfo& info)
 {
+  auto value = info[0].As<Object>();
   if (!value.IsObject() ||
       !value.As<Object>().InstanceOf(Font::constructor.Value())) {
     throw Error::New(info.Env(), "value must be an instance of NoPoDoFo Font");
@@ -134,11 +133,11 @@ SimpleTable::GetText(const CallbackInfo& info)
 }
 
 void
-SimpleTable::SetText(const CallbackInfo& info, const Napi::Value& value)
+SimpleTable::SetText(const CallbackInfo& info)
 {
-  const int col = value.As<Object>().Get("col").As<Number>();
-  const int row = value.As<Object>().Get("row").As<Number>();
-  const auto text = value.As<Object>().Get("text").As<String>().Utf8Value();
+  const int col = info[0].As<Number>();
+  const int row = info[1].As<Number>();
+  const auto text = info[2].As<String>().Utf8Value();
   model->SetText(col, row, text);
 }
 
@@ -349,7 +348,6 @@ SimpleTable::Draw(const CallbackInfo& info)
   const double posY = point.Get("y").As<Number>();
   auto painter = Painter::Unwrap(info[1].As<Object>());
   if (!table->GetModel()) {
-    cout << model->GetText(0, 0).GetStringUtf8() << endl;
     table->SetModel(model);
   }
   table->Draw(posX, posY, &painter->GetPainter());
