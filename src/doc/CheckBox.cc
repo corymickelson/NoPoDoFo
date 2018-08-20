@@ -42,7 +42,7 @@ CheckBox::Initialize(Napi::Env& env, Napi::Object& target)
   HandleScope scope(env);
   Function ctor = DefineClass(
     env,
-    "CheckBox",
+    "Checkbox",
     { InstanceAccessor("checked", &CheckBox::IsChecked, &CheckBox::SetChecked),
       InstanceAccessor(
         "readOnly", &CheckBox::IsReadOnly, &CheckBox::SetReadOnly),
@@ -66,7 +66,7 @@ CheckBox::Initialize(Napi::Env& env, Napi::Object& target)
   constructor = Napi::Persistent(ctor);
   constructor.SuppressDestruct();
 
-  target.Set("CheckBox", ctor);
+  target.Set("Checkbox", ctor);
 }
 Napi::Value
 CheckBox::IsChecked(const CallbackInfo& info)

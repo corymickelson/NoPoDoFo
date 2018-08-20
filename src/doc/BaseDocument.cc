@@ -77,13 +77,11 @@ BaseDocument::BaseDocument(const Napi::CallbackInfo& info, bool inMem)
       base = new PdfStreamedDocument(
         info[0].As<String>().Utf8Value().c_str(), version, encrypt, writeMode);
     } else {
-#ifdef EXPERIMENTAL
-      PdfOutputDevice device(refBuffer);
-      base = new PdfStreamedDocument(&device, version, encrypt, writeMode);
-      streamToBuffer = true;
-#else
-      cout << "Streaming to buffer is not supported in this build" << endl;
-#endif
+      cout << "Streaming to Buffer" << endl;
+      streamDocRefCountedBuffer = new PdfRefCountedBuffer(2048);
+      streamDocOutputDevice = new PdfOutputDevice(streamDocRefCountedBuffer);
+      base = new PdfStreamedDocument(
+        streamDocOutputDevice, version, encrypt, writeMode);
     }
   }
 }
@@ -92,6 +90,8 @@ BaseDocument::~BaseDocument()
 {
   cout << "Destructing Base" << endl;
   delete base;
+  delete streamDocOutputDevice;
+  delete streamDocRefCountedBuffer;
 }
 
 Napi::Value
@@ -476,7 +476,7 @@ BaseDocument::GetOutlines(const CallbackInfo& info)
   if (opts[1] == 1) {
     root = info[1].As<String>().Utf8Value();
   }
-  if(!root.empty()) {
+  if (!root.empty()) {
     dynamic_cast<PdfOutlines*>(outlines)->CreateRoot(PdfString(root));
   }
 

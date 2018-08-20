@@ -13,8 +13,6 @@ To get started please read [the book]()
 ### __Current Version 0.7.0__
 [![NPM](https://nodei.co/npm/nopodofo.png?downloads=true&downloadRank=true)](http://nodei.co/npm/nopodofo)
 
-### [Typescript Api Documentation](https://corymickelson.github.io/NoPoDoFo/index)<small>, generated via typedoc</small>
-
 ## A Brief Introduction
 
 NoPoDoFo is a bindings library for NodeJS to PoDoFo. The project began mid 2017 stemming from my own frustration at the lack of 
@@ -29,17 +27,8 @@ NoPoDoFo is licensed under AGPL, a copy of which is available at the root direct
 ## Project Structure
 
 NoPoDoFo bindings `/src` follow as closely as possible the same folder structure as PoDoFo. 
-The library `/lib` provides a signature map from native bindings to typescript definitions, as interfaces and enums.
-These types are exported when NoPoDoFo is included as a dependency, `import {} from 'nopodofo'`.
-Using NoPoDoFo as a stand alone library is possible, but the api is faily low level requiring some familiarity
-with the PDF specification. It is my hope that NoPoDoFo will used as a building block for higher level PDF libraries
+NoPoDoFo provides a definitions file included in the repository; typescript style enums, types, and interfaces
+are also available and exported from `index.js`.
+Using NoPoDoFo as a stand alone library is possible, but the api is fairly low level requiring some familiarity
+with the PDF specification. It is my hope that NoPoDoFo will be used as a building block for higher level PDF libraries
 for the NodeJS ecosystem.
-
-### Conventions
-
-NoPoDoFo exports class definitions with the `I` prefix, ex `IDocument` is the typescript interface to NoPoDoFo::Document, which 
-is a wrapper around PoDoFo::PdfMemDocument.
-
-NoPoDoFo exports enum's and other static values with the `NPDF` prefix, ex `NPDFWriteMode` is an enumerable, that has been copied from 
-PoDoFo::ePdfWriteMode for NoPoDoFo ease of use. If NoPoDoFo did not create and copy such values the end user would have to have an 
-intimate knowledge of PoDoFo.

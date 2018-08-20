@@ -204,7 +204,7 @@ var NPDFCertificatePermission;
 var NPDFFieldType;
 (function (NPDFFieldType) {
     NPDFFieldType[NPDFFieldType["PushButton"] = 0] = "PushButton";
-    NPDFFieldType[NPDFFieldType["CheckBox"] = 1] = "CheckBox";
+    NPDFFieldType[NPDFFieldType["Checkbox"] = 1] = "Checkbox";
     NPDFFieldType[NPDFFieldType["RadioButton"] = 2] = "RadioButton";
     NPDFFieldType[NPDFFieldType["TextField"] = 3] = "TextField";
     NPDFFieldType[NPDFFieldType["ComboBox"] = 4] = "ComboBox";

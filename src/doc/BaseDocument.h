@@ -54,7 +54,6 @@ public:
   void SetCenterWindow(const Napi::CallbackInfo&);
   void SetDisplayDocTitle(const Napi::CallbackInfo&);
   void SetPrintingScale(const Napi::CallbackInfo&, const Napi::Value&);
-  void SetBaseURI(const Napi::CallbackInfo&, const Napi::Value&);
   void SetLanguage(const Napi::CallbackInfo&, const Napi::Value&);
   void AttachFile(const Napi::CallbackInfo&);
   Napi::Value GetVersion(const Napi::CallbackInfo&);
@@ -73,6 +72,8 @@ public:
   Napi::Value CreateXObject(const Napi::CallbackInfo&);
 
   PoDoFo::PdfDocument* base;
+  PoDoFo::PdfRefCountedBuffer* streamDocRefCountedBuffer = nullptr;
+  PoDoFo::PdfOutputDevice* streamDocOutputDevice = nullptr;
   string output;
 
 };

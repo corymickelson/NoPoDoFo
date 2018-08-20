@@ -205,7 +205,7 @@ export enum NPDFCertificatePermission {
 
 export enum NPDFFieldType {
   PushButton,
-  CheckBox,
+  Checkbox,
   RadioButton,
   TextField,
   ComboBox,
@@ -551,7 +551,7 @@ export namespace nopodofo {
     richText: boolean
   }
 
-  export class CheckBox extends Field {
+  export class Checkbox extends Field {
     /**
      * @desc Create from an existing Field
      */
@@ -565,7 +565,7 @@ export namespace nopodofo {
     checked: boolean
   }
 
-  export class ListField extends Field {
+  abstract class ListField extends Field {
     selected: number
     length: number
     spellCheckEnabled: boolean
@@ -1122,9 +1122,9 @@ export namespace nopodofo {
     resources: Object
 
     /**
-     * Get the field as a field of type T where T is one of: Checkbox, Pushbutton, Textfield, Combobox, or ListField
+     * Get the field as a field of type T where T is one of: Checkbox, Pushbutton, Textfield, ComboBox, or ListField
      * @param index - field index
-     * @see CheckBox
+     * @see Checkbox
      * @see ListBox
      * @see TextField
      * @see ComboBox

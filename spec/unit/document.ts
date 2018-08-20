@@ -219,3 +219,18 @@ tap('IDocument Destinations, Outline', t => {
         }
     })
 })
+
+tap('StreamDocument write to buffer', t => {
+    const doc = new npdf.StreamDocument()
+    const page = doc.createPage(new npdf.Rect(0,0,612, 792))
+    const font = doc.createFont({fontName: 'monospace', embed: true})
+    const painter = new npdf.Painter(doc)
+    painter.setPage(page)
+    painter.font = font
+    painter.setColor([0,0,0])
+    painter.drawText({x: 150, y: 400}, 'TESTING')
+    painter.finishPage()
+    const output = doc.close()
+    t.assert(Buffer.isBuffer(output))
+    t.end()
+})

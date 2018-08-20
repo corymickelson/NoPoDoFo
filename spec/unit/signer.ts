@@ -1,13 +1,13 @@
 import * as tap from 'tape'
 import { join } from 'path'
-import { IField, IForm, NPDFAnnotation, NPDFAnnotationFlag, npdf } from "../../dist";
+import { NPDFAnnotation, NPDFAnnotationFlag, nopodofo as npdf } from "../../";
 
 if (!global.gc) {
     global.gc = () => { }
 }
 tap('Signer', sub => {
     const doc = new npdf.Document()
-    doc.load(join(__dirname, '../test-documents/test.pdf'), { forUpdate: true }, async e => {
+    doc.load(join(__dirname, '../test-documents/test.pdf'), { forUpdate: true }, async (e:Error) => {
         sub.test('ISigner Api', t => {
 
             // Create a SignatureField
@@ -33,9 +33,9 @@ tap('Signer', sub => {
                         t.fail(e.message)
                     } else {
                         let signed = new npdf.Document()
-                        signed.load(signedPath, e => {
+                        signed.load(signedPath, (e:Error) => {
                             if (e instanceof Error) t.fail(e.message)
-                            let writtenSignatureField = signed.getPage(1).getFields().filter(i => i instanceof npdf.SignatureField)[0]
+                            let writtenSignatureField = signed.getPage(1).getFields().filter((i: any) => i instanceof npdf.SignatureField)[0]
                             let docSignatureMode = signed.form.SigFlags
                             t.ok(writtenSignatureField, 'Signature field successfully written to page')
                             t.assert(docSignatureMode === 3, 'AcroForm SigFlags successfully updated')

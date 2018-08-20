@@ -1,6 +1,6 @@
 import { join } from 'path'
 import { Suite, Options } from 'benchmark'
-import { npdf } from '../../dist'
+import { nopodofo as npdf } from '../../'
 import { readFileSync } from "fs";
 
 const opts: Options = {
@@ -20,11 +20,11 @@ const reader = new Suite('reader')
 reader.add('Document load (from file) and iterate body', Object.assign({
     fn: (defer: PromiseConstructor) => {
         const doc = new npdf.Document()
-        doc.load(testDoc, err => {
+        doc.load(testDoc, (err: Error) => {
             if (err) defer.reject(err)
             else {
                 let work: { [key: string]: number } = {}
-                doc.body.forEach(o => {
+                doc.body.forEach((o: npdf.Object) => {
                     if (!work.hasOwnProperty(o.type)) work[o.type] = 0
                     work[o.type]++
                 })
@@ -37,11 +37,11 @@ reader.add('Document load (from file) and iterate body', Object.assign({
     .add('Document load (from buffer) and iterate body', Object.assign({
         fn: (defer: PromiseConstructor) => {
             const doc = new npdf.Document()
-            doc.load(testDocData, err => {
+            doc.load(testDocData, (err: Error) => {
                 if (err) defer.reject(err)
                 else {
                     let work: { [key: string]: number } = {}
-                    doc.body.forEach(o => {
+                    doc.body.forEach((o: npdf.Object) => {
                         if (!work.hasOwnProperty(o.type)) work[o.type] = 0
                         work[o.type]++
                     })

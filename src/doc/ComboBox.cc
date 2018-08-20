@@ -48,7 +48,6 @@ ComboBox::Initialize(Napi::Env& env, Napi::Object& target)
     "ComboBox",
     { InstanceAccessor(
         "editable", &ComboBox::GetEditable, &ComboBox::SetEditable),
-
       InstanceAccessor(
         "selected", &ComboBox::GetSelectedItem, &ComboBox::SetSelectedItem),
       InstanceAccessor("length", &ComboBox::GetItemCount, nullptr),
@@ -58,11 +57,6 @@ ComboBox::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceAccessor("sorted", &ComboBox::IsSorted, &ComboBox::SetSorted),
       InstanceAccessor(
         "multiSelect", &ComboBox::IsMultiSelect, &ComboBox::SetMultiSelect),
-      InstanceMethod("isComboBox", &ComboBox::IsComboBox),
-      InstanceMethod("insertItem", &ComboBox::InsertItem),
-      InstanceMethod("removeItem", &ComboBox::RemoveItem),
-      InstanceMethod("getItem", &ComboBox::GetItem),
-
       InstanceAccessor(
         "readOnly", &ComboBox::IsReadOnly, &ComboBox::SetReadOnly),
       InstanceAccessor(
@@ -76,6 +70,11 @@ ComboBox::Initialize(Napi::Env& env, Napi::Object& target)
                        &ComboBox::SetAlternateName),
       InstanceAccessor(
         "mappingName", &ComboBox::GetMappingName, &ComboBox::SetMappingName),
+      InstanceMethod("isComboBox", &ComboBox::IsComboBox),
+      InstanceMethod("insertItem", &ComboBox::InsertItem),
+      InstanceMethod("removeItem", &ComboBox::RemoveItem),
+      InstanceMethod("getItem", &ComboBox::GetItem),
+
       InstanceMethod("setBackgroundColor", &ComboBox::SetBackground),
       InstanceMethod("setBorderColor", &ComboBox::SetBorder),
       InstanceMethod("setMouseAction", &ComboBox::SetMouseAction),

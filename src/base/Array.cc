@@ -149,10 +149,10 @@ Array::Push(const CallbackInfo& info)
 Value
 Array::Pop(const CallbackInfo& info)
 {
-  Napi::Value item = GetObjAtIndex(info);
+  Napi::Value copy = GetObjAtIndex(info);
   size_t index = info[0].As<Number>().Uint32Value();
   GetArray().erase(GetArray().begin() + index);
-  return item;
+  return copy;
 }
 
 Value
@@ -177,6 +177,7 @@ Array::GetObjAtIndex(const CallbackInfo& info)
   } else {
     item = &(GetArray()[index]);
   }
+  // Create copy for shift and pop operations
   auto child = new PdfObject(*item);
   children.push_back(child);
   auto initPtr = Napi::External<PdfObject>::New(info.Env(), child);

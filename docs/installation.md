@@ -11,8 +11,7 @@ The recommended installation process is as follows:
 ## Windows
 
 Please install [vcpkg](https://github.com/Microsoft/vcpkg) as your package manager for building and installing PoDoFo.
-To install PoDoFo with vcpkg run `vcpkg install podofo:x64-windows`. NoPoDoFo requires the path to vcpkg root directory as environment variable `vcpkg_path`.
-
+To install PoDoFo with vcpkg run `vcpkg install podofo:x64-windows`[^1]. NoPoDoFo requires the path to vcpkg root directory as environment variable `vcpkg_path`.
 Building NoPoDoFo from source requires CMake.
  - Set environment variable `vcpkg_path` to the root of your vcpkg installation, ex: `set vcpkg_path=C:\\vcpkg`
  - run `git clone https://github.com/corymickelson/NoPoDoFo`
@@ -77,3 +76,8 @@ built on this will also run on AWS
  - Install dependencies `npm i`
  - Build package `LDFLAGS=-Wl,-rpath=/var/task/node_modules/nopodofolambda/lib ./node_modules/.bin/cmake-js build`
 
+
+[1]: The Windows vcpkg PoDoFo build does not include all optional dependencies. This build does not support
+AES256 encryption. Missing optional dependencies are: libidn, fontconfig. As previously stated, this build does not
+support AES256 encryption which is caused from libidn not being available. The lack of fontconfig does not disable
+features such as libidn but will require you to provide additional information when using the [Font](font.md) class.

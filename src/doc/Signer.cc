@@ -53,7 +53,8 @@ namespace NoPoDoFo {
 FunctionReference Signer::constructor; // NOLINT
 
 /**
- * @note JS new Signer(doc: IDocument, output?: string)
+ * todo: StreamDocument support
+ * @note JS new Signer(doc: Document, output?: string)
  * @param info
  */
 Signer::Signer(const Napi::CallbackInfo& info)
@@ -66,7 +67,7 @@ Signer::Signer(const Napi::CallbackInfo& info)
     return;
   }
   if (!info[0].IsObject()) {
-    TypeError::New(info.Env(), "Requires Document to construct Signer")
+    TypeError::New(info.Env(), "Document required to construct Signer")
       .ThrowAsJavaScriptException();
     return;
   }

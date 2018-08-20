@@ -24,11 +24,6 @@
 using namespace PoDoFo;
 using namespace Napi;
 
-using std::cout;
-using std::endl;
-using std::make_shared;
-using std::shared_ptr;
-
 namespace NoPoDoFo {
 
 ListField::ListField(PdfField& field)

@@ -99,8 +99,8 @@ tap('IField', t => {
                     case NPDFFieldType.TextField:
                         (field as npdf.TextField).text = 'TEST'
                         break
-                    case NPDFFieldType.CheckBox:
-                        (field as npdf.CheckBox).checked = true
+                    case NPDFFieldType.Checkbox:
+                        (field as npdf.Checkbox).checked = true
                         break
                     case NPDFFieldType.ComboBox:
                         (field as npdf.ComboBox).selected = 0 // set to first value
@@ -122,8 +122,8 @@ tap('IField', t => {
                                         let text = field as npdf.TextField
                                         t.assert(text.text === 'TEST')
                                         break
-                                    case NPDFFieldType.CheckBox:
-                                        let check = field as npdf.CheckBox
+                                    case NPDFFieldType.Checkbox:
+                                        let check = field as npdf.Checkbox
                                         t.true(check.checked)
                                         break
                                     case NPDFFieldType.ComboBox:

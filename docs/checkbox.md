@@ -5,6 +5,9 @@
 * [Methods](#methods)
 
 ## NoPoDoFo CheckBox
+A Checkbox is a field that toggles between two states, open and closed. The oopen(on) and closed(off) state of the field has a direct correlation to the
+on and off states of the `AP` (appearance stream) of the [Annotation](./annotations.).
+
 ```typescript
 class CheckBox extends Field {
   new(page: Page, fieldIndex: number): CheckBox
@@ -32,4 +35,4 @@ new(form: Form, annotation: Annotation): CheckBox
 ## Properties
 
 ### checked
-Checked is a getter / setter property for the `` value of this field.
+Toggle the `AS` property of the checkbox annotations dictionary; `AS` values maybe one of `ON` or `OFF`.
