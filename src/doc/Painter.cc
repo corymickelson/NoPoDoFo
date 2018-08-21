@@ -133,7 +133,7 @@ void
 Painter::SetPage(const Napi::CallbackInfo& info)
 {
   if (!info[0].IsObject()) {
-    throw Napi::Error::New(info.Env(), "Page must be an instance of Page.");
+    throw Napi::Error::New(info.Env(), "args[0] must be an instance of Page.");
   }
   if (info[0].As<Object>().InstanceOf(Page::constructor.Value())) {
     auto canvas = Page::Unwrap(info[0].As<Object>());
@@ -252,7 +252,8 @@ Painter::DrawText(const CallbackInfo& info)
   x = d.Get("x").As<Number>();
   y = d.Get("y").As<Number>();
   try {
-    painter->DrawText(x, y, text.c_str());
+    painter->DrawText(
+      x, y, PdfString(reinterpret_cast<const pdf_utf8*>(text.c_str())));
   } catch (PdfError& err) {
     ErrorHandler(err, info);
   }
@@ -280,7 +281,10 @@ Painter::DrawMultiLineText(const CallbackInfo& info)
   }
   try {
     painter->DrawMultiLineText(
-      rect, PdfString(text), alignment, verticalAlignment);
+      rect,
+      PdfString(reinterpret_cast<const pdf_utf8*>(text.c_str())),
+      alignment,
+      verticalAlignment);
   } catch (PdfError& err) {
     ErrorHandler(err, info);
   }
@@ -717,7 +721,12 @@ Painter::DrawTextAligned(const CallbackInfo& info)
   y = o.Get("y").As<Number>();
   width = o.Get("width").As<Number>();
   try {
-    painter->DrawTextAligned(x, y, width, PdfString(text), alignment);
+    painter->DrawTextAligned(
+      x,
+      y,
+      width,
+      PdfString(reinterpret_cast<const pdf_utf8*>(text.c_str())),
+      alignment);
   } catch (PdfError& err) {
     ErrorHandler(err, info);
   }
@@ -768,7 +777,8 @@ void
 Painter::AddText(const CallbackInfo& info)
 {
   try {
-    painter->AddText(PdfString(info[0].As<String>().Utf8Value()));
+    painter->AddText(PdfString(reinterpret_cast<const pdf_utf8*>(
+      info[0].As<String>().Utf8Value().c_str())));
   } catch (PdfError& err) {
     ErrorHandler(err, info);
   }

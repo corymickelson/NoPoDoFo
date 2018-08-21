@@ -152,14 +152,6 @@ tap('IDocument password protected', (t: Test) => {
  * @todo: Append only works with Document + Document, fix to support StreamDocument as well
  */
 tap('IDocument append doc', (t: Test) => {
-    // let doc = new npdf.StreamDocument('/tmp/append.test.pdf')
-    // let page = doc.createPage(new npdf.Rect(0, 0, 612, 792))
-    // let painter = new npdf.Painter(doc)
-    // let font = doc.createFont({fontName: 'Courier'})
-    // painter.setPage(page)
-    // painter.font = font
-    // painter.drawTextAligned({x:365, y: 690, width: 40}, 'Testing', NPDFAlignment.Center)
-    // painter.finishPage()
     let doc = new npdf.Document()
     doc.load(filePath, e => {
         if (e) t.fail(e.message)
@@ -223,12 +215,14 @@ tap('IDocument Destinations, Outline', t => {
 tap('StreamDocument write to buffer', t => {
     const doc = new npdf.StreamDocument()
     const page = doc.createPage(new npdf.Rect(0,0,612, 792))
-    const font = doc.createFont({fontName: 'monospace', embed: true})
+    const font = doc.createFont({fontName: 'Carlito', embed: true})
+    font.size = 12
     const painter = new npdf.Painter(doc)
     painter.setPage(page)
     painter.font = font
     painter.setColor([0,0,0])
-    painter.drawText({x: 150, y: 400}, 'TESTING')
+    t.comment('utf8 test. To verify print test output to disk and open file to verify test is correct')
+    painter.drawText({x: 150, y: 400}, 'Unicode Umlauts: ÄÖÜß')
     painter.finishPage()
     const output = doc.close()
     t.assert(Buffer.isBuffer(output))

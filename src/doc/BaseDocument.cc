@@ -74,8 +74,9 @@ BaseDocument::BaseDocument(const Napi::CallbackInfo& info, bool inMem)
       }
     }
     if (info.Length() > 0 && info[0].IsString()) {
+      output = info[0].As<String>().Utf8Value();
       base = new PdfStreamedDocument(
-        info[0].As<String>().Utf8Value().c_str(), version, encrypt, writeMode);
+        output.c_str(), version, encrypt, writeMode);
     } else {
       cout << "Streaming to Buffer" << endl;
       streamDocRefCountedBuffer = new PdfRefCountedBuffer(2048);
