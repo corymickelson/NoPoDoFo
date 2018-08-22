@@ -58,11 +58,37 @@ Document utilizes PoDoFo's load on demand policy. When a PDF is loaded through `
 at their first point of access. If an object is never used, it will never be loaded into memory, allowing for the ingestion and modification
 of large documents with a small memory footprint.
 
+```typescript
+class Document extends Base {
+    constructor()
+
+    password: string
+    encrypt: Encrypt
+    readonly trailer: Object
+    readonly catalog: Object
+
+    load(file: string | Buffer,
+        opts: {
+        forUpdate?: boolean,
+        password?: string
+        },
+        cb: Callback<void>): void
+    load(file: string | Buffer, cb: Callback<void>): void
+    splicePages(startIndex: number, count: number): void
+    insertPages(fromDoc: Document, startIndex: number, count: number): number
+    write(destination: Callback<Buffer> | string, cb?: Callback<string>): void
+    getFont(name: string): Font
+    listFonts(): { id: string, name: string }[]
+    gc(file: string, pwd: string, output: string, cb: Callback<string | Buffer>): void
+    hasSignatures(): boolean
+    getSignatures(): SignatureField[]
+}
+```
 ## Properties
 
 ### catalog
 
-Readonly, returns the Documents catalog object as an IObj.
+Readonly, returns the Documents catalog [Object](./object.md).
 
 ### trailer
 

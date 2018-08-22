@@ -106,16 +106,16 @@ if (MSVC)
     endforeach(file_i)
 
 else ()
-    message(warning "build/Debug must be created before running, otherwise an error will be thrown.")
-    find_path(PODOFO_INCLUDE_DIR podofo/podofo.h PATHS /usr/include /usr/local/include)
-    find_library(PODOFO_LIBRARY NAMES podofo PATHS /usr/lib64 /usr/lib /usr/local/lib)
+    message(warning "Creating build output directory: build/${CMAKE_BUILD_TYPE}")
+    file(MAKE_DIRECTORY ${CMAKE_SOURCE_DIR}/build/${CMAKE_BUILD_TYPE})
+    find_path(PODOFO_INCLUDE_DIR podofo/podofo.h PATHS /sources/local /usr/include /usr/local/include)
+    find_library(PODOFO_LIBRARY NAMES podofo PATHS /sources/local /usr/lib64 /usr/lib /usr/local/lib)
     target_include_directories(${PROJECT_NAME} PRIVATE ${PODOFO_INCLUDE_DIR})
     target_link_libraries(${PROJECT_NAME} PRIVATE ${PODOFO_LIBRARY})
     add_custom_command(TARGET nopodofo
             POST_BUILD
             COMMAND "${CMAKE_COMMAND}"
             -E copy $<TARGET_FILE:nopodofo> ${CMAKE_SOURCE_DIR}/build/${CMAKE_BUILD_TYPE})
-
 endif (MSVC)
 
 
