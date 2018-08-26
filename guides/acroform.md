@@ -1,11 +1,9 @@
 # NoPoDoFo Forms
 
 NoPoDoFo supports creating, modifying, and filling interactive forms (AcroForm). 
-To access a documents acroform use the `Document` `form` accessor. This will return an instance of
-[NoPoDoFo::Form](). 
+To access a documents acroform use the `Document.form` accessor. 
 You can use the acroform's dictionary to access the fields array, but the preferred way is through the page.
-All the annotations, including widget (form fields) annotations are indexed and easily available via `getField`,
-`getFields`, `getAnnotation` and `getAnnotations`.  
+All annotations are indexed and easily available via `getField`, `getFields`, `getAnnotation` and `getAnnotations`.  
 
 ### Setting the default appearance stream
 An acroforms default appearance stream is 12pt black arial. You can override the defaults on the annotation directly.

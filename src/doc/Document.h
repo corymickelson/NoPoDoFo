@@ -46,12 +46,9 @@ public:
   Napi::Value Load(const Napi::CallbackInfo&);
   Napi::Value CreatePage(const Napi::CallbackInfo&) override;
   void DeletePages(const Napi::CallbackInfo&);
-  void SetPassword(const Napi::CallbackInfo&, const Napi::Value&);
+  void SetPassword(const Napi::CallbackInfo&);
   Napi::Value Write(const Napi::CallbackInfo&);
-  Napi::Value GetFont(const Napi::CallbackInfo&);
-  Napi::Value ListFonts(const Napi::CallbackInfo&);
   Napi::Value CreateFont(const Napi::CallbackInfo&) override;
-  vector<PoDoFo::PdfFont*> GetFonts();
   void SetEncrypt(const Napi::CallbackInfo&, const Napi::Value&);
   Napi::Value GetEncrypt(const Napi::CallbackInfo&);
   Napi::Value GetTrailer(const Napi::CallbackInfo&);

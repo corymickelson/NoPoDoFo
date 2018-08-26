@@ -53,7 +53,6 @@ Document::Initialize(Napi::Env& env, Napi::Object& target)
     env,
     "Document",
     { StaticMethod("gc", &Document::GC),
-      InstanceAccessor("password", nullptr, &Document::SetPassword),
       InstanceAccessor("encrypt", &Document::GetEncrypt, &Document::SetEncrypt),
       InstanceAccessor("form", &Document::GetForm, nullptr),
       InstanceAccessor("body", &Document::GetObjects, nullptr),
@@ -66,15 +65,13 @@ Document::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceAccessor("printingScale", nullptr, &Document::SetPrintingScale),
       InstanceAccessor("language", nullptr, &Document::SetLanguage),
       InstanceAccessor("info", &Document::GetInfo, nullptr),
-
+      InstanceMethod("setPassword", &Document::SetPassword),
       InstanceMethod("hasSignatures", &Document::HasSignature),
       InstanceMethod("getSignatures", &Document::GetSignatures),
       InstanceMethod("load", &Document::Load),
       InstanceMethod("getPageCount", &Document::GetPageCount),
       InstanceMethod("getPage", &Document::GetPage),
       InstanceMethod("splicePages", &Document::DeletePages),
-      InstanceMethod("getFont", &Document::GetFont),
-      InstanceMethod("listFonts", &Document::ListFonts),
       InstanceMethod("hideToolbar", &Document::SetHideToolbar),
       InstanceMethod("hideMenubar", &Document::SetHideMenubar),
       InstanceMethod("hideWindowUI", &Document::SetHideWindowUI),
@@ -112,95 +109,16 @@ Document::Document(const CallbackInfo& info)
 }
 
 Value
-Document::GetFont(const CallbackInfo& info)
-{
-  try {
-    auto id = info[0].As<String>().Utf8Value();
-    auto fonts = GetFonts();
-    for (auto item : fonts) {
-      string itemId = item->GetIdentifier().GetName();
-      string itemName = item->GetFontMetrics()->GetFontname();
-      if (itemId == id || itemName == id) {
-        EscapableHandleScope scope(info.Env());
-        return scope.Escape(
-          Font::constructor.New({ External<PdfFont>::New(info.Env(), item) }));
-      }
-    }
-    return info.Env().Null();
-  } catch (PdfError& err) {
-    ErrorHandler(err, info);
-  }
-  return info.Env().Undefined();
-}
-
-Napi::Value
-Document::ListFonts(const CallbackInfo& info)
-{
-  auto fonts = GetFonts();
-  auto list = Array::New(info.Env());
-  uint32_t n = 0;
-  for (auto item : fonts) {
-    string itemId = item->GetIdentifier().GetName();
-    string itemName = item->GetFontMetrics()->GetFontname();
-    auto v = Object::New(info.Env());
-    v.Set("id", String::New(info.Env(), itemId));
-    v.Set("name", String::New(info.Env(), itemName));
-    list.Set(n, v);
-    n++;
-  }
-  return list;
-}
-
-Value
 Document::CreateFont(const CallbackInfo& info)
 {
   Napi::Value font = BaseDocument::CreateFont(info);
-  // fonts.clear();
-  // GetFonts();
   return font;
 }
 
-vector<PdfFont*>
-Document::GetFonts()
-{
-  if (fonts.empty()) {
-    vector<PdfObject*> fontObjs;
-    for (auto item : GetDocument().GetObjects()) {
-      if (item->IsDictionary()) {
-        if (item->GetDictionary().HasKey(Name::TYPE) &&
-            item->GetDictionary().GetKey(Name::TYPE)->IsName() &&
-            item->GetDictionary().GetKey(Name::TYPE)->GetName().GetName() ==
-              Name::FONT) {
-          fontObjs.push_back(item);
-        }
-      }
-      if (item->IsReference()) {
-        auto ref = GetDocument().GetObjects().GetObject(item->GetReference());
-        if (ref->IsDictionary()) {
-          if (ref->GetDictionary().HasKey(Name::TYPE) &&
-              ref->GetDictionary().GetKey(Name::TYPE)->IsName() &&
-              ref->GetDictionary().GetKey(Name::TYPE)->GetName().GetName() ==
-                Name::FONT) {
-            fontObjs.push_back(ref);
-          }
-        }
-      }
-    }
-    for (auto o : fontObjs) {
-      auto font = GetDocument().GetFont(o);
-      if (!font) {
-        continue;
-      } else {
-        fonts.push_back(font);
-      }
-    }
-  }
-  return fonts;
-}
-
 void
-Document::SetPassword(const CallbackInfo& info, const Napi::Value& value)
+Document::SetPassword(const CallbackInfo& info)
 {
+  auto value = info[0];
   if (value.IsEmpty() || !value.IsString()) {
     throw Napi::Error::New(info.Env(), "password must be of type string");
   }
