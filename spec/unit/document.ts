@@ -70,9 +70,6 @@ tap('IDocument', (t: Test) => {
             doc.encrypt = encrypt as npdf.Encrypt
         }, 'Can set the Document Encrypt instance from CreateEncrypt value')
         t.comment("Document instance methods")
-        let docFont = doc.getFont('PoDoFoFt31')
-        t.assert(docFont instanceof (npdf.Font as any))
-        t.assert(docFont.getMetrics().fontSize > 0)
         t.assert(doc.getPageCount() === 3)
         t.comment('create font')
         let font = doc.createFont({italic: true, embed: false, fontName: 'Courier'})
@@ -105,7 +102,7 @@ tap('File Spec attachment', (t: Test) => {
     const fDoc = new npdf.Document()
     fDoc.load(join(__dirname, '../test-documents/attachment.pdf'), {password: 'secret'}, e => {
         if (e) {
-            fDoc.password = 'secret'
+            fDoc.setPassword('secret')
         }
         let names = fDoc.getNames(false)
         if (!names) {

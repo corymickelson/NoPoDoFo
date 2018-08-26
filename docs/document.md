@@ -62,11 +62,11 @@ of large documents with a small memory footprint.
 class Document extends Base {
     constructor()
 
-    password: string
     encrypt: Encrypt
     readonly trailer: Object
     readonly catalog: Object
 
+    setPassword(pwd:string): void
     load(file: string | Buffer,
         opts: {
         forUpdate?: boolean,
@@ -87,55 +87,44 @@ class Document extends Base {
 ## Properties
 
 ### catalog
-
-Readonly, returns the Documents catalog [Object](./object.md).
+Readonly property returning an [Object](./object.md). The catalog is the root of the documents object tree; every object in a document
+is reachable from the catalog.
 
 ### trailer
-
-Readonly, returns the Documents trailer object as an IObj.
+Readonly property returning an [Object](./object.md). The trailer resides at the end of the document, containing document level information necessary
+to parse the document. 
 
 ### encrypt
-
-Get / Set an encrypt object. See [IEncrypt]().
-
-### password
-
-Set the password on the Document. This value is a set only, you may not read from this property.
+If the document is encrypted an [Encrypt](./encrypt.md) object is returned otherwise null.
 
 ### info
-
-Readonly, get [NPDFInfo]().
+Readonly NPDFInfo.
 
 ### language
-
 Set the Document viewer preference. Set the language of the Document.
 
 ### printingScale
-
-Get / Set printingScale. See [printingScale]().
+The page scaling option displayed in the print dialog, valid values are: 'None', and 'AppDefault'
 
 ### pageLayout
-
-Get / Set pageLayout. See [pageLayout]().
+Specifies the page layout as NPDFPageLayout when the document is opened.
 
 ### pageMode
-
-Get / Set pageMode. See [pageMode]().
+Specifies the page mode as NPDFPageMode when the document is opened.
 
 ### version
-
-The PDF version. See [NPDFVersion]().
+Pdf specification version as NPDFVersion.
 
 ### body
-
-The Document body (readonly) is an array of all IObjects accessible from the Document catalog. See [IObj]().
+The Document body (readonly) is an array of all [Objects](./object.md) accessible from the Document catalog(#catalog).
 
 ### form
-
-Form is a readonly property that will either return IForm or null if the Document does not have an AcroForm dictionary.
-See [IForm]() for more information.
+Form is a readonly property that will either return [Form](./form.md) or null if the Document does not have an AcroForm dictionary.
 
 ## Methods
+
+### setPassword
+Set the password for the document.
 
 ### getPageCount
 
@@ -150,9 +139,7 @@ Get the number of pages in the Document. A Document must have at least one page.
 ```typescript
 getPage(n: number): IPage
 ```
-
-Get the page. If n is < 0 or greater than page count a RangeError will be thrown.
-See [IPage]().
+Get the [Page](./page.md). If n is < 0 or greater than page count a RangeError will be thrown.
 
 ### hideToolbar
 
@@ -211,12 +198,12 @@ Toggle view option useFullScreen.
 attachFile(file: string): void
 ```
 
-Attach a file, as a [IFileSpec]() to the Document. The file will be embedded into the Document.
+Attach a file, as a [FileSpec](./filespec.md) to the Document. The file will be embedded into the Document.
 
 ### insertExistingPage
 
 ```typescript
-insertExistingPage(memDoc: IDocument, index: number, insertIndex: number): number
+insertExistingPage(memDoc: Document, index: number, insertIndex: number): number
 ```
 
 Insert the page of one Document into another. The document accepting the new page may be a Document or StreamDocument.
@@ -225,7 +212,7 @@ However the Document that the page originates from must be a Document.
 ### insertPage
 
 ```typescript
-insertPage(rect: IRect, index: number): IPage
+insertPage(rect: Rect, index: number): Page
 ```
 
 Insert a new page into the Document pages tree. Returns the new page. Note pages are 0-based index.
@@ -235,7 +222,7 @@ greater than the current page count a RangeError is thrown.
 ### append
 
 ```typescript
-append(doc: IDocument): void
+append(doc: Document): void
 ```
 
 Append a Document to another Document. The Document to be appended to must be a Document, StreamDocument's are not supported for this operation.
@@ -253,7 +240,7 @@ Check if the Document is linearized, returns a boolean.
 getWriteMode(): NPDFWriteMode
 ```
 
-Get the write mode for the Document. See [NPDFWriteMode]()
+Get the write mode as NPDFWriteMode for the Document.
 
 ### isAllowed
 
@@ -261,12 +248,12 @@ Get the write mode for the Document. See [NPDFWriteMode]()
 isAllowed(perm: ProtectionOption): boolean
 ```
 
-Check if a PDF protection permission is allowed, returns a boolean, see [ProtectionOption]()
+Check if a PDF protection permission ProtectionOption is allowed, returns a boolean.
 
 ### createFont
 
 ```typescript
-createFont(opts: NPDFCreateFontOpts): IFont
+createFont(opts: NPDFCreateFontOpts): Font
 ```
 
 Create / Get a PDF Font object. If the build you have does not include fontconfig (Windows users) you must include the fontFile (path to font file on disk) in NPDFCreateFontOpts.
@@ -274,17 +261,17 @@ Create / Get a PDF Font object. If the build you have does not include fontconfi
 ### getObject
 
 ```typescript
-getObject(ref: Ref): IObj
+getObject(ref: Ref): Obj
 ```
 
-Get an object by [Ref]() (indirect object reference). NoPoDoFo will always try to resolve a reference, some methods may however return a Ref instead of an IObj, this happens when the IObj in question
+Get an object by Ref (indirect object reference). NoPoDoFo will always try to resolve a reference, some methods may however return a Ref instead of an IObj, this happens when the IObj in question
 is not available by the parent object, or parent vector. This is primarily seen in a nested array structure.
 
 #### Example
 
 ```typescript
 const ar: IArray = someObject.getArray()
-if(ar.at(0) instanceof npdf.IObj) {
+if(ar.at(0) instanceof nopodofo.Object) {
     // do something with the object
 } else {
     let ref = ar.at(0)
@@ -296,7 +283,7 @@ if(ar.at(0) instanceof npdf.IObj) {
 ### getNames
 
 ```typescript
-getNames(create: boolean): IObj|null
+getNames(create: boolean): nopodofo.Object|null
 ```
 
 Get the document names tree, if a names tree does not exist null is returned.
@@ -304,7 +291,7 @@ Get the document names tree, if a names tree does not exist null is returned.
 ### createXObject
 
 ```typescript
-createXObject(rect: IRect): IXObj
+createXObject(rect: Rect): XObject
 ```
 
 Creates a new XObject, returns the newly created XObject.
@@ -312,7 +299,7 @@ Creates a new XObject, returns the newly created XObject.
 ### createPage
 
 ```typescript
-createPage(rect: IRect): IPage
+createPage(rect: Rect): Page
 ```
 
 Create a new PDF Page, returns the newly created page.
@@ -320,14 +307,14 @@ Create a new PDF Page, returns the newly created page.
 ### createPages
 
 ```typescript
-createPages(rects: IRect[]): number
+createPages(rects: Rect[]): number
 ```
 Creates as many pages as rects provided, returns the new page count of the document.
 
 ### getAttachment
 
 ```typescript
-getAttachment(uri: string): IFileSpec
+getAttachment(uri: string): FileSpec
 ```
 
 Get an attached file, if the file is not found null is returned.
@@ -396,7 +383,7 @@ of pages from the startIndex to delete.
 ### insertPages
 
 ```typescript
-insertPages(fromDoc: IDocument, startIndex: number, count: number): number
+insertPages(fromDoc: Document, startIndex: number, count: number): number
 ```
 
 Copies one or more pages from another pdf to this document. This function copies the entire document to the target document and then
@@ -411,16 +398,6 @@ write(destination: Callback<Buffer> | string, cb?: Callback<string>): void
 
 Write the file and any modifications made to the file to disk or a nodejs buffer. If destination is a string (file path), write will write
 the document to this path, if destination is not provided a buffer will be returned in the callback.
-
-### getFont
-
-```typescript
-getFont(name: string): IFont | null
-```
-
-Looks for a font with the provided name or id. This operation may be expensive as it iterates all pdf object searching for the font.
-If nothing is found null is returned
-
 
 ### hasSignatures
 

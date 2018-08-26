@@ -1,7 +1,5 @@
 /// <reference types="node" />
 
-import { setTextRange } from "typescript";
-
 export const CONVERSION = 0.0028346456693
 export type NPDFExternal<T> = Object
 export type Callback<T> = (err: Error, data: T) => void
@@ -115,7 +113,7 @@ export type NPDFCoerceKeyType = 'boolean' | 'long' | 'name' | 'real'
 export type NPDFDataType = 'Boolean' | 'Number' | 'Name' | 'Real' | 'String' | 'Array' |
   'Dictionary' | 'Reference' | 'RawData'
 
-export enum SigFlags {
+export enum NPDFSigFlags {
   SignatureExists = 1,
   AppendOnly = 2,
   SignatureExistsAppendOnly = 3
@@ -674,7 +672,7 @@ export namespace nopodofo {
     DA?: string
     DR?: Dictionary
     CO?: Dictionary
-    SigFlags?: SigFlags
+    SigFlags?: NPDFSigFlags
   }
 
   export class Image {
@@ -701,7 +699,6 @@ export namespace nopodofo {
   export class Document extends Base {
     constructor()
 
-    password: string
     encrypt: Encrypt
     readonly trailer: Object
     readonly catalog: Object
@@ -713,6 +710,8 @@ export namespace nopodofo {
       },
       cb: Callback<void>): void
     load(file: string | Buffer, cb: Callback<void>): void
+
+    setPassword(pwd: string): void
 
     /**
      * Deletes one or more pages from the document by removing the pages reference
@@ -742,19 +741,6 @@ export namespace nopodofo {
      * @param cb - if file path was provided as destination, this must be a callback function
      */
     write(destination: Callback<Buffer> | string, cb?: Callback<string>): void
-
-    /**
-     * Looks for a font with the provided name or id.
-     * This operation may be expensive as it iterates all pdf object searching for the font.
-     * If nothing is found null is returned
-     * @param name - font name or font id
-     */
-    getFont(name: string): Font
-
-    /**
-     * List all the fonts from the document.
-     */
-    listFonts(): { id: string, name: string }[]
 
     /**
      * Performs garbage collection on the document. All objects not
@@ -1092,7 +1078,6 @@ export namespace nopodofo {
     embed(): void
   }
   export class Encoding {
-    constructor()
     addToDictionary(target: Object): void
     convertToUnicode(content: string, font: Font): string
     convertToEncoding(content: string, font: Font): Buffer
@@ -1136,12 +1121,12 @@ export namespace nopodofo {
      * Note: to determine the type of field use the Field.type property
      */
     getFields(): Field[]
-    fieldsCount(): number
+    fieldCount(): number
     getFieldIndex(fieldName: string): number
     getMediaBox(): Rect
     getBleedBox(): Rect
     getArtBox(): Rect
-    annotationsCount(): number
+    annotationCount(): number
     createAnnotation(type: NPDFAnnotation, rect: Rect): Annotation
     createField(type: NPDFFieldType, annot: Annotation, form: Form, opts?: Object): Field
     deleteField(index: number): void
