@@ -71,14 +71,14 @@ Page::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceMethod("deleteField", &Page::DeleteField),
       InstanceMethod("getFields", &Page::GetFields),
       InstanceMethod("flattenFields", &Page::FlattenFields),
-      InstanceMethod("fieldsCount", &Page::GetNumFields),
+      InstanceMethod("fieldCount", &Page::GetNumFields),
       InstanceMethod("getFieldIndex", &Page::GetFieldIndex),
       InstanceMethod("getMediaBox", &Page::GetMediaBox),
       InstanceMethod("getBleedBox", &Page::GetBleedBox),
       InstanceMethod("getArtBox", &Page::GetArtBox),
       InstanceMethod("createAnnotation", &Page::CreateAnnotation),
       InstanceMethod("getAnnotation", &Page::GetAnnotation),
-      InstanceMethod("annotationsCount", &Page::GetNumAnnots),
+      InstanceMethod("annotationCount", &Page::GetNumAnnots),
       InstanceMethod("deleteAnnotation", &Page::DeleteAnnotation) });
   constructor = Napi::Persistent(ctor);
   constructor.SuppressDestruct();
@@ -266,7 +266,6 @@ Page::GetPageNumber(const CallbackInfo& info)
 Napi::Value
 Page::GetContents(const CallbackInfo& info)
 {
-  EscapableHandleScope scope(info.Env());
   // bool forAppending = info[0].As<Boolean>();
   PdfObject* contentsObj = page.GetContents();
   // forAppending ? page.GetContentsForAppending() :

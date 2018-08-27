@@ -39,7 +39,7 @@ This is a readonly property returning the NPDFActions type. An actions `Type` mu
 
 ### uri
 This property gets or sets the `URI` property of the action [Dictionary](./dictionary.md). This is a required field when the NPDFActions type is
-a `URI` action. 
+a `URI` action.
 
 ### script
 This is a required property of a `JavaScript` type action. This script will be executed when the action is activated. Please familiarize yourself with the Adobe Acrobat JavaScript API Reference  Materials.

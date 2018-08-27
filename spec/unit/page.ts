@@ -23,18 +23,18 @@ function createField() {
         let annot = page.createAnnotation(NPDFAnnotation.Widget, new npdf.Rect(0, 0, 100, 100))
         let field = page.createField(NPDFFieldType.TextField, annot, doc.form)
         t.ok(field)
-        t.assert(page.fieldsCount() === 1)
+        t.assert(page.fieldCount() === 1)
         t.end()
     })
 }
 function removeAnnotation() {
     test('remove annotation', t => {
-        let annCount = page.annotationsCount()
-        let fieldsCount = page.fieldsCount()
+        let annCount = page.annotationCount()
+        let fieldsCount = page.fieldCount()
         page.deleteAnnotation(0)
         let field = page.getField(0)
-        t.assert(annCount - 1 === page.annotationsCount())
-        t.assert(fieldsCount - 1 === page.fieldsCount())
+        t.assert(annCount - 1 === page.annotationCount())
+        t.assert(fieldsCount - 1 === page.fieldCount())
         t.ok(field)
         t.end()
     })
@@ -80,7 +80,7 @@ function pageTrimBox() {
 
 function pageGetAnnotsCount() {
     test('page number of annotations', t => {
-        t.assert(page.annotationsCount() === 21, 'get\'s all annotations on the page')
+        t.assert(page.annotationCount() === 21, 'get\'s all annotations on the page')
         t.end()
     })
 }

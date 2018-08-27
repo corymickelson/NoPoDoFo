@@ -1121,12 +1121,12 @@ export namespace nopodofo {
      * Note: to determine the type of field use the Field.type property
      */
     getFields(): Field[]
-    fieldsCount(): number
+    fieldCount(): number
     getFieldIndex(fieldName: string): number
     getMediaBox(): Rect
     getBleedBox(): Rect
     getArtBox(): Rect
-    annotationsCount(): number
+    annotationCount(): number
     createAnnotation(type: NPDFAnnotation, rect: Rect): Annotation
     createField(type: NPDFFieldType, annot: Annotation, form: Form, opts?: Object): Field
     deleteField(index: number): void
