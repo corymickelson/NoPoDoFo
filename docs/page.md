@@ -197,13 +197,11 @@ Delete the field at the provided index
 ### flattenField
 
 ```typescript
-/**
- * Flattening is the process of taking a fields appearance stream, appending that appearance stream
- * to the page, and then removing the field object and annotation widget, and scrubbing all references 
- * to the field from the document (scrub the page and acroform dictionary)
- */
 flattenFields(): void
 ```
+Flattening is the process of taking a fields appearance stream, appending that appearance stream
+to the page, and then removing the field object and annotation widget, and scrubbing all references 
+to the field from the document (scrub the page and acroform dictionary)
 
 ### getAnnotation
 

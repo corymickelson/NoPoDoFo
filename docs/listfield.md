@@ -36,6 +36,7 @@ abstract class ListField extends Field {
 ## Properties
 
 ### selected
+Get or set the selected list item.
 
 Get or set the selected list item.
 
@@ -44,20 +45,27 @@ Get or set the selected list item.
 Readonly property, returns the number of options in the field.
 
 ### spellCheckEnabled
+Enable or disable spellchecking
 
 Enable or disable spellchecking
 
 ### sorted
+Enable of disable sorting
 
 Enable of disable sorting
 
 ### multiSelect
+Enable or sidable multiselect
 
 Enable or sidable multiselect
 
 ## Methods
 
 ### isComboBox
+```typescript
+isComboBox(): boolean
+```
+If derived field is a ComboBox return true, else false
 
 ```typescript
 isComboBox(): boolean
@@ -66,6 +74,10 @@ isComboBox(): boolean
 If derived field is a ComboBox return true, else false
 
 ### insertItem
+```typescript
+insertItem(value: string, displayName: string): void
+```
+Add an item to the list of values
 
 ```typescript
 insertItem(value: string, displayName: string): void
@@ -74,6 +86,11 @@ insertItem(value: string, displayName: string): void
 Add an item to the list of values
 
 ### removeItem
+```typescript
+removeItem(index: number): void
+```
+
+Remove an item from the list
 
 ```typescript
 removeItem(index: number): void

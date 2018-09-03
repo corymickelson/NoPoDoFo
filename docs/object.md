@@ -1,7 +1,10 @@
 # API Documentation for Object
 
 ## NoPoDoFo Object
+<<<<<<< HEAD
+=======
 
+>>>>>>> 8b7823f8d1343ca4542b7d08cd31d5bbdfbf7ebb
 ```typescript
 class Object {
   readonly reference: { object: number, generation: number }
@@ -28,14 +31,12 @@ class Object {
 ```
 
 ## Constructors
-
 NoPoDoFo does not support the creation of new objects by the Object class, however many of the methods used in NoPoDoFo
 will return or expose an accessor to retrieve the underlying PDF object data type.
 
 ## Properties
 
 ### reference
-
 Get the reference of the object. If the object is not an indirect object a reference is not available. This would
 signify that the object is an inline object.
 
@@ -58,7 +59,6 @@ Get or set immutability
 ## Methods
 
 ### hasStream
-
 ```typescript
 hasStream(): boolean
 ```
