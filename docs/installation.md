@@ -10,6 +10,8 @@ The recommended installation process is as follows:
 
 ## Windows
 
+<mark>Windows support is still a work in progress</mark>
+
 Please install [vcpkg](https://github.com/Microsoft/vcpkg) as your package manager for building and installing PoDoFo.
 To install PoDoFo with vcpkg run `vcpkg install podofo:x64-windows`[^1]. NoPoDoFo requires the path to vcpkg root directory as environment variable `vcpkg_path`.
 Building NoPoDoFo from source requires CMake.
