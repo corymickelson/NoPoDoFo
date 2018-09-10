@@ -18,11 +18,16 @@
  */
 
 #include "Annotation.h"
+#include "../Defines.h"
 #include "../ErrorHandler.h"
+#include "../base/Color.h"
 #include "../base/XObject.h"
 #include "Action.h"
 #include "Destination.h"
+#include "Document.h"
 #include "FileSpec.h"
+#include "Page.h"
+#include "Rect.h"
 #include "StreamDocument.h"
 
 using std::cout;
@@ -236,42 +241,54 @@ Annotation::GetOpen(const CallbackInfo& info)
 }
 
 void
-Annotation::SetColor(const CallbackInfo& info, const Napi::Value& value)
-{
-  if (value.IsArray()) {
-    auto jsValue = value.As<Array>();
-    double rgb[3];
-    for (uint8_t i = 0; i < jsValue.Length(); i++) {
-      double v = jsValue.Get(i).As<Number>();
-      if (v < 0 || v > 256) {
-        RangeError::New(info.Env(),
-                        "RGB value must be an integer between 0-256")
-          .ThrowAsJavaScriptException();
-        return;
-      }
-      rgb[i] = v;
-    }
-    GetAnnotation().SetColor(rgb[0], rgb[1], rgb[2]);
-  } else {
-    throw Napi::TypeError::New(info.Env(),
-                               "Requires RGB color: [Number, Number, Number]");
-  }
+Annotation::SetColor(const CallbackInfo& info, const Napi::Value& value){
+  SetNoPoDoFoColor(value, GetAnnotation().SetColor)
+  // if (value.IsObject() &&
+  //     value.As<Object>().InstanceOf(Color::constructor.Value())) {
+  //   auto color = Color::Unwrap(info[0].As<Object>())->color;
+  //   if (color->IsCMYK()) {
+  //     GetAnnotation().SetColor(
+  //       color->GetRed(), color->GetGreen(), color->GetBlue());
+  //   } else if (color->IsGrayScale()) {
+  //     GetAnnotation().SetColor(color->GetGrayScale());
+  //   } else if (color->IsRGB()) {
+  //     GetAnnotation().SetColor(color->GetCyan(),
+  //                              color->GetMagenta(),
+  //                              color->GetYellow(),
+  //                              color->GetBlack());
+  //   }
+  // } else if (value.IsArray()) {
+  //   auto jsValue = value.As<Array>();
+  //   double rgb[3];
+  //   for (uint8_t i = 0; i < jsValue.Length(); i++) {
+  //     double v = jsValue.Get(i).As<Number>();
+  //     if (v < 0 || v > 256) {
+  //       RangeError::New(info.Env(),
+  //                       "RGB value must be an integer between 0-256")
+  //         .ThrowAsJavaScriptException();
+  //       return;
+  //     }
+  //     rgb[i] = v;
+  //   }
+  //   GetAnnotation().SetColor(rgb[0], rgb[1], rgb[2]);
+  // } else {
+  //   throw Napi::TypeError::New(info.Env(),
+  //                              "Requires RGB color: [Number, Number,
+  //                              Number]");
+  // }
 }
 
-Napi::Value
-Annotation::GetColor(const CallbackInfo& info)
+Napi::Value Annotation::GetColor(const CallbackInfo& info)
 {
-  auto rgbArray = Napi::Array::New(info.Env());
   auto pdfRgb = GetAnnotation().GetColor();
-  if (pdfRgb.size() != 3) {
-  }
   const double r = pdfRgb[0].GetNumber();
   const double g = pdfRgb[1].GetNumber();
   const double b = pdfRgb[2].GetNumber();
-  rgbArray.Set(1, Napi::Number::New(info.Env(), r));
-  rgbArray.Set(2, Napi::Number::New(info.Env(), g));
-  rgbArray.Set(3, Napi::Number::New(info.Env(), b));
-  return rgbArray;
+  return Color::constructor.New({
+    Napi::Number::New(info.Env(), r),
+    Napi::Number::New(info.Env(), g),
+    Napi::Number::New(info.Env(), b)
+  });
 }
 
 Napi::Value

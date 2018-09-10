@@ -449,7 +449,7 @@ export namespace nopodofo {
     action: Action
     open: boolean
     quadPoints: number[]
-    color: NPDFColor
+    color: NPDFColor|Color
     attachment: FileSpec
 
     setBorderStyle(v: NPDFAnnotationBorderStyle): void
@@ -516,9 +516,9 @@ export namespace nopodofo {
     mappingName?: string
     exported?: boolean
 
-    setBackgroundColor(color: NPDFColor): void
+    setBackgroundColor(color: NPDFColor|Color): void
 
-    setBorderColor(color: NPDFColor): void
+    setBorderColor(color: NPDFColor|Color): void
 
     setHighlightingMode(mode: NPDFHighlightingMode): void
 
@@ -527,6 +527,26 @@ export namespace nopodofo {
     setPageAction(on: NPDFPageEvent, action: Action): void
   }
 
+  export class Color {
+    constructor()
+    constructor(grey: number)
+    constructor(red:number, green: number, blue: number)
+    constructor(cyan: number, magenta: number, yellow: number, black: number)
+    isRGB(): boolean
+    isCMYK(): boolean
+    isGreyScale(): boolean
+    convertToGreyScale(): Color
+    convertToCMYK(): Color
+    convertToRGB(): Color
+    getGrey(): number
+    getRed(): number
+    getGreen(): number
+    getBlue(): number
+    getCyan(): number
+    getMagenta(): number
+    getYellow(): number
+    getBlack(): number
+  }
   export class TextField extends Field {
     /**
      * @desc Create from an existing Field
@@ -1006,7 +1026,7 @@ export namespace nopodofo {
     precision: number
     constructor(doc: Base)
     setPage(page: Page | XObject): void
-    setColor(rgb: NPDFrgb): void
+    setColor(rgb: NPDFrgb|Color): void
     setStrokeWidth(w: number): void
     setGrey(v: number): void
     setStrokingGrey(v: number): void
@@ -1154,7 +1174,7 @@ export namespace nopodofo {
     action: Action
     title: string
     textFormat: number
-    textColor: NPDFColor
+    textColor: NPDFColor|Color
     createChild(name: string, value: Destination): Outline
     createNext(name: string, value: Destination | Action): Outline
     insertItem(item: Object): void
@@ -1165,10 +1185,10 @@ export namespace nopodofo {
 
   }
   export class SimpleTable {
-    constructor(doc:Document, cols:number, rows: number)
+    constructor(doc:Base, cols:number, rows: number)
     borderWidth: number
-    foregroundColor: NPDFColor
-    backgroundColor: NPDFColor
+    foregroundColor: NPDFColor|Color
+    backgroundColor: NPDFColor|Color
     alignment: string
     wordWrap: boolean
     tableWidth: number
@@ -1185,7 +1205,7 @@ export namespace nopodofo {
     hasImage(col: number, row: number): boolean
     hasBackgroundColor(col: number, row: number): boolean
     enableBackground(v: boolean): void
-    getBorderColor(col: number, row: number): NPDFColor
+    getBorderColor(col: number, row: number): NPDFColor|Color
     draw(point: NPDFPoint, painter: Painter): void
     columnCount(): number
     rowCount(): number

@@ -19,7 +19,6 @@
 
 #include "Encoding.h"
 #include "../ErrorHandler.h"
-#include "../ValidateArguments.h"
 #include "../base/Dictionary.h"
 #include "Font.h"
 

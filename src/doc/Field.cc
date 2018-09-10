@@ -18,13 +18,13 @@
  */
 
 #include "Field.h"
+#include "../Defines.h"
+#include "../ValidateArguments.h"
+#include "../base/Color.h"
 #include "Action.h"
 #include "Annotation.h"
-#include "Document.h"
 #include "Form.h"
 #include "Page.h"
-#include "Rect.h"
-#include "StreamDocument.h"
 #include <iostream>
 
 using namespace Napi;
@@ -34,6 +34,7 @@ using std::cout;
 using std::endl;
 using std::make_shared;
 using std::make_unique;
+using tl::nullopt;
 
 namespace NoPoDoFo {
 
@@ -142,7 +143,8 @@ Field::GetType(const Napi::CallbackInfo& info)
 Napi::Value
 Field::GetFieldName(const CallbackInfo& info)
 {
-  return Napi::String::New(info.Env(), GetField().GetFieldName().GetStringUtf8());
+  return Napi::String::New(info.Env(),
+                           GetField().GetFieldName().GetStringUtf8());
 }
 
 void
@@ -215,68 +217,35 @@ Field::IsExport(const Napi::CallbackInfo& info)
  * @param info
  * @return
  */
-Napi::Value
+void
 Field::SetBackground(const Napi::CallbackInfo& info)
 {
-  auto js = info[0].As<Array>();
-  if (js.Length() == 1) {
-    double gray = js.Get(static_cast<uint32_t>(0)).As<Number>().DoubleValue();
-    field->SetBackgroundColor(gray);
-  } else if (js.Length() == 3) {
-    double r = js.Get(static_cast<uint32_t>(0)).As<Number>().DoubleValue();
-    double g = js.Get(static_cast<uint32_t>(1)).As<Number>().DoubleValue();
-    double b = js.Get(static_cast<uint32_t>(2)).As<Number>().DoubleValue();
-    field->SetBackgroundColor(r, g, b);
-  } else if (js.Length() == 4) {
-    double c = js.Get(static_cast<uint32_t>(0)).As<Number>().DoubleValue();
-    double m = js.Get(static_cast<uint32_t>(1)).As<Number>().DoubleValue();
-    double y = js.Get(static_cast<uint32_t>(2)).As<Number>().DoubleValue();
-    double k = js.Get(static_cast<uint32_t>(3)).As<Number>().DoubleValue();
-    field->SetBackgroundColor(c, m, y, k);
-  } else {
-    TypeError::New(info.Env(), "value must be [grayscale], [r,g,b], [c,m,y,k]")
-      .ThrowAsJavaScriptException();
-  }
-  return info.Env().Undefined();
+  SetNoPoDoFoColor(info[0], field->SetBackgroundColor)
 }
-Napi::Value
+void
 Field::SetBorder(const Napi::CallbackInfo& info)
 {
-  auto js = info[0].As<Array>();
-  if (js.Length() == 1) {
-    double gray = js.Get(static_cast<uint32_t>(0)).As<Number>().DoubleValue();
-    field->SetBorderColor(gray);
-  } else if (js.Length() == 3) {
-    double r = js.Get(static_cast<uint32_t>(0)).As<Number>().DoubleValue();
-    double g = js.Get(static_cast<uint32_t>(1)).As<Number>().DoubleValue();
-    double b = js.Get(static_cast<uint32_t>(2)).As<Number>().DoubleValue();
-    field->SetBorderColor(r, g, b);
-  } else if (js.Length() == 4) {
-    double c = js.Get(static_cast<uint32_t>(0)).As<Number>().DoubleValue();
-    double m = js.Get(static_cast<uint32_t>(1)).As<Number>().DoubleValue();
-    double y = js.Get(static_cast<uint32_t>(2)).As<Number>().DoubleValue();
-    double k = js.Get(static_cast<uint32_t>(3)).As<Number>().DoubleValue();
-    field->SetBorderColor(c, m, y, k);
-  } else {
-    TypeError::New(info.Env(), "value must be [grayscale], [r,g,b], [c,m,y,k]")
-      .ThrowAsJavaScriptException();
+  try {
+    SetNoPoDoFoColor(info[0], field->SetBorderColor)
+  } catch (PdfError& err) {
+    err.PrintErrorMsg();
+    cout << err.what() << endl;
   }
-  return info.Env().Undefined();
 }
-Napi::Value
+
+void
 Field::SetHighlightingMode(const Napi::CallbackInfo& info)
 {
   EPdfHighlightingMode mode =
     static_cast<EPdfHighlightingMode>(info[0].As<Number>().Uint32Value());
   field->SetHighlightingMode(mode);
-  return info.Env().Undefined();
 }
 /**
  * @note (type: NPDFMouseActionEnum: 'up'|'down'|'enter'|'exit', action:
  * NPDFAction)
  * @return
  */
-Napi::Value
+void
 Field::SetMouseAction(const Napi::CallbackInfo& info)
 {
   int onMouse = info[0].As<Number>();
@@ -298,9 +267,8 @@ Field::SetMouseAction(const Napi::CallbackInfo& info)
       TypeError::New(info.Env(), "Unknown mouse action. See NPDFMouseEvents")
         .ThrowAsJavaScriptException();
   }
-  return info.Env().Undefined();
 }
-Napi::Value
+void
 Field::SetPageAction(const Napi::CallbackInfo& info)
 {
   int onMouse = info[0].As<Number>();
@@ -322,6 +290,5 @@ Field::SetPageAction(const Napi::CallbackInfo& info)
       TypeError::New(info.Env(), "Unknown mouse action. See NPDFMouseEvents")
         .ThrowAsJavaScriptException();
   }
-  return info.Env().Undefined();
 }
 }

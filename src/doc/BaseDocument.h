@@ -23,7 +23,6 @@
 #include <iostream>
 #include <napi.h>
 #include <podofo/podofo.h>
-#include "../Defines.h"
 
 using std::cout;
 using std::endl;

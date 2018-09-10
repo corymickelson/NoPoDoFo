@@ -23,7 +23,6 @@
 #include "../base/Names.h"
 #include "../base/Obj.h"
 #include "Document.h"
-#include "Font.h"
 #include "StreamDocument.h"
 #include <iostream>
 

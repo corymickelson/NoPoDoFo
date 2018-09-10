@@ -94,8 +94,8 @@ private:
   bool isMemDoc = false;
   std::unique_ptr<PoDoFo::PdfPainter> painter;
   PoDoFo::PdfDocument* document;
-  void GetCMYK(Napi::Value&, int* cmyk);
-  void GetRGB(Napi::Value&, int* rgb);
+  void GetCMYK(Napi::Value&, float* cmyk);
+  void GetRGB(Napi::Value&, float* rgb);
 };
 }
 #endif // NPDF_PAINTER_H

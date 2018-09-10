@@ -19,14 +19,10 @@
 
 #include "SignatureField.h"
 #include "../ErrorHandler.h"
-#include "../ValidateArguments.h"
-#include "../base/Data.h"
 #include "../base/Names.h"
 #include "../base/XObject.h"
 #include "../doc/Annotation.h"
 #include "../doc/Document.h"
-#include "../doc/Form.h"
-#include "Signer.h"
 #include "StreamDocument.h"
 
 using namespace Napi;

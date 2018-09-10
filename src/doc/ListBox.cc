@@ -18,7 +18,6 @@
  */
 
 #include "ListBox.h"
-#include "../ValidateArguments.h"
 #include "Field.h"
 
 using namespace Napi;

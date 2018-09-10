@@ -37,7 +37,8 @@ tap('StreamDocument create simple form', t => {
 
     const nameField = page.createField( NPDFFieldType.TextField, nameFieldAnnot, doc.form)
     nameField.fieldName = 'FirstName'
-
+    const red = new npdf.Color(1.0, 0.0, 0.0)
+    nameField.setBackgroundColor(red)
     doc.close()
     t.end()
 })

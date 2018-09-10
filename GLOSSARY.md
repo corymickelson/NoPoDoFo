@@ -32,7 +32,7 @@ interface NPDFFontMetrics {
 ```type NPDFGrayScale = number```
 
 ## NPDFColor
-```type NPDFColor = NPDFrgb | NPDFcmyk | NPDFGrayScale```
+Values must be between 0.0 and 1.0 `type NPDFColor = NPDFrgb | NPDFcmyk | NPDFGrayScale`
 
 ## NPDFPoint
 ```type NPDFPoint = { x: number, y: number }```

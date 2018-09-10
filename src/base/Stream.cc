@@ -19,7 +19,6 @@
 
 #include "Stream.h"
 #include "../ErrorHandler.h"
-#include "../ValidateArguments.h"
 
 
 using namespace Napi;

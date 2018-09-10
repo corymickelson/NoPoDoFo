@@ -22,7 +22,6 @@
 
 #include <napi.h>
 #include <podofo/podofo.h>
-#include "BaseDocument.h"
 
 using std::vector;
 

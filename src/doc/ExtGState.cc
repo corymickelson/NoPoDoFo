@@ -19,7 +19,6 @@
 
 #include "ExtGState.h"
 #include "../ErrorHandler.h"
-#include "../ValidateArguments.h"
 #include "Document.h"
 #include "StreamDocument.h"
 #include <algorithm>

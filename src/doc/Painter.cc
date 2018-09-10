@@ -19,7 +19,7 @@
 
 #include "Painter.h"
 #include "../ErrorHandler.h"
-#include "../ValidateArguments.h"
+#include "../base/Color.h"
 #include "../base/Stream.h"
 #include "../base/XObject.h"
 #include "Document.h"
@@ -152,9 +152,11 @@ Painter::SetPage(const Napi::CallbackInfo& info)
 void
 Painter::SetColor(const CallbackInfo& info)
 {
-  if (info[0].IsArray()) {
+  if(info[0].IsObject() && info[0].As<Object>().InstanceOf(Color::constructor.Value())) {
+    painter->SetColor(*Color::Unwrap(info[0].As<Object>())->color);
+  } else if (info[0].IsArray()) {
     auto jsValue = info[0].As<Array>();
-    int rgb[3];
+    float rgb[3];
     GetRGB(jsValue, rgb);
     painter->SetColor(rgb[0], rgb[1], rgb[2]);
   } else {
@@ -171,7 +173,7 @@ Painter::SetColorCMYK(const CallbackInfo& info)
       info.Env(), "Requires CMYK color: [number, number, number, number]");
   }
   auto js = info[0].As<Array>();
-  int cmyk[4];
+  float cmyk[4];
   GetCMYK(js, cmyk);
   painter->SetColorCMYK(cmyk[0], cmyk[1], cmyk[2], cmyk[3]);
 }
@@ -190,7 +192,7 @@ Painter::GetCanvas(const CallbackInfo& info)
 void
 Painter::SetStrokingGrey(const CallbackInfo& info)
 {
-  double value = info[0].As<Number>();
+  float value = info[0].As<Number>();
   if (value < 0.0 || value > 1.0) {
     throw Error::New(info.Env(), "value must be between 0.0 and 1.0");
   }
@@ -200,7 +202,7 @@ Painter::SetStrokingGrey(const CallbackInfo& info)
 void
 Painter::SetGrey(const CallbackInfo& info)
 {
-  double value = info[0].As<Number>();
+  float value = info[0].As<Number>();
   if (value < 0.0 || value > 1.0) {
     throw Error::New(info.Env(), "value must be between 0.0 and 1.0");
   }
@@ -215,7 +217,7 @@ Painter::SetStrokingColorCMYK(const CallbackInfo& info)
       info.Env(), "Requires CMYK color: [number, number, number, number]");
   }
   auto js = info[0].As<Array>();
-  int cmyk[4];
+  float cmyk[4];
   GetCMYK(js, cmyk);
   painter->SetStrokingColorCMYK(cmyk[0], cmyk[1], cmyk[2], cmyk[3]);
 }
@@ -223,7 +225,7 @@ Painter::SetStrokingColorCMYK(const CallbackInfo& info)
 void
 Painter::SetStrokeWidth(const Napi::CallbackInfo& info)
 {
-  double value = info[0].As<Number>();
+  float value = info[0].As<Number>();
   painter->SetStrokeWidth(value);
 }
 
@@ -239,7 +241,7 @@ Painter::FinishPage(const CallbackInfo& info)
 void
 Painter::DrawText(const CallbackInfo& info)
 {
-  double x, y;
+  float x, y;
   string text = info[1].As<String>().Utf8Value();
   if (text.empty()) {
     Error::New(
@@ -304,7 +306,7 @@ Painter::DrawImage(const CallbackInfo& info)
     PdfImage img = imgInstance->GetImage();
 
     // Coordinates
-    double x, y;
+    float x, y;
     if (!info[1].IsNumber() || !info[2].IsNumber()) {
       throw Napi::Error::New(info.Env(), "coorindates must be of type number");
     }
@@ -312,7 +314,7 @@ Painter::DrawImage(const CallbackInfo& info)
     y = info[2].As<Number>().DoubleValue();
 
     // Scaling
-    double width = 0.0, height = 0.0;
+    float width = 0.0, height = 0.0;
     if (info.Length() == 5) {
       if (!info[3].IsNumber() || !info[4].IsNumber()) {
         throw Napi::Error::New(info.Env(),
@@ -399,7 +401,7 @@ Painter::SetClipRect(const Napi::CallbackInfo& info)
 void
 Painter::SetMiterLimit(const CallbackInfo& info)
 {
-  double limit = info[0].As<Number>();
+  float limit = info[0].As<Number>();
   painter->SetMiterLimit(limit);
 }
 
@@ -418,7 +420,7 @@ void
 Painter::Ellipse(const CallbackInfo& info)
 {
   auto o = info[0].As<Object>();
-  double x, y, width, height;
+  float x, y, width, height;
   x = o.Get("x").As<Number>();
   y = o.Get("y").As<Number>();
   width = o.Get("width").As<Number>();
@@ -434,7 +436,7 @@ void
 Painter::Circle(const CallbackInfo& info)
 {
   auto o = info[0].As<Object>();
-  double x, y, radius;
+  float x, y, radius;
   x = o.Get("x").As<Number>();
   y = o.Get("y").As<Number>();
   radius = o.Get("radius").As<Number>();
@@ -455,7 +457,7 @@ void
 Painter::LineTo(const CallbackInfo& info)
 {
   auto o = info[0].As<Object>();
-  double x, y;
+  float x, y;
   x = o.Get("x").As<Number>();
   y = o.Get("y").As<Number>();
   try {
@@ -468,7 +470,7 @@ Painter::LineTo(const CallbackInfo& info)
 void
 Painter::MoveTo(const CallbackInfo& info)
 {
-  double x, y;
+  float x, y;
   auto o = info[0].As<Object>();
   x = o.Get("x").As<Number>();
   y = o.Get("y").As<Number>();
@@ -502,7 +504,7 @@ Painter::CubicBezierTo(const CallbackInfo& info)
 void
 Painter::HorizontalLineTo(const CallbackInfo& info)
 {
-  double value = info[0].As<Number>();
+  float value = info[0].As<Number>();
   try {
     painter->HorizontalLineTo(value);
   } catch (PdfError& err) {
@@ -513,7 +515,7 @@ Painter::HorizontalLineTo(const CallbackInfo& info)
 void
 Painter::VerticalLineTo(const CallbackInfo& info)
 {
-  double value = info[0].As<Number>();
+  float value = info[0].As<Number>();
   try {
     painter->VerticalLineTo(value);
   } catch (PdfError& err) {
@@ -526,7 +528,7 @@ Painter::SmoothCurveTo(const CallbackInfo& info)
 {
   auto d1 = info[0].As<Object>();
   auto d2 = info[1].As<Object>();
-  double d1x, d1y, d2x, d2y;
+  float d1x, d1y, d2x, d2y;
   d1x = d1.Get("x").As<Number>();
   d1y = d1.Get("y").As<Number>();
   d2x = d2.Get("x").As<Number>();
@@ -560,10 +562,10 @@ Painter::ArcTo(const CallbackInfo& info)
 {
   auto point1 = info[0].As<Object>();
   auto point2 = info[1].As<Object>();
-  double rotation = info[2].As<Number>();
+  float rotation = info[2].As<Number>();
   bool large = info[3].As<Boolean>();
   bool sweep = info[4].As<Boolean>();
-  double p1x, p1y, p2x, p2y;
+  float p1x, p1y, p2x, p2y;
   p1x = point1.Get("x").As<Number>();
   p1y = point1.Get("y").As<Number>();
   p2x = point2.Get("x").As<Number>();
@@ -820,20 +822,20 @@ Painter::DrawGlyph(const CallbackInfo& info)
 }
 
 void
-Painter::GetCMYK(Napi::Value& value, int* cmyk)
+Painter::GetCMYK(Napi::Value& value, float* cmyk)
 {
   auto js = value.As<Array>();
   for (uint8_t i = 0; i < js.Length(); i++) {
-    cmyk[i] = js.Get(i).As<Number>();
+    cmyk[i] = js.Get(i).As<Number>().FloatValue();
   }
 }
 
 void
-Painter::GetRGB(Napi::Value& value, int* rgb)
+Painter::GetRGB(Napi::Value& value, float* rgb)
 {
   auto js = value.As<Array>();
   for (uint8_t i = 0; i < js.Length(); i++) {
-    rgb[i] = js.Get(i).As<Number>();
+    rgb[i] = js.Get(i).As<Number>().FloatValue();
   }
 }
 }

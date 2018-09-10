@@ -5,8 +5,7 @@ if (!global.gc) {
     global.gc = () => { }
 }
 const filePath = join(__dirname, '../test-documents/test.pdf'),
-    outFile = '/tmp/painter.out.pdf',
-    doc = new npdf.Document()
+    outFile = '/tmp/painter.out.pdf'
 
 tap('Stream Painter SetPage', t => {
     const doc = new npdf.StreamDocument(join(__dirname, '../tmp/streamPainterSetPage.pdf'))
@@ -15,7 +14,40 @@ tap('Stream Painter SetPage', t => {
     t.doesNotThrow(() => painter.setPage(page))
     t.end()
 })
+tap('Paint SimpleTable', t => {
+    const doc = new npdf.StreamDocument()
+    const painter = new npdf.Painter(doc)
+    const page = doc.createPage(new npdf.Rect(0, 0, 612, 792))
+    painter.setPage(page)
+    const font = doc.createFont({ fontName: 'Carlito', embed: true })
+    painter.font = font
+    const table = new npdf.SimpleTable(doc, 5, 5)
+    const purple = new npdf.Color(0.21, 0.15, 0.34)
+    const red = new npdf.Color(1.0, 0.0, 0.0)
+    table.setFont(font)
+    table.foregroundColor = purple 
+    table.backgroundColor = red
+    table.borderEnable(true)
+    table.enableBackground(true)
+    table.borderWidth = 3
+    table.wordWrap = true
+    for (let c = 0; c < 5; c++) {
+        for (let r = 0; r < 5; r++) {
+            table.setText(c, r, 'AAAAAAA')
+        }
+    }
+
+    table.tableWidth = 200
+    table.tableHeight = 200
+    t.doesNotThrow(() => table.draw({ x: 300, y: 300 }, painter))
+    painter.finishPage()
+    let output = doc.close()
+    t.assert(Buffer.isBuffer(output))
+    // require('fs').writeFileSync('/tmp/tabletest.pdf', output)
+    t.end()
+})
 tap('IPainter', t => {
+    let doc = new npdf.Document()
     t.test('Document [MemDocument]', t => {
         doc.load(filePath, (err: Error) => {
             if (err) t.fail(err.message)
@@ -65,7 +97,7 @@ tap('IPainter', t => {
                 table.foregroundColor = [0.0, 0.0, 0.0]
                 for (let c = 0; c < 5; c++) {
                     for (let r = 0; r < 5; r++) {
-                        table.setText(c, r, 'A') 
+                        table.setText(c, r, 'A')
                     }
                 }
                 table.tableWidth = 200

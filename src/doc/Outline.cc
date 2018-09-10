@@ -22,8 +22,8 @@
 #include "Action.h"
 #include "Destination.h"
 #include "Document.h"
-#include "Page.h"
 #include "StreamDocument.h"
+#include "../base/Color.h"
 
 using namespace Napi;
 using namespace PoDoFo;
@@ -233,6 +233,8 @@ Outline::GetTextColor(const Napi::CallbackInfo& info)
 void
 Outline::SetTextColor(const Napi::CallbackInfo& info, const Napi::Value& value)
 {
+  if(value.IsObject() && value.As<Object>().InstanceOf(Color::constructor.Value())) {
+  }
   Napi::Array a = value.As<Napi::Array>();
   double r = a.Get(static_cast<uint32_t>(0)).As<Number>();
   double g = a.Get(static_cast<uint32_t>(1)).As<Number>();
