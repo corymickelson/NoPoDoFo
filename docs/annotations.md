@@ -32,7 +32,7 @@ Annotations are a lower level PDF object, please familiarize yourself with the P
     action: Action
     open: boolean
     quadPoints: number[]
-    color: NPDFColor
+    color: Color
     attachment: FileSpec
 
     setBorderStyle(v: NPDFAnnotationBorderStyle): void

@@ -1,21 +1,24 @@
 # API Documentation for Outline
 
-* [Properties](#properties)
-  * [prev](#prev)
-  * [next](#next)
-  * [first](#first)
-  * [last](#last)
-  * [destination](#destination)
-  * [action](#action)
-  * [title](#title)
-  * [textFormat](#textformat)
-  * [textColor](#textcolor)
-* [Methods](#methods)
-  * [createChild](#createchild)
-  * [createNext](#createnext)
-  * [insertItem](#insertitem)
-  * [getParent](#getparent)
-  * [erase](#erase)
+- [API Documentation for Outline](#api-documentation-for-outline)
+  - [NoPoDoFo Outline](#nopodofo-outline)
+  - [Constructor](#constructor)
+  - [Properties](#properties)
+    - [prev](#prev)
+    - [next](#next)
+    - [first](#first)
+    - [last](#last)
+    - [destination](#destination)
+    - [action](#action)
+    - [title](#title)
+    - [textFormat](#textformat)
+    - [textColor](#textcolor)
+  - [Methods](#methods)
+    - [createChild](#createchild)
+    - [createNext](#createnext)
+    - [insertItem](#insertitem)
+    - [getParent](#getparent)
+    - [erase](#erase)
 
 ## NoPoDoFo Outline
 
@@ -33,7 +36,7 @@ class Outline {
   action: Action
   title: string
   textFormat: number
-  textColor: NPDFColor
+  textColor: Color
   createChild(name: string, value: Destination): Outline
   createNext(name: string, value: Destination | Action): Outline
   insertItem(item: Object): void
@@ -84,7 +87,7 @@ Get and set the format of the title of the outline item
 
 ### textColor
 
-Get and set the text color as NPDFColor of the title of the outline item
+Get and set the text color as [Color](./color.md) of the title of the outline item
 
 ## Methods
 

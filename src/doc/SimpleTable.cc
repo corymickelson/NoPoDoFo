@@ -21,11 +21,11 @@
 #include "../Defines.h"
 #include "../ErrorHandler.h"
 #include "../base/Color.h"
+#include "Document.h"
 #include "Font.h"
 #include "Page.h"
 #include "Painter.h"
 #include "StreamDocument.h"
-#include "Document.h"
 #include <optional/optional.hpp>
 
 using namespace PoDoFo;
@@ -167,10 +167,8 @@ SimpleTable::GetBorderColor(const CallbackInfo& info)
   const int col = info[0].As<Number>();
   const int row = info[1].As<Number>();
   auto color = model->GetBorderColor(col, row);
-  auto colorValues = color.ToArray();
-  auto js = Array::New(info.Env());
-  GetColor(color, js);
-  return js;
+  return Color::constructor.New(
+    { External<PdfColor>::New(info.Env(), &color) });
 }
 
 void
@@ -211,26 +209,15 @@ SimpleTable::GetForegroundColor(const CallbackInfo& info)
   const int col = info[0].As<Number>();
   const int row = info[1].As<Number>();
   auto color = model->GetForegroundColor(col, row);
-  auto js = Array::New(info.Env());
-  GetColor(color, js);
-  return js;
+  return Color::constructor.New(
+    { External<PdfColor>::New(info.Env(), &color) });
 }
 void
 SimpleTable::SetForegroundColor(const CallbackInfo& info,
                                 const Napi::Value& value)
 {
-  try {
-    if (info[0].IsArray()) {
-      Array a = value.As<Array>();
-      model->SetForegroundColor(*SetColor(a));
 
-    } else if (info[0].IsObject() &&
-               info[0].As<Object>().InstanceOf(Color::constructor.Value())) {
-      model->SetForegroundColor(*Color::Unwrap(info[0].As<Object>())->color);
-    }
-  } catch (PdfError& err) {
-    ErrorHandler(err, info);
-  }
+  model->SetForegroundColor(*Color::Unwrap(info[0].As<Object>())->color);
 }
 
 Value
@@ -238,30 +225,16 @@ SimpleTable::GetBackgroundColor(const CallbackInfo& info)
 {
   const int col = info[0].As<Number>();
   const int row = info[1].As<Number>();
-  auto color = model->GetForegroundColor(col, row).ToArray();
-  auto js = Array::New(info.Env());
-  uint32_t n = 1;
-  for (auto& i : color) {
-    js.Set(n, i.GetNumber());
-    ++n;
-  }
-  return js;
+  auto color = model->GetForegroundColor(col, row);
+  return Color::constructor.New(
+    { External<PdfColor>::New(info.Env(), &color) });
 }
 
 void
 SimpleTable::SetBackgroundColor(const CallbackInfo& info,
                                 const Napi::Value& value)
 {
-  try {
-    if (info[0].IsArray()) {
-      auto a = value.As<Array>();
-      model->SetBackgroundColor(*SetColor(a));
-    } else if (info[0].As<Object>().InstanceOf(Color::constructor.Value())) {
-      model->SetBackgroundColor(*Color::Unwrap(info[0].As<Object>())->color);
-    }
-  } catch (PdfError& err) {
-    ErrorHandler(err, info);
-  }
+  model->SetBackgroundColor(*Color::Unwrap(info[0].As<Object>())->color);
 }
 
 Value

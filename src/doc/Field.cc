@@ -25,6 +25,7 @@
 #include "Annotation.h"
 #include "Form.h"
 #include "Page.h"
+#include <algorithm>
 #include <iostream>
 
 using namespace Napi;
@@ -32,8 +33,10 @@ using namespace PoDoFo;
 
 using std::cout;
 using std::endl;
+using std::find;
 using std::make_shared;
 using std::make_unique;
+using std::vector;
 using tl::nullopt;
 
 namespace NoPoDoFo {
@@ -220,17 +223,21 @@ Field::IsExport(const Napi::CallbackInfo& info)
 void
 Field::SetBackground(const Napi::CallbackInfo& info)
 {
-  SetNoPoDoFoColor(info[0], field->SetBackgroundColor)
+  vector<NPDFColorFormat> types = { NPDFColorFormat::GreyScale,
+                                    NPDFColorFormat::RGB,
+                                    NPDFColorFormat::CMYK };
+  NPDFColorAccessor(Color::Unwrap(info[0].As<Object>())->color,
+                    types,
+                    field->SetBackgroundColor)
 }
 void
 Field::SetBorder(const Napi::CallbackInfo& info)
 {
-  try {
-    SetNoPoDoFoColor(info[0], field->SetBorderColor)
-  } catch (PdfError& err) {
-    err.PrintErrorMsg();
-    cout << err.what() << endl;
-  }
+  vector<NPDFColorFormat> types = { NPDFColorFormat::GreyScale,
+                                    NPDFColorFormat::RGB,
+                                    NPDFColorFormat::CMYK };
+  NPDFColorAccessor(
+    Color::Unwrap(info[0].As<Object>())->color, types, field->SetBorderColor)
 }
 
 void

@@ -43,8 +43,8 @@ The NoPoDoFo wrapper manages the underlying PdfTable for you. Please see the [Ta
 class SimpleTable {
   new(doc:Base, cols:number, rows: number): SimpleTable
   borderWidth: number
-  foregroundColor: NPDFColor
-  backgroundColor: NPDFColor
+  foregroundColor: Color
+  backgroundColor: Color
   alignment: string
   wordWrap: boolean
   tableWidth: number
@@ -61,7 +61,7 @@ class SimpleTable {
   hasImage(col: number, row: number): boolean
   hasBackgroundColor(col: number, row: number): boolean
   enableBackground(v: boolean): void
-  getBorderColor(col: number, row: number): NPDFColor
+  getBorderColor(col: number, row: number): Color
   draw(point: NPDFPoint, painter: Painter): void
   columnCount(): number
   rowCount(): number
@@ -88,11 +88,11 @@ Table border width as double
 
 ### foregroundColor
 
-Table foreground color as NPDFColor
+Table foreground color
 
 ### backgroundColor
 
-Table background color as NPDFColor
+Table background color
 
 ### alignment
 
@@ -210,7 +210,7 @@ Enable background coloring for the table cell at the column and row provided
 ### getBorderColor
 
 ```typescript
-getBorderColor(col: number, row: number): NPDFColor
+getBorderColor(col: number, row: number): Color
 ```
 
 Get the border color for the table cell at the column and row provided

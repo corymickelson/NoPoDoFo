@@ -217,7 +217,8 @@ tap('StreamDocument write to buffer', t => {
     const painter = new npdf.Painter(doc)
     painter.setPage(page)
     painter.font = font
-    painter.setColor([0,0,0])
+    const black = new npdf.Color(0, 0, 0, 1)
+    painter.setColor(black)
     t.comment('utf8 test. To verify print test output to disk and open file to verify test is correct')
     painter.drawText({x: 150, y: 400}, 'Unicode Umlauts: ÄÖÜß')
     painter.finishPage()

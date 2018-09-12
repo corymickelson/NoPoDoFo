@@ -66,41 +66,57 @@ enum DocumentInputDevice
       }                                                                        \
     }                                                                          \
   }
+enum NPDFColorFormat
+{
+  GreyScale = 0,
+  RGB,
+  CMYK
+};
 
-#define SetNoPoDoFoColor(info, cb)                                             \
+#define NPDFColorAccessor(color, types, cb)                                    \
+  /* Color is the PdfColor object, types an array of NPDFColorFormat's in*/    \
+  /* order of precedence, and the function to call as the cb*/                 \
   {                                                                            \
-    if (info.IsObject() &&                                                     \
-        info.As<Napi::Object>().InstanceOf(Color::constructor.Value())) {      \
-      std::cout << "Color" << std::endl;                                       \
-      auto color = Color::Unwrap(info.As<Napi::Object>())->color;              \
-      if (color->IsRGB()) {                                                    \
-        cb(color->GetRed(), color->GetGreen(), color->GetBlue());              \
-      } else if (color->IsGrayScale()) {                                       \
-        cb(color->GetGrayScale());                                             \
-      } else if (color->IsCMYK()) {                                            \
-        cb(color->GetCyan(),                                                   \
-           color->GetMagenta(),                                                \
-           color->GetYellow(),                                                 \
-           color->GetBlack());                                                 \
-      }                                                                        \
-    } else if (info.IsArray()) {                                               \
+    if ((*color).IsRGB() &&                                                    \
+        find((types).begin(), (types).end(), NPDFColorFormat::RGB) !=          \
+          (types).end()) {                                                     \
+      cb((*color).GetRed(), (*color).GetGreen(), (*color).GetBlue());          \
+      return;                                                                  \
+    }                                                                          \
+    if ((*color).IsCMYK() &&                                                   \
+        find((types).begin(), (types).end(), NPDFColorFormat::CMYK) !=         \
+          (types).end()) {                                                     \
+      cb((*color).GetCyan(),                                                   \
+         (*color).GetMagenta(),                                                \
+         (*color).GetYellow(),                                                 \
+         (*color).GetBlack());                                                 \
+      return;                                                                  \
+    }                                                                          \
+    if ((*color).IsGrayScale() &&                                              \
+        find((types).begin(), (types).end(), NPDFColorFormat::GreyScale) !=    \
+          (types).end()) {                                                     \
+      cb((*color).GetGrayScale());                                             \
+      return;                                                                  \
+    }                                                                          \
                                                                                \
-      std::cout << "Array" << std::endl;                                       \
-      auto js = info.As<Napi::Array>();                                        \
-      if (js.Length() == 1) {                                                  \
-        double gray = js.Get(static_cast<uint32_t>(0)).As<Napi::Number>();     \
-        cb(gray);                                                              \
-      } else if (js.Length() == 3) {                                           \
-        double r = js.Get(static_cast<uint32_t>(0)).As<Napi::Number>();        \
-        double g = js.Get(static_cast<uint32_t>(1)).As<Napi::Number>();        \
-        double b = js.Get(static_cast<uint32_t>(2)).As<Napi::Number>();        \
-        cb(r, g, b);                                                           \
-      } else if (js.Length() == 4) {                                           \
-        double c = js.Get(static_cast<uint32_t>(0)).As<Napi::Number>();        \
-        double m = js.Get(static_cast<uint32_t>(1)).As<Napi::Number>();        \
-        double y = js.Get(static_cast<uint32_t>(2)).As<Napi::Number>();        \
-        double k = js.Get(static_cast<uint32_t>(3)).As<Napi::Number>();        \
-        cb(c, m, y, k);                                                        \
+    switch (types[0]) {                                                        \
+      case NPDFColorFormat::GreyScale: {                                       \
+        auto gs = (*color).ConvertToGrayScale();                               \
+        cb(gs.GetGrayScale());                                                 \
+        break;                                                                 \
+      }                                                                        \
+      case NPDFColorFormat::RGB: {                                             \
+        auto rgb = (*color).ConvertToRGB();                                    \
+        cb(rgb.GetRed(), rgb.GetGreen(), rgb.GetBlue());                       \
+        break;                                                                 \
+      }                                                                        \
+      case NPDFColorFormat::CMYK: {                                            \
+        auto cmyk = (*color).ConvertToCMYK();                                  \
+        cb(cmyk.GetCyan(),                                                     \
+           cmyk.GetMagenta(),                                                  \
+           cmyk.GetYellow(),                                                   \
+           cmyk.GetBlack());                                                   \
+        break;                                                                 \
       }                                                                        \
     }                                                                          \
   }

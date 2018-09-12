@@ -4,6 +4,7 @@ A bookmark is a combination of an [Outline](../outline.md) and one of either an 
 is a link list type data structure, adding links to pages, external sources or scripts. 
 
 ## Creating a new Bookmark
+
 ```typescript
   let doc = new npdf.Document()
   doc.load('/path/to/file', e => {

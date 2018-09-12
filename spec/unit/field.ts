@@ -29,7 +29,8 @@ tap('StreamDocument create simple form', t => {
 
     // Add field label to page
     painter.setPage(page)
-    painter.setColor([0.0, 0.0, 0.0])
+    const black = new npdf.Color(1.0)
+    painter.setColor(black)
     courier.size = 11
     painter.font = courier
     painter.drawText({ x: 100, y: 500 }, nameLabel)

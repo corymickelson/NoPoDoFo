@@ -152,17 +152,7 @@ Painter::SetPage(const Napi::CallbackInfo& info)
 void
 Painter::SetColor(const CallbackInfo& info)
 {
-  if(info[0].IsObject() && info[0].As<Object>().InstanceOf(Color::constructor.Value())) {
-    painter->SetColor(*Color::Unwrap(info[0].As<Object>())->color);
-  } else if (info[0].IsArray()) {
-    auto jsValue = info[0].As<Array>();
-    float rgb[3];
-    GetRGB(jsValue, rgb);
-    painter->SetColor(rgb[0], rgb[1], rgb[2]);
-  } else {
-    throw Napi::TypeError::New(info.Env(),
-                               "Requires RGB color: [Number, Number, Number]");
-  }
+  painter->SetColor(*Color::Unwrap(info[0].As<Object>())->color);
 }
 
 void

@@ -92,9 +92,7 @@ tap('IPainter', t => {
                 }
 
                 const table = new npdf.SimpleTable(doc, 5, 5)
-                painter.setColor([0.0, 0.0, 0.0])
                 table.setFont(font)
-                table.foregroundColor = [0.0, 0.0, 0.0]
                 for (let c = 0; c < 5; c++) {
                     for (let r = 0; r < 5; r++) {
                         table.setText(c, r, 'A')
