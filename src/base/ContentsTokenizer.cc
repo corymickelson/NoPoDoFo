@@ -54,14 +54,15 @@ ContentsTokenizer::Initialize(Napi::Env& env, Napi::Object& target)
   Function ctor =
     DefineClass(env,
                 "ContentsTokenizer",
-                { InstanceMethod("reader", &ContentsTokenizer::ReadAll) });
+                { InstanceMethod("readSync", &ContentsTokenizer::ReadSync),
+                  InstanceMethod("read", &ContentsTokenizer::Read) });
   constructor = Napi::Persistent(ctor);
   constructor.SuppressDestruct();
   target.Set("ContentsTokenizer", ctor);
 }
 
-Napi::Value
-ContentsTokenizer::ReadAll(const CallbackInfo& info)
+void
+ContentsTokenizer::ReadIntoData()
 {
   const char* token = nullptr;
   PdfVariant var;
@@ -69,8 +70,6 @@ ContentsTokenizer::ReadAll(const CallbackInfo& info)
   std::stack<PdfVariant> stack;
   bool blockText = false;
   PdfFont* font = nullptr;
-  Napi::Array out = Array::New(info.Env());
-
   while (self->ReadNext(type, token, var)) {
     if (type == ePdfContentsType_Keyword) {
       if (strcmp(token, "l") == 0 || strcmp(token, "m") == 0) {
@@ -96,16 +95,16 @@ ContentsTokenizer::ReadAll(const CallbackInfo& info)
             doc.GetDocument().GetPage(pIndex)->GetFromResources(PdfName("Font"),
                                                                 fontName);
           if (!pFont) {
-            throw Error::New(info.Env(), "Failed to create font");
+            throw std::runtime_error("Unable to create font object");
           }
           font = doc.GetDocument().GetFont(pFont);
           if (!font) {
-            throw Error::New(info.Env(), "Failed to create font");
+            throw std::runtime_error("Unable to create font object");
           }
         } else if (strcmp(token, "Tj") == 0 || strcmp(token, "'") == 0) {
           if (stack.empty())
             continue;
-          AddText(font, stack.top().GetString(), out);
+          AddText(font, stack.top().GetString());
           stack.pop();
         } else if (strcmp(token, "\"") == 0) {
           if (stack.size() < 3) {
@@ -114,7 +113,7 @@ ContentsTokenizer::ReadAll(const CallbackInfo& info)
             }
             continue;
           }
-          AddText(font, stack.top().GetString(), out);
+          AddText(font, stack.top().GetString());
           stack.pop();
           stack.pop(); // remove char spacing
           stack.pop(); // remove word spacing
@@ -125,7 +124,7 @@ ContentsTokenizer::ReadAll(const CallbackInfo& info)
           stack.pop();
           for (auto& i : array) {
             if (i.IsString() || i.IsHexString()) {
-              AddText(font, i.GetString(), out);
+              AddText(font, i.GetString());
             }
           }
         }
@@ -134,8 +133,31 @@ ContentsTokenizer::ReadAll(const CallbackInfo& info)
       stack.push(var);
     } else if (type == ePdfContentsType_ImageData) {
     } else {
-      throw Error::New(info.Env(), "Something has gone terribly wrong :(");
+      throw std::runtime_error(
+        "Contents Tokenizer failed with an unknown exception");
     }
+  }
+}
+Napi::Value
+ContentsTokenizer::ReadSync(const CallbackInfo& info)
+{
+  if (!data.empty()) {
+    cout << "Clearing previous results from ContentsTokenizer::Read" << endl;
+    data.clear();
+    contentsString = "";
+  }
+  Napi::Array out = Napi::Array::New(info.Env());
+  try {
+    ReadIntoData();
+  } catch (...) {
+    Error::New(
+      info.Env(),
+      "Unable to finish reader, please report this error to maintainer")
+      .ThrowAsJavaScriptException();
+    return {};
+  }
+  for (uint32_t i = 0; i < data.size(); i++) {
+    out.Set(i, String::New(info.Env(), data[i]));
   }
   return out.Get(Napi::Symbol::WellKnown(info.Env(), "iterator"))
     .As<Napi::Function>()
@@ -143,9 +165,7 @@ ContentsTokenizer::ReadAll(const CallbackInfo& info)
 }
 
 void
-ContentsTokenizer::AddText(PdfFont* font,
-                           const PdfString& text,
-                           Napi::Array& out)
+ContentsTokenizer::AddText(PdfFont* font, const PdfString& text)
 {
   if (!font || !font->GetEncoding()) {
     // handle error
@@ -153,6 +173,62 @@ ContentsTokenizer::AddText(PdfFont* font,
   }
   PdfString unicode = font->GetEncoding()->ConvertToUnicode(text, font);
   const char* chunk = unicode.GetStringUtf8().c_str();
-  out.Set(out.Length(), chunk);
+  data.emplace_back(chunk);
+}
+
+class AsyncContentReader : public AsyncWorker
+{
+public:
+  AsyncContentReader(Function& cb, Napi::Object self)
+    : AsyncWorker(cb, "async_content_reader", self)
+    , Tokenizer(ContentsTokenizer::Unwrap(self))
+  {}
+
+protected:
+  void Execute() override
+  {
+    try {
+      Tokenizer->ReadIntoData();
+    } catch (...) {
+      SetError("Async Reader failure");
+    }
+  }
+  void OnOK() override
+  {
+    if (Tokenizer->data.empty()) {
+      Callback().Call({ Env().Null(), Env().Null() });
+      return;
+    }
+    string all;
+    for (auto& i : Tokenizer->data) {
+      all += i;
+    }
+    //    string all(Tokenizer->data.begin(), Tokenizer->data.end());
+    Tokenizer->contentsString = all;
+    Buffer<string> buffer = Buffer<string>::New(
+      Env(), &Tokenizer->contentsString, Tokenizer->contentsString.size());
+    Callback().Call({ Env().Null(), buffer });
+  }
+
+private:
+  ContentsTokenizer* Tokenizer;
+};
+
+void
+ContentsTokenizer::Read(const CallbackInfo& info)
+{
+  if (!data.empty()) {
+    cout << "Clearing previous results from ContentsTokenizer::Read" << endl;
+    data.clear();
+    contentsString = "";
+  }
+  if (info.Length() < 1 || !info[0].IsFunction()) {
+    Error::New(info.Env(), "A Callback is required")
+      .ThrowAsJavaScriptException();
+    return;
+  }
+  Function cb = info[0].As<Function>();
+  AsyncWorker* async = new AsyncContentReader(cb, this->Value());
+  async->Queue();
 }
 }

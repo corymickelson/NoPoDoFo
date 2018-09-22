@@ -12,14 +12,14 @@ from Javascript to C++ and from C++ back to Javascript.
 
 NoPoDoFo attempts to limit this copy overhead by keeping as much of the PDF as possible in external memory; memory outside v8.
 NoPoDoFo api's where applicable do not return a value to the Javascript runtime(v8) but accept an argument(value) from the Javascript
-runtime and apply that value to the PDF held in external memory. For example, when setting the background color:
+runtime and apply that value to the PDF held in external memory. For example, when setting the stroking width:
 
 ```typescript
-painter.setColor([0.0, 0.0, 0.0])
+painter.setStokingWidth(0.5)
 ```
 
-The value `[0.0, 0.0, 0.0]` is passed to a method on the C++ NoPoDoFo::Painter object which converts the array to a PDF Color and applies
-that color the PoDoFo::Painter instance in memory, no value is returned from this method.
+The value `0.5` is passed to a method on the C++ NoPoDoFo::Painter object which converts the Javascript number to a C++ float and applies
+that number to the PoDoFo::Painter instance in memory, no value is returned from this method.
 
 There are however a handful of NoPoDoFo operations that can be somewhat expensive in terms of copy overhead, one such method being
 `Document.body`. The Document body accessor iterates each object of the PDF Document creating a new NoPoDoFo::Object and returning

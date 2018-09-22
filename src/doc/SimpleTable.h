@@ -75,8 +75,6 @@ private:
   PoDoFo::PdfSimpleTableModel* model = nullptr;
   PoDoFo::PdfTable* table = nullptr;
   PoDoFo::PdfDocument* doc = nullptr;
-  PoDoFo::PdfColor* SetColor(Napi::Array&);
-  void GetColor(PoDoFo::PdfColor&, Napi::Array& js);
 };
 }
 #endif // NPDF_SIMPLETABLE_H

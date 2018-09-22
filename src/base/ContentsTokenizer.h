@@ -23,6 +23,9 @@
 #include <napi.h>
 #include <podofo/podofo.h>
 
+using Napi::CallbackInfo;
+using std::vector;
+
 namespace NoPoDoFo {
 class ContentsTokenizer : public Napi::ObjectWrap<ContentsTokenizer>
 {
@@ -30,14 +33,17 @@ public:
   explicit ContentsTokenizer(const Napi::CallbackInfo&);
   static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
-  Napi::Value ReadAll(const Napi::CallbackInfo&);
-
+  Napi::Value ReadSync(const Napi::CallbackInfo&);
+  void Read(const CallbackInfo&);
+  void ReadIntoData();
+  vector<string> data;
+  string contentsString;
 private:
   std::unique_ptr<PoDoFo::PdfContentsTokenizer> self;
   Document& doc;
 
   int pIndex;
-  void AddText(PoDoFo::PdfFont*, const PoDoFo::PdfString&, Napi::Array& out);
+  void AddText(PoDoFo::PdfFont*, const PoDoFo::PdfString&);
 };
 }
 

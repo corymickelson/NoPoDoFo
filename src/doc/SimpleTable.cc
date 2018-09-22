@@ -444,42 +444,4 @@ SimpleTable::GetAutoPageBreak(const CallbackInfo& info)
   return Boolean::New(info.Env(), table->GetAutoPageBreak());
 }
 
-PdfColor*
-SimpleTable::SetColor(Array& js)
-{
-  PdfColor* color = nullptr;
-  try {
-    uint32_t i = 0;
-    if (js.Length() == 3) {
-      const float r = js.Get(i).As<Number>();
-      const float g = js.Get(++i).As<Number>();
-      const float b = js.Get(++i).As<Number>();
-      color = new PdfColor(r, g, b);
-    } else if (js.Length() == 4) {
-      // cmyk color
-      const float c = js.Get(i).As<Number>();
-      const float m = js.Get(++i).As<Number>();
-      const float y = js.Get(++i).As<Number>();
-      const float k = js.Get(++i).As<Number>();
-      color = new PdfColor(c, m, y, k);
-    } else if (js.Length() == 1) {
-      // gray scale
-      const float gs = js.Get(i).As<Number>();
-      color = new PdfColor(gs);
-    }
-  } catch (PdfError& err) {
-    err.PrintErrorMsg();
-  }
-  return color;
-}
-
-void
-SimpleTable::GetColor(PdfColor& color, Array& js)
-{
-  uint32_t n = 0;
-  for (auto& i : color.ToArray()) {
-    js.Set(n, i.GetNumber());
-    ++n;
-  }
-}
 }

@@ -113,7 +113,7 @@ tap('IPainter', t => {
                             if (e) t.fail(e.message)
                             else {
                                 let contentsParser = new npdf.ContentsTokenizer(doc, 0)
-                                let contents = contentsParser.reader();
+                                let contents = contentsParser.readSync();
                                 let it = contents.next()
                                 let expects = ['MULTILINE', 'TEST', 'SingleLineText']
                                 let found = 0

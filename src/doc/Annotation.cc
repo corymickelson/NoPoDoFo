@@ -281,6 +281,7 @@ Annotation::GetColor(const CallbackInfo& info)
         .ThrowAsJavaScriptException();
       break;
   }
+  return Value();
 }
 
 Napi::Value

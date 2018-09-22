@@ -194,7 +194,7 @@ class DocumentWriteAsync : public AsyncWorker
 {
 public:
   DocumentWriteAsync(Napi::Function& cb, Document& doc, string arg)
-    : Napi::AsyncWorker(cb)
+    : Napi::AsyncWorker(cb, "document_write_async", doc.Value())
     , doc(doc)
     , arg(std::move(arg))
   {}
@@ -230,7 +230,7 @@ public:
                           PdfRefCountedInputDevice* input,
                           bool forUpdate,
                           string pwd)
-    : AsyncWorker(cb)
+    : AsyncWorker(cb, "document_load_buffer_async", doc.Value())
     , doc(doc)
     , data(input)
     , forUpdate(forUpdate)
@@ -269,7 +269,7 @@ public:
                     string arg,
                     bool forUpdate,
                     string pwd)
-    : AsyncWorker(cb)
+    : AsyncWorker(cb, "document_load_async", doc.Value())
     , doc(doc)
     , arg(std::move(arg))
     , pwd(std::move(pwd))
@@ -358,7 +358,7 @@ class DocumentWriteBufferAsync : public AsyncWorker
 {
 public:
   DocumentWriteBufferAsync(Function& cb, Document& doc)
-    : AsyncWorker(cb)
+    : AsyncWorker(cb, "document_write_buffer_async", doc.Value())
     , doc(doc)
   {}
 
@@ -417,7 +417,7 @@ class GCAsync : public AsyncWorker
 {
 public:
   GCAsync(const Function& callback, string doc, string pwd, string output)
-    : AsyncWorker(callback)
+    : AsyncWorker(callback, "gc_async")
     , doc(std::move(doc))
     , pwd(std::move(pwd))
     , output(std::move(output))
