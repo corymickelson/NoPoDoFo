@@ -19,7 +19,6 @@
 #ifndef NPDF_VALIDATEARGUMENTS_H
 #define NPDF_VALIDATEARGUMENTS_H
 
-#include "Defines.h"
 
 #include <map>
 #include <napi.h>

@@ -24,12 +24,12 @@
 #include "Annotation.h"
 #include "CheckBox.h"
 #include "ComboBox.h"
-#include "Field.h"
 #include "Form.h"
 #include "ListBox.h"
 #include "PushButton.h"
 #include "SignatureField.h"
 #include "TextField.h"
+#include "Rect.h"
 
 using namespace Napi;
 using namespace PoDoFo;
@@ -448,6 +448,7 @@ Page::DeleteFormField(const Napi::Env env, PdfObject& item, PdfObject& coll)
     }
     ++it;
   }
+  return false;
 }
 void
 Page::FlattenFields(const Napi::CallbackInfo& info)

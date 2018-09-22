@@ -18,18 +18,22 @@
  */
 
 #include "Outline.h"
+#include "../Defines.h"
+#include "../base/Color.h"
 #include "../base/Obj.h"
 #include "Action.h"
 #include "Destination.h"
 #include "Document.h"
-#include "Page.h"
 #include "StreamDocument.h"
+#include <algorithm>
 
 using namespace Napi;
 using namespace PoDoFo;
 
+using std::find;
 using std::make_unique;
 using std::string;
+using std::vector;
 
 namespace NoPoDoFo {
 
@@ -221,22 +225,22 @@ Outline::SetTextFormat(const Napi::CallbackInfo& info, const Napi::Value& value)
 Napi::Value
 Outline::GetTextColor(const Napi::CallbackInfo& info)
 {
-  double r = GetOutline().GetTextColorRed();
-  double b = GetOutline().GetTextColorBlue();
-  double g = GetOutline().GetTextColorGreen();
-  Array a = Array::New(info.Env());
-  a.Set(static_cast<uint32_t>(0), Number::New(info.Env(), r));
-  a.Set(static_cast<uint32_t>(1), Number::New(info.Env(), g));
-  a.Set(static_cast<uint32_t>(2), Number::New(info.Env(), b));
-  return a;
+  return Color::constructor.New({
+    Number::New(info.Env(), GetOutline().GetTextColorRed()),
+    Number::New(info.Env(), GetOutline().GetTextColorGreen()),
+    Number::New(info.Env(), GetOutline().GetTextColorBlue()),
+  });
 }
 void
 Outline::SetTextColor(const Napi::CallbackInfo& info, const Napi::Value& value)
 {
-  Napi::Array a = value.As<Napi::Array>();
-  double r = a.Get(static_cast<uint32_t>(0)).As<Number>();
-  double g = a.Get(static_cast<uint32_t>(1)).As<Number>();
-  double b = a.Get(static_cast<uint32_t>(2)).As<Number>();
-  GetOutline().SetTextColor(r, g, b);
+  PdfColor color = *Color::Unwrap(info[0].As<Object>())->color;
+  if (!color.IsRGB()) {
+    cout << "Outline text coloring only supports color format RGB, color "
+            "automatically converted to RGB"
+         << endl;
+    color = color.ConvertToRGB();
+  }
+  GetOutline().SetTextColor(color.GetRed(), color.GetGreen(), color.GetBlue());
 }
 }

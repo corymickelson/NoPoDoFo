@@ -20,8 +20,6 @@
 #ifndef NPDF_DICTIONARY_H
 #define NPDF_DICTIONARY_H
 
-#include "../doc/Document.h"
-#include "Obj.h"
 #include <napi.h>
 #include <podofo/podofo.h>
 #include <string>

@@ -17,14 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "../Defines.h"
 #include "Signer.h"
 #include "../ErrorHandler.h"
-#include "../ValidateArguments.h"
 #include "../base/Names.h"
+#include "../ValidateArguments.h"
 #include "Document.h"
 #include "SignatureField.h"
 #include "StreamDocument.h"
+
 #include <map>
 #include <openssl/err.h>
 #include <openssl/pem.h>

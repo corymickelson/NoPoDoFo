@@ -30,6 +30,8 @@
 #include "Form.h"
 #include "Outline.h"
 #include "Page.h"
+#include "Document.h"
+#include "StreamDocument.h"
 
 using namespace Napi;
 using namespace PoDoFo;

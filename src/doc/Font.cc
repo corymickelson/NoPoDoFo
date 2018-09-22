@@ -19,7 +19,6 @@
 
 #include "Font.h"
 #include "../ErrorHandler.h"
-#include "../ValidateArguments.h"
 #include "../base/Obj.h"
 #include "../base/Stream.h"
 #include "Encoding.h"

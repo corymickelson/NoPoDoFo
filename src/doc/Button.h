@@ -20,7 +20,6 @@
 #ifndef NPDF_BUTTON_H
 #define NPDF_BUTTON_H
 
-#include "Field.h"
 #include <napi.h>
 #include <podofo/podofo.h>
 

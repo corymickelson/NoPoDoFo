@@ -27,6 +27,7 @@
 using std::cout;
 using std::endl;
 using std::string;
+using value = Napi::Value;
 
 namespace NoPoDoFo {
 class Field
@@ -34,24 +35,24 @@ class Field
 public:
   explicit Field(PoDoFo::EPdfField type, const Napi::CallbackInfo& info);
   ~Field();
-  Napi::Value GetType(const Napi::CallbackInfo&);
-  Napi::Value GetFieldName(const Napi::CallbackInfo&);
+  value GetType(const Napi::CallbackInfo&);
+  value GetFieldName(const Napi::CallbackInfo&);
   void SetFieldName(const Napi::CallbackInfo&, const Napi::Value&);
-  Napi::Value GetAlternateName(const Napi::CallbackInfo&);
-  Napi::Value GetMappingName(const Napi::CallbackInfo&);
+  value GetAlternateName(const Napi::CallbackInfo&);
+  value GetMappingName(const Napi::CallbackInfo&);
   void SetAlternateName(const Napi::CallbackInfo&, const Napi::Value&);
   void SetMappingName(const Napi::CallbackInfo&, const Napi::Value&);
   void SetRequired(const Napi::CallbackInfo&, const Napi::Value&);
-  Napi::Value IsRequired(const Napi::CallbackInfo&);
+  value IsRequired(const Napi::CallbackInfo&);
   void SetReadOnly(const Napi::CallbackInfo&, const Napi::Value&);
-  Napi::Value IsReadOnly(const Napi::CallbackInfo&);
+  value IsReadOnly(const Napi::CallbackInfo&);
   void SetExport(const Napi::CallbackInfo&, const Napi::Value&);
-  Napi::Value IsExport(const Napi::CallbackInfo&);
-  Napi::Value SetBackground(const Napi::CallbackInfo&);
-  Napi::Value SetBorder(const Napi::CallbackInfo&);
-  Napi::Value SetHighlightingMode(const Napi::CallbackInfo&);
-  Napi::Value SetMouseAction(const Napi::CallbackInfo&);
-  Napi::Value SetPageAction(const Napi::CallbackInfo&);
+  value IsExport(const Napi::CallbackInfo&);
+  void SetBackground(const Napi::CallbackInfo&);
+  void SetBorder(const Napi::CallbackInfo&);
+  void SetHighlightingMode(const Napi::CallbackInfo&);
+  void SetMouseAction(const Napi::CallbackInfo&);
+  void SetPageAction(const Napi::CallbackInfo&);
 
   PoDoFo::PdfField& GetField() { return *field; }
 
@@ -60,6 +61,8 @@ public:
 
 protected:
   string TypeString();
+
+  // void SetColor(const Napi::CallbackInfo&, std::function<void (double, double, double, double)>);
 
 private:
   PoDoFo::PdfField* field;

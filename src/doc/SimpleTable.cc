@@ -18,14 +18,19 @@
  */
 
 #include "SimpleTable.h"
+#include "../Defines.h"
 #include "../ErrorHandler.h"
-#include "../ValidateArguments.h"
+#include "../base/Color.h"
+#include "Document.h"
 #include "Font.h"
 #include "Page.h"
 #include "Painter.h"
+#include "StreamDocument.h"
+#include <optional/optional.hpp>
 
 using namespace PoDoFo;
 using namespace Napi;
+using tl::nullopt;
 
 namespace NoPoDoFo {
 
@@ -34,7 +39,12 @@ FunctionReference SimpleTable::constructor; // NOLINT
 SimpleTable::SimpleTable(const CallbackInfo& info)
   : ObjectWrap(info)
 {
-  doc = Document::Unwrap(info[0].As<Object>())->base;
+  if (info[0].As<Object>().InstanceOf(Document::constructor.Value())) {
+    doc = Document::Unwrap(info[0].As<Object>())->base;
+  } else if (info[0].As<Object>().InstanceOf(
+               StreamDocument::constructor.Value())) {
+    doc = StreamDocument::Unwrap(info[0].As<Object>())->base;
+  }
   const int cols = info[1].As<Number>();
   const int rows = info[2].As<Number>();
   model = new PdfSimpleTableModel(cols, rows);
@@ -46,8 +56,6 @@ SimpleTable::~SimpleTable()
   HandleScope scope(Env());
   delete model;
   delete table;
-  delete backgroundColor;
-  delete foregroundColor;
   doc = nullptr;
 }
 
@@ -159,10 +167,8 @@ SimpleTable::GetBorderColor(const CallbackInfo& info)
   const int col = info[0].As<Number>();
   const int row = info[1].As<Number>();
   auto color = model->GetBorderColor(col, row);
-  auto colorValues = color.ToArray();
-  auto js = Array::New(info.Env());
-  GetColor(color, js);
-  return js;
+  return Color::constructor.New(
+    { External<PdfColor>::New(info.Env(), &color) });
 }
 
 void
@@ -203,21 +209,15 @@ SimpleTable::GetForegroundColor(const CallbackInfo& info)
   const int col = info[0].As<Number>();
   const int row = info[1].As<Number>();
   auto color = model->GetForegroundColor(col, row);
-  auto js = Array::New(info.Env());
-  GetColor(color, js);
-  return js;
+  return Color::constructor.New(
+    { External<PdfColor>::New(info.Env(), &color) });
 }
 void
 SimpleTable::SetForegroundColor(const CallbackInfo& info,
                                 const Napi::Value& value)
 {
-  try {
-    Array a = value.As<Array>();
-    foregroundColor = SetColor(a);
-    model->SetForegroundColor(*foregroundColor);
-  } catch (PdfError& err) {
-    ErrorHandler(err, info);
-  }
+
+  model->SetForegroundColor(*Color::Unwrap(info[0].As<Object>())->color);
 }
 
 Value
@@ -225,27 +225,16 @@ SimpleTable::GetBackgroundColor(const CallbackInfo& info)
 {
   const int col = info[0].As<Number>();
   const int row = info[1].As<Number>();
-  auto color = model->GetForegroundColor(col, row).ToArray();
-  auto js = Array::New(info.Env());
-  uint32_t n = 1;
-  for (auto& i : color) {
-    js.Set(n, i.GetNumber());
-    ++n;
-  }
-  return js;
+  auto color = model->GetForegroundColor(col, row);
+  return Color::constructor.New(
+    { External<PdfColor>::New(info.Env(), &color) });
 }
 
 void
 SimpleTable::SetBackgroundColor(const CallbackInfo& info,
                                 const Napi::Value& value)
 {
-  try {
-    auto a = value.As<Array>();
-    backgroundColor = SetColor(a);
-    model->SetBackgroundColor(*backgroundColor);
-  } catch (PdfError& err) {
-    ErrorHandler(err, info);
-  }
+  model->SetBackgroundColor(*Color::Unwrap(info[0].As<Object>())->color);
 }
 
 Value
@@ -462,23 +451,24 @@ SimpleTable::SetColor(Array& js)
   try {
     uint32_t i = 0;
     if (js.Length() == 3) {
-      const double r = js.Get(i).As<Number>();
-      const double g = js.Get(++i).As<Number>();
-      const double b = js.Get(++i).As<Number>();
+      const float r = js.Get(i).As<Number>();
+      const float g = js.Get(++i).As<Number>();
+      const float b = js.Get(++i).As<Number>();
       color = new PdfColor(r, g, b);
     } else if (js.Length() == 4) {
       // cmyk color
-      const double c = js.Get(i).As<Number>();
-      const double m = js.Get(++i).As<Number>();
-      const double y = js.Get(++i).As<Number>();
-      const double k = js.Get(++i).As<Number>();
+      const float c = js.Get(i).As<Number>();
+      const float m = js.Get(++i).As<Number>();
+      const float y = js.Get(++i).As<Number>();
+      const float k = js.Get(++i).As<Number>();
       color = new PdfColor(c, m, y, k);
     } else if (js.Length() == 1) {
       // gray scale
-      const double gs = js.Get(i).As<Number>();
+      const float gs = js.Get(i).As<Number>();
       color = new PdfColor(gs);
     }
   } catch (PdfError& err) {
+    err.PrintErrorMsg();
   }
   return color;
 }

@@ -18,10 +18,7 @@
  */
 
 #include "XObject.h"
-#include "../doc/BaseDocument.h"
-#include "../doc/Document.h"
 #include "../doc/Rect.h"
-#include "../doc/StreamDocument.h"
 #include "Obj.h"
 
 using namespace Napi;

@@ -20,17 +20,14 @@
 #ifndef NPDF_ANNOTATION_H
 #define NPDF_ANNOTATION_H
 
-#include "Document.h"
-#include "Page.h"
-#include "Rect.h"
 #include <napi.h>
 #include <podofo/podofo.h>
 #include <vector>
 
-namespace NoPoDoFo {
-
 using namespace PoDoFo;
 using namespace Napi;
+
+namespace NoPoDoFo {
 
 class Annotation : public ObjectWrap<Annotation>
 {

@@ -18,14 +18,12 @@
  */
 
 #include "Destination.h"
-#include "../Defines.h"
-#include "../ValidateArguments.h"
 #include "../base/Dictionary.h"
+
+#include "../ValidateArguments.h"
 #include "../base/Obj.h"
 #include "./Page.h"
 #include "./Rect.h"
-#include "Document.h"
-#include "StreamDocument.h"
 #include <iostream>
 
 using namespace PoDoFo;

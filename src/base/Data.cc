@@ -19,7 +19,6 @@
 
 #include "Data.h"
 #include "../ErrorHandler.h"
-#include "../ValidateArguments.h"
 
 using namespace PoDoFo;
 using namespace Napi;

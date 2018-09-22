@@ -18,8 +18,8 @@
  */
 
 #include "Document.h"
+#include "../Defines.h"
 #include "../ErrorHandler.h"
-#include "../ValidateArguments.h"
 #include "../base/Names.h"
 #include "../base/Obj.h"
 #include "Encrypt.h"

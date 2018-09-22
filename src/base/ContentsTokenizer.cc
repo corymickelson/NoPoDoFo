@@ -18,10 +18,10 @@
  */
 
 #include "ContentsTokenizer.h"
-#include "../ValidateArguments.h"
 #include "../doc/Document.h"
 #include "../doc/Page.h"
 #include "../doc/StreamDocument.h"
+
 #include <iostream>
 #include <sstream>
 #include <stack>

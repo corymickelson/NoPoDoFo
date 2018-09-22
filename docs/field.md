@@ -1,19 +1,21 @@
 # API Documentation for Field
 
-* [Properties](#properties)
-  * [readOnly](#readonly)
-  * [required](#required)
-  * [type](#type)
-  * [fieldName](#fieldname)
-  * [alternateName](#alternateName)
-  * [mappingName](#mappingName)
-  * [exported](#exported)
-* [Methods](#methods)
-  * [setBackgroundColor](#setBackgroundColor)
-  * [setBorderColor](#setBorderColor)
-  * [setHighlightingMode](#setHighlightingMode)
-  * [setMouseAction](#setMouseAction)
-  * [setPageAction](#setPageAction)
+- [API Documentation for Field](#api-documentation-for-field)
+  - [NoPoDoFo Field](#nopodofo-field)
+  - [Properties](#properties)
+    - [readOnly](#readonly)
+    - [required](#required)
+    - [type](#type)
+    - [fieldName](#fieldname)
+    - [alternateName](#alternatename)
+    - [mappingName](#mappingname)
+    - [exported](#exported)
+  - [Methods](#methods)
+    - [setBackgroundColor](#setbackgroundcolor)
+    - [setBorderColor](#setbordercolor)
+    - [setHighlightingMode](#sethighlightingmode)
+    - [setMouseAction](#setmouseaction)
+    - [setPageAction](#setpageaction)
 
 ## NoPoDoFo Field
 All acroform fields with the exception of SignatureField inherit Field.
@@ -27,9 +29,9 @@ All acroform fields with the exception of SignatureField inherit Field.
     mappingName?: string
     exported?: boolean
 
-    setBackgroundColor(color: NPDFColor): void
+    setBackgroundColor(color: Color): void
 
-    setBorderColor(color: NPDFColor): void
+    setBorderColor(color: Color): void
 
     setHighlightingMode(mode: NPDFHighlightingMode): void
 
@@ -67,15 +69,15 @@ Enable/Disable exporting.
 
 ### setBackgroundColor
 ```typescript
-setBackgroundColor(color: NPDFColor): void
+setBackgroundColor(color: Color): void
 ```
-Set the background color as an NPDFColor.
+Set the background color as an [Color](./color.md).
 
 ### setBorderColor
 ```typescript
-setBorderColor(color: NPDFColor): void
+setBorderColor(color: Color): void
 ```
-Set the bordercolor as an NPDFColor.
+Set the bordercolor as an [Color](./color.md).
 
 ### setHighlightingMode
 ```typescript

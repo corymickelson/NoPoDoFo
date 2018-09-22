@@ -21,6 +21,7 @@
 #include "../base/Names.h"
 #include "../base/Obj.h"
 #include "StreamDocument.h"
+#include "Document.h"
 
 using namespace Napi;
 using namespace PoDoFo;

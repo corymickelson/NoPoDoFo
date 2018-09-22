@@ -20,6 +20,7 @@
 #include "base/Array.h"
 #include "base/Date.h"
 #include "base/ContentsTokenizer.h"
+#include "base/Color.h"
 #include "base/Data.h"
 #include "base/Dictionary.h"
 #include "base/Obj.h"
@@ -47,6 +48,8 @@
 #include "doc/SimpleTable.h"
 #include "doc/StreamDocument.h"
 #include "doc/TextField.h"
+#include "doc/Page.h"
+#include "doc/Rect.h"
 #include <napi.h>
 
 Napi::Object
@@ -61,6 +64,7 @@ return;
   NoPoDoFo::Annotation::Initialize(env, exports);
   NoPoDoFo::Array::Initialize(env, exports);
   NoPoDoFo::CheckBox::Initialize(env, exports);
+  NoPoDoFo::Color::Initialize(env, exports);
   NoPoDoFo::ComboBox::Initialize(env, exports);
   NoPoDoFo::ContentsTokenizer::Initialize(env, exports);
   NoPoDoFo::Data::Initialize(env, exports);

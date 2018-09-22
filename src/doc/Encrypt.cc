@@ -19,7 +19,6 @@
 
 #include "Encrypt.h"
 #include "../ErrorHandler.h"
-#include "../ValidateArguments.h"
 #include "Document.h"
 #include <algorithm>
 #include <sstream>

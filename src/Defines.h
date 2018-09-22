@@ -24,8 +24,12 @@
 #define CONCAT(a, b) CONCAT_(a, b)
 #define DEFER(fn) ScopeGuard CONCAT(__defer__, __LINE__) = [&]() { fn; }
 
+#include "base/Color.h"
 #include <napi.h>
 #include <podofo/podofo.h>
+
+using namespace Napi;
+using namespace PoDoFo;
 
 namespace NoPoDoFo {
 
@@ -62,6 +66,60 @@ enum DocumentInputDevice
       }                                                                        \
     }                                                                          \
   }
+enum NPDFColorFormat
+{
+  GreyScale = 0,
+  RGB,
+  CMYK
+};
+
+#define NPDFColorAccessor(color, types, cb)                                    \
+  /* Color is the PdfColor object, types an array of NPDFColorFormat's in*/    \
+  /* order of precedence, and the function to call as the cb*/                 \
+  {                                                                            \
+    if ((*color).IsRGB() &&                                                    \
+        find((types).begin(), (types).end(), NPDFColorFormat::RGB) !=          \
+          (types).end()) {                                                     \
+      cb((*color).GetRed(), (*color).GetGreen(), (*color).GetBlue());          \
+      return;                                                                  \
+    }                                                                          \
+    if ((*color).IsCMYK() &&                                                   \
+        find((types).begin(), (types).end(), NPDFColorFormat::CMYK) !=         \
+          (types).end()) {                                                     \
+      cb((*color).GetCyan(),                                                   \
+         (*color).GetMagenta(),                                                \
+         (*color).GetYellow(),                                                 \
+         (*color).GetBlack());                                                 \
+      return;                                                                  \
+    }                                                                          \
+    if ((*color).IsGrayScale() &&                                              \
+        find((types).begin(), (types).end(), NPDFColorFormat::GreyScale) !=    \
+          (types).end()) {                                                     \
+      cb((*color).GetGrayScale());                                             \
+      return;                                                                  \
+    }                                                                          \
+                                                                               \
+    switch (types[0]) {                                                        \
+      case NPDFColorFormat::GreyScale: {                                       \
+        auto gs = (*color).ConvertToGrayScale();                               \
+        cb(gs.GetGrayScale());                                                 \
+        break;                                                                 \
+      }                                                                        \
+      case NPDFColorFormat::RGB: {                                             \
+        auto rgb = (*color).ConvertToRGB();                                    \
+        cb(rgb.GetRed(), rgb.GetGreen(), rgb.GetBlue());                       \
+        break;                                                                 \
+      }                                                                        \
+      case NPDFColorFormat::CMYK: {                                            \
+        auto cmyk = (*color).ConvertToCMYK();                                  \
+        cb(cmyk.GetCyan(),                                                     \
+           cmyk.GetMagenta(),                                                  \
+           cmyk.GetYellow(),                                                   \
+           cmyk.GetBlack());                                                   \
+        break;                                                                 \
+      }                                                                        \
+    }                                                                          \
+  }
 
 /**
  *https://oded.blog/2017/10/05/go-defer-in-cpp/
@@ -73,11 +131,13 @@ public:
   ScopeGuard(Callable&& fn)
     : fn_(std::forward<Callable>(fn))
   {}
+
   ScopeGuard(ScopeGuard&& other) noexcept
     : fn_(std::move(other.fn_))
   {
     other.fn_ = nullptr;
   }
+
   ~ScopeGuard()
   {
     if (fn_)
@@ -85,6 +145,7 @@ public:
   }
 
   ScopeGuard(const ScopeGuard&) = delete;
+
   void operator=(const ScopeGuard&) = delete;
 
 private:

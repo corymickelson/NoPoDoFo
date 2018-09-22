@@ -19,12 +19,14 @@
 
 #include "Rect.h"
 #include "../ValidateArguments.h"
-#include "Page.h"
+#include <iostream>
 
 using namespace Napi;
 using namespace PoDoFo;
 using std::vector;
 using tl::nullopt;
+using std::cout;
+using std::endl;
 
 namespace NoPoDoFo {
 
