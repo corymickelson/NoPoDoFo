@@ -35,6 +35,8 @@ public:
   Napi::Value ToString(const Napi::CallbackInfo&);
   Napi::Value IsValid(const Napi::CallbackInfo&);
 
+  PoDoFo::PdfDate GetDate() { return *timestamp; }
+
 private:
   PoDoFo::PdfDate* timestamp;
 };

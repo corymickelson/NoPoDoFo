@@ -651,7 +651,7 @@ export namespace nopodofo {
 
     setCreator(creator: string): void
 
-    setDate(dateTime?: string): void
+    setDate(dateTime?: string|nopodofo.Date): void
 
     addCertificateReference(perm: NPDFCertificatePermission): void
 
