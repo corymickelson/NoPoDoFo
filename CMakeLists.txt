@@ -33,7 +33,8 @@ if (MSVC)
 
     set(CMAKE_CXX_FLAGS /EH)
     set(CMAKE_CXX_FLAGS /EHsc)
-    set(CMAKE_TOOLCHAIN_FILE "${VCPKG_PATH}\\scripts\\buildsystems\\vcpkg.cmake")
+    # set(CMAKE_TOOLCHAIN_FILE "$ENV{vcpkg_path}\\scripts\\buildsystems\\vcpkg.cmake")
+    message("CMAKE_TOOLCHAIN_FILE = ${CMAKE_TOOLCHAIN_FILE}")
 endif (MSVC)
 
 file(GLOB SOURCE_FILES
@@ -56,7 +57,7 @@ else()
     set(NAPI_MODULE "${PROJECT_DIR}/node_modules/node-addon-api")
     set(NAPI_SRC  "${PROJECT_DIR}/node_modules/node-addon-api/src")
 endif()
-message(WARNING "Using napi: ${NAPI_MODULE}")
+message("Using napi: ${NAPI_MODULE}")
 target_include_directories(${PROJECT_NAME} PRIVATE
         ${CMAKE_SOURCE_DIR}/deps/include
         ${NAPI_MODULE}
@@ -65,23 +66,24 @@ target_include_directories(${PROJECT_NAME} PRIVATE
         ${CMAKE_JS_INC})
 target_link_libraries(${PROJECT_NAME} PRIVATE ${CMAKE_JS_LIB} ${OPENSSL_LIBRARIES})
 
-message(WARNING "Openssl version: ${OPENSSL_VERSION}")
-message(WARNING "CMAKE-JS version: ${CMAKE_JS_VERSION}")
+message("Openssl version: ${OPENSSL_VERSION}")
+message("CMAKE-JS version: ${CMAKE_JS_VERSION}")
 
 if (MSVC)
     add_definitions(-DUSING_SHARED_PODOFO=1)
     target_include_directories(${PROJECT_NAME} PRIVATE ${PODOFO_INCLUDE_DIR})
     target_link_libraries(${PROJECT_NAME} PRIVATE ${PODOFO_LIBRARY})
+    target_link_libraries(${PROJECT_NAME} PRIVATE OpenSSL::SSL OpenSSL::Crypto)
     message("what is the output directory: ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}")
     set(WIN_REQUIRED_DLLS
-      "expat.dll" 
-      "fontconfig.dll" 
+      #"expat.dll" 
+      #"fontconfig.dll" 
       "freetype.dll" 
       "jpeg62.dll" 
       "libbz2.dll" 
-      "libcharset.dll" 
+      #"libcharset.dll" 
       "libeay32.dll" 
-      "libiconv.dll" 
+      #"libiconv.dll" 
       "libpng16.dll" 
       "lzma.dll" 
       "podofo.dll" 
@@ -106,7 +108,7 @@ if (MSVC)
     endforeach(file_i)
 
 else ()
-    message(warning "Creating build output directory: build/${CMAKE_BUILD_TYPE}")
+    message("Creating build output directory: build/${CMAKE_BUILD_TYPE}")
     file(MAKE_DIRECTORY ${CMAKE_SOURCE_DIR}/build/${CMAKE_BUILD_TYPE})
     find_path(PODOFO_INCLUDE_DIR podofo/podofo.h PATHS /sources/local /usr/include /usr/local/include)
     find_library(PODOFO_LIBRARY NAMES podofo PATHS /sources/local /usr/lib64 /usr/lib /usr/local/lib)

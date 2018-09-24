@@ -5,6 +5,7 @@ Requirements:
  - PoDoFo >= 0.9.6
  - CMake >= 3
  - Nodejs >= 8
+ - OpenSSL
 
 The recommended installation process is as follows:
 
@@ -14,12 +15,17 @@ The recommended installation process is as follows:
 
 Please install [vcpkg](https://github.com/Microsoft/vcpkg) as your package manager for building and installing PoDoFo.
 To install PoDoFo with vcpkg run `vcpkg install podofo:x64-windows`[^1]. NoPoDoFo requires the path to vcpkg root directory as environment variable `vcpkg_path`.
+Install OpenSSL (required by NoPoDoFo) using the same command used to install PoDoFo `vcpkg install openssl:x64-windows`.
+To enable [CMake find_package](https://cmake.org/cmake/help/v3.8/command/find_package.html), used to find openssl, run `vcpkg integrate install`.
 Building NoPoDoFo from source requires CMake.
  - Set environment variable `vcpkg_path` to the root of your vcpkg installation, ex: `set vcpkg_path=C:\\vcpkg`
  - run `git clone https://github.com/corymickelson/NoPoDoFo`
  - run `npm install`
  - run `./node_modules/.bin/cmake-js build`
  - run `./node_modules/.bin/tsc -p tsconfig.json`
+
+**Note** If `cmake-js build` fails with the error 'Unable to find OpenSSL' try running the build command again with CMAKE_TOOLCHAIN_FILE set to the 
+proper location, ex `cmake-js build --CDCMAKE_TOOLCHAIN_FILE=C:\vcpkg\scripts\buildsystems\vcpkg.cmake`
 
 NoPoDoFo also provides pre-built binaries for Windows.
 To install a pre-built in your npm project run `npm install https://github.com/corymickelson/NoPoDoFo/releases/download/{version}/nopodofo-{version}-win-x86_64.tar.gz`

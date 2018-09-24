@@ -549,6 +549,8 @@ export namespace nopodofo {
 
         setMouseAction(on: NPDFMouseEvent, action: Action): void
 
+        setDate(dateTime?: string|nopodofo.Date): void
+
         setPageAction(on: NPDFPageEvent, action: Action): void
     }
 

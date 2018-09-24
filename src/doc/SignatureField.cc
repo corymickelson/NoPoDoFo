@@ -19,6 +19,9 @@
 
 #include "SignatureField.h"
 #include "../ErrorHandler.h"
+#include "../ValidateArguments.h"
+#include "../base/Data.h"
+#include "../base/Date.h"
 #include "../base/Names.h"
 #include "../base/XObject.h"
 #include "../doc/Annotation.h"
@@ -134,6 +137,9 @@ SignatureField::SetDate(const CallbackInfo& info)
   if (info.Length() == 1 && info[0].IsString()) {
     GetField()->SetSignatureDate(
       PdfDate(PdfString(info[0].As<String>().Utf8Value())));
+  } else if (info.Length() == 1 && info[0].IsObject() &&
+             info[0].As<Object>().InstanceOf(Date::constructor.Value())) {
+    GetField()->SetSignatureDate(Date::Unwrap(info[0].As<Object>())->GetDate());
   } else {
     GetField()->SetSignatureDate(PdfDate());
   }
