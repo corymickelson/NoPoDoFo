@@ -1,17 +1,11 @@
 # API Documentation for SignatureField
 
-* [Properties](#properties)
-* [NoPoDoFo SignatureField](#nopodofo-signaturefield)
-* [Methods](#methods)
-  * [setAppearanceStream](#setappearancestream)
-  * [setReason](#setreason)
-  * [setLocation](#setlocation)
-  * [setCreator](#setcreator)
-  * [setDate](#setdate)
-  * [setFieldName](#setfieldname)
-  * [addCertificateReference](#setcertificatereference)
-  * [getObject](#getobject)
-  * [ensureSignatureObject](#ensuresignatureobject)
+- [API Documentation for SignatureField](#api-documentation-for-signaturefield)
+  - [NoPoDoFo SignatureField](#nopodofo-signaturefield)
+  - [Constructors](#constructors)
+  - [Properties](#properties)
+  - [Methods](#methods)
+    - [setAppearanceStream](#setappearancestream)
 
 ## NoPoDoFo SignatureField
 
@@ -37,6 +31,7 @@ class SignatureField {
 ```
 
 ## Constructors
+---------------
 
 ```typescript
 new(annotation: Annotation, doc: Document): SignatureField
@@ -45,14 +40,17 @@ new(annotation: Annotation, doc: Document): SignatureField
 Create a new instance of a SignatureField object. The [Annotation](./annotations.md) must be of type `Widget`.
 
 ## Properties
+-------------
 
 ## Methods
+-----------------
 
 ### setAppearanceStream
 
 ```typescript
 setAppearanceStream(xObj: any, appearance: NPDFAnnotationAppearance, name: string): void
 ```
+
 Set an appearance stream for this field. Setting the appearance stream `AP` is comprised of a set of instructions written
 to an [XObject](./xobject.md), the type of appearance as one of NPDFAnnotationAppearance, and an optional name for the state of
 the appearance. Please familiarize yourself with the [spec](https://wwwimages2.adobe.com/content/dam/acom/en/devnet/pdf/PDF32000_2008.pdf) section

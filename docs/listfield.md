@@ -1,16 +1,18 @@
 # API Documentation for ListField
 
-* [Properties](#properties)
-  * [selected](#selected)
-  * [length](#length)
-  * [spellCheckEnabled](#spellCheckEnabled)
-  * [sorted](#sorted)
-  * [multiSelect](#multiselect)
-* [Methods](#methods)
-  * [isComboBox](#isComboBox)
-  * [insertItem](#insertItem)
-  * [removeItem](#removeItem)
-  * [getItem](#getItem)
+- [API Documentation for ListField](#api-documentation-for-listfield)
+  - [NoPoDoFo ListField](#nopodofo-listfield)
+  - [Properties](#properties)
+    - [selected](#selected)
+    - [length](#length)
+    - [spellCheckEnabled](#spellcheckenabled)
+    - [sorted](#sorted)
+    - [multiSelect](#multiselect)
+  - [Methods](#methods)
+    - [isComboBox](#iscombobox)
+    - [insertItem](#insertitem)
+    - [removeItem](#removeitem)
+    - [getItem](#getitem)
 
 ## NoPoDoFo ListField
 
@@ -34,6 +36,7 @@ abstract class ListField extends Field {
 ```
 
 ## Properties
+----------------
 
 ### selected
 Get or set the selected list item.
@@ -60,11 +63,14 @@ Enable or sidable multiselect
 Enable or sidable multiselect
 
 ## Methods
+---------------
 
 ### isComboBox
+
 ```typescript
 isComboBox(): boolean
 ```
+
 If derived field is a ComboBox return true, else false
 
 ```typescript

@@ -18,7 +18,9 @@
     - [setPageAction](#setpageaction)
 
 ## NoPoDoFo Field
+
 All acroform fields with the exception of SignatureField inherit Field.
+
 ```typescript
   abstract class Field {
     readOnly: boolean
@@ -43,6 +45,7 @@ All acroform fields with the exception of SignatureField inherit Field.
 ```
 
 ## Properties
+----------------
 
 ### readOnly
 Enable/Disable readonly property. If set the user may not change the value of the field.
@@ -66,6 +69,7 @@ Get or set a mapping name; a mapping name is used when exporting the fields data
 Enable/Disable exporting.
 
 ## Methods
+---------------
 
 ### setBackgroundColor
 ```typescript

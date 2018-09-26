@@ -73,6 +73,7 @@ class SimpleTable {
 ```
 
 ## Constructors
+-------------------
 
 ```typescript
 new(doc:Document, cols:number, rows: number): SimpleTable
@@ -81,6 +82,7 @@ new(doc:Document, cols:number, rows: number): SimpleTable
 Create a new table model with n columns(cols) and n rows(row)
 
 ## Properties
+--------------
 
 ### borderWidth
 
@@ -118,6 +120,7 @@ if there is not enough space on the current page. The newly created page will be
 on the painter used to draw and will be created using the same size as the old page.
 
 ## Methods
+----------------
 
 ### getText
 

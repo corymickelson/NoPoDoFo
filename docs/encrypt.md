@@ -1,17 +1,23 @@
 # API Documentation for Encrypt
 
-* [Properties](#properties)
-  * [owner](#owner)
-  * [user](#user)
-  * [encryptionKey](#encryptionkey)
-  * [keyLength](#keylength)
-  * [protections](#protections)
-* [Methods](#methods)
-  * [isAllowed](#isAllowed)
+- [API Documentation for Encrypt](#api-documentation-for-encrypt)
+  - [NoPoDoFo Encrypt](#nopodofo-encrypt)
+  - [Constructors](#constructors)
+    - [Example](#example)
+  - [Properties](#properties)
+    - [owner](#owner)
+    - [user](#user)
+    - [encryptionKey](#encryptionkey)
+    - [keyLength](#keylength)
+    - [protections](#protections)
+  - [Methods](#methods)
+    - [isAllowed](#isallowed)
 
 ## NoPoDoFo Encrypt
+
 A PDF can encrypt it's contents, all strings and stream objects, to prevent unauthorized user's from viewing sensitive information.
 EncryptOption(s) are dependent on PoDoFo built with libidn and OpenSSL.
+
 ```typescript
 class Encrypt {
   static createEncrypt(opts: EncryptOption): NPDFExternal<Encrypt>
@@ -67,6 +73,7 @@ doc.load('/path/to/doc.pdf', (e) => {
 ```
 
 ## Properties
+----------------
 
 ### owner
 Get the owner object value
@@ -84,9 +91,12 @@ Get the encryption key length
 Get the protections applied to the [Document](./document.md) as ProtectionSummary
 
 ## Methods
+---------
 
 ### isAllowed
+
 ```typescript
 isAllowed(action: ProtectionOption): boolean
 ```
+
 Check if a ProtectionOption is allowed.

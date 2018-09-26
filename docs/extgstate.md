@@ -1,17 +1,22 @@
 # API Documentation for ExtGState
 
-* [Properties](#properties)
-* [Methods](#methods)
-  * [setFillOpacity](#setFillOpacity)
-  * [setBlendMode](#setBlendMode)
-  * [setOverprint](#setOverprint)
-  * [setFillOverprint](#setFillOverprint)
-  * [setStrokeOpacity](#setStrokeOpacity)
-  * [setNoneZeroOverprint](#setNoneZeroOverprint)
-  * [setRenderingIntent](#setRenderingIntent)
-  * [setFrequency](#setFrequency)
+- [API Documentation for ExtGState](#api-documentation-for-extgstate)
+  - [NoPoDoFo ExtGState](#nopodofo-extgstate)
+  - [Constructors](#constructors)
+  - [Properties](#properties)
+  - [Methods](#methods)
+    - [setFillOpacity](#setfillopacity)
+    - [setBlendMode](#setblendmode)
+    - [setOverprint](#setoverprint)
+    - [setFillOverprint](#setfilloverprint)
+    - [setStrokeOpacity](#setstrokeopacity)
+    - [setStrokeOverprint](#setstrokeoverprint)
+    - [setNonZeroOverprint](#setnonzerooverprint)
+    - [setRenderingIntent](#setrenderingintent)
+    - [setFrequency](#setfrequency)
 
 ## NoPoDoFo ExtGState
+
 The ExtGState, external graphics state, is primarily responsible for transparency. The simplist type being the level of opacity
 of an object, where 1 is completely opaque 0 is invisible.
 
@@ -30,6 +35,8 @@ class ExtGState {
 }
 ```
 ## Constructors
+----------------
+
 ```typescript
 new(doc: Base): ExtGState
 ```
@@ -37,8 +44,10 @@ Create a new ExtGState object owned by the [Document](./document.md) provided. A
 resource dictionary. Setting this value is accomplished by [Painter.SetExtGState](./painter.md#setextgstate.md).
 
 ## Properties
+-------------
 
 ## Methods
+----------
 
 ### setFillOpacity
 ```typescript

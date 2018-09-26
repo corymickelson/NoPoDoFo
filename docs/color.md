@@ -48,6 +48,7 @@ class Color {
 ```
 
 ## Constructors
+--------------
 
 ```typescript
 constructor(grey: number)
@@ -68,8 +69,10 @@ constructor(cyan: number, magenta: number, yellow: number, black: number)
 Create a new CMYK Color
 
 ## Properties
+--------------
 
 ## Methods
+--------------
 
 ### isRGB
 

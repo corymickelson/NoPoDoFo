@@ -1,15 +1,19 @@
 # API Documentation for Form
 
-* [Properties](#properties)
-  * [needAppearances](#needAppearances)
-  * [dictionary](#dictionary)
-  * [DA](#da)
-  * [DR](#dr)
-  * [CO](#co)
-  * [SigFlags](#sigflags)
-* [Methods](#methods)
+- [API Documentation for Form](#api-documentation-for-form)
+  - [NoPoDoFo Form](#nopodofo-form)
+  - [Constructors](#constructors)
+  - [Properties](#properties)
+    - [needAppearances](#needappearances)
+    - [dictionary](#dictionary)
+    - [DA](#da)
+    - [DR](#dr)
+    - [CO](#co)
+    - [SigFlags](#sigflags)
+  - [Methods](#methods)
 
 ## NoPoDoFo Form
+
 A Form or AcroForm is a [Dictionary](./dictionary.md) containing all the [Annotation](./annotations.md) for the [Document](./document.md).
 NoPoDoFo supports creating, modifying, and filling interactive forms (AcroForm). 
 To access a documents acroform use the `Document.form` accessor. 
@@ -29,8 +33,10 @@ class Form {
 ```
 
 ## Constructors
+----------------
 
 ## Properties
+-----------------
 
 ### needAppearances
 Enable or disable the use of the default appearance stream. 
@@ -56,3 +62,4 @@ action is triggered.
 Get or set SigFlags flags as one of NPDFSigFlags.
 
 ## Methods
+---------------

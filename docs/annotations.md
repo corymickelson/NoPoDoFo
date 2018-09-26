@@ -1,23 +1,22 @@
 # API Documentation for Annotation
 
-* [Properties](#properties)
-  * [flags](#flags)
-  * [title](#title)
-  * [content](#content)
-  * [destination](#destination)
-  * [action](#action)
-  * [open](#open)
-  * [quadPoints](#quadPoints)
-  * [color](#color)
-  * [attachment](#attachment)
-
-* [Methods](#methods)
-  * [setBorderStyle](#setBorderStyle)
-  * [hasAppearanceStream](#hasAppearanceStream)
-  * [setAppearanceStream](#setAppearanceStream)
-  * [getType](#getType)
+- [API Documentation for Annotation](#api-documentation-for-annotation)
+  - [NoPoDoF Annotation](#nopodof-annotation)
+  - [Properties](#properties)
+    - [flags](#flags)
+    - [title](#title)
+    - [content](#content)
+    - [destination](#destination)
+    - [action](#action)
+    - [open](#open)
+  - [Methods](#methods)
+    - [setBorderStyle](#setborderstyle)
+    - [hasAppearanceStream](#hasappearancestream)
+    - [setAppearanceStream](#setappearancestream)
+    - [getType](#gettype)
 
 ## NoPoDoF Annotation
+
 An annotation associates an object to a specific location on a [Page](./page).
 Annotations are the core of all pdf widgets including AcroForm fields, sticky notes, links, etc...
 In nopodofo an Annotation may only be created via [createAnnotation](./page.md#createannotation).
@@ -43,6 +42,7 @@ Annotations are a lower level PDF object, please familiarize yourself with the P
 ```
 
 ## Properties
+-------------
 
 ### flags
 This gets or sets the NPDFAnnotationFlag value of the annotations `F` property.
@@ -68,16 +68,37 @@ This gets or sets the open property. An annotation may be in one of two states, 
 box or stamp, when a closed annotation is clicked it becomes activated performing exhibiting it's associated object.
 
 ## Methods
+-------------
 
 ### setBorderStyle
+
+```typescript
+setBorderStyle(v: NPDFAnnotationBorderStyle): void
+```
+
 An annotation my optionally be surrounded with a styled border when displayed or printed. This method will set the `BS` dictionary with the
 NPDFAnnotationBorderStyle value provied as the first parameter.
 
 ### hasAppearanceStream
+
+```typescript
+hasAppearanceStream(): boolean
+```
+
 If an appearance stream `AS` is present in the annotation [Dictionary](./dictionary.md) returns true, else false.
 
 ### setAppearanceStream
+
+```typescript
+setAppearanceStream(xobj: XObject): void
+```
+
 Set the appearance stream `AS` property of the annotation [Dictionary](./dictionary.md).
 
 ### getType
+
+```typescript
+getType(): NPDFAnnotationType
+```
+
 Get the type of annotation as an NPDFAnnotationType value.

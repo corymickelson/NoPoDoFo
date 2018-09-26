@@ -46,12 +46,14 @@ class Outline {
 ```
 
 ## Constructor
+--------------
 
 NoPoDoFo does not support a default constructor for creating Outline objects. In order to begin an outline you must start at the root.
 Creating a root is accomplished by [Document.getOutline](./document.md#getoutline), subsequent nodes are created using the [createChild](#createchild)
 and [createNext](#createnext) methods.
 
 ## Properties
+------------
 
 ### prev
 
@@ -90,6 +92,7 @@ Get and set the format of the title of the outline item
 Get and set the text color as [Color](./color.md) of the title of the outline item
 
 ## Methods
+----------------
 
 ### createChild
 

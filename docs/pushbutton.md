@@ -1,11 +1,15 @@
 # API Documentation for PushButton
 
-* [Properties](#properties)
-  * [rollover](#rollover)
-  * [rolloverAlternate](#rolloveralternate)
-* [Methods](#methods)
+- [API Documentation for PushButton](#api-documentation-for-pushbutton)
+  - [NoPoDoFo PushButton](#nopodofo-pushbutton)
+  - [Constructors](#constructors)
+  - [Properties](#properties)
+    - [rollover](#rollover)
+    - [rolloverAlternate](#rolloveralternate)
+  - [Methods](#methods)
 
 ## NoPoDoFo PushButton
+
 ```typescript
 class PushButton extends Field {
   new(page: Page, fieldIndex: number): PushButton
@@ -17,6 +21,8 @@ class PushButton extends Field {
 ```
 
 ## Constructors
+-------------
+
 ```typescript
 new(page: Page, fieldIndex: number): PushButton
 ```
@@ -26,6 +32,7 @@ new(form: Form, annotation: Annotation): PushButton
 ```
 
 ## Properties
+--------------
 
 ### rollover
 Rollover text
@@ -34,3 +41,4 @@ Rollover text
 Rollover alternate text
 
 ## Methods
+--------------

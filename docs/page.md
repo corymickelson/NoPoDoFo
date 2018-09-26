@@ -1,28 +1,31 @@
 # API Documentation for Page
 
-* [Properties](#properties)
-  * [rotation](#rotation)
-  * [trimBox](#trimbox)
-  * [number](#number)
-  * [width](#width)
-  * [height](#height)
-  * [contents](#contents)
-  * [resources](#resources)
-* [Methods](#methods)
-  * [getField](#getfield)
-  * [getFields](#getfields)
-  * [fieldCount](#fieldcount)
-  * [getFieldIndex](#getfieldindex)
-  * [getMediaBox](#getmediaBox)
-  * [getBleedBox](#getbleedBox)
-  * [getArtBox](#getartBox)
-  * [annotationCount](#annotationcount)
-  * [createAnnotation](#createannotation)
-  * [createField](#createfield)
-  * [deleteField](#deletefield)
-  * [flattenFields](#flattenfields)
-  * [getAnnotation](#getannotation)
-  * [deleteAnnotation](#deleteannotation)
+- [API Documentation for Page](#api-documentation-for-page)
+  - [NoPoDoFo Page](#nopodofo-page)
+  - [Constructors](#constructors)
+  - [Properties](#properties)
+    - [rotation](#rotation)
+    - [trimBox](#trimbox)
+    - [number](#number)
+    - [width](#width)
+    - [height](#height)
+    - [contents](#contents)
+    - [resources](#resources)
+  - [Methods](#methods)
+    - [getField](#getfield)
+    - [getFields](#getfields)
+    - [fieldCount](#fieldcount)
+    - [getFieldIndex](#getfieldindex)
+    - [getMediaBox](#getmediabox)
+    - [getBleedBox](#getbleedbox)
+    - [getArtBox](#getartbox)
+    - [annotationCount](#annotationcount)
+    - [createAnnotation](#createannotation)
+    - [createField](#createfield)
+    - [deleteField](#deletefield)
+    - [flattenField](#flattenfield)
+    - [getAnnotation](#getannotation)
+    - [deleteAnnotation](#deleteannotation)
 
 ## NoPoDoFo Page
 
@@ -36,15 +39,6 @@ class Page {
   contents: Object
   resources: Object
 
-  /**
-   * Get the field as a field of type T where T is one of: Checkbox, Pushbutton, Textfield, ComboBox, or ListField
-   * @param index - field index
-   * @see Checkbox
-   * @see ListBox
-   * @see TextField
-   * @see ComboBox
-   * @see PushButton
-   */
   getField<T extends Field>(index: number): T
   getFields(): Field[]
   fieldCount(): number
@@ -56,11 +50,6 @@ class Page {
   createAnnotation(type: NPDFAnnotation, rect: Rect): Annotation
   createField(type: NPDFFieldType, annot: Annotation, form: Form, opts?: Object): Field
   deleteField(index: number): void
-  /**
-   * Flattening is the process of taking a fields appearance stream, appending that appearance stream
-   * to the page, and then removing the field object and annotation widget, and scrubbing all references 
-   * to the field from the document (scrub the page and acroform dictionary)
-   */
   flattenFields(): void
   getAnnotation(index: number): Annotation
   deleteAnnotation(index: number): void
@@ -68,10 +57,12 @@ class Page {
 ```
 
 ## Constructors
+------------------
 
 NoPoDoFo does not support a public Page constructor. To create a new Page use [Document.createPage](./document.md#createpage)
 
 ## Properties
+-------------
 
 ### rotation
 
@@ -104,6 +95,7 @@ Get the page's contents [Object](./object.md)
 Get the page's resources [Object](./object.md)
 
 ## Methods
+------------
 
 ### getField
 

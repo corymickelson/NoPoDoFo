@@ -1,57 +1,60 @@
 # API Documentation for Painter
 
-* [Properties](#properties)
-  * [tabWidth](#tabwidth)
-  * [canvas](#canvas)
-  * [font](#font)
-  * [precision](#precision)
-* [Methods](#methods)
-  * [setPage](#setpage)
-  * [setColor](#setcolor)
-  * [setStrokeWidth](#setstrokewidth)
-  * [setGrey](#setgrey)
-  * [setStrokingGrey](#setstrokinggrey)
-  * [setColorCMYK](#setcolorcmyk)
-  * [setStrokingColorCMYK](#setstrokingcolorcmyk)
-  * [setStrokeStyle](#setstrokestyle)
-  * [setLineCapStyle](#setlinecapstyle)
-  * [setLineJoinStyle](#setlinejoinstyle)
-  * [setClipRect](#setcliprect)
-  * [setMiterLimit](#setmiterlimit)
-  * [rectangle](#rectangle)
-  * [ellipse](#ellipse)
-  * [circle](#circle)
-  * [closePath](#closepath)
-  * [lineTo](#lineto)
-  * [moveTo](#moveto)
-  * [cubicBezierTo](#cubicbezierto)
-  * [horizontalLineTo](#horizontallineto)
-  * [verticalLineTo](#verticallineto)
-  * [smoothCurveTo](#smoothcurveto)
-  * [quadCurveTo](#quadcurveto)
-  * [arcTo](#arcto)
-  * [close](#close)
-  * [stroke](#stroke)
-  * [fill](#fill)
-  * [strokeAndFill](#strokeandfill)
-  * [endPath](#endpath)
-  * [clip](#clip)
-  * [save](#save)
-  * [restore](#restore)
-  * [setExtGState](#setextgstate)
-  * [getCurrentPath](#getcurrentpath)
-  * [drawLine](#drawline)
-  * [drawText](#drawtext)
-  * [drawTextAligned](#drawtextaligned)
-  * [drawMultiLineText](#drawmultilinetext)
-  * [getMultiLineText](#getmultilinetext)
-  * [bt](#bt)
-  * [et](#et)
-  * [addText](#addtext)
-  * [moveTextPosition](#movetextposition)
-  * [drawGlyph](#drawglyph)
-  * [finishPage](#finishpage)
-  * [drawImage](#drawimage)
+- [API Documentation for Painter](#api-documentation-for-painter)
+  - [NoPoDoFo Painter](#nopodofo-painter)
+  - [Constructors](#constructors)
+  - [Properties](#properties)
+    - [tabWidth](#tabwidth)
+    - [canvas](#canvas)
+    - [font](#font)
+    - [precision](#precision)
+  - [Methods](#methods)
+    - [setPage](#setpage)
+    - [setColor](#setcolor)
+    - [setStrokeWidth](#setstrokewidth)
+    - [setGrey](#setgrey)
+    - [setStrokingGrey](#setstrokinggrey)
+    - [setColorCMYK](#setcolorcmyk)
+    - [setStrokingColorCMYK](#setstrokingcolorcmyk)
+    - [setStrokeStyle](#setstrokestyle)
+    - [setLineCapStyle](#setlinecapstyle)
+    - [setLineJoinStyle](#setlinejoinstyle)
+    - [setClipRect](#setcliprect)
+    - [setMiterLimit](#setmiterlimit)
+    - [rectangle](#rectangle)
+    - [ellipse](#ellipse)
+    - [circle](#circle)
+    - [closePath](#closepath)
+    - [lineTo](#lineto)
+    - [moveTo](#moveto)
+    - [cubicBezierTo](#cubicbezierto)
+    - [horizontalLineTo](#horizontallineto)
+    - [verticalLineTo](#verticallineto)
+    - [smoothCurveTo](#smoothcurveto)
+    - [quadCurveTo](#quadcurveto)
+    - [arcTo](#arcto)
+    - [close](#close)
+    - [stroke](#stroke)
+    - [fill](#fill)
+    - [strokeAndFill](#strokeandfill)
+    - [endPath](#endpath)
+    - [clip](#clip)
+    - [save](#save)
+    - [restore](#restore)
+    - [setExtGState](#setextgstate)
+    - [getCurrentPath](#getcurrentpath)
+    - [drawLine](#drawline)
+    - [drawText](#drawtext)
+    - [drawTextAligned](#drawtextaligned)
+    - [drawMultiLineText](#drawmultilinetext)
+    - [getMultiLineText](#getmultilinetext)
+    - [bt](#bt)
+    - [et](#et)
+    - [addText](#addtext)
+    - [moveTextPosition](#movetextposition)
+    - [drawGlyph](#drawglyph)
+    - [finishPage](#finishpage)
+    - [drawImage](#drawimage)
 
 
 ## NoPoDoFo Painter
@@ -123,6 +126,7 @@ class Painter {
 ```
 
 ## Constructors
+----------------
 
 ```typescript
 new(doc: Base): Painter
@@ -131,6 +135,7 @@ new(doc: Base): Painter
 Construct a new Painter object. To begin using the painter you must first set the page which the painter will apply painting/drawing operation on.
 
 ## Properties
+---------------
 
 ### tabWidth
 
@@ -149,6 +154,7 @@ Get and set the [Font](./font.md) the painter will use to draw text.
 Get and set the floating point precision for drawing operations.
 
 ## Methods
+------------
 
 ### setPage
 

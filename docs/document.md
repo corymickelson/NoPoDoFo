@@ -1,52 +1,53 @@
 # API Documentation for Document
 
-* [Properties](#properties)
-    * [form](#form)
-    * [body](#body)
-    * [version](#version)
-    * [pageMode](#pageMode)
-    * [pageLayout](#pageLayout)
-    * [printingScale](#printingScale)
-    * [language](#language)
-    * [info](#info)
-    * [password](#password)
-    * [encrypt](#encrypt)
-    * [trailer](#trailer)
-    * [catalog](#catalog)
-
-* [Methods](#methods)
-    * [getPageCount](#getPageCount)
-    * [getPage](#getPage)
-    * [hideToolbar](#hideToolbar)
-    * [hideMenubar](#hideMenubar)
-    * [hideWindowUI](#hideWindowUI)
-    * [fitWindow](#fitWindow)
-    * [centerWindow](#centerWindow)
-    * [displayDocTitle](#displayDocTitle)
-    * [useFullScreen](#useFullScreen)
-    * [attachFile](#attachFile)
-    * [insertExistingPage](#insertExistingPage)
-    * [insertPage](#insertPage)
-    * [append](#append)
-    * [isLinearized](#isLinearized)
-    * [getWriteMode](#getWriteMode)
-    * [isAllowed](#isAllowed)
-    * [createFont](#createFont)
-    * [getOutlines](#getOutlines)
-    * [getObject](#getObject)
-    * [getNames](#getNames)
-    * [createXObject](#createXObject)
-    * [createPage](#createPage)
-    * [createPages](#createPages)
-    * [getAttachment](#getAttachment)
-    * [load](#load)
-    * [splicePages](#splicePages)
-    * [insertPages](#insertPages)
-    * [write](#write)
-    * [getFont](#getFont)
-    * [hasSignatures](#hasSignatures)
-    * [getSignatures](#getSignatures)
-    * [gc](#gc)
+- [API Documentation for Document](#api-documentation-for-document)
+    - [NoPoDoFo Document](#nopodofo-document)
+    - [Properties](#properties)
+        - [catalog](#catalog)
+        - [trailer](#trailer)
+        - [encrypt](#encrypt)
+        - [info](#info)
+        - [language](#language)
+        - [printingScale](#printingscale)
+        - [pageLayout](#pagelayout)
+        - [pageMode](#pagemode)
+        - [version](#version)
+        - [body](#body)
+        - [form](#form)
+    - [Methods](#methods)
+        - [setPassword](#setpassword)
+        - [getPageCount](#getpagecount)
+        - [getPage](#getpage)
+        - [hideToolbar](#hidetoolbar)
+        - [hideMenubar](#hidemenubar)
+        - [hideWindowUI](#hidewindowui)
+        - [fitWindow](#fitwindow)
+        - [centerWindow](#centerwindow)
+        - [displayDocTitle](#displaydoctitle)
+        - [useFullScreen](#usefullscreen)
+        - [attachFile](#attachfile)
+        - [insertExistingPage](#insertexistingpage)
+        - [insertPage](#insertpage)
+        - [append](#append)
+        - [isLinearized](#islinearized)
+        - [getWriteMode](#getwritemode)
+        - [isAllowed](#isallowed)
+        - [createFont](#createfont)
+        - [getObject](#getobject)
+            - [Example](#example)
+        - [getNames](#getnames)
+        - [createXObject](#createxobject)
+        - [createPage](#createpage)
+        - [createPages](#createpages)
+        - [getAttachment](#getattachment)
+        - [load](#load)
+            - [Examples](#examples)
+        - [splicePages](#splicepages)
+        - [insertPages](#insertpages)
+        - [write](#write)
+        - [hasSignatures](#hassignatures)
+        - [getSignatures](#getsignatures)
+        - [gc](#gc)
 
 ## NoPoDoFo Document
 
@@ -84,7 +85,9 @@ class Document extends Base {
     getSignatures(): SignatureField[]
 }
 ```
+
 ## Properties
+-----------
 
 ### catalog
 Readonly property returning an [Object](./object.md). The catalog is the root of the documents object tree; every object in a document
@@ -122,6 +125,7 @@ The Document body (readonly) is an array of all [Objects](./object.md) accessibl
 Form is a readonly property that will either return [Form](./form.md) or null if the Document does not have an AcroForm dictionary.
 
 ## Methods
+----------
 
 ### setPassword
 Set the password for the document.
@@ -139,6 +143,7 @@ Get the number of pages in the Document. A Document must have at least one page.
 ```typescript
 getPage(n: number): IPage
 ```
+
 Get the [Page](./page.md). If n is < 0 or greater than page count a RangeError will be thrown.
 
 ### hideToolbar
@@ -146,6 +151,7 @@ Get the [Page](./page.md). If n is < 0 or greater than page count a RangeError w
 ```typescript
 hideToolbar(): void
 ```
+
 Toggle view option hideToolbar.
 
 ### hideMenubar
@@ -153,6 +159,7 @@ Toggle view option hideToolbar.
 ```typescript
 hideMenubar(): void
 ```
+
 Toggle view option hideMenubar.
 
 ### hideWindowUI

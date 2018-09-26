@@ -1,22 +1,25 @@
 # API Documentation for Font
 
-* [Properties](#properties)
-  * [object](#object)
-  * [size](#size)
-  * [scale](#scale)
-  * [charSpace](#charspace)
-  * [wordSpace](#wordspace)
-  * [underline](#underline)
-  * [strikeOut](#strikeOut)
-  * [identifier](#identifier)
-* [Methods](#methods)
-  * [isBold](#isbold)
-  * [isItalic](#isitalic)
-  * [getEncoding](#getencoding)
-  * [getMetrics](#getmetrics)
-  * [stringWidth](#stringWidth)
-  * [write](#write)
-  * [embed](#embed)
+- [API Documentation for Font](#api-documentation-for-font)
+  - [NoPoDoFo Font](#nopodofo-font)
+  - [Constructors](#constructors)
+  - [Properties](#properties)
+    - [object](#object)
+    - [size](#size)
+    - [scale](#scale)
+    - [charSpace](#charspace)
+    - [wordSpace](#wordspace)
+    - [underline](#underline)
+    - [strikeOut](#strikeout)
+    - [identifier](#identifier)
+  - [Methods](#methods)
+    - [isBold](#isbold)
+    - [isItalic](#isitalic)
+    - [getEncoding](#getencoding)
+    - [getMetrics](#getmetrics)
+    - [stringWidth](#stringwidth)
+    - [write](#write)
+    - [embed](#embed)
 
 ## NoPoDoFo Font
 Before you can draw (see [Painter](./painter.md)) on a page, you must first create and set a font object.
@@ -42,9 +45,12 @@ class Font {
 ```
 
 ## Constructors
+-------------
+
 To construct a new Font object use [Document.createFont](./document.md#createfont).
 
 ## Properties
+--------------
 
 ### object
 Get the underlying font [Object](./object.md)
@@ -71,6 +77,7 @@ Enable or disable strikeout
 Get the font identifier
 
 ## Methods
+----------
 
 ### isBold
 

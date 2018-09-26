@@ -1,10 +1,32 @@
 # API Documentation for Object
 
-## NoPoDoFo Object
-<<<<<<< HEAD
-=======
+- [API Documentation for Object](#api-documentation-for-object)
+  - [NoPoDoFo Object](#nopodofo-object)
+  - [Constructors](#constructors)
+  - [Properties](#properties)
+    - [reference](#reference)
+    - [length](#length)
+    - [stream](#stream)
+    - [type](#type)
+    - [immutable](#immutable)
+  - [Methods](#methods)
+    - [hasStream](#hasstream)
+    - [getOffset](#getoffset)
+    - [write](#write)
+    - [flateCompressStream](#flatecompressstream)
+    - [delayedStreamLoad](#delayedstreamload)
+    - [getBool](#getbool)
+    - [getDictionary](#getdictionary)
+    - [getString](#getstring)
+    - [getName](#getname)
+    - [getReal](#getreal)
+    - [getNumber](#getnumber)
+    - [getArray](#getarray)
+    - [getBuffer](#getbuffer)
+    - [clear](#clear)
 
->>>>>>> 8b7823f8d1343ca4542b7d08cd31d5bbdfbf7ebb
+## NoPoDoFo Object
+
 ```typescript
 class Object {
   readonly reference: { object: number, generation: number }
@@ -31,10 +53,14 @@ class Object {
 ```
 
 ## Constructors
+--------------
+
 NoPoDoFo does not support the creation of new objects by the Object class, however many of the methods used in NoPoDoFo
 will return or expose an accessor to retrieve the underlying PDF object data type.
 
 ## Properties
+--------------
+
 
 ### reference
 Get the reference of the object. If the object is not an indirect object a reference is not available. This would
@@ -57,6 +83,7 @@ Get the type of object as one of NPDFDataType
 Get or set immutability
 
 ## Methods
+-------------
 
 ### hasStream
 ```typescript
