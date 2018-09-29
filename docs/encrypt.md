@@ -47,7 +47,7 @@ Create an Encrypt object from the [Document](./document.md) `encrypt` property. 
 static createEncrypt(opts: EncryptOption): NPDFExternal<Encrypt>
 ```
 Create a new instance of a pdf encrypt object with options EncryptOption. This method does not return an Encrypt object but a pointer
-to an internal instance of a PoDoFo PdfEncrypt object. The return value is not inspectable from javascript; the return value is only 
+to an internal instance of a PoDoFo PdfEncrypt object. The return value is not inspectable from javascript; the return value is only
 intended to be used to encrypt a [Document](./document.md) by setting this value as the `Document().encrypt` property. For more information
 on the return value type see [NPDFExternal](./cookbook/datatypes.md#external)
 

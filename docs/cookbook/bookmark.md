@@ -1,4 +1,4 @@
-# Bookmarks
+# Bookmarks Cookbook
 
 A bookmark is a combination of an [Outline](../outline.md) and one of either an [Action](../action.md) or [Destination](../destination.md). A Bookmark in a PDF document
 is a link list type data structure, adding links to pages, external sources or scripts. 
