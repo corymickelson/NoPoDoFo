@@ -24,15 +24,20 @@
 #include <podofo/podofo.h>
 #include <string>
 
+using std::vector;
+
 namespace NoPoDoFo {
 class Dictionary : public Napi::ObjectWrap<Dictionary>
 {
 public:
   explicit Dictionary(const Napi::CallbackInfo&);
+  ~Dictionary();
   static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
   void AddKey(const Napi::CallbackInfo&);
   Napi::Value GetKey(const Napi::CallbackInfo&);
+  Napi::Value GetObject(const Napi::CallbackInfo&);
+  Napi::Value GetKeyType(const Napi::CallbackInfo&);
   Napi::Value GetKeys(const Napi::CallbackInfo&);
   Napi::Value RemoveKey(const Napi::CallbackInfo&);
   Napi::Value HasKey(const Napi::CallbackInfo&);
@@ -49,6 +54,7 @@ public:
   PoDoFo::PdfDictionary& GetDictionary() { return obj.GetDictionary(); }
 
 private:
+  vector<PoDoFo::PdfObject*> children; 
   PoDoFo::PdfObject& obj;
 };
 }

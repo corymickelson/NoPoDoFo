@@ -1,10 +1,10 @@
 import { existsSync, unlinkSync, writeFile } from 'fs'
 import { join } from 'path'
 import * as test from 'tape'
-import { nopodofo as npdf, NPDFAnnotation, NPDFFieldType } from "../../";
-if (!global.gc) {
-    global.gc = () => { }
-}
+import { nopodofo as npdf, NPDFAnnotation, NPDFFieldType, NPDFName } from "../../";
+// if (!global.gc) {
+//     global.gc = () => { }
+// }
 const filePath = join(__dirname, '../test-documents/test.pdf'),
     outFile = join(__dirname, '../tmp/test.out.pdf'),
     doc = new npdf.Document()
@@ -112,7 +112,7 @@ function pageResources() {
     })
 }
 
-function pageAddImg() {
+function pageGetImgIterator() {
     test('add image', t => {
         const painter = new npdf.Painter(doc),
             img = new npdf.Image(doc, join(__dirname, '../test-documents/test.jpg'))
@@ -122,44 +122,43 @@ function pageAddImg() {
         painter.finishPage()
         function extractImg(obj: npdf.Object, jpg: Boolean) {
             let ext = jpg ? '.jpg' : '.ppm'
-            writeFile(`/tmp/test.img.extract.${ext}`, obj.stream, err => {
+            writeFile(`/tmp/test.img.extract[1]${ext}`, obj.stream, err => {
                 if (err instanceof Error)
                     t.fail()
                 t.assert(existsSync(`/tmp/test.img.extract.${ext}`) === true)
-                if (existsSync('./img.out.pdf')) unlinkSync('./img.out.pdf')
                 t.end()
             })
         }
         doc.write((e, d) => {
             let sub = new npdf.Document()
             sub.load(d, e => {
-
                 if (e instanceof Error) t.fail()
                 sub.body.forEach(o => {
                     if (o.type === 'Dictionary') {
                         let objDict = o.getDictionary(),
-                            objType = objDict.hasKey('Type') ? objDict.getKey('Type') : null,
-                            objSubType = objDict.hasKey('SubType') ? objDict.getKey('SubType') : null
+                            objType = objDict.hasKey('Type') ? objDict.getKeyType('Type') : null,
+                            objSubType = objDict.hasKey('SubType') ? objDict.getKeyType('SubType') : null
 
-                        if ((objType && objType.type === 'Name') ||
-                            (objSubType && objSubType.type === 'Name')) {
+                        if ((objType && objType === 'Name') ||
+                            (objSubType && objSubType === 'Name')) {
 
-                            if ((objType && objType.getName() === 'XObject') || (objSubType && objSubType.getName() === 'Image')) {
-                                let imgObj = objDict.hasKey('Filter') ? objDict.getKey('Filter') : null
-                                if (imgObj && imgObj.type === 'Array') {
-                                    const imgObjArr = imgObj.getArray()
-                                    if (imgObjArr.length === 1) {
-                                        if ((imgObjArr.at(0) as npdf.Object).type === 'Name') {
-                                            if ((imgObjArr.at(0) as npdf.Object).getName() === 'DCTDecode') {
-                                                extractImg(o, true)
-                                                return
+                            if ((objType && objDict.getKey<String>('Type') === 'XObject') || (objSubType && objDict.getKey<String>('SubType') === 'Image')) {
+                                if (objDict.hasKey('Filter')) {
+                                    if (objDict.getKeyType('Filter') === 'Array') {
+                                        const imgObjArr = objDict.getKey<npdf.Array>('Filter')
+                                        if (imgObjArr.length === 1) {
+                                            if ((imgObjArr.at(0) as npdf.Object).type === 'Name') {
+                                                if ((imgObjArr.at(0) as npdf.Object).getName() === 'DCTDecode') {
+                                                    extractImg(o, true)
+                                                    return
+                                                }
                                             }
                                         }
+                                    } else if (objDict.getKeyType('Filter') === 'Name' && objDict.getKey<String>('Filter') === 'DCTDecode') {
+                                        extractImg(o, true)
+                                        return
                                     }
-                                }
-                                else if (imgObj && imgObj.type === 'Name' && imgObj.getName() === 'DCTDecode') {
-                                    extractImg(o, true)
-                                    return
+
                                 }
                             }
                         }
@@ -171,6 +170,44 @@ function pageAddImg() {
     })
 }
 
+function pageImg() {
+    test('add image', t => {
+        const painter = new npdf.Painter(doc),
+            img = new npdf.Image(doc, join(__dirname, '../test-documents/test.jpg'))
+
+        painter.setPage(page)
+        painter.drawImage(img, 0, page.height - img.height)
+        painter.finishPage()
+        function extractImg(obj: npdf.Object, jpg: Boolean) {
+            let ext = jpg ? '.jpg' : '.ppm'
+            writeFile(`/tmp/test.img.extract[2]${ext}`, obj.stream, err => {
+                if (err instanceof Error)
+                    t.fail()
+                t.assert(existsSync(`/tmp/test.img.extract.${ext}`) === true)
+                t.end()
+            })
+        }
+        doc.write('/tmp/foo.pdf', (e, d) => {
+            let sub = new npdf.Document()
+            sub.load(d, e => {
+                if (e instanceof Error) t.fail()
+                let page = sub.getPage(0)
+                let resource = page.resources.getDictionary().getKey<npdf.Dictionary>('XObject')
+                let xob = resource.getKey<npdf.Dictionary>('XOb4')
+                t.comment('GC')
+                global.gc()
+                if (xob.getKey<String>(NPDFName.SUBTYPE) === 'Image') {
+                    if (xob.hasKey('Filter') && xob.getKey<String>('Filter') === 'DCTDecode') {
+                        extractImg(xob.obj, true)
+                    } else {
+                        extractImg(resource.getKey<npdf.Object>('XOb4', false), true)
+                    }
+                }
+            })
+        })
+    })
+}
+
 function runTest(test: Function) {
     setImmediate(() => {
         global.gc()
@@ -179,15 +216,14 @@ function runTest(test: Function) {
 }
 
 export function runAll() {
-    [   // removeAnnotation,
-        createField,
+    [   createField,
         pageRotation,
         pageProperties,
         pageTrimBox,
-        // pageGetAnnotsCount,
         pageGetAnnot,
         pageContents,
         pageResources,
-        pageAddImg
+        pageGetImgIterator,
+        pageImg
     ].map(i => runTest(i))
 }

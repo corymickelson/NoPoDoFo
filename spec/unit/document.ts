@@ -52,9 +52,9 @@ tap('IDocument', (t: Test) => {
         }
         t.assert(names && names.type === 'Dictionary')
         t.assert(names.getDictionary().getKeys().includes(NPDFName.EMBEDDED_FILES))
-        let embeddedFiles = names.getDictionary().getKey(NPDFName.EMBEDDED_FILES).getDictionary().getKey(NPDFName.KIDS)
-        let fileSpecArray = embeddedFiles.getArray().at(0) as npdf.Object
-        t.assert((fileSpecArray.getDictionary().getKey(NPDFName.NAMES).getArray().at(0) as npdf.Object).getString().includes('scratch2Etxt'), 'embedded file path correct')
+        let embeddedFiles = names.getDictionary().getKey<npdf.Dictionary>(NPDFName.EMBEDDED_FILES).getKey<npdf.Array>(NPDFName.KIDS)
+        let fileSpecArray = embeddedFiles.at(0) as npdf.Object
+        t.assert((fileSpecArray.getDictionary().getKey<npdf.Array>(NPDFName.NAMES).at(0) as npdf.Object).getString().includes('scratch2Etxt'), 'embedded file path correct')
 
         t.comment("Document instance accessors [SET]")
         t.comment('Can create an encrypt instance and set to Document')
@@ -111,14 +111,14 @@ tap('File Spec attachment', (t: Test) => {
         }
         t.assert(names && names.type === 'Dictionary')
         t.assert(names.getDictionary().getKeys().includes(NPDFName.EMBEDDED_FILES))
-        let embeddedFiles = names.getDictionary().getKey(NPDFName.EMBEDDED_FILES).getDictionary().getKey(NPDFName.KIDS)
-        let fileSpecArray = embeddedFiles.getArray().at(0) as npdf.Object
-        let fileSpecObj = fileSpecArray.getDictionary().getKey(NPDFName.NAMES).getArray().at(1) as any
+        let embeddedFiles = names.getDictionary().getKey<npdf.Dictionary>(NPDFName.EMBEDDED_FILES).getKey<npdf.Array>(NPDFName.KIDS)
+        let fileSpecArray = embeddedFiles.at(0) as npdf.Object
+        let fileSpecObj = fileSpecArray.getDictionary().getKey<npdf.Array>(NPDFName.NAMES).at(1) as any
         global.gc()
         if (Array.isArray(fileSpecObj)) {
             fileSpecObj = fDoc.getObject(fileSpecObj as Ref)
         }
-        t.assert((fileSpecObj as npdf.Object).getDictionary().getKey(NPDFName.TYPE).getName() === NPDFName.FILESPEC, 'FileSpec object')
+        t.assert((fileSpecObj as npdf.Object).getDictionary().getKey<String>(NPDFName.TYPE) === NPDFName.FILESPEC, 'FileSpec object')
         let npdfFileSpec = new npdf.FileSpec(fileSpecObj)
         t.ok(npdfFileSpec, 'copy constructor')
         t.end()

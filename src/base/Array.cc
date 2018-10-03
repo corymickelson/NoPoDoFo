@@ -19,6 +19,7 @@
 
 #include "Array.h"
 #include "../ErrorHandler.h"
+#include "../ValidateArguments.h"
 #include "Obj.h"
 
 using namespace Napi;
@@ -32,7 +33,8 @@ Napi::FunctionReference Array::constructor; // NOLINT
 
 Array::Array(const CallbackInfo& info)
   : ObjectWrap<Array>(info)
-  , obj(Obj::Unwrap(info[0].As<Object>())->GetObject())
+  , obj(info[0].IsObject() ? Obj::Unwrap(info[0].As<Object>())->GetObject()
+                           : *info[0].As<External<PdfObject>>().Data())
 {}
 
 Array::~Array()

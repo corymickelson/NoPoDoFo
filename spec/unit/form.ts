@@ -28,7 +28,7 @@ tap('NPDF Form Accessors and Methods', standard => {
         standard.test('Creating Default Appearance', t => {
             let dr = doc.form.DR as npdf.Dictionary
             let font = doc.createFont({fontName: 'Helvetica', encoding: NPDFFontEncoding.WinAnsi})
-            let fontObj = dr.hasKey(name.FONT) ? dr.getKey(name.FONT) : null
+            let fontObj = dr.hasKey(name.FONT) ? dr.getKey<npdf.Object>(name.FONT, false) : null
             let fontDict: npdf.Dictionary
             if (!fontObj) t.fail()
             else {

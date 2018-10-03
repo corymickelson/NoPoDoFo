@@ -958,13 +958,15 @@ export namespace nopodofo {
     export class Dictionary {
         dirty: boolean
         immutable: boolean
+        readonly obj: Object
+
+        getKeyType(k: string): NPDFDataType
 
         /**
-         * @param {string} k
-         * @param {boolean} resolveValue - If value is a reference try to resolve the reference, defaults to true
-         * @returns {Object}
+         * @param k - dictionary key
+         * @param resolveType - if true the value returned will be the type defined by Obj.type, otherwise an Obj is returned
          */
-        getKey(k: string, resolveValue?: boolean): Object
+        getKey<T>(k: string, resolveType?: boolean): T
 
         addKey(prop: string, value: boolean | number | string | Object): void
 

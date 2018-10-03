@@ -19,6 +19,7 @@
 
 #include "Dictionary.h"
 #include "../ErrorHandler.h"
+#include "Array.h"
 #include "Obj.h"
 #include <algorithm>
 #include <sstream>
@@ -45,7 +46,11 @@ FunctionReference Dictionary::constructor; // NOLINT
 Dictionary::Dictionary(const CallbackInfo& info)
   : ObjectWrap(info)
   , obj(*info[0].As<External<PdfObject>>().Data())
-{}
+{
+  // for (auto k : GetDictionary().GetKeys()) {
+  //   cout << k.first.GetName() << endl;
+  // }
+}
 
 void
 Dictionary::Initialize(Napi::Env& env, Napi::Object& target)
@@ -55,11 +60,13 @@ Dictionary::Initialize(Napi::Env& env, Napi::Object& target)
     env,
     "Dictionary",
     { InstanceMethod("getKey", &Dictionary::GetKey),
+      InstanceMethod("getKeyType", &Dictionary::GetKeyType),
       InstanceMethod("getKeys", &Dictionary::GetKeys),
       InstanceMethod("hasKey", &Dictionary::HasKey),
       InstanceMethod("addKey", &Dictionary::AddKey),
       InstanceMethod("removeKey", &Dictionary::RemoveKey),
       InstanceMethod("getKeyAs", &Dictionary::GetKeyAs),
+      InstanceAccessor("obj", &Dictionary::GetObject, nullptr),
       InstanceAccessor("dirty", &Dictionary::GetDirty, &Dictionary::SetDirty),
       InstanceAccessor(
         "immutable", &Dictionary::GetImmutable, &Dictionary::SetImmutable),
@@ -73,6 +80,19 @@ Dictionary::Initialize(Napi::Env& env, Napi::Object& target)
   target.Set("Dictionary", ctor);
 }
 
+Dictionary::~Dictionary()
+{
+  HandleScope scope(Env());
+  for (auto i : children) {
+    delete i;
+  }
+}
+Napi::Value
+Dictionary::GetObject(const Napi::CallbackInfo& info)
+{
+  // TODO: Test lifetime of &obj
+  return Obj::constructor.New({ External<PdfObject>::New(info.Env(), &obj) });
+}
 Napi::Value
 Dictionary::Eq(const CallbackInfo& info)
 {
@@ -125,20 +145,114 @@ Dictionary::AddKey(const CallbackInfo& info)
 }
 
 Napi::Value
-Dictionary::GetKey(const CallbackInfo& info)
+Dictionary::GetKeyType(const Napi::CallbackInfo& info)
 {
   string k = info[0].As<String>().Utf8Value();
   PdfObject* v = obj.MustGetIndirectKey(k);
   if (!v) {
-    stringstream msg;
-    msg << "Could not resolve object reference: "
-        << v->GetReference().ObjectNumber() << ", "
-        << v->GetReference().GenerationNumber() << endl;
-    Error::New(info.Env(), msg.str());
-    return info.Env().Undefined();
-  } else {
+    Error::New(info.Env(), "Could not resolve key")
+      .ThrowAsJavaScriptException();
+    return {};
+  }
+  string t;
+  switch (v->GetDataType()) {
+    case ePdfDataType_Bool:
+      t = "Boolean";
+      break;
+    case ePdfDataType_Number:
+      t = "Number";
+      break;
+    case ePdfDataType_Real:
+      t = "Real";
+      break;
+    case ePdfDataType_String:
+    case ePdfDataType_HexString:
+      t = "String";
+      break;
+    case ePdfDataType_Name:
+      t = "Name";
+      break;
+    case ePdfDataType_Array:
+      t = "Array";
+      break;
+    case ePdfDataType_Dictionary:
+      t = "Dictionary";
+      break;
+    case ePdfDataType_Null:
+      t = "Null";
+      break;
+    case ePdfDataType_Reference:
+      t = "Reference";
+      break;
+    case ePdfDataType_RawData:
+      t = "RawData";
+      break;
+    case ePdfDataType_Unknown:
+      t = "Undefined";
+      break;
+  }
+  return String::New(info.Env(), t);
+}
+Napi::Value
+Dictionary::GetKey(const CallbackInfo& info)
+{
+  string k = info[0].As<String>();
+  bool resolveType = true;
+  if (info.Length() > 1 && info[1].IsBoolean()) {
+    resolveType = info[1].As<Boolean>();
+  }
+  PdfObject* v = obj.MustGetIndirectKey(k);
+  if (!v) {
+    Error::New(info.Env(), "Could not resolve key")
+      .ThrowAsJavaScriptException();
+    return {};
+  }
+  if (!resolveType) {
     return Obj::constructor.New(
       { Napi::External<PdfObject>::New(info.Env(), v) });
+  }
+  switch (v->GetDataType()) {
+    case ePdfDataType_Bool:
+      return Boolean::New(info.Env(), v->GetBool());
+    case ePdfDataType_Number:
+      return Number::New(info.Env(), v->GetNumber());
+    case ePdfDataType_Real:
+      return Number::New(info.Env(), v->GetReal());
+    case ePdfDataType_String:
+    case ePdfDataType_HexString:
+      return String::New(info.Env(), v->GetString().GetString());
+    case ePdfDataType_Name:
+      return String::New(info.Env(), v->GetName().GetName());
+    case ePdfDataType_Array:
+      return NoPoDoFo::Array::constructor.New(
+        { Napi::External<PdfObject>::New(info.Env(), v) });
+    case ePdfDataType_Dictionary:
+      return Dictionary::constructor.New(
+        { Napi::External<PdfObject>::New(info.Env(), v) });
+    case ePdfDataType_Null:
+      return info.Env().Null();
+    case ePdfDataType_RawData: {
+      if (!v->HasStream()) {
+        Error::New(info.Env(), "RawData missing Stream property")
+          .ThrowAsJavaScriptException();
+        return {};
+      }
+      auto pStream = dynamic_cast<PdfMemStream*>(v->GetStream());
+      auto stream = pStream->Get();
+      auto length = pStream->GetLength();
+      auto value =
+        Buffer<char>::Copy(info.Env(), stream, static_cast<size_t>(length));
+      return value;
+    }
+    case ePdfDataType_Reference: {
+      Napi::Array ref = Napi::Array::New(info.Env());
+      ref.Set(static_cast<uint32_t>(0),
+              Number::New(info.Env(), v->GetReference().GenerationNumber()));
+      ref.Set(1, Number::New(info.Env(), v->GetReference().ObjectNumber()));
+      return ref;
+    }
+    case ePdfDataType_Unknown:
+      return info.Env().Undefined();
   }
 }
 

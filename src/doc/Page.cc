@@ -282,7 +282,8 @@ Page::GetResources(const CallbackInfo& info)
   PdfObject* resources = page.GetResources();
   auto objPtr = External<PdfObject>::New(info.Env(), resources);
   auto instance = Obj::constructor.New({ objPtr });
-  return instance;
+  return scope.Escape(instance);
+  // return instance;
 }
 
 Napi::Value

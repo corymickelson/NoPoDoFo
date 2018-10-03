@@ -11,34 +11,32 @@ doc.load('/path/to/document.pdf', (err, data) => {
   for(let i = 0; i < doc.body.length; i++) {
     const o = doc.body[i]
     if (o.type === 'Dictionary') {
-      let objDict = o.getDictionary(),
-          objType = objDict.hasKey('Type') ? objDict.getKey('Type') : null,
-          objSubType = objDict.hasKey('SubType') ? objDict.getKey('SubType') : null
+        let objDict = o.getDictionary(),
+            objType = objDict.hasKey('Type') ? objDict.getKeyType('Type') : null,
+            objSubType = objDict.hasKey('SubType') ? objDict.getKeyType('SubType') : null
 
-      if ((objType && objType.type === 'Name') ||
-          (objSubType && objSubType.type === 'Name')) {
+        if ((objType && objType === 'Name') ||
+            (objSubType && objSubType === 'Name')) {
 
-          if ((objType && objType.getName() === 'XObject') || (objSubType && objSubType.getName() === 'Image')) {
-              let imgObj = objDict.hasKey('Filter') ? objDict.getKey('Filter') : null
-              if (imgObj && imgObj.type === 'Array') {
-                  const imgObjArr = imgObj.getArray()
-                  if (imgObjArr.length === 1) {
-                      if ((imgObjArr.at(0) as npdf.Object).type === 'Name') {
-                          if ((imgObjArr.at(0) as npdf.Object).getName() === 'DCTDecode') {
-                              // image found, extractImg writes the image to disk
-                              // the image is available as a buffer on the stream property of the Object
-                              // see Object.stream
-                              return
-                          }
-                      }
-                  }
-              }
-              else if (imgObj && imgObj.type === 'Name' && imgObj.getName() === 'DCTDecode') {
-                  extractImg(o, true)
-                  return
-              }
-          }
-      }
+            if ((objType && objDict.getKey<String>('Type') === 'XObject') || (objSubType && objDict.getKey<String>('SubType') === 'Image')) {
+                if (objDict.hasKey('Filter')) {
+                    if (objDict.getKeyType('Filter') === 'Array') {
+                        const imgObjArr = objDict.getKey<npdf.Array>('Filter')
+                        if (imgObjArr.length === 1) {
+                            if ((imgObjArr.at(0) as npdf.Object).type === 'Name') {
+                                if ((imgObjArr.at(0) as npdf.Object).getName() === 'DCTDecode') {
+                                    extractImg(o, true)
+                                    return
+                                }
+                            }
+                        }
+                    } else if (objDict.getKeyType('Filter') === 'Name' && objDict.getKey<String>('Filter') === 'DCTDecode') {
+                        extractImg(o, true)
+                        return
+                    }
+                }
+            }
+        }
     }
   }
 })
@@ -56,6 +54,24 @@ Getting images from a page is similar to the above with the exception that inste
 we will iterate a page's resources dictionary. This method will only work if the image has been set in the page's resources.
 
 ```typescript
+const doc = new npdf.Document()
+doc.load('/path/to/doc', e => {
+    if (e instanceof Error) t.fail()
+    const page = doc.getPage(0)
+    let resource = page.resources.getDictionary().getKey<npdf.Dictionary>('XObject')
+    let xKey = resource.getKeys()
+    let xob = resource.getKey<npdf.Dictionary>('XOb4')
+    if(xob.getKey<String>(NPDFName.SUBTYPE) === 'Image') {
+        if(xob.hasKey('Filter') && xob.getKey<String>('Filter') === 'DCTDecode') {
+            extractImg(xob.obj, true)
+        } else {
+            extractImg(xob.obj, true)
+        }
+    }
+})
+function extractImg(obj: npdf.Object, jpg: Boolean) {
+    // img data is accessable via npdf.Object.stream
+}
 ```
 
 ## Set an image
