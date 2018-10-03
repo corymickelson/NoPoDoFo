@@ -1,6 +1,7 @@
 # NoPoDoFo
 
 [![CircleCI](https://circleci.com/gh/corymickelson/NoPoDoFo.svg?style=svg)](https://circleci.com/gh/corymickelson/NoPoDoFo)
+![NAPI](https://img.shields.io/badge/N--API-v1-green.svg)
 [![Coverage Status](https://coveralls.io/repos/github/corymickelson/NoPoDoFo/badge.svg?branch=master)](https://coveralls.io/github/corymickelson/NoPoDoFo?branch=master)
 
 NoPoDoFo is a bindings library to [PoDoFo](http://podofo.sourceforge.net/index.html), hence the name No(de)PoDoFo. The aim of this project it to bring a complete PDF solution
