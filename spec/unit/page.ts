@@ -2,9 +2,9 @@ import { existsSync, unlinkSync, writeFile } from 'fs'
 import { join } from 'path'
 import * as test from 'tape'
 import { nopodofo as npdf, NPDFAnnotation, NPDFFieldType, NPDFName } from "../../";
-// if (!global.gc) {
-//     global.gc = () => { }
-// }
+if (!global.gc) {
+    global.gc = () => { }
+}
 const filePath = join(__dirname, '../test-documents/test.pdf'),
     outFile = join(__dirname, '../tmp/test.out.pdf'),
     doc = new npdf.Document()

@@ -1,4 +1,4 @@
-# NoPoDoFo DataTypes Cookbook
+# DataTypes
 
 This is an overview of some of the data types used in NoPoDoFo PDF programming. Most data types in NoPoDoFo
 will be familiar to you, some however do not fit well within the NodeJs / Javascript language and are presented here with

@@ -1,4 +1,4 @@
-# NoPoDoFo Signature and Signer Cookbook
+# Signer Cookbook
 
 ## Creating a Signature
 

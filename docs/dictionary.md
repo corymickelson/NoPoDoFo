@@ -5,7 +5,9 @@
   - [Properties](#properties)
     - [dirty](#dirty)
     - [immutable](#immutable)
+    - [obj](#obj)
   - [Methods](#methods)
+    - [getKeyType](#getkeytype)
     - [getKey](#getkey)
     - [addKey](#addkey)
     - [getKeys](#getkeys)
@@ -26,8 +28,10 @@ a new Dictionary are handled implicitly by PoDoFo.
 class Dictionary {
   dirty: boolean
   immutable: boolean
+  readonly obj: nopodofo.Object
 
-  getKey(k: string): nopodofo.Object
+  getKey<T>(k: string, resolveType?: boolean): T
+  getKeyType(k:string): NPDFDataType
   addKey(prop: NPDFName|string, value: boolean | number | string | nopodofo.Object): void
   getKeys(): string[]
   hasKey(k: string): boolean
@@ -50,17 +54,30 @@ This flag is internally by PoDoFo, dirty is set to true if there has been a modi
 
 This property will get or set a corresponding property on the PoDoFo PdfDictionary. When set to true no keys can be edited or changed.
 
+### obj
+
+Readonly property accessor. Get the dictionary [Object](./object.md)
+
 ## Methods
 ------------
+
+### getKeyType
+
+```typescript
+getKeyType(k:string): NPDFDataType
+```
+
+Get the NPDFDataType of the value of the `k` key.
 
 ### getKey
 
 ```typescript
-getKey(k: string): nopodofo.Object
+getKey<T>(k: string, resolveType?: boolean): T
 ```
 
-Get the value of the `k` key. Value is returned as an [Object](./object.md) or [Dictionary](./dictionary.md). NoPoDoFo will always try to 
-resolve Ref types to their corresponding [Object](./object.md) but in the instance a value can not be resolved an error will be thrown.
+Get the value of the `k` key. Value is returned as `T` unless resolveType is false which will return an [Object](./object.md).
+It is good practice to check the type; [getKeyType](#getkeytype) of the object before casting a value to `T`.
+NoPoDoFo will always try to resolve Ref types to their corresponding [Object](./object.md) or `T` type, but in the instance a value can not be resolved an error will be thrown.
 
 ### addKey
 

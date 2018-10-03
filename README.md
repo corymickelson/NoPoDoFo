@@ -6,9 +6,9 @@
 NoPoDoFo is a bindings library to [PoDoFo](http://podofo.sourceforge.net/index.html), hence the name No(de)PoDoFo. The aim of this project it to bring a complete PDF solution
 to the Nodejs ecosystem. NoPoDoFo provides low level PDF api's for creating new PDF documents, and reading and modifying 
 existing PDF documents. Features also include encryption, signing, and drawing api's. Please take note that this project
-is currently in <mark>early development</mark>. 
+is currently in <mark>early development</mark>.
 
-To get started please read [the book]()
+To get started please read [the book](https://corymickelson.github.io/NoPoDoFo/index)
 
 ### __Current Version 0.7.0__
 [![NPM](https://nodei.co/npm/nopodofo.png?downloads=true&downloadRank=true)](http://nodei.co/npm/nopodofo)

@@ -36,5 +36,9 @@
   * [TextField](docs/textfield.md)
   * [XObject](docs/xobject.md)
 
-* [Cookbook](docs/cookbook/index.md)
+* [Cookbook]()
   * [Bookmarks](docs/cookbook/bookmark.md)
+  * [Images](docs/cookbook/images.md)
+  * [Data Types](docs/cookbook/datatypes.md)
+  * [Signer](docs/cookbook/signer.md)
+  * [Table](docs/cookbook/table.md)

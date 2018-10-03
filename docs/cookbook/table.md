@@ -1,4 +1,4 @@
-# NoPoDoFo Table Cookbook
+# Table Cookbook
 
 ## Create a Table
 

@@ -26,3 +26,5 @@ docs/README.md
 package.json
 package-lock.json
 node_modules
+index.d.ts
+index.js

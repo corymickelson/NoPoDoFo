@@ -10,7 +10,7 @@
   },
   "scripts": {
     "coverage": "nyc tape spec/unit/*.js && nyc report --reporter=text-lcov | coveralls",
-    "test": "mkdir -p spec/tmp && tsc -p tsconfig.json && node ./node_modules/.bin/tape spec/unit/*.js",
+    "test": "mkdir -p spec/tmp && tsc -p tsconfig.json && node --expose-gc ./node_modules/.bin/tape spec/unit/*.js",
     "tsc:spec": "tsc -p tsconfig.json"
   },
   "nyc": {
@@ -33,6 +33,7 @@
     "@types/node": "^8.10.18",
     "@types/tape": "^4.2.32",
     "@types/uuid": "^3.4.3",
+    "alsatian": "^2.3.0",
     "benchmark": "^2.1.4",
     "cmake-js": "^3.7.3",
     "coveralls": "^3.0.1",
