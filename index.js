@@ -1,4 +1,4 @@
-exports.nopodofo = require('./build/Debug/nopodofo.node')//require('bindings')('nopodofo')
+exports.nopodofo = require('bindings')('nopodofo')
 exports.CONVERSION = 0.0028346456693
 Object.defineProperty(exports, "__esModule", { value: true });
 var NPDFActions;
