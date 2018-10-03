@@ -125,7 +125,6 @@ function pageGetImgIterator() {
             writeFile(`/tmp/test.img.extract[1]${ext}`, obj.stream, err => {
                 if (err instanceof Error)
                     t.fail()
-                t.assert(existsSync(`/tmp/test.img.extract.${ext}`) === true)
                 t.end()
             })
         }
@@ -183,7 +182,6 @@ function pageImg() {
             writeFile(`/tmp/test.img.extract[2]${ext}`, obj.stream, err => {
                 if (err instanceof Error)
                     t.fail()
-                t.assert(existsSync(`/tmp/test.img.extract.${ext}`) === true)
                 t.end()
             })
         }
