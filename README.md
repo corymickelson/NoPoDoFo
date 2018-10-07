@@ -11,7 +11,7 @@ is currently in <mark>early development</mark>.
 
 To get started please read [the book](https://corymickelson.github.io/NoPoDoFo/index)
 
-### __Current Version 0.7.0__
+### __Current Version 0.8.0__
 [![NPM](https://nodei.co/npm/nopodofo.png?downloads=true&downloadRank=true)](http://nodei.co/npm/nopodofo)
 
 ## A Brief Introduction

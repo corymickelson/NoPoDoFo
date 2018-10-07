@@ -8,6 +8,8 @@ export type Callback<T> = (err: Error, data: T) => void
  */
 export type Ref = [number, number]
 
+export function pdfDate(d: Date): string
+
 export interface NPDFFontMetrics {
     lineSpacing: number
     underlineThickness: number

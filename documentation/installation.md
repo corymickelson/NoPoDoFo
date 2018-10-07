@@ -2,10 +2,10 @@
 
 Requirements:
 
- - PoDoFo >= 0.9.6
- - CMake >= 3
- - Nodejs >= 8
- - OpenSSL
+- PoDoFo >= 0.9.6
+- CMake >= 3
+- Nodejs >= 8
+- OpenSSL
 
 The recommended installation process is as follows:
 
@@ -18,11 +18,12 @@ To install PoDoFo with vcpkg run `vcpkg install podofo:x64-windows`[^1]. NoPoDoF
 Install OpenSSL (required by NoPoDoFo) using the same command used to install PoDoFo `vcpkg install openssl:x64-windows`.
 To enable [CMake find_package](https://cmake.org/cmake/help/v3.8/command/find_package.html), used to find openssl, run `vcpkg integrate install`.
 Building NoPoDoFo from source requires CMake.
- - Set environment variable `vcpkg_path` to the root of your vcpkg installation, ex: `set vcpkg_path=C:\\vcpkg`
- - run `git clone https://github.com/corymickelson/NoPoDoFo`
- - run `npm install`
- - run `./node_modules/.bin/cmake-js build`
- - run `./node_modules/.bin/tsc -p tsconfig.json`
+
+- Set environment variable `vcpkg_path` to the root of your vcpkg installation, ex: `set vcpkg_path=C:\\vcpkg`
+- run `git clone https://github.com/corymickelson/NoPoDoFo`
+- run `npm install`
+- run `./node_modules/.bin/cmake-js build`
+- run `./node_modules/.bin/tsc -p tsconfig.json`
 
 **Note** If `cmake-js build` fails with the error 'Unable to find OpenSSL' try running the build command again with CMAKE_TOOLCHAIN_FILE set to the 
 proper location, ex `cmake-js build --CDCMAKE_TOOLCHAIN_FILE=C:\vcpkg\scripts\buildsystems\vcpkg.cmake`
@@ -36,22 +37,23 @@ Please use your native package manager, the following is for arch (pacman). Othe
 installation instruction, if you are truly blocked on the installation of PoDoFo please create an issue.
 
 dependencies:
- - openssl-dev
- - fontconfig-dev
- - libtiff-dev
- - boost (optional)
- - libidn-dev
- - libjpeg-turbo-dev
- - libpng-dev
- - freetype-dev
- - zlib-dev
+
+- openssl
+- fontconfig
+- libtiff
+- boost (optional)
+- libidn
+- libjpeg-turbo
+- libpng
+- freetype
+- zlib
 
 Install dependencies with `pacman -S [dependencies]`
 
 Install PoDoFo from source.
 Below is a small bash script for easy installation.
 
-```bash 
+```bash
 git clone https://github.com/svn2github/podofo $HOME/podofo && \
 cd $HOME/podofo && \
 mkdir $HOME/podofo/build && \
@@ -61,10 +63,11 @@ make && make install
 ```
 
 Building NoPoDoFo from source.
- - run `git clone https://github.com/corymickelson/NoPoDoFo`
- - run `npm install`
- - run `./node_modules/.bin/cmake-js build`
- - run `./node_modules/.bin/tsc -p tsconfig.json`
+
+- run `git clone https://github.com/corymickelson/NoPoDoFo`
+- run `npm install`
+- run `./node_modules/.bin/cmake-js build`
+- run `./node_modules/.bin/tsc -p tsconfig.json`
 
 ### AWS Lambda
 
@@ -72,17 +75,18 @@ Incorporating NoPoDoFo into your AWS Lambda functions is easily accomplished by 
 In addition to installing this package `nopodofo` you will also need to install `nopodofolambda`. The latter package is a collection of
 binaries used by PoDoFo that are not included in an AWS linux instance.
 __Please note this will only run on AWS Lambda Node8__.
- - run `npm i -S https://github.com/corymickelson/NoPoDoFo/releases/download/v0.7.0/nopodofo-v0.7.0-linux-aws-x64-node-v8.tar.gz` - install nopodofo v0.7.0
- - run `npm i -S nopodofolambda`
+
+- run `npm i -S https://github.com/corymickelson/NoPoDoFo/releases/download/v0.7.0/nopodofo-v0.7.0-linux-aws-x64-node-v8.tar.gz` - install nopodofo v0.7.0
+- run `npm i -S nopodofolambda`
 
 You can also build this yourself using docker. Pull image nopodofo/aws, this is a centos 7 image which closely resembles the amazon linux image. Binaries
 built on this will also run on AWS
 
- - Start a bash shell by running `docker run -it nopodofo/aws /bin/sh`
- - Enable devtoolset-7 `source /opt/rh/devtoolset-7/enable`
- - Clone this module `git clone https://github.com/corymickelson/NoPoDoFo`
- - Install dependencies `npm i`
- - Build package `LDFLAGS=-Wl,-rpath=/var/task/node_modules/nopodofolambda/lib ./node_modules/.bin/cmake-js build`
+- Start a bash shell by running `docker run -it nopodofo/aws /bin/sh`
+- Enable devtoolset-7 `source /opt/rh/devtoolset-7/enable`
+- Clone this module `git clone https://github.com/corymickelson/NoPoDoFo`
+- Install dependencies `npm i`
+- Build package `LDFLAGS=-Wl,-rpath=/var/task/node_modules/nopodofolambda/lib ./node_modules/.bin/cmake-js build`
 
 
 [1]: The Windows vcpkg PoDoFo build does not include all optional dependencies. This build does not support

@@ -12,6 +12,7 @@
 ## NoPoDoFo Signer
 
 This class is a wrapper for the classes necessary to execute and apply a signature to the document.
+NoPoDoFo currently supports PKCS7 (adbe-pkcs7-detached) signature only.
 Please see the [Signer Cookbook](./cookbook/signer.md) for an example.
 
 ```typescript

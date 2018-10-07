@@ -134,7 +134,7 @@ function doubleDigit(v) {
  * @param {Date} d - The Date to convert
  * @returns {string} - d (Date) in pdf string format
  */
-exports.toPDfFormat = function toPDFFormat(d) {
+exports.pdfDate = function toPDFFormat(d) {
     const offset = d.getTimezoneOffset() / 60;
     let dateString = d.toISOString().replace(/-|T|\.|:/g, '').substr(0, 14);
     return `${dateString}-${doubleDigit(offset)}'00'`;
