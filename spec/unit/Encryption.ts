@@ -1,4 +1,4 @@
-import {AsyncTest, Expect, TestCase, TestFixture} from 'alsatian'
+import {AsyncTest, Expect, TestCase, TestFixture, Timeout} from 'alsatian'
 import {EncryptOption, nopodofo as npdf, ProtectionOption} from '../../'
 import {join} from "path";
 
@@ -57,23 +57,37 @@ export class EncryptionSpec {
     @AsyncTest("Password validation")
     @TestCase('secret', 'secret')
     @TestCase('secret')
-    @TestCase(undefined, 'secret')
     public async passwordValidationSpec(owner: string, user?: string) {
         const doc = new npdf.Document()
         return new Promise((resolve, reject) => {
             doc.load(join(__dirname, '../test-documents/test.pdf'), err => {
                 if (err) Expect.fail(err.message)
-                const opts = () => user ? {userPassword: user, ownerPassword: owner}
-                    : {ownerPassword: owner}
-                doc.encrypt = npdf.Encrypt.createEncrypt(opts()) as npdf.Encrypt
+                const opts = Object.assign({
+                    keyLength: 128,
+                    protection: ['Edit'],
+                    algorithm: 'aesv2'
+                }, user ? {userPassword: user, ownerPassword: owner}
+                    : {ownerPassword: owner})
+                doc.encrypt = npdf.Encrypt.createEncrypt(opts) as npdf.Encrypt
                 doc.write(async (err, data) => {
                     if (err) Expect.fail(err.message)
                     const child = new npdf.Document()
-                    await Expect(() =>
-                        new Promise((resolve, reject) => {
-                            child.load(data, err => err ? reject(err) : resolve())
+                    if (user) { // Expect a failure since a user pwd has been provided
+                        await Expect(() =>
+                            new Promise((resolve, reject) => {
+                                child.load(data, err => err ? reject(err) : resolve())
+                            })
+                        ).toThrowErrorAsync(Error, "Password required to modify this document")
+                    } else { // Expect no failure since a user pwd was not set
+                        await new Promise(resolve => {
+                            child.load(data, err => {
+                                if (err) Expect.fail(err.message)
+                                return resolve()
+                            })
                         })
-                    ).toThrowErrorAsync(Error, "Password required to modify this document")
+
+                    }
+                    return resolve()
                 })
             })
         })

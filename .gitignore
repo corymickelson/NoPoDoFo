@@ -35,6 +35,9 @@ spec/bench/*.map
 spec/unit/*.d.ts
 spec/unit/*.js
 spec/unit/*.map
+spec/unit-old/*.d.ts
+spec/unit-old/*.js
+spec/unit-old/*.map
 spec/tmp/*.pdf
 *.log
 .coveralls.yml
