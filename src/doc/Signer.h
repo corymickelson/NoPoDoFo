@@ -41,11 +41,9 @@ public:
   PoDoFo::PdfMemDocument& doc;
   std::string output;
   std::shared_ptr<PoDoFo::PdfSignatureField> field;
+
   EVP_PKEY* pkey = nullptr;
   X509* cert = nullptr;
-
-private:
-  bool hasSigned = false;
 };
 }
 #endif

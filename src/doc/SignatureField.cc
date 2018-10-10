@@ -23,6 +23,7 @@
 #include "../base/Data.h"
 #include "../base/Date.h"
 #include "../base/Names.h"
+#include "../base/Obj.h"
 #include "../base/XObject.h"
 #include "../doc/Annotation.h"
 #include "../doc/Document.h"
@@ -76,6 +77,33 @@ SignatureField::SignatureField(const CallbackInfo& info)
   } catch (PdfError& err) {
     ErrorHandler(err, info);
   }
+
+  try {
+    field->EnsureSignatureObject();
+    signatureInfo = SignatureInfo{ {} };
+    if (field->GetSignatureObject()->IsDictionary()) {
+      auto signatureDict = field->GetSignatureObject()->GetDictionary();
+      if (signatureDict.HasKey(Name::BYTERANGE) &&
+          signatureDict.GetKey(Name::BYTERANGE)->IsArray()) {
+        PdfArray byteRange = signatureDict.GetKey(Name::BYTERANGE)->GetArray();
+        for (auto& i : byteRange) {
+          signatureInfo.range.emplace_back(i.GetNumber());
+        }
+      }
+      if (signatureDict.HasKey(Name::CONTENTS) &&
+          (signatureDict.GetKey(Name::CONTENTS)->IsString() ||
+           signatureDict.GetKey(Name::CONTENTS)->IsHexString())) {
+        PdfObject contents = *signatureDict.GetKey(Name::CONTENTS);
+        string out;
+        contents.ToString(out);
+        signatureInfo.contents = out;
+      }
+    } else {
+      cout << "Could not parse Signature Object" << endl;
+    }
+  } catch (PdfError& err) {
+    cout << "Signature Object has not been set on this field" << endl;
+  }
 }
 
 void
@@ -85,7 +113,8 @@ SignatureField::Initialize(Napi::Env& env, Napi::Object& target)
   Function ctor = DefineClass(
     env,
     "SignatureField",
-    { InstanceMethod("setAppearanceStream",
+    { InstanceAccessor("info", &SignatureField::GetInfo, nullptr),
+      InstanceMethod("setAppearanceStream",
                      &SignatureField::SetAppearanceStream),
       InstanceMethod("setReason", &SignatureField::SetReason),
       InstanceMethod("setLocation", &SignatureField::SetLocation),
@@ -175,7 +204,13 @@ SignatureField::AddCertificateReference(const CallbackInfo& info)
 Napi::Value
 SignatureField::GetSignatureObject(const CallbackInfo& info)
 {
-  return External<PdfObject>::New(info.Env(), GetField()->GetSignatureObject());
+  if (!GetField()->GetSignatureObject()) {
+    cout << "Signature Object NULL" << endl;
+    return info.Env().Undefined();
+  }
+  auto o =
+    External<PdfObject>::New(info.Env(), GetField()->GetSignatureObject());
+  return Obj::constructor.New({ o });
 }
 
 Napi::Value
@@ -187,5 +222,25 @@ SignatureField::EnsureSignatureObject(const CallbackInfo& info)
     ErrorHandler(err, info);
   }
   return info.Env().Undefined();
+}
+Napi::Value
+SignatureField::GetInfo(const Napi::CallbackInfo &info)
+{
+  Object infoObj = Object::New(info.Env());
+  if(!signatureInfo.range.empty()) {
+    Napi::Array byteRange = Napi::Array::New(info.Env());
+    for(uint32_t i = 0; i < signatureInfo.range.size(); i++) {
+      byteRange.Set(i, Number::New(info.Env(), signatureInfo.range[i]));
+    }
+    infoObj.Set("byteRange", byteRange);
+  } else {
+    infoObj.Set("byteRange", info.Env().Undefined());
+  }
+  if(!signatureInfo.contents.empty()){
+    infoObj.Set("signature", String::New(info.Env(), signatureInfo.contents));
+  } else {
+    infoObj.Set("signature",info.Env().Undefined());
+  }
+  return infoObj;
 }
 }

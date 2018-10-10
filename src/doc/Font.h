@@ -55,6 +55,8 @@ public:
   Napi::Value GetObject(const Napi::CallbackInfo&);
   void WriteToStream(const Napi::CallbackInfo&);
   void EmbedFont(const Napi::CallbackInfo&);
+  Napi::Value IsSubsetting(const Napi::CallbackInfo&);
+  void EmbedSubsetFont(const Napi::CallbackInfo&);
 
   PoDoFo::PdfFont& GetFont() { return font; }
 

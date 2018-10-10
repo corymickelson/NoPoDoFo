@@ -705,6 +705,8 @@ export namespace nopodofo {
         getObject(): Object
 
         ensureSignatureObject(): void
+
+        getSignatureInfo(): {}
     }
 
     export class FileSpec {
@@ -774,7 +776,7 @@ export namespace nopodofo {
                  password?: string
              },
              cb: Callback<void>): void
-        load(file: string | Buffer, cb: Callback<void>): void
+        load(file: string | Buffer, cb: Callback<Document>): void
 
         setPassword(pwd: string): void
 
@@ -865,7 +867,7 @@ export namespace nopodofo {
 
         insertPage(rect: Rect, index: number): Page
 
-        append(doc: Document): void
+        append(doc: Document|Document[]): void
 
         isLinearized(): boolean
 
@@ -1228,6 +1230,10 @@ export namespace nopodofo {
         write(content: string, stream: Stream): void
 
         embed(): void
+
+        isSubsetting(): boolean
+
+        embedSubsetFont(): void
     }
 
     export class Encoding {

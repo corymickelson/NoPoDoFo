@@ -61,7 +61,7 @@ doc.load('/path/to/doc.pdf', (e) => {
     }
     let encrypt = npdf.Encrypt.createEncrypt({
         ownerPassword: 'secret',
-        userPassword: 'secret',
+        userPassword: 'secret', // if empty the user does not have to enter a password to open the document
         keyLength: 40,
         protection: ['Edit', 'FillAndSign'],
         algorithm: 'rc4v1'

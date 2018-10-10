@@ -41,6 +41,8 @@ class Font {
   stringWidth(v: string): number
   write(content: string, stream: Stream): void
   embed(): void
+  isSubsetting(): boolean
+  embedSubsetFont(): void
 }
 ```
 
@@ -126,3 +128,20 @@ embed(): void
 
 Embed the font in the document. It is highly recommended to embed fonts, if a font is not embedded and
 the viewer's machine does not have the font installed locally, the contents may not render (some viewers will use a fallback font)
+
+### isSubsetting
+
+```typescript
+isSubsetting(): boolean
+```
+
+Check if this is a subset font
+
+### embedSubsetFont
+
+```typescript
+embedSubsetFont(): void
+```
+
+Embed subset-font into the [Page](./page.md). Call [isSubsetting](#issubsetting) to assert this is a subset font before 
+embedding as an exception will be thrown if the font is not a subset.

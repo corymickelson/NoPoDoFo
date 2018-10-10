@@ -64,7 +64,9 @@ Font::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceMethod("getEncoding", &Font::GetEncoding),
       InstanceMethod("write", &Font::WriteToStream),
       InstanceMethod("embed", &Font::EmbedFont),
-      InstanceMethod("stringWidth", &Font::StringWidth) });
+      InstanceMethod("stringWidth", &Font::StringWidth),
+      InstanceMethod("isSubsetting", &Font::IsSubsetting),
+      InstanceMethod("embedSubsetFont", &Font::EmbedSubsetFont)});
   constructor = Napi::Persistent(ctor);
   constructor.SuppressDestruct();
   target.Set("Font", ctor);
@@ -238,5 +240,19 @@ Font::EmbedFont(const Napi::CallbackInfo& info)
   } catch (PdfError& err) {
     ErrorHandler(err, info);
   }
+}
+Napi::Value
+Font::IsSubsetting(const Napi::CallbackInfo &info)
+{
+  return Boolean::New(info.Env(), GetFont().IsSubsetting());
+}
+void
+Font::EmbedSubsetFont(const Napi::CallbackInfo &info)
+{
+  if(!GetFont().IsSubsetting()) {
+    Error::New(info.Env(), "This is not a subsetting font").ThrowAsJavaScriptException();
+    return;
+  }
+  GetFont().EmbedSubsetFont();
 }
 }

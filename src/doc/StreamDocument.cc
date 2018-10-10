@@ -82,6 +82,7 @@ StreamDocument::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceMethod("getObject", &StreamDocument::GetObject),
       InstanceMethod("isAllowed", &StreamDocument::IsAllowed),
       InstanceMethod("createFont", &StreamDocument::CreateFont),
+      InstanceMethod("createFontSubset", &StreamDocument::CreateFontSubset),
       InstanceMethod("getOutlines", &StreamDocument::GetOutlines),
       InstanceMethod("getNames", &StreamDocument::GetNamesTree),
       InstanceMethod("createPage", &StreamDocument::CreatePage),

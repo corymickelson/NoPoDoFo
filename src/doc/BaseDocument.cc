@@ -24,13 +24,13 @@
 #include "../base/Obj.h"
 #include "../base/XObject.h"
 #include "../doc/Rect.h"
+#include "Document.h"
 #include "Encrypt.h"
 #include "FileSpec.h"
 #include "Font.h"
 #include "Form.h"
 #include "Outline.h"
 #include "Page.h"
-#include "Document.h"
 #include "StreamDocument.h"
 
 using namespace Napi;
@@ -77,8 +77,8 @@ BaseDocument::BaseDocument(const Napi::CallbackInfo& info, bool inMem)
     }
     if (info.Length() > 0 && info[0].IsString()) {
       output = info[0].As<String>().Utf8Value();
-      base = new PdfStreamedDocument(
-        output.c_str(), version, encrypt, writeMode);
+      base =
+        new PdfStreamedDocument(output.c_str(), version, encrypt, writeMode);
     } else {
       cout << "Streaming to Buffer" << endl;
       streamDocRefCountedBuffer = new PdfRefCountedBuffer(2048);
@@ -91,7 +91,6 @@ BaseDocument::BaseDocument(const Napi::CallbackInfo& info, bool inMem)
 
 BaseDocument::~BaseDocument()
 {
-  cout << "Destructing Base" << endl;
   delete base;
   delete streamDocOutputDevice;
   delete streamDocRefCountedBuffer;
@@ -107,6 +106,10 @@ Napi::Value
 BaseDocument::GetPage(const CallbackInfo& info)
 {
   int n = info[0].As<Number>();
+  if(n < 0 || n > base->GetPageCount()) {
+    RangeError::New(info.Env(), "Page index out of range").ThrowAsJavaScriptException();
+    return {};
+  }
   return Page::constructor.New(
     { External<PdfPage>::New(info.Env(), base->GetPage(n)) });
 }
@@ -333,77 +336,13 @@ BaseDocument::IsAllowed(const CallbackInfo& info)
 Napi::Value
 BaseDocument::CreateFont(const CallbackInfo& info)
 {
-  auto opts = info[0].As<Object>();
-  if (!opts.Has("fontName")) {
-    TypeError::New(info.Env(), "Requires fontName")
+  if (info.Length() < 1 || !info[0].IsObject()) {
+    Error::New(info.Env(), "Invalid arguement, expected an object")
       .ThrowAsJavaScriptException();
     return info.Env().Undefined();
   }
-  auto fontName = opts.Get("fontName").As<String>().Utf8Value();
-  bool bold = opts.Has("bold") ? opts.Get("bold").As<Boolean>() : false;
-  bool italic = opts.Has("italic") ? opts.Get("italic").As<Boolean>() : false;
-  bool embed = opts.Has("embed") ? opts.Get("embed").As<Boolean>() : false;
-  const PdfEncoding* encoding = nullptr;
-  string filename =
-    opts.Has("fileName") ? opts.Get("fileName").As<String>().Utf8Value() : "";
-#ifndef PODOFO_HAVE_FONTCONFIG
-  std::cout << "This build does not include fontconfig. To load a font you "
-               "must provide the full path to the font file"
-            << std::endl;
-  if (filename == "") {
-    Error::New(info.Env(),
-               "This build requires any font creation to pass the full path to "
-               "the font file")
-      .ThrowAsJavaScriptException();
-  }
-#endif
-  int n = opts.Has("encoding") ? opts.Get("encoding").As<Number>() : 1;
-  switch (n) {
-    case 1:
-      encoding = new PdfWinAnsiEncoding();
-      break;
-    case 2:
-      encoding = new PdfStandardEncoding();
-      break;
-    case 3:
-      encoding = new PdfDocEncoding();
-      break;
-    case 4:
-      encoding = new PdfMacRomanEncoding();
-      break;
-    case 5:
-      encoding = new PdfMacExpertEncoding();
-      break;
-    case 6:
-      encoding = new PdfSymbolEncoding();
-      break;
-    case 7:
-      encoding = new PdfZapfDingbatsEncoding();
-      break;
-    case 8:
-      encoding = new PdfWin1250Encoding();
-      break;
-    case 9:
-      encoding = new PdfIso88592Encoding();
-      break;
-    default:
-      encoding = new PdfIdentityEncoding(0, 0xffff, true);
-  }
-  try {
-    PdfFont* font =
-      base->CreateFont(fontName.c_str(),
-                       bold,
-                       italic,
-                       false,
-                       encoding,
-                       PdfFontCache::eFontCreationFlags_AutoSelectBase14,
-                       embed,
-                       filename.empty() ? nullptr : filename.c_str());
-    return Font::constructor.New({ External<PdfFont>::New(info.Env(), font) });
-  } catch (PdfError& err) {
-    ErrorHandler(err, info);
-  }
-  return info.Env().Undefined();
+  PdfFont* font = CreateFontObject(info.Env(), info[0].As<Object>(), false);
+  return Font::constructor.New({ External<PdfFont>::New(info.Env(), font) });
 }
 /**
  * @note Javascript args (doc:Document, pageN:number, atN:number)
@@ -526,12 +465,28 @@ BaseDocument::InsertPage(const Napi::CallbackInfo& info)
     { External<PdfPage>::New(info.Env(), base->GetPage(index)) });
 }
 
-Napi::Value
+void
 BaseDocument::Append(const Napi::CallbackInfo& info)
 {
-  auto mergedDoc = Document::Unwrap(info[0].As<Object>());
-  base->Append(mergedDoc->GetDocument());
-  return info.Env().Undefined();
+  if (info.Length() == 1 && info[0].IsArray()) {
+    Napi::Array docs = info[0].As<Array>();
+    for (unsigned int i = 0; i < docs.Length(); i++) {
+      auto arg = docs.Get(i);
+      if (arg.IsObject() &&
+          arg.As<Object>().InstanceOf(Document::constructor.Value())) {
+        auto mergedDoc = Document::Unwrap(arg.As<Object>());
+        base->Append(mergedDoc->GetDocument());
+      } else {
+        TypeError::New(info.Env(), "Only Document's can be appended, StreamDocument not supported in append operation")
+          .ThrowAsJavaScriptException();
+        return;
+      }
+    }
+  } else if (info.Length() == 1 && info[0].IsObject() &&
+             info[0].As<Object>().InstanceOf(Document::constructor.Value())) {
+    auto mergedDoc = Document::Unwrap(info[0].As<Object>());
+    base->Append(mergedDoc->GetDocument());
+  }
 }
 
 Napi::Value
@@ -572,5 +527,99 @@ BaseDocument::GetForm(const CallbackInfo& info)
     Form::constructor.New({ External<BaseDocument>::New(info.Env(), this),
                             Boolean::New(info.Env(), true) });
   return instance;
+}
+Napi::Value
+BaseDocument::CreateFontSubset(const Napi::CallbackInfo& info)
+{
+  if (info.Length() < 1 || !info[0].IsObject()) {
+    Error::New(info.Env(), "Invalid argument, expected an object")
+      .ThrowAsJavaScriptException();
+    return info.Env().Undefined();
+  }
+  PdfFont* font = CreateFontObject(info.Env(), info[0].As<Object>(), true);
+  return Font::constructor.New({ External<PdfFont>::New(info.Env(), font) });
+}
+PdfFont*
+BaseDocument::CreateFontObject(napi_env env, Napi::Object opts, bool subset)
+{
+  HandleScope scope(env);
+  if (!opts.Has("fontName")) {
+    TypeError::New(env, "Requires fontName").ThrowAsJavaScriptException();
+  }
+  auto fontName = opts.Get("fontName").As<String>().Utf8Value();
+  bool bold = opts.Has("bold") ? opts.Get("bold").As<Boolean>() : false;
+  bool italic = opts.Has("italic") ? opts.Get("italic").As<Boolean>() : false;
+  bool embed = opts.Has("embed") ? opts.Get("embed").As<Boolean>() : false;
+  const PdfEncoding* encoding = nullptr;
+  string filename =
+    opts.Has("fileName") ? opts.Get("fileName").As<String>().Utf8Value() : "";
+#ifndef PODOFO_HAVE_FONTCONFIG
+  std::cout << "This build does not include fontconfig. To load a font you "
+               "must provide the full path to the font file"
+            << std::endl;
+  if (filename == "") {
+    Error::New(env,
+               "This build requires any font creation to pass the full path to "
+               "the font file")
+      .ThrowAsJavaScriptException();
+  }
+#endif
+  int n = opts.Has("encoding") ? opts.Get("encoding").As<Number>() : 1;
+  switch (n) {
+    case 1:
+      encoding = new PdfWinAnsiEncoding();
+      break;
+    case 2:
+      encoding = new PdfStandardEncoding();
+      break;
+    case 3:
+      encoding = new PdfDocEncoding();
+      break;
+    case 4:
+      encoding = new PdfMacRomanEncoding();
+      break;
+    case 5:
+      encoding = new PdfMacExpertEncoding();
+      break;
+    case 6:
+      encoding = new PdfSymbolEncoding();
+      break;
+    case 7:
+      encoding = new PdfZapfDingbatsEncoding();
+      break;
+    case 8:
+      encoding = new PdfWin1250Encoding();
+      break;
+    case 9:
+      encoding = new PdfIso88592Encoding();
+      break;
+    default:
+      encoding = new PdfIdentityEncoding(0, 0xffff, true);
+  }
+  try {
+    PdfFont* font;
+    if (subset) {
+      font =
+        base->CreateFontSubset(fontName.c_str(),
+                               bold,
+                               italic,
+                               false,
+                               encoding,
+                               filename.empty() ? nullptr : filename.c_str());
+    } else {
+      font = base->CreateFont(fontName.c_str(),
+                              bold,
+                              italic,
+                              false,
+                              encoding,
+                              PdfFontCache::eFontCreationFlags_AutoSelectBase14,
+                              embed,
+                              filename.empty() ? nullptr : filename.c_str());
+    }
+    return font;
+  } catch (PdfError& err) {
+    Error::New(env, err.what()).ThrowAsJavaScriptException();
+    return {};
+  }
 }
 }

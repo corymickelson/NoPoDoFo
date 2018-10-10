@@ -48,7 +48,6 @@ public:
   void DeletePages(const Napi::CallbackInfo&);
   void SetPassword(const Napi::CallbackInfo&);
   Napi::Value Write(const Napi::CallbackInfo&);
-  Napi::Value CreateFont(const Napi::CallbackInfo&) override;
   void SetEncrypt(const Napi::CallbackInfo&, const Napi::Value&);
   Napi::Value GetEncrypt(const Napi::CallbackInfo&);
   Napi::Value GetTrailer(const Napi::CallbackInfo&);

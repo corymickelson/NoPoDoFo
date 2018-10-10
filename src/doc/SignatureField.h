@@ -22,8 +22,19 @@
 
 #include <napi.h>
 #include <podofo/podofo.h>
+#include <openssl/evp.h>
+
+using std::vector;
+using std::string;
 
 namespace NoPoDoFo {
+
+struct SignatureInfo {
+public:
+  vector<uint32_t> range = {};
+  string contents;
+};
+
 class SignatureField : public Napi::ObjectWrap<SignatureField>
 {
 public:
@@ -39,14 +50,14 @@ public:
   void AddCertificateReference(const Napi::CallbackInfo&);
   Napi::Value GetSignatureObject(const Napi::CallbackInfo&);
   Napi::Value EnsureSignatureObject(const Napi::CallbackInfo&);
+  Napi::Value GetInfo(const Napi::CallbackInfo&);
   PoDoFo::PdfData* GetSignatureData() { return signatureBuffer.get(); }
   std::shared_ptr<PoDoFo::PdfSignatureField> GetField() { return field; }
 
 private:
-//  bool isMemDoc = false;
   std::shared_ptr<PoDoFo::PdfSignatureField> field;
   std::unique_ptr<PoDoFo::PdfData> signatureBuffer;
-//  PoDoFo::PdfDocument* doc;
+  SignatureInfo signatureInfo;
 };
 }
 #endif

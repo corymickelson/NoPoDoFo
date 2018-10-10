@@ -90,6 +90,7 @@ Document::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceMethod("getObject", &Document::GetObject),
       InstanceMethod("isAllowed", &Document::IsAllowed),
       InstanceMethod("createFont", &Document::CreateFont),
+      InstanceMethod("createFontSubset", &Document::CreateFontSubset),
       InstanceMethod("getOutlines", &Document::GetOutlines),
       InstanceMethod("getNames", &Document::GetNamesTree),
       InstanceMethod("createPage", &Document::CreatePage),
@@ -106,13 +107,6 @@ Document::Document(const CallbackInfo& info)
   , BaseDocument(info, true)
 {
   cout << "Memory Document" << endl;
-}
-
-Value
-Document::CreateFont(const CallbackInfo& info)
-{
-  Napi::Value font = BaseDocument::CreateFont(info);
-  return font;
 }
 
 void
@@ -137,7 +131,7 @@ Document::DeletePages(const CallbackInfo& info)
 {
   int pageIndex = info[0].As<Number>();
   int count = info[1].As<Number>();
-  if (GetDocument().GetPageCount() < pageIndex + count) {
+  if (GetDocument().GetPageCount() < pageIndex + count || pageIndex < 0) {
     RangeError::New(info.Env(), "Pages out of range")
       .ThrowAsJavaScriptException();
   }
@@ -296,7 +290,7 @@ protected:
   void OnOK() override
   {
     HandleScope scope(Env());
-    Callback().Call({ Env().Null(), String::New(Env(), arg) });
+    Callback().Call({ Env().Null(), doc.Value() });
   }
 };
 

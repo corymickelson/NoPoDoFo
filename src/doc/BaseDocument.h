@@ -40,7 +40,8 @@ public:
   Napi::Value GetObjects(const Napi::CallbackInfo&);
   Napi::Value GetObject(const Napi::CallbackInfo&);
   Napi::Value IsAllowed(const Napi::CallbackInfo&);
-  virtual Napi::Value CreateFont(const Napi::CallbackInfo&);
+  Napi::Value CreateFont(const Napi::CallbackInfo&);
+  Napi::Value CreateFontSubset(const Napi::CallbackInfo&);
   Napi::Value GetPageMode(const Napi::CallbackInfo&);
   Napi::Value GetForm(const Napi::CallbackInfo&);
   void SetPageMode(const Napi::CallbackInfo&, const Napi::Value&);
@@ -65,7 +66,8 @@ public:
   virtual Napi::Value CreatePage(const Napi::CallbackInfo&);
   Napi::Value CreatePages(const Napi::CallbackInfo&);
   Napi::Value InsertPage(const Napi::CallbackInfo&);
-  Napi::Value Append(const Napi::CallbackInfo&);
+  void
+  Append(const Napi::CallbackInfo &);
   Napi::Value GetAttachment(const Napi::CallbackInfo&);
   void AddNamedDestination(const Napi::CallbackInfo&);
   Napi::Value CreateXObject(const Napi::CallbackInfo&);
@@ -75,6 +77,8 @@ public:
   PoDoFo::PdfOutputDevice* streamDocOutputDevice = nullptr;
   string output;
 
+protected:
+  PoDoFo::PdfFont* CreateFontObject(napi_env, Napi::Object, bool subset);
 };
 }
 #endif
