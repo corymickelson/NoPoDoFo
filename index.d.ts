@@ -894,7 +894,7 @@ export namespace nopodofo {
 
         createPages(rects: Rect[]): number
 
-        getAttachment(uri: string): FileSpec
+        getAttachment(fileName: string): FileSpec
 
         addNamedDestination(page: Page, destination: NPDFDestinationFit, name: string): void
     }

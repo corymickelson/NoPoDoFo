@@ -1,6 +1,6 @@
 {
   "name": "nopodofo",
-  "version": "0.8.0",
+  "version": "1.0.0-pre",
   "description": "Node.js native module bindings for PoDoFo",
   "main": "index.js",
   "types": "index.d.ts",

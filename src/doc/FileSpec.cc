@@ -20,8 +20,8 @@
 #include "FileSpec.h"
 #include "../base/Names.h"
 #include "../base/Obj.h"
-#include "StreamDocument.h"
 #include "Document.h"
+#include "StreamDocument.h"
 
 using namespace Napi;
 using namespace PoDoFo;
@@ -100,41 +100,14 @@ FileSpec::Data(const Napi::CallbackInfo& info)
   if (!spec->GetObject()->GetDictionary().HasKey(Name::EF)) {
     return info.Env().Null();
   } else {
-    auto ef = spec->GetObject()->GetDictionary().GetKey(Name::EF);
-    if (ef->IsReference()) {
-      auto efr = ef->GetOwner()->GetObject(ef->GetReference());
-      if (!efr->IsDictionary()) {
-        Error::New(info.Env(),
-                   "Failed to parse fileSpec for EmbeddedFile dictionary")
-          .ThrowAsJavaScriptException();
-        return info.Env().Undefined();
-      } else {
-        if (!ef->IsDictionary()) {
-          Error::New(info.Env(), "EmbeddedFile expected dictionary")
-            .ThrowAsJavaScriptException();
-          return info.Env().Undefined();
-        } else {
-          auto efd = ef->GetDictionary();
-          if (!efd.HasKey(Name::F)) {
-            Error::New(info.Env(), "Missing File Key")
-              .ThrowAsJavaScriptException();
-            return info.Env().Undefined();
-          } else {
-            PdfObject* data;
-            auto fd = efd.GetKey(Name::F);
-            if (fd->IsReference()) {
-              data = fd->GetOwner()->GetObject(fd->GetReference());
-            } else {
-              data = fd;
-            }
-            auto pStream = dynamic_cast<PdfMemStream*>(data->GetStream());
-            const char* stream = pStream->Get();
-            pdf_long length = pStream->GetLength();
-            auto value = Buffer<char>::Copy(
-              info.Env(), stream, static_cast<size_t>(length));
-            return value;
-          }
-        }
+    auto ef = spec->GetObject()->MustGetIndirectKey(Name::EF);
+    if (ef->IsDictionary() && ef->GetDictionary().HasKey(Name::F)) {
+      PdfObject* f = ef->MustGetIndirectKey(Name::F);
+      if (f->HasStream()) {
+        char* copy = new char[f->GetStream()->GetLength()];
+        pdf_long copyLen = f->GetStream()->GetLength();
+        f->GetStream()->GetFilteredCopy(&copy, &copyLen);
+        return Buffer<char>::Copy(info.Env(), copy, static_cast<size_t>(copyLen));
       }
     }
   }
