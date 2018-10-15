@@ -59,15 +59,14 @@ public:
   Napi::Value GetVersion(const Napi::CallbackInfo&);
   Napi::Value IsLinearized(const Napi::CallbackInfo&);
   Napi::Value GetWriteMode(const Napi::CallbackInfo&);
-  Napi::Value InsertExistingPage(const Napi::CallbackInfo&);
+  virtual Napi::Value InsertExistingPage(const Napi::CallbackInfo&);
   Napi::Value GetInfo(const Napi::CallbackInfo&);
   Napi::Value GetOutlines(const Napi::CallbackInfo&);
   Napi::Value GetNamesTree(const Napi::CallbackInfo&);
   virtual Napi::Value CreatePage(const Napi::CallbackInfo&);
   Napi::Value CreatePages(const Napi::CallbackInfo&);
   Napi::Value InsertPage(const Napi::CallbackInfo&);
-  void
-  Append(const Napi::CallbackInfo &);
+  virtual void Append(const Napi::CallbackInfo &);
   Napi::Value GetAttachment(const Napi::CallbackInfo&);
   void AddNamedDestination(const Napi::CallbackInfo&);
   Napi::Value CreateXObject(const Napi::CallbackInfo&);

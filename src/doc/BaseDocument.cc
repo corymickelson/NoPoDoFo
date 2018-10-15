@@ -87,7 +87,6 @@ BaseDocument::BaseDocument(const Napi::CallbackInfo& info, bool inMem)
       base =
         new PdfStreamedDocument(output.c_str(), version, encrypt, writeMode);
     } else {
-      cout << "Streaming to Buffer" << endl;
       streamDocRefCountedBuffer = new PdfRefCountedBuffer(2048);
       streamDocOutputDevice = new PdfOutputDevice(streamDocRefCountedBuffer);
       base = new PdfStreamedDocument(
@@ -464,10 +463,8 @@ BaseDocument::CreatePages(const Napi::CallbackInfo& info)
 {
   auto coll = info[0].As<Array>();
   vector<PdfRect> rects;
-  for (int n = coll.Length(); n >= 0; n++) {
-    PdfRect r =
-      Rect::Unwrap(coll.Get(static_cast<uint32_t>(n)).As<Object>())->GetRect();
-    rects.push_back(r);
+  for(uint32_t i = 0; i < coll.Length(); i++) {
+    rects.emplace_back(Rect::Unwrap(coll.Get(static_cast<uint32_t>(i)).As<Object>())->GetRect());
   }
   base->CreatePages(rects);
   return Number::New(info.Env(), base->GetPageCount());
@@ -512,6 +509,10 @@ Napi::Value
 BaseDocument::GetAttachment(const CallbackInfo& info)
 {
   string name = info[0].As<String>();
+  if (base->GetAttachment(name)) {
+    return FileSpec::constructor.New({ External<PdfObject>::New(
+      info.Env(), base->GetAttachment(name)->GetObject()) });
+  }
   PdfObject* embeddedFiles =
     base->GetNamesTree(false)->GetObject()->MustGetIndirectKey(
       Name::EMBEDDED_FILES);

@@ -439,7 +439,7 @@ export namespace nopodofo {
      * @see Annotation
      */
     export class Action {
-        constructor(type: NPDFActions, doc: Document)
+        constructor(doc: Base, type: NPDFActions)
 
         readonly type: NPDFActions
         uri?: string
@@ -830,6 +830,10 @@ export namespace nopodofo {
          * @returns {SignatureField[]}
          */
         getSignatures(): SignatureField[]
+
+        append(doc: Document|Document[]): void
+
+        insertExistingPage(memDoc: Document, index: number, insertIndex: number): number
     }
 
     abstract class Base {
@@ -863,11 +867,7 @@ export namespace nopodofo {
 
         attachFile(file: string): void
 
-        insertExistingPage(memDoc: Document, index: number, insertIndex: number): number
-
         insertPage(rect: Rect, index: number): Page
-
-        append(doc: Document|Document[]): void
 
         isLinearized(): boolean
 

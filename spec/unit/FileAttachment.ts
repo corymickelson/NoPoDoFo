@@ -34,19 +34,11 @@ export class FileSpecPreWrite {
         await new Promise(resolve => {
             this.mem.write( (err, data) => err ? Expect.fail(err.message) : resolve())
         })
-
         this.stream.close()
-
-        // await new Promise(resolve => {
-        //     const data = this.stream.close()
-        //     const check = new Document()
-        //     check.load(data, err => err ? Expect.fail(err.message) : resolve())
-        // })
         return Promise.resolve()
     }
 
-    @AsyncTest("Attach file (post-write)")
-    @Timeout(500000)
+    @AsyncTest("Attach file read as FileSpec")
     public async pdfWAttachment() {
         return new Promise(resolve => {
             const doc = new Document()

@@ -33,9 +33,11 @@
         - [getWriteMode](#getwritemode)
         - [isAllowed](#isallowed)
         - [createFont](#createfont)
+        - [createFontSubset](#createfontsubset)
         - [getObject](#getobject)
             - [Example](#example)
         - [getNames](#getnames)
+        - [getOutlines](#getoutlines)
         - [createXObject](#createxobject)
         - [createPage](#createpage)
         - [createPages](#createpages)
@@ -60,6 +62,70 @@ at their first point of access. If an object is never used, it will never be loa
 of large documents with a small memory footprint.
 
 ```typescript
+abstract class Base {
+    readonly form: Form
+    readonly body: Object[]
+    readonly version: NPDFVersion
+    pageMode: NPDFPageMode
+    pageLayout: NPDFPageLayout
+    printingScale: string
+    baseUri: string
+    language: string
+    readonly info: NPDFInfo
+
+    getPageCount(): number
+
+    getPage(n: number): Page
+
+    hideToolbar(): void
+
+    hideMenubar(): void
+
+    hideWindowUI(): void
+
+    fitWindow(): void
+
+    centerWindow(): void
+
+    displayDocTitle(): void
+
+    useFullScreen(): void
+
+    attachFile(file: string): void
+
+    insertPage(rect: Rect, index: number): Page
+
+    isLinearized(): boolean
+
+    getWriteMode(): NPDFWriteMode
+
+    isAllowed(perm: ProtectionOption): boolean
+
+    createFont(opts: NPDFCreateFontOpts): Font
+
+    createFontSubset(opts: NPDFCreateFontOpts): Font
+
+    /**
+     * Get an existing outline or create a new outline and new root node
+     * @param {boolean} [create] - Create a new outline if one does not already exist
+     * @param {string} [root] - Create a Root node with the provided name
+     */
+    getOutlines(create?: boolean, root?: string): null | Outline
+
+    getObject(ref: Ref): Object
+
+    getNames(create: boolean): Object | null
+
+    createXObject(rect: Rect): XObject
+
+    createPage(rect: Rect): Page
+
+    createPages(rects: Rect[]): number
+
+    getAttachment(fileName: string): FileSpec
+
+    addNamedDestination(page: Page, destination: NPDFDestinationFit, name: string): void
+}
 class Document extends Base {
     constructor()
 
@@ -83,7 +149,27 @@ class Document extends Base {
     gc(file: string, pwd: string, output: string, cb: Callback<string | Buffer>): void
     hasSignatures(): boolean
     getSignatures(): SignatureField[]
+    insertExistingPage(memDoc: Document, index: number, insertIndex: number): number
+    append(doc: Document|Document[]): void
 }
+export class StreamDocument extends Base {
+        /**
+         *
+         * @param {string} [file]
+         * @param {{version: NPDFVersion, writer: NPDFWriteMode, encrypt: Encrypt}} [opts] -
+         *      defaults to {pdf1.7, writeMode_default, null}
+         * @returns {StreamDocument}
+         */
+        constructor(file?: string, opts?: { version: NPDFVersion, writer: NPDFWriteMode, encrypt?: Encrypt })
+
+        /**
+         * Closing a stream document will prevent any further writes to the document.
+         * If the object was instantiated with a file path, close will write to this file.
+         * If "new" was called without any args, the document is written to a nodejs buffer, close
+         *   will return the buffer.
+         */
+        close(): string | Buffer
+    }
 ```
 
 ## Properties
@@ -205,7 +291,8 @@ Toggle view option useFullScreen.
 attachFile(file: string): void
 ```
 
-Attach a file, as a [FileSpec](./filespec.md) to the Document. The file will be embedded into the Document.
+Attach a file, as a [FileSpec](./filespec.md) to the Document. Files are by default embedded into instances of `Document`,
+`StreamDocument` by default does __not__ embed file attachments.
 
 ### insertExistingPage
 
@@ -265,19 +352,28 @@ createFont(opts: NPDFCreateFontOpts): Font
 
 Create / Get a PDF Font object. If the build you have does not include fontconfig (Windows users) you must include the fontFile (path to font file on disk) in NPDFCreateFontOpts.
 
+### createFontSubset
+
+```typescript
+createFontSubset(opts: NPDFCreateFontOpts): Font
+```
+
+Create a new PDF [Font](./font.md) object. This font class will write only the characters used during painting operations.
+You can check if the [Font](./font.md) instance is a subset by invoking [Font.isSubsetting](./font.md#issubsetting)
+
 ### getObject
 
 ```typescript
 getObject(ref: Ref): Obj
 ```
 
-Get an object by Ref (indirect object reference). NoPoDoFo will always try to resolve a reference, some methods may however return a Ref instead of an IObj, this happens when the IObj in question
+Get an object by Ref (indirect object reference). NoPoDoFo will always try to resolve a reference, some methods may however return a Ref instead of an nopodofo.Obj, this happens when the Obj in question
 is not available by the parent object, or parent vector. This is primarily seen in a nested array structure.
 
 #### Example
 
 ```typescript
-const ar: IArray = someObject.getArray()
+const ar: nopodofo.Array = someObject.getArray()
 if(ar.at(0) instanceof nopodofo.Object) {
     // do something with the object
 } else {
@@ -294,6 +390,17 @@ getNames(create: boolean): nopodofo.Object|null
 ```
 
 Get the document names tree, if a names tree does not exist null is returned.
+
+### getOutlines
+
+```typescript
+getOutlines(create?:boolean, root?:string): Outline
+```
+
+Get a `Document` [Outlines](./outline.md) tree root object if one exists. To create an [Outline](./outline.md)
+use the create and root parameters with values `true` and a name for the new root node. An [Outline](./outline.md)
+is typically used in conjunction with [Destination](./destination.md) and [Action](./action.md) objects to
+create `Bookmarks` on a document. For a complete example see the [Bookmark Cookbook](./cookbook/bookmark.md)
 
 ### createXObject
 
@@ -321,10 +428,12 @@ Creates as many pages as rects provided, returns the new page count of the docum
 ### getAttachment
 
 ```typescript
-getAttachment(uri: string): FileSpec
+getAttachment(filename: string): FileSpec
 ```
 
-Get an attached file, if the file is not found null is returned.
+Get an embedded file as an instance of [FileSpec](./filespec.md). File lookup is done off the embedded file object's
+`UF` key. The `UF` key value is the name of the file in utf-8. If no file is found with the filename provided, null
+is returned.
 
 ### load
 
