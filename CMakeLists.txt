@@ -64,7 +64,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE
         ${NAPI_SRC}
         ${OPENSSL_INCLUDE_DIR}
         ${CMAKE_JS_INC})
-target_link_libraries(${PROJECT_NAME} PRIVATE ${CMAKE_JS_LIB} ${OPENSSL_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} PRIVATE ${CMAKE_JS_LIB} ${OPENSSL_LIBRARIES} stdc++fs)
 
 message("Openssl version: ${OPENSSL_VERSION}")
 message("CMAKE-JS version: ${CMAKE_JS_VERSION}")

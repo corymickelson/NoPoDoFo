@@ -22,11 +22,15 @@
 #include "Document.h"
 #include "StreamDocument.h"
 
+#include <experimental/filesystem>
+
 using namespace Napi;
 using namespace PoDoFo;
 
 using std::make_unique;
 using std::string;
+
+namespace fs = std::experimental::filesystem;
 
 namespace NoPoDoFo {
 
@@ -61,6 +65,11 @@ Image::Image(const CallbackInfo& info)
   size_t bufLen = 0;
   if (info[1].IsString()) {
     file = info[1].As<String>().Utf8Value();
+    fs::path p(file.c_str());
+    if (!fs::exists(p)) {
+      Error::New(info.Env(), "File not found").ThrowAsJavaScriptException();
+      return;
+    }
   } else if (info[1].IsBuffer()) {
     buffer = info[1].As<Buffer<unsigned char>>().Data();
     bufLen = info[1].As<Buffer<unsigned char>>().Length();
@@ -110,14 +119,14 @@ void
 Image::Initialize(Napi::Env& env, Napi::Object& target)
 {
   HandleScope scope(env);
-  Function ctor = DefineClass(
-    env,
-    "Image",
-    {
-      InstanceAccessor("width", &Image::GetWidth, nullptr),
-      InstanceAccessor("height", &Image::GetHeight, nullptr),
-      InstanceMethod("setInterpolate", &Image::SetInterpolate),
-    });
+  Function ctor =
+    DefineClass(env,
+                "Image",
+                {
+                  InstanceAccessor("width", &Image::GetWidth, nullptr),
+                  InstanceAccessor("height", &Image::GetHeight, nullptr),
+                  InstanceMethod("setInterpolate", &Image::SetInterpolate),
+                });
   constructor = Napi::Persistent(ctor);
   constructor.SuppressDestruct();
 
