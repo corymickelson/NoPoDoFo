@@ -63,7 +63,7 @@ Image::Image(const CallbackInfo& info)
     file = info[1].As<String>().Utf8Value();
   } else if (info[1].IsBuffer()) {
     buffer = info[1].As<Buffer<unsigned char>>().Data();
-    size_t len = info[1].As<Buffer<unsigned char>>().Length();
+    bufLen = info[1].As<Buffer<unsigned char>>().Length();
   }
   // data = 0, png =1, tiff =2, jpeg=3
   switch (format) {
@@ -116,8 +116,6 @@ Image::Initialize(Napi::Env& env, Napi::Object& target)
     {
       InstanceAccessor("width", &Image::GetWidth, nullptr),
       InstanceAccessor("height", &Image::GetHeight, nullptr),
-      //                  InstanceMethod("loadFromFile", &Image::LoadFromFile),
-      //                  InstanceMethod("setData", &Image::LoadFromBuffer),
       InstanceMethod("setInterpolate", &Image::SetInterpolate),
     });
   constructor = Napi::Persistent(ctor);

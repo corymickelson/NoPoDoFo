@@ -287,8 +287,8 @@ export enum NPDFAnnotation {
     Caret,
     Ink,
     Popup,
-    FileAttachement,
-    Sound,
+    //FileAttachement, // To create a file attachment use Document.attachFile() method
+    Sound = 17,
     Movie,
     Widget,
     Screen,
