@@ -24,6 +24,9 @@
 #define CONCAT(a, b) CONCAT_(a, b)
 #define DEFER(fn) ScopeGuard CONCAT(__defer__, __LINE__) = [&]() { fn; }
 
+#include <node_api.h>
+#define NAPI_EXPERIMENTAL
+
 #include "base/Color.h"
 #include <napi.h>
 #include <podofo/podofo.h>

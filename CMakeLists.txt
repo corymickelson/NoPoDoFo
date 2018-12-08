@@ -3,20 +3,22 @@ cmake_minimum_required(VERSION 3.8)
 project(nopodofo)
 
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_STANDARD 14)
-
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 set(CMAKE_VISIBILITY_INLINES_HIDDEN)
-# set(CMAKE_CXX_FLAGS "-fsanitize=address")
-#set(CMAKE_SHARED_LINKER_FLAGS "-Wl,-rpath=/var/task/node_modules/nopodofolambda/lib")
-set(CMAKE_EXPORT_COMPILE_COMMANDS "yes")
-set(CMAKE_CXX_FLAGS -fPIC)
+set(CMAKE_CXX_FLAGS "-fsanitize=address")
+#set(CMAKE_CXX_FLAGS -fPIC)
+set(CMAKE_SHARED_LINKER_FLAGS "-Wl,-rpath=/var/task/node_modules/nopodofolambda/lib")
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE RELEASE)
 endif()
+
 set(CMAKE_CXX_FLAGS_DEBUG "-g")
 set(CMAKE_CXX_FLAGS_RELEASE  "-O3")
 set(NAPI_CPP_EXCEPTIONS "yes")
+
 if (MSVC)
     set(VCPKG_PATH "$ENV{vcpkg_path}\\installed\\x64-windows")
     message("Windows VCPKG PATH: ${VCPKG_PATH}")
@@ -33,7 +35,6 @@ if (MSVC)
 
     set(CMAKE_CXX_FLAGS /EH)
     set(CMAKE_CXX_FLAGS /EHsc)
-    # set(CMAKE_TOOLCHAIN_FILE "$ENV{vcpkg_path}\\scripts\\buildsystems\\vcpkg.cmake")
     message("CMAKE_TOOLCHAIN_FILE = ${CMAKE_TOOLCHAIN_FILE}")
 endif (MSVC)
 
@@ -49,23 +50,28 @@ add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES})
 set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "" SUFFIX ".node")
 
 find_package(OpenSSL REQUIRED)
+find_package(Threads REQUIRED)
+
 if (NOT PROJECT_DIR)
     message(WARNING "Project dir not explicity set using cmake source directory: ${CMAKE_SOURCE_DIR}")
     set(NAPI_MODULE "${CMAKE_SOURCE_DIR}/node_modules/node-addon-api")
-    set(NAPI_SRC "${CMAKE_SOURCE_DIR}/node_modules/node-addon-api/src")
 else()
     set(NAPI_MODULE "${PROJECT_DIR}/node_modules/node-addon-api")
-    set(NAPI_SRC  "${PROJECT_DIR}/node_modules/node-addon-api/src")
 endif()
 message("Using napi: ${NAPI_MODULE}")
 target_include_directories(${PROJECT_NAME} PRIVATE
         ${CMAKE_SOURCE_DIR}/deps/include
+        ${CMAKE_SOURCE_DIR}/node_modules/napi-thread-safe-callback
         ${NAPI_MODULE}
-        ${NAPI_SRC}
         ${OPENSSL_INCLUDE_DIR}
         ${CMAKE_JS_INC})
-target_link_libraries(${PROJECT_NAME} PRIVATE ${CMAKE_JS_LIB} ${OPENSSL_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} PRIVATE
+        ${CMAKE_JS_LIB}
+        ${OPENSSL_LIBRARIES}
+        Threads::Threads
+        stdc++fs)
 
+message("CMAKE-JS includes: ${CMAKE_JS_INC}")
 message("Openssl version: ${OPENSSL_VERSION}")
 message("CMAKE-JS version: ${CMAKE_JS_VERSION}")
 
@@ -76,15 +82,11 @@ if (MSVC)
     target_link_libraries(${PROJECT_NAME} PRIVATE OpenSSL::SSL OpenSSL::Crypto)
     message("what is the output directory: ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}")
     set(WIN_REQUIRED_DLLS
-      #"expat.dll" 
-      #"fontconfig.dll" 
-      "freetype.dll" 
+      "freetype.dll"
       "jpeg62.dll" 
       "libbz2.dll" 
-      #"libcharset.dll" 
-      "libeay32.dll" 
-      #"libiconv.dll" 
-      "libpng16.dll" 
+      "libeay32.dll"
+      "libpng16.dll"
       "lzma.dll" 
       "podofo.dll" 
       "ssleay32.dll" 
@@ -119,6 +121,4 @@ else ()
             COMMAND "${CMAKE_COMMAND}"
             -E copy $<TARGET_FILE:nopodofo> ${CMAKE_SOURCE_DIR}/build/${CMAKE_BUILD_TYPE})
 endif (MSVC)
-
-
 

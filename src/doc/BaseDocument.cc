@@ -469,7 +469,7 @@ void
 BaseDocument::Append(const Napi::CallbackInfo& info)
 {
   if (info.Length() == 1 && info[0].IsArray()) {
-    Napi::Array docs = info[0].As<Array>();
+    auto docs = info[0].As<Array>();
     for (unsigned int i = 0; i < docs.Length(); i++) {
       auto arg = docs.Get(i);
       if (arg.IsObject() &&

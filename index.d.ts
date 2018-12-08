@@ -877,6 +877,8 @@ export namespace nopodofo {
 
         createFont(opts: NPDFCreateFontOpts): Font
 
+        createFontSubset(opts: NPDFCreateFontOpts): Font
+
         /**
          * Get an existing outline or create a new outline and new root node
          * @param {boolean} [create] - Create a new outline if one does not already exist

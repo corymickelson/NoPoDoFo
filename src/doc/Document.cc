@@ -314,7 +314,7 @@ Document::Load(const CallbackInfo& info)
   string pwd;
 
   if (info.Length() >= 2 && info[1].IsObject()) {
-    Object opts = info[1].As<Object>();
+    auto opts = info[1].As<Object>();
     if (opts.Has("forUpdate")) {
       forUpdate = opts.Get("forUpdate").As<Boolean>();
     }

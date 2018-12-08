@@ -88,7 +88,7 @@ The page height, a standard page is 612 X 792 (width X height)
 
 ### contents
 
-Get the page's contents [Object](./object.md)
+Get the page's contents [Object](./object.md). To append to this contents object, if the object is a [Dictionary](./dictionary.md)
 
 ### resources
 

@@ -22,11 +22,15 @@
 #include "Document.h"
 #include "StreamDocument.h"
 
+#include <filesystem>
+
 using namespace Napi;
 using namespace PoDoFo;
 
 using std::make_unique;
 using std::string;
+
+namespace fs = std::filesystem;
 
 namespace NoPoDoFo {
 

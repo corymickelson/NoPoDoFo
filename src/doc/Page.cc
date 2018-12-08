@@ -266,10 +266,7 @@ Page::GetPageNumber(const CallbackInfo& info)
 Napi::Value
 Page::GetContents(const CallbackInfo& info)
 {
-  // bool forAppending = info[0].As<Boolean>();
   PdfObject* contentsObj = page.GetContents();
-  // forAppending ? page.GetContentsForAppending() :
-  // page.GetContents();
   auto objPtr = External<PdfObject>::New(info.Env(), contentsObj);
   auto instance = Obj::constructor.New({ objPtr });
   return instance;
@@ -283,7 +280,6 @@ Page::GetResources(const CallbackInfo& info)
   auto objPtr = External<PdfObject>::New(info.Env(), resources);
   auto instance = Obj::constructor.New({ objPtr });
   return scope.Escape(instance);
-  // return instance;
 }
 
 Napi::Value
