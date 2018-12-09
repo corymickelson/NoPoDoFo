@@ -27,7 +27,11 @@ export class FontSpec {
 
     @AsyncTeardown
     public async teardown() {
-
+        await new Promise(resolve => {
+            this.mem.write((err, data) => err ? Expect.fail(err.message) : resolve())
+        })
+        this.stream.close()
+        return Promise.resolve()
     }
 
     @AsyncTest('Create Font')
@@ -36,6 +40,20 @@ export class FontSpec {
     public async createFont(m: string) {
         const doc: Base = (this as any)[m]
         const firaCode = doc.createFont({
+            fontName: 'Fira Code',
+            fileName: `${homedir()}/.fonts/f/FiraCode_Regular.ttf`
+        })
+        const metric = firaCode.getMetrics()
+        Expect(metric.fileName).toBe(`${homedir()}/.fonts/f/FiraCode_Regular.ttf`)
+        Expect(metric.fontSize).toBe(12)
+    }
+
+    @AsyncTest('Create Subsetting font')
+    @TestCase('mem')
+    @TestCase('stream')
+    public async createSubFont(m: string) {
+        const doc: Base = (this as any)[m]
+        const firaCode = doc.createFontSubset({
             fontName: 'Fira Code',
             fileName: `${homedir()}/.fonts/f/FiraCode_Regular.ttf`
         })
