@@ -22,7 +22,11 @@
 #include "Document.h"
 #include "StreamDocument.h"
 
+<<<<<<< HEAD
 #include <filesystem>
+=======
+#include <experimental/filesystem>
+>>>>>>> master
 
 using namespace Napi;
 using namespace PoDoFo;
@@ -30,7 +34,11 @@ using namespace PoDoFo;
 using std::make_unique;
 using std::string;
 
+<<<<<<< HEAD
 namespace fs = std::filesystem;
+=======
+namespace fs = std::experimental::filesystem;
+>>>>>>> master
 
 namespace NoPoDoFo {
 
@@ -65,9 +73,14 @@ Image::Image(const CallbackInfo& info)
   size_t bufLen = 0;
   if (info[1].IsString()) {
     file = info[1].As<String>().Utf8Value();
+    fs::path p(file.c_str());
+    if (!fs::exists(p)) {
+      Error::New(info.Env(), "File not found").ThrowAsJavaScriptException();
+      return;
+    }
   } else if (info[1].IsBuffer()) {
     buffer = info[1].As<Buffer<unsigned char>>().Data();
-    size_t len = info[1].As<Buffer<unsigned char>>().Length();
+    bufLen = info[1].As<Buffer<unsigned char>>().Length();
   }
   // data = 0, png =1, tiff =2, jpeg=3
   switch (format) {
@@ -114,16 +127,14 @@ void
 Image::Initialize(Napi::Env& env, Napi::Object& target)
 {
   HandleScope scope(env);
-  Function ctor = DefineClass(
-    env,
-    "Image",
-    {
-      InstanceAccessor("width", &Image::GetWidth, nullptr),
-      InstanceAccessor("height", &Image::GetHeight, nullptr),
-      //                  InstanceMethod("loadFromFile", &Image::LoadFromFile),
-      //                  InstanceMethod("setData", &Image::LoadFromBuffer),
-      InstanceMethod("setInterpolate", &Image::SetInterpolate),
-    });
+  Function ctor =
+    DefineClass(env,
+                "Image",
+                {
+                  InstanceAccessor("width", &Image::GetWidth, nullptr),
+                  InstanceAccessor("height", &Image::GetHeight, nullptr),
+                  InstanceMethod("setInterpolate", &Image::SetInterpolate),
+                });
   constructor = Napi::Persistent(ctor);
   constructor.SuppressDestruct();
 

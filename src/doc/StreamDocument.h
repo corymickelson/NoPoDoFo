@@ -35,6 +35,8 @@ public:
   explicit StreamDocument(const Napi::CallbackInfo&);
   static void Initialize(Napi::Env& env, Napi::Object& target);
   Napi::Value Close(const Napi::CallbackInfo&);
+  void Append(const Napi::CallbackInfo&) override;
+  Napi::Value InsertExistingPage(const Napi::CallbackInfo&) override;
   PoDoFo::PdfStreamedDocument& GetStreamedDocument()
   {
     return *dynamic_cast<PoDoFo::PdfStreamedDocument*>(BaseDocument::base);

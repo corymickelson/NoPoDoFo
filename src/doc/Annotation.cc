@@ -157,7 +157,7 @@ Annotation::SetTitle(const CallbackInfo& info, const Napi::Value& value)
 Napi::Value
 Annotation::GetTitle(const CallbackInfo& info)
 {
-  return Napi::String::New(info.Env(), GetAnnotation().GetTitle().GetString());
+  return Napi::String::New(info.Env(), GetAnnotation().GetTitle().GetStringUtf8());
 }
 
 void
@@ -193,6 +193,7 @@ Annotation::SetDestination(const CallbackInfo& info, const Napi::Value& value)
 Napi::Value
 Annotation::GetDestination(const CallbackInfo& info)
 {
+  if(!GetAnnotation().HasDestination()) return info.Env().Null();
   auto doc = Document::Unwrap(info[0].As<Object>())->base;
   PdfDestination d = GetAnnotation().GetDestination(doc);
   return Destination::constructor.New(
@@ -246,7 +247,6 @@ Annotation::GetOpen(const CallbackInfo& info)
 void
 Annotation::SetColor(const CallbackInfo& info, const Napi::Value& value)
 {
-  // SetNoPoDoFoColor(value, GetAnnotation().SetColor) vector<NPDFColorFormat>
   vector<NPDFColorFormat> types = { NPDFColorFormat::RGB,
                                     NPDFColorFormat::GreyScale,
                                     NPDFColorFormat::CMYK };
@@ -258,6 +258,7 @@ Napi::Value
 Annotation::GetColor(const CallbackInfo& info)
 {
   auto color = GetAnnotation().GetColor();
+  if(color.empty()) return info.Env().Null();
   switch (color.size()) {
     case 1: { // greyscale
       return Color::constructor.New(

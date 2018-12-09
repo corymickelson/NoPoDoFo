@@ -55,27 +55,22 @@ Destination::Destination(const CallbackInfo& info)
   }
   // Create a new Destination object
   else if (opts[0] == 1) {
-    auto noPage = Page::Unwrap(info[0].As<Object>());
-    auto doc = noPage->page.GetObject()->GetOwner()->GetParentDocument();
-    auto i = noPage->page.GetPageNumber();
+    auto page = Page::Unwrap(info[0].As<Object>());
     if (opts[1] == 0) {
-      // PdfDestination(PdfPage, EPdfDestinationFit)
       if (opts[2] == 1) {
         destination = new PdfDestination(
-          doc->GetPage(i),
+          &page->page,
           static_cast<EPdfDestinationFit>(info[1].As<Number>().Int32Value()));
       }
-      // PdfDestination(PdfPage, EPdfDestinationFit, FitArgument)
       else if (opts[2] == 0) {
         destination = new PdfDestination(
-          doc->GetPage(i),
+          &page->page,
           static_cast<EPdfDestinationFit>(info[1].As<Number>().Int32Value()),
           info[2].As<Number>().DoubleValue());
       }
-      // PdfDestination(PdfPage, left, top, zoom)
       else if (opts[2] == 0 && opts[3] == 0) {
         destination =
-          new PdfDestination(doc->GetPage(i),
+          new PdfDestination(&page->page,
                              info[1].As<Number>().DoubleValue(),  // left
                              info[2].As<Number>().DoubleValue(),  // top
                              info[3].As<Number>().DoubleValue()); // zoom
@@ -83,7 +78,8 @@ Destination::Destination(const CallbackInfo& info)
 
     } else if (opts[1] == 1) {
       destination = new PdfDestination(
-        doc->GetPage(i), Rect::Unwrap(info[1].As<Object>())->GetRect());
+        &page->page,
+        Rect::Unwrap(info[1].As<Object>())->GetRect());
     } else {
       Error::New(info.Env()).ThrowAsJavaScriptException();
     }
@@ -92,7 +88,6 @@ Destination::Destination(const CallbackInfo& info)
 Destination::~Destination()
 {
   HandleScope scope(Env());
-//  delete page;
   delete destination;
   destination = nullptr;
 }

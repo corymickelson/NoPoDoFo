@@ -33,6 +33,13 @@
 #include "Page.h"
 #include "StreamDocument.h"
 
+#if defined(_WIN32) || defined(_WIN64)
+#define R_OK 4
+#define access _access
+#else
+#include <unistd.h>
+#endif
+
 using namespace Napi;
 using namespace PoDoFo;
 
@@ -80,7 +87,6 @@ BaseDocument::BaseDocument(const Napi::CallbackInfo& info, bool inMem)
       base =
         new PdfStreamedDocument(output.c_str(), version, encrypt, writeMode);
     } else {
-      cout << "Streaming to Buffer" << endl;
       streamDocRefCountedBuffer = new PdfRefCountedBuffer(2048);
       streamDocOutputDevice = new PdfOutputDevice(streamDocRefCountedBuffer);
       base = new PdfStreamedDocument(
@@ -106,8 +112,9 @@ Napi::Value
 BaseDocument::GetPage(const CallbackInfo& info)
 {
   int n = info[0].As<Number>();
-  if(n < 0 || n > base->GetPageCount()) {
-    RangeError::New(info.Env(), "Page index out of range").ThrowAsJavaScriptException();
+  if (n < 0 || n > base->GetPageCount()) {
+    RangeError::New(info.Env(), "Page index out of range")
+      .ThrowAsJavaScriptException();
     return {};
   }
   return Page::constructor.New(
@@ -195,7 +202,16 @@ void
 BaseDocument::AttachFile(const CallbackInfo& info)
 {
   auto value = info[0].As<String>().Utf8Value();
-  PdfFileSpec attachment(value.c_str(), true, base);
+  if (access(value.c_str(), R_OK) == -1) {
+    Error::New(info.Env(), "File: " + value + " not found")
+      .ThrowAsJavaScriptException();
+    return;
+  }
+  bool embed = true;
+  if (!output.empty() || (streamDocOutputDevice && streamDocRefCountedBuffer)) {
+    embed = false;
+  }
+  PdfFileSpec attachment(value.c_str(), embed, base);
   base->AttachFile(attachment);
 }
 
@@ -447,10 +463,8 @@ BaseDocument::CreatePages(const Napi::CallbackInfo& info)
 {
   auto coll = info[0].As<Array>();
   vector<PdfRect> rects;
-  for (int n = coll.Length(); n >= 0; n++) {
-    PdfRect r =
-      Rect::Unwrap(coll.Get(static_cast<uint32_t>(n)).As<Object>())->GetRect();
-    rects.push_back(r);
+  for(uint32_t i = 0; i < coll.Length(); i++) {
+    rects.emplace_back(Rect::Unwrap(coll.Get(static_cast<uint32_t>(i)).As<Object>())->GetRect());
   }
   base->CreatePages(rects);
   return Number::New(info.Env(), base->GetPageCount());
@@ -477,7 +491,9 @@ BaseDocument::Append(const Napi::CallbackInfo& info)
         auto mergedDoc = Document::Unwrap(arg.As<Object>());
         base->Append(mergedDoc->GetDocument());
       } else {
-        TypeError::New(info.Env(), "Only Document's can be appended, StreamDocument not supported in append operation")
+        TypeError::New(info.Env(),
+                       "Only Document's can be appended, StreamDocument not "
+                       "supported in append operation")
           .ThrowAsJavaScriptException();
         return;
       }
@@ -492,8 +508,54 @@ BaseDocument::Append(const Napi::CallbackInfo& info)
 Napi::Value
 BaseDocument::GetAttachment(const CallbackInfo& info)
 {
-  return FileSpec::constructor.New({ External<PdfFileSpec>::New(
-    info.Env(), base->GetAttachment(info[0].As<String>().Utf8Value())) });
+  string name = info[0].As<String>();
+  if (base->GetAttachment(name)) {
+    return FileSpec::constructor.New({ External<PdfObject>::New(
+      info.Env(), base->GetAttachment(name)->GetObject()) });
+  }
+  PdfObject* embeddedFiles =
+    base->GetNamesTree(false)->GetObject()->MustGetIndirectKey(
+      Name::EMBEDDED_FILES);
+  for (auto& i : embeddedFiles->MustGetIndirectKey(Name::KIDS)->GetArray()) {
+    PdfObject* kid = nullptr;
+    PdfObject* names = nullptr;
+    PdfObject* filespec = nullptr;
+    if (i.IsReference()) {
+      kid = base->GetObjects()->GetObject(i.GetReference());
+    } else if (i.IsDictionary()) {
+      kid = &i;
+    } else
+      break;
+
+    if (kid->GetDictionary().HasKey(Name::NAMES) ||
+        !kid->MustGetIndirectKey(Name::NAMES)->IsArray()) {
+      names = kid->MustGetIndirectKey(Name::NAMES);
+    } else
+      break;
+
+    for (auto&& ii : names->GetArray()) {
+      PdfObject* item;
+      if (ii.IsReference()) {
+        item = base->GetObjects()->GetObject(ii.GetReference());
+      } else
+        item = &ii;
+      if (item->IsDictionary() && item->GetDictionary().HasKey(Name::TYPE) &&
+          item->GetDictionary().GetKey(Name::TYPE)->GetName() ==
+            Name::FILESPEC) {
+        filespec = item;
+        break;
+      }
+    }
+    if (filespec && filespec->GetDictionary().HasKey(Name::UF)) {
+      PdfObject* uf = filespec->MustGetIndirectKey(Name::UF);
+      if (uf->IsString() && uf->GetString().GetStringUtf8() == name) {
+        return FileSpec::constructor.New(
+          { External<PdfObject>::New(info.Env(), filespec) });
+      }
+    }
+  }
+
+  return info.Env().Null();
 }
 void
 BaseDocument::AddNamedDestination(const Napi::CallbackInfo& info)

@@ -3,6 +3,7 @@ import {nopodofo, nopodofo as npdf} from '../../'
 import {join} from "path";
 import {readFileSync} from "fs";
 import Document = nopodofo.Document;
+import Base = nopodofo.Base;
 
 @TestFixture("(Mem)Document")
 export class MemDocSpec {
@@ -71,68 +72,6 @@ export class MemDocSpec {
         return Promise.resolve(Expect((this.subject as any)[prop]).toBeDefined())
     }
 
-    @AsyncTest("Document Body Resolves all Objects")
-    public async documentBodyResolutionSpec() {
-        // const unresolved = this.subject.body.filter(i => i.type === 'Reference' || Array.isArray(i))
-        return Promise.resolve(Expect(this.subject.body.filter(i => i.type === 'Reference' || Array.isArray(i)).length).toBe(0))
-    }
-
-    @AsyncTest("Page Getter")
-    @TestCase(0)
-    @TestCase(-1, true)
-    @TestCase(10, true)
-    @TestCase(2)
-    public async getPage(idx: number, fails: boolean = false) {
-        if (fails) {
-            return Promise.resolve(Expect(() => this.subject.getPage(idx)).toThrowError(RangeError, "Page index out of range"))
-        } else {
-            return Promise.resolve(Expect(this.subject.getPage(idx)).toBeDefined())
-        }
-    }
-
-    @AsyncTest("Page Setter, Create new page(s)")
-    // @ts-ignore
-    @TestCase([new npdf.Rect(0, 0, 0, 0)])
-    // @ts-ignore
-    @TestCase([new npdf.Rect(0, 0, 0, 0), new npdf.Rect(0, 0, 0, 0)])
-    public async setPage(args: npdf.Rect[]) {
-        return Promise.resolve(() => {
-            if (args.length === 1) {
-                let page = this.subject.createPage(args[0])
-                Expect(page).toBeDefined()
-                Expect(typeof page).toBe('object')
-            } else {
-                let pages = this.subject.createPages(args)
-                Expect(pages).toEqual(this.subject.getPageCount())
-            }
-        })
-    }
-
-    @AsyncTest("Appending Documents")
-    @Timeout(2500)
-    @TestCase([join(__dirname, '../test-documents/test.pdf')])
-    @TestCase([join(__dirname, '../test-documents/test.pdf'), join(__dirname, '../test-documents/test.pdf')])
-    public async appendingSpec(append: string[]) {
-        return new Promise(async (resolve) => {
-
-            const originalPageCount = this.subject.getPageCount()
-            let children = await Promise.all<npdf.Document>(append.map(i => new Promise(resolve => {
-                const child = new npdf.Document()
-                child.load(i, err => err ? Expect.fail(err.message) : resolve(child))
-            })))
-            if (children.length === 1) {
-                console.log('Append single Document')
-                this.subject.append(children[0])
-            } else {
-                console.log('Append Array of Documents')
-                this.subject.append(children)
-            }
-            const total = children.reduce((accum, item) => accum += item.getPageCount(), originalPageCount)
-            Expect(this.subject.getPageCount()).toEqual(total)
-            return resolve()
-        })
-    }
-
     @AsyncTest("Page splicing")
     @TestCase(0, 1)
     @TestCase(1, 2)
@@ -147,5 +86,48 @@ export class MemDocSpec {
             Expect(this.subject.getPageCount()).toEqual(startingCount - end)
         }
         return Promise.resolve()
+    }
+
+    @AsyncTest("Insert pages from other document")
+    public async insertTest(t: string) {
+        const doc = this.subject
+        const startingCount = doc.getPageCount()
+        const other = new Document()
+        await new Promise(resolve => {
+            other.load(join(__dirname, '../test-documents/test.pdf'), e => {
+                if(e) Expect.fail(e.message)
+                return resolve()
+            })
+        })
+        doc.insertExistingPage(other, 0, 1)
+        Expect(doc.getPageCount()).toBeGreaterThan(startingCount)
+        return Promise.resolve()
+    }
+
+    @AsyncTest("Appending Documents")
+    @Timeout(1000)
+    @TestCase([join(__dirname, '../test-documents/test.pdf')])
+    @TestCase([join(__dirname, '../test-documents/test.pdf'), join(__dirname, '../test-documents/test.pdf')])
+    public async appendingSpec(append: string[]) {
+
+        const doc = this.subject
+        return new Promise(async (resolve) => {
+
+            const originalPageCount = doc.getPageCount()
+            let children = await Promise.all<Document>(append.map(i => new Promise(resolve => {
+                const child = new Document()
+                child.load(i, err => err ? Expect.fail(err.message) : resolve(child))
+            })))
+            if (children.length === 1) {
+                console.log('Append single Document')
+                doc.append(children[0])
+            } else {
+                console.log('Append Array of Documents')
+                doc.append(children)
+            }
+            const total = children.reduce((accum, item) => accum += item.getPageCount(), originalPageCount)
+            Expect(doc.getPageCount()).toEqual(total)
+            return resolve()
+        })
     }
 }

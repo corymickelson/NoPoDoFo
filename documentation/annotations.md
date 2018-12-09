@@ -15,7 +15,7 @@
     - [setAppearanceStream](#setappearancestream)
     - [getType](#gettype)
 
-## NoPoDoF Annotation
+## NoPoDoFo Annotation
 
 An annotation associates an object to a specific location on a [Page](./page).
 Annotations are the core of all pdf widgets including AcroForm fields, sticky notes, links, etc...

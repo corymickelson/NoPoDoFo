@@ -28,7 +28,7 @@ Action::Action(const Napi::CallbackInfo& info)
                        { { 0, { option(napi_external), option(napi_object) } },
                          { 1, { nullopt, option(napi_number) } } });
   // Create Copy Constructor Action
-  if (opts[0] == 0) {
+  if (opts[0] == 0 && info.Length() == 1) {
     action = make_unique<PdfAction>(
       info[0].As<External<PdfAction>>().Data()->GetObject());
   }
@@ -41,7 +41,7 @@ Action::Action(const Napi::CallbackInfo& info)
                  StreamDocument::constructor.Value())) {
       doc = StreamDocument::Unwrap(info[0].As<Object>())->base;
     }
-    EPdfAction t = static_cast<EPdfAction>(info[0].As<Number>().Uint32Value());
+    EPdfAction t = static_cast<EPdfAction>(info[1].As<Number>().Uint32Value());
     action = make_unique<PdfAction>(t, doc);
   } else {
     TypeError::New(
