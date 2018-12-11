@@ -2,13 +2,13 @@
 
 - [API Documentation for XObject](#api-documentation-for-xobject)
   - [NoPoDoFo XObject](#nopodofo-xobject)
-  - [Constructors](#constructors)
-  - [Properties](#properties)
+  - [## Constructors](#constructors)
+  - [## Properties](#properties)
     - [contents](#contents)
     - [contentsForAppending](#contentsforappending)
     - [resources](#resources)
     - [pageMediaBox](#pagemediabox)
-  - [Methods](#methods)
+  - [## Methods](#methods)
 
 ## NoPoDoFo XObject
 

@@ -6,9 +6,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 set(CMAKE_VISIBILITY_INLINES_HIDDEN)
-#set(CMAKE_CXX_FLAGS "-fsanitize=address")
-#set(CMAKE_CXX_FLAGS -fPIC)
-set(CMAKE_SHARED_LINKER_FLAGS "-Wl,-rpath=/var/task/node_modules/nopodofolambda/lib")
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 if(NOT CMAKE_BUILD_TYPE)
@@ -18,6 +15,10 @@ endif()
 set(CMAKE_CXX_FLAGS_DEBUG "-g")
 set(CMAKE_CXX_FLAGS_RELEASE  "-O3")
 set(NAPI_CPP_EXCEPTIONS "yes")
+
+if(NOPODOFO_AWS)
+    set(CMAKE_SHARED_LINKER_FLAGS "-Wl,-rpath=/var/task/node_modules/nopodofolambda/lib")
+endif(NOPODOFO_AWS)
 
 if (MSVC)
     set(VCPKG_PATH "$ENV{vcpkg_path}\\installed\\x64-windows")
@@ -121,4 +122,3 @@ else ()
             COMMAND "${CMAKE_COMMAND}"
             -E copy $<TARGET_FILE:nopodofo> ${CMAKE_SOURCE_DIR}/build/${CMAKE_BUILD_TYPE})
 endif (MSVC)
-

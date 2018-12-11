@@ -35,7 +35,7 @@ class Dictionary {
 
   getKey<T>(k: string, resolveType?: boolean): T
   getKeyType(k:string): NPDFDataType
-  addKey(prop: NPDFName|string, value: boolean | number | string | nopodofo.Object): void
+  addKey(prop: NPDFName|string, value: boolean | number | string | nopodofo.Object | nopodofo.Dictionary | nopodofo.Ref): void
   getKeys(): string[]
   hasKey(k: string): boolean
   removeKey(k: string): void
@@ -95,7 +95,7 @@ NoPoDoFo will always try to resolve Ref types to their corresponding [Object](./
 ### addKey
 
 ```typescript
-addKey(prop: NPDFName|string, value: boolean | number | string | nopodofo.Object): void
+addKey(prop: NPDFName|string, value: boolean | number | string | nopodofo.Object | nopodofo.Dictionary | nopodofo.Ref): void
 ```
 
 Add a new entry to the dictionary, with an NPDFName `k` and a value. If the value is an [Object](./object.md) the object's reference will be
