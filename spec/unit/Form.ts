@@ -28,7 +28,7 @@ export class FormSpec {
                 painter.restore()
                 const firaCode = doc.createFont({
                     fontName: 'Fira Code',
-                    fileName: `${homedir()}/.fonts/f/FiraCode_Regular.ttf`,
+                    fileName: join(__dirname, '../test-documents/FiraCode_Regular.ttf'),
                     bold: false,
                     embed: true
                 })

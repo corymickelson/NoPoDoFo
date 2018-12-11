@@ -41,10 +41,10 @@ export class FontSpec {
         const doc: Base = (this as any)[m]
         const firaCode = doc.createFont({
             fontName: 'Fira Code',
-            fileName: `${homedir()}/.fonts/f/FiraCode_Regular.ttf`
+            fileName: join(__dirname, '../test-documents/FiraCode_Regular.ttf')
         })
         const metric = firaCode.getMetrics()
-        Expect(metric.fileName).toBe(`${homedir()}/.fonts/f/FiraCode_Regular.ttf`)
+        Expect(metric.fileName).toBe(join(__dirname, '../test-documents/FiraCode_Regular.ttf'))
         Expect(metric.fontSize).toBe(12)
     }
 
@@ -55,11 +55,11 @@ export class FontSpec {
         const doc: Base = (this as any)[m]
         const firaCodeSub = doc.createFontSubset({
             fontName: 'Fira Code',
-            fileName: `${homedir()}/.fonts/f/FiraCode_Regular.ttf`
+            fileName: join(__dirname, '../test-documents/FiraCode_Regular.ttf')
         })
         const firaCode = doc.createFont({
             fontName: 'Fira Code',
-            fileName: `${homedir()}/.fonts/f/FiraCode_Regular.ttf`
+            fileName: join(__dirname, '../test-documents/FiraCode_Regular.ttf')
         })
         const metricSub = firaCodeSub.getMetrics()
         const metric = firaCode.getMetrics()
