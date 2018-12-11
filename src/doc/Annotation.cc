@@ -56,6 +56,7 @@ Annotation::Initialize(Napi::Env& env, Napi::Object& target)
     "Annotation",
     {
       InstanceAccessor("flags", &Annotation::GetFlags, &Annotation::SetFlags),
+      InstanceAccessor("rect", &Annotation::GetRect, &Annotation::SetRect),
       InstanceAccessor(
         "action", &Annotation::GetAction, &Annotation::SetAction),
       InstanceAccessor("open", &Annotation::GetOpen, &Annotation::SetOpen),
@@ -453,4 +454,25 @@ Annotation::GetAttachment(const CallbackInfo& info)
 void
 Annotation::SetAttachment(const CallbackInfo& info, const Napi::Value& value)
 {}
+Napi::Value
+Annotation::GetRect(const CallbackInfo &info)
+{
+  PdfRect rect = GetAnnotation().GetRect();
+  return Rect::constructor.New({
+    Number::New(info.Env(), rect.GetLeft()),
+    Number::New(info.Env(), rect.GetBottom()),
+    Number::New(info.Env(), rect.GetWidth()),
+    Number::New(info.Env(), rect.GetHeight())
+    });
+}
+void
+Annotation::SetRect(const CallbackInfo &info, const Napi::Value &value)
+{
+  if(!value.As<Object>().InstanceOf(Rect::constructor.Value())) {
+    Error::New(info.Env(), "NoPoDoFo Rect required").ThrowAsJavaScriptException();
+    return;
+  }
+  auto rect = Rect::Unwrap(value.As<Object>());;
+  GetAnnotation().SetRect(rect->GetRect());
+}
 }

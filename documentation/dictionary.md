@@ -2,11 +2,12 @@
 
 - [API Documentation for Dictionary](#api-documentation-for-dictionary)
   - [NoPoDoFo Dictionary](#nopodofo-dictionary)
+  - [Constructors](#constructors)
   - [Properties](#properties)
     - [dirty](#dirty)
     - [immutable](#immutable)
     - [obj](#obj)
-  - [Methods](#methods)
+  - [## Methods](#methods)
     - [getKeyType](#getkeytype)
     - [getKey](#getkey)
     - [addKey](#addkey)
@@ -30,6 +31,8 @@ class Dictionary {
   immutable: boolean
   readonly obj: nopodofo.Object
 
+  constructor()
+
   getKey<T>(k: string, resolveType?: boolean): T
   getKeyType(k:string): NPDFDataType
   addKey(prop: NPDFName|string, value: boolean | number | string | nopodofo.Object): void
@@ -43,7 +46,17 @@ class Dictionary {
 }
 ```
 
+## Constructors
+
+A public constructor is available for instantiating a new empty dictionary. This dictionary does not belong to any document, and
+therefore must be explicitly added to the document for it to take effect.
+
+```typescript
+constructor()
+```
+
 ## Properties
+
 --------------
 
 ### dirty

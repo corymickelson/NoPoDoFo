@@ -27,6 +27,7 @@
 using std::cout;
 using std::endl;
 using std::string;
+using std::vector;
 using value = Napi::Value;
 
 namespace NoPoDoFo {
@@ -53,8 +54,17 @@ public:
   void SetHighlightingMode(const Napi::CallbackInfo&);
   void SetMouseAction(const Napi::CallbackInfo&);
   void SetPageAction(const Napi::CallbackInfo&);
+  value GetAnnotation(const Napi::CallbackInfo&);
+  value GetAppearanceStream(const Napi::CallbackInfo&);
+  void SetAppearanceStream(const Napi::CallbackInfo&, const Napi::Value&);
+  value GetDefaultAppearance(const Napi::CallbackInfo&);
+  void SetDefaultAppearance(const Napi::CallbackInfo&, const Napi::Value&);
+  value GetJustification(const Napi::CallbackInfo&);
+  void SetJustification(const Napi::CallbackInfo&, const Napi::Value&);
+
 
   PoDoFo::PdfField& GetField() { return *field; }
+  PoDoFo::PdfDictionary& GetFieldDictionary() { return field->GetFieldObject()->GetDictionary(); }
 
   string fieldName;
   string fieldType;
@@ -66,6 +76,7 @@ protected:
 
 private:
   PoDoFo::PdfField* field;
+  vector<PoDoFo::PdfObject*> children;
 };
 }
 #endif // NPDF_PDFFIELD_H

@@ -50,6 +50,7 @@
 #include "doc/TextField.h"
 #include "doc/Page.h"
 #include "doc/Rect.h"
+#include "base/Ref.h"
 #include <napi.h>
 
 Napi::Object
@@ -92,6 +93,7 @@ return;
   NoPoDoFo::SimpleTable::Initialize(env, exports);
   NoPoDoFo::StreamDocument::Initialize(env, exports);
   NoPoDoFo::TextField::Initialize(env, exports);
+  NoPoDoFo::Ref::Initialize(env, exports);
 
   return exports;
 }

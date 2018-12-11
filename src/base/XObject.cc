@@ -20,6 +20,7 @@
 #include "XObject.h"
 #include "../doc/Rect.h"
 #include "Obj.h"
+#include "Ref.h"
 
 using namespace Napi;
 using namespace PoDoFo;
@@ -59,9 +60,11 @@ XObject::Initialize(Napi::Env& env, Object& target)
     env,
     "XObject",
     { InstanceAccessor("contents", &XObject::GetContents, nullptr),
+      InstanceAccessor("reference", &XObject::Reference, nullptr),
       InstanceAccessor(
         "contentsForAppending", &XObject::GetContentsForAppending, nullptr),
-      InstanceAccessor("resources", &XObject::GetContents, nullptr),
+      InstanceAccessor("contents", &XObject::GetContents, nullptr),
+      InstanceAccessor("resource", &XObject::GetResources, nullptr),
       InstanceAccessor("pageMediaBox", &XObject::GetPageSize, nullptr) });
   constructor = Napi::Persistent(ctor);
   constructor.SuppressDestruct();
@@ -105,5 +108,11 @@ XObject::GetPageSize(const CallbackInfo& info)
     Number::New(info.Env(), width),
     Number::New(info.Env(), height)
   });
+}
+Napi::Value
+XObject::Reference(const Napi::CallbackInfo &info)
+{
+  auto r =xobj->GetObject()->Reference();
+  return Ref::constructor.New({External<PdfReference>::New(info.Env(), &r)});
 }
 }

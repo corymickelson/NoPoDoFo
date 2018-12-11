@@ -114,6 +114,8 @@ SignatureField::Initialize(Napi::Env& env, Napi::Object& target)
     env,
     "SignatureField",
     { InstanceAccessor("info", &SignatureField::GetInfo, nullptr),
+      InstanceAccessor("widgetAnnotation", &SignatureField::GetAnnotation, nullptr),
+      InstanceAccessor("obj", &SignatureField::GetFieldObject, nullptr),
       InstanceMethod("setAppearanceStream",
                      &SignatureField::SetAppearanceStream),
       InstanceMethod("setReason", &SignatureField::SetReason),
@@ -132,6 +134,12 @@ SignatureField::Initialize(Napi::Env& env, Napi::Object& target)
   target.Set("SignatureField", ctor);
 }
 
+Napi::Value
+SignatureField::GetFieldObject(const Napi::CallbackInfo &info)
+{
+  auto o = field->GetFieldObject();
+  return Obj::constructor.New({External<PdfObject>::New(info.Env(), o)});
+}
 void
 SignatureField::SetAppearanceStream(const CallbackInfo& info)
 {
@@ -242,5 +250,11 @@ SignatureField::GetInfo(const Napi::CallbackInfo &info)
     infoObj.Set("signature",info.Env().Undefined());
   }
   return infoObj;
+}
+Napi::Value
+SignatureField::GetAnnotation(const Napi::CallbackInfo &info)
+{
+  PdfAnnotation* annot = field->GetWidgetAnnotation();
+  return Annotation::constructor.New({External<PdfAnnotation>::New(info.Env(), annot)});
 }
 }

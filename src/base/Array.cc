@@ -21,6 +21,7 @@
 #include "../ErrorHandler.h"
 #include "../ValidateArguments.h"
 #include "Obj.h"
+#include "Ref.h"
 
 using namespace Napi;
 using namespace PoDoFo;
@@ -167,10 +168,12 @@ Array::GetObjAtIndex(const CallbackInfo& info)
     PdfReference indirect = GetArray()[index].GetReference();
     auto owner = obj.GetOwner();
     if (!owner) {
-      Napi::Array ref = Napi::Array::New(info.Env(), 2);
-      ref.Set(static_cast<uint32_t>(0), indirect.GenerationNumber());
-      ref.Set(static_cast<uint32_t>(1), indirect.ObjectNumber());
-      return ref;
+      cout << "NoPoDoFo.Array does not have access to the owner of this array."
+           << "To resolve the value at " << index
+           << " please take the returned Ref"
+           << "for the first argument in Base.GetObject" << endl;
+      return Ref::constructor.New(
+        { External<PdfReference>::New(info.Env(), &indirect) });
     }
     item = obj.GetOwner()->GetObject(GetArray()[index].GetReference());
 

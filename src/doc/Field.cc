@@ -21,6 +21,9 @@
 #include "../Defines.h"
 #include "../ValidateArguments.h"
 #include "../base/Color.h"
+#include "../base/Dictionary.h"
+#include "../base/Names.h"
+#include "../base/Obj.h"
 #include "Action.h"
 #include "Annotation.h"
 #include "Form.h"
@@ -103,6 +106,9 @@ Field::Field(EPdfField type, const CallbackInfo& info)
 Field::~Field()
 {
   delete field;
+  for (auto c : children) {
+    delete c;
+  }
 }
 
 string
@@ -137,13 +143,13 @@ Field::TypeString()
   return typeStr;
 }
 
-Napi::Value
+value
 Field::GetType(const Napi::CallbackInfo& info)
 {
   return Number::New(info.Env(), static_cast<int>(field->GetType()));
 }
 
-Napi::Value
+value
 Field::GetFieldName(const CallbackInfo& info)
 {
   return Napi::String::New(info.Env(),
@@ -157,14 +163,14 @@ Field::SetFieldName(const CallbackInfo&, const Napi::Value& value)
   GetField().SetFieldName(PdfString(name));
 }
 
-Napi::Value
+value
 Field::GetAlternateName(const CallbackInfo& info)
 {
   return Napi::String::New(info.Env(),
                            field->GetAlternateName().GetStringUtf8());
 }
 
-Napi::Value
+value
 Field::GetMappingName(const CallbackInfo& info)
 {
   return Napi::String::New(info.Env(), field->GetMappingName().GetStringUtf8());
@@ -188,13 +194,13 @@ Field::SetRequired(const CallbackInfo&, const Napi::Value& value)
   field->SetRequired(value.As<Boolean>());
 }
 
-Napi::Value
+value
 Field::IsRequired(const CallbackInfo& info)
 {
   return Napi::Boolean::New(info.Env(), field->IsRequired());
 }
 
-Napi::Value
+value
 Field::IsReadOnly(const Napi::CallbackInfo& info)
 {
   return Boolean::New(info.Env(), field->IsReadOnly());
@@ -210,7 +216,7 @@ Field::SetExport(const Napi::CallbackInfo&, const Napi::Value& value)
 {
   field->SetExport(value.As<Boolean>());
 }
-Napi::Value
+value
 Field::IsExport(const Napi::CallbackInfo& info)
 {
   return Boolean::New(info.Env(), field->IsExport());
@@ -298,4 +304,93 @@ Field::SetPageAction(const Napi::CallbackInfo& info)
         .ThrowAsJavaScriptException();
   }
 }
+value
+Field::GetAnnotation(const Napi::CallbackInfo& info)
+{
+  PdfAnnotation* annot = field->GetWidgetAnnotation();
+  return Annotation::constructor.New(
+    { External<PdfAnnotation>::New(info.Env(), annot) });
+}
+value
+Field::GetAppearanceStream(const Napi::CallbackInfo& info)
+{
+  if (GetFieldDictionary().HasKey(Name::AP)) {
+    auto ap = field->GetFieldObject()->MustGetIndirectKey(Name::AP);
+    return Dictionary::constructor.New(
+      { External<PdfObject>::New(info.Env(), ap) });
+  } else {
+    return info.Env().Null();
+  }
+}
+void
+Field::SetAppearanceStream(const Napi::CallbackInfo& info,
+                           const Napi::Value& value)
+{
+  if (GetFieldDictionary().HasKey(Name::AP)) {
+    GetFieldDictionary().RemoveKey(Name::AP);
+  }
+  if (value.IsNull()) {
+    cout << "The AP value you've provided is null. Removing field ap object"
+         << endl;
+  }
+
+  if (value.IsObject() &&
+      value.As<Object>().InstanceOf(Dictionary::constructor.Value())) {
+    PdfDictionary* dict =
+      Dictionary::Unwrap(value.As<Object>())->GetDictionary();
+    GetFieldDictionary().AddKey(PdfName(Name::AP), *dict);
+  }
+}
+value
+Field::GetDefaultAppearance(const Napi::CallbackInfo& info)
+{
+  if (GetFieldDictionary().HasKey(Name::DA)) {
+    auto da = field->GetFieldObject()->MustGetIndirectKey(Name::DA);
+    return String::New(info.Env(), da->GetString().GetStringUtf8());
+  } else {
+    return info.Env().Null();
+  }
+}
+void
+Field::SetDefaultAppearance(const Napi::CallbackInfo& info,
+                            const Napi::Value& value)
+{
+  if (GetFieldDictionary().HasKey(Name::DA)) {
+    GetFieldDictionary().RemoveKey(Name::DA);
+  }
+  if (value.IsNull()) {
+    cout << "The DA value you've provided is null. Removing field DA from field dictionary"
+         << endl;
+  }
+
+  if (value.IsString()) {
+    GetFieldDictionary().AddKey(PdfName(Name::DA),
+                                PdfString(value.As<String>()));
+  }
+}
+value
+Field::GetJustification(const Napi::CallbackInfo &info)
+{
+  if (field->GetFieldObject()->GetDictionary().HasKey(Name::Q)) {
+    return Number::New(info.Env(), field->GetFieldObject()->MustGetIndirectKey(Name::Q)->GetNumber());
+  } else {
+    return info.Env().Null();
+  }
+}
+void
+Field::SetJustification(const Napi::CallbackInfo &info, const Napi::Value &value)
+{
+  if(value.IsNumber()) {
+    pdf_int64 qValue = value.As<Number>();
+    if (qValue > 3 || qValue < 0) {
+      RangeError::New(info.Env(), "Please see NPDFAlignment for valid values").ThrowAsJavaScriptException();
+      return;
+    }
+    if (GetFieldDictionary().HasKey(Name::Q)) {
+      GetFieldDictionary().RemoveKey(Name::Q);
+    }
+    GetFieldDictionary().AddKey(Name::Q, PdfVariant(qValue));
+  }
+}
+
 }

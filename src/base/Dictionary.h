@@ -50,12 +50,15 @@ public:
   Napi::Value Write(const Napi::CallbackInfo&);
   void WriteSync(const Napi::CallbackInfo&);
   Napi::Value Eq(const Napi::CallbackInfo&);
-  Napi::Value JsObject(const Napi::CallbackInfo&);
-  PoDoFo::PdfDictionary& GetDictionary() { return obj.GetDictionary(); }
+  PoDoFo::PdfDictionary* GetDictionary()
+  {
+    return self == nullptr ? &(obj.GetDictionary()) : self;
+  }
 
 private:
-  vector<PoDoFo::PdfObject*> children; 
-  PoDoFo::PdfObject& obj;
+  vector<PoDoFo::PdfObject*> children;
+  PoDoFo::PdfObject obj;
+  PoDoFo::PdfDictionary* self = nullptr;
 };
 }
 #endif

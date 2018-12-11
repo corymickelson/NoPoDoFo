@@ -19,7 +19,8 @@
 
 A text field widget type [Annotation](./annotations.md). This field is responsible for handling user text input.
 This class is capable of handling a variety of text type inputs including: password fields, multiline text, and rich text.
-TextField is derived from the [Field](./field.md) class.
+TextField is derived from the [Field](./field.md) class. Please see the [Appearance Stream Cookbook](./cookbook/ap.md) for
+examples of how to set the appearance stream for a text field.
 
 ```typescript
 class TextField extends Field {

@@ -110,6 +110,6 @@ void
 Action::AddToDictionary(const Napi::CallbackInfo& info)
 {
   auto dictionary = Dictionary::Unwrap(info[0].As<Object>())->GetDictionary();
-  GetAction()->AddToDictionary(dictionary);
+  GetAction()->AddToDictionary(*dictionary);
 }
 }

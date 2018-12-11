@@ -1,7 +1,3 @@
-## Ref
-``` type Ref = [number, number] ``` is an array with two numerical values. The first being the generation number, and the second the object number. 
-A Ref may be resolved by passing the Ref to `Document.getObject(ref)`.
-
 ## NPDFFontMetrics
 Follow link for typedef. Font Metrics interface.
 ```typescript

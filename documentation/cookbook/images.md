@@ -52,6 +52,7 @@ function extractImg(obj: npdf.Object, jpg: Boolean) {
 
 Getting images from a page is similar to the above with the exception that instead of iterating the document's body
 we will inspect a page's resources dictionary. This method will only work if the image has been set in the page's resources.
+If the image is an inline object the following method will not work, for finding inline images the above method must be used.
 
 ```typescript
 const doc = new npdf.Document()

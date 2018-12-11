@@ -90,6 +90,9 @@ TextField::Initialize(Napi::Env& env, Napi::Object& target)
     "TextField",
     { InstanceAccessor("text", &TextField::Text, &TextField::SetText),
       InstanceAccessor("maxLen", &TextField::GetMaxLen, &TextField::SetMaxLen),
+      InstanceAccessor("AP", &TextField::GetAppearanceStream, &TextField::SetAppearanceStream),
+      InstanceAccessor("DA", &TextField::GetDefaultAppearance, &TextField::SetDefaultAppearance),
+      InstanceAccessor("alignment", &TextField::GetJustification, &TextField::SetJustification),
       InstanceAccessor(
         "multiLine", &TextField::IsMultiLine, &TextField::SetMultiLine),
       InstanceAccessor("passwordField",
@@ -119,6 +122,7 @@ TextField::Initialize(Napi::Env& env, Napi::Object& target)
                        &TextField::SetAlternateName),
       InstanceAccessor(
         "mappingName", &TextField::GetMappingName, &TextField::SetMappingName),
+      InstanceAccessor("widgetAnnotation", &TextField::GetAnnotation, nullptr),
       InstanceMethod("setBackgroundColor", &TextField::SetBackground),
       InstanceMethod("setBorderColor", &TextField::SetBorder),
       InstanceMethod("setMouseAction", &TextField::SetMouseAction),

@@ -37,6 +37,8 @@ public:
   static void Initialize(Napi::Env& env, Napi::Object& target);
   Napi::Value HasAppearanceStream(const CallbackInfo&);
   void SetAppearanceStream(const CallbackInfo&);
+  void SetRect(const CallbackInfo&, const Napi::Value&);
+  Napi::Value GetRect(const CallbackInfo&);
   void SetFlags(const CallbackInfo&, const Napi::Value&);
   Napi::Value GetFlags(const CallbackInfo&);
   void SetBorderStyle(const CallbackInfo&);

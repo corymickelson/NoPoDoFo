@@ -2,14 +2,14 @@
 
 - [API Documentation for Object](#api-documentation-for-object)
   - [NoPoDoFo Object](#nopodofo-object)
-  - [Constructors](#constructors)
-  - [Properties](#properties)
+  - [## Constructors](#constructors)
+  - [## Properties](#properties)
     - [reference](#reference)
     - [length](#length)
     - [stream](#stream)
     - [type](#type)
     - [immutable](#immutable)
-  - [Methods](#methods)
+  - [## Methods](#methods)
     - [hasStream](#hasstream)
     - [getOffset](#getoffset)
     - [write](#write)
@@ -29,7 +29,7 @@
 
 ```typescript
 class Object {
-  readonly reference: { object: number, generation: number }
+  readonly reference: Ref
   readonly length: number
   readonly stream: Stream
   readonly type: NPDFDataType
@@ -138,7 +138,11 @@ Get the object as a boolean value
 getDictionary(): Dictionary
 ```
 
-Get the object as a PDF [Dictionary](./dictionary.md) value
+Get the object as a PDF [Dictionary](./dictionary.md) value. This is a copy or readonly instance of the dictionary
+(this is currently a limitation of the lower level api).
+Any changes made to this dictionary will not be persisted back to the document. Higher level api's are available for
+manipulating dictionary values (ex. [Form](./form.md) [DA, DR, CO, and SigFlags]). If there is a use case that you
+need that is not yet exposed please submit an issue.
 
 ### getString
 

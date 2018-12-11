@@ -56,7 +56,6 @@ public:
   Napi::Value GetImmutable(const Napi::CallbackInfo&);
   void SetImmutable(const Napi::CallbackInfo&, const Napi::Value&);
   void Clear(const Napi::CallbackInfo&);
-  Napi::Value Eq(const Napi::CallbackInfo&);
   PoDoFo::PdfObject& GetObject() { return obj; }
 
 private:

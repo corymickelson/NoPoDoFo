@@ -53,13 +53,21 @@ export class FontSpec {
     @TestCase('stream')
     public async createSubFont(m: string) {
         const doc: Base = (this as any)[m]
-        const firaCode = doc.createFontSubset({
+        const firaCodeSub = doc.createFontSubset({
             fontName: 'Fira Code',
             fileName: `${homedir()}/.fonts/f/FiraCode_Regular.ttf`
         })
+        const firaCode = doc.createFont({
+            fontName: 'Fira Code',
+            fileName: `${homedir()}/.fonts/f/FiraCode_Regular.ttf`
+        })
+        const metricSub = firaCodeSub.getMetrics()
         const metric = firaCode.getMetrics()
-        Expect(metric.fileName).toBe(`${homedir()}/.fonts/f/FiraCode_Regular.ttf`)
-        Expect(metric.fontSize).toBe(12)
+        Expect(metric.fontScale).toEqual(metricSub.fontScale)
+        Expect(metric.fontSize).toEqual(metricSub.fontSize)
+        Expect(metric.charSpace).toEqual(metricSub.charSpace)
+        Expect(metric.fontWeight).toEqual(metricSub.fontWeight)
+        Expect(metric.lineSpacing).toEqual(metricSub.lineSpacing)
     }
 
 }

@@ -62,7 +62,7 @@ Encoding::AddToDictionary(const Napi::CallbackInfo& info)
 {
   auto wrap = info[0].As<Object>();
   Dictionary* d = Dictionary::Unwrap(wrap);
-  encoding->AddToDictionary(d->GetDictionary());
+  encoding->AddToDictionary(*d->GetDictionary());
   return info.Env().Undefined();
 }
 Napi::Value

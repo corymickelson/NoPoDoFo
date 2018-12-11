@@ -32,6 +32,7 @@
 #include "Outline.h"
 #include "Page.h"
 #include "StreamDocument.h"
+#include "../base/Ref.h"
 
 #if defined(_WIN32) || defined(_WIN64)
 #define R_OK 4
@@ -48,6 +49,7 @@ using std::endl;
 using std::make_shared;
 using std::string;
 using tl::nullopt;
+using std::stringstream;
 
 namespace NoPoDoFo {
 
@@ -302,6 +304,7 @@ BaseDocument::GetObjects(const CallbackInfo& info)
 Napi::Value
 BaseDocument::GetObject(const CallbackInfo& info)
 {
+  PdfReference *ref = nullptr;
   if (info[0].IsArray()) {
     unsigned long g = info[0]
                         .As<Array>()
@@ -311,12 +314,22 @@ BaseDocument::GetObject(const CallbackInfo& info)
     pdf_objnum o =
       info[0].As<Array>().Get(static_cast<uint32_t>(1)).As<Number>();
     auto gen = static_cast<pdf_gennum>(g);
-    PdfReference ref(o, gen);
-    return Obj::constructor.New({ External<PdfObject>::New(
-      info.Env(), base->GetObjects()->GetObject(ref)) });
+    PdfReference r(o, gen);
+    ref = &r;
+  } else if(info[0].IsObject() && info[0].As<Object>().InstanceOf(Ref::constructor.Value())) {
+    ref = Ref::Unwrap(info[0].As<Object>())->self;
   }
-  auto ref = Obj::Unwrap(info[0].As<Object>())->GetObject();
-  PdfObject* target = base->GetObjects()->GetObject(ref.GetReference());
+  if (!ref) {
+    Error::New(info.Env(), "NoPoDoFo is unable to resolve null reference").ThrowAsJavaScriptException();
+    return {};
+  }
+  PdfObject* target = base->GetObjects()->GetObject(*ref);
+  if (!target) {
+    stringstream oss;
+    oss << "NoPoDoFo is unable to resolve reference " << ref->ObjectNumber() << " : " << ref->GenerationNumber();
+    Error::New(info.Env(), oss.str()).ThrowAsJavaScriptException();
+    return {};
+  }
   return Obj::constructor.New({ External<PdfObject>::New(info.Env(), target) });
 }
 

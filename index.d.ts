@@ -6,7 +6,6 @@ export type Callback<T> = (err: Error, data: T) => void
 /**
  * Indirect object reference [GenerationNumber, ObjectNumber]
  */
-export type Ref = [number, number]
 
 export function pdfDate(d: Date): string
 
@@ -467,6 +466,7 @@ export namespace nopodofo {
         quadPoints: number[]
         color: Color
         attachment: FileSpec
+        rect: Rect
 
         setBorderStyle(v: NPDFAnnotationBorderStyle): void
 
@@ -537,11 +537,14 @@ export namespace nopodofo {
     abstract class Field {
         readOnly: boolean
         required: boolean
-        readonly type: NPDFFieldType
         fieldName: string
         alternateName?: string
         mappingName?: string
         exported?: boolean
+        AP?: Dictionary
+        DA?: string | null
+        readonly widgetAnnotation: Annotation
+        readonly type: NPDFFieldType
 
         setBackgroundColor(color: Color): void
 
@@ -611,6 +614,7 @@ export namespace nopodofo {
         scrollEnabled: boolean
         combs: boolean
         richText: boolean
+        alignment?: NPDFAlignment
     }
 
     export class Checkbox extends Field {
@@ -686,6 +690,8 @@ export namespace nopodofo {
     }
 
     export class SignatureField {
+        readonly widgetAnnotation: Annotation
+        readonly obj: Object
         constructor(annotation: Annotation, doc: Document)
 
         setAppearanceStream(xObj: any, appearance: NPDFAnnotationAppearance, name: string): void
@@ -902,7 +908,7 @@ export namespace nopodofo {
     }
 
     export class Object {
-        readonly reference: { object: number, generation: number }
+        readonly reference: Ref
         readonly length: number
         readonly stream: Stream
         readonly type: NPDFDataType
@@ -960,11 +966,16 @@ export namespace nopodofo {
 
         write(destination: string): void
     }
-
+    export class Ref {
+        readonly gennum: number
+        readonly objnum: number
+    }
     export class Dictionary {
         dirty: boolean
         immutable: boolean
         readonly obj: Object
+
+        constructor()
 
         getKeyType(k: string): NPDFDataType
 
@@ -974,7 +985,7 @@ export namespace nopodofo {
          */
         getKey<T>(k: string, resolveType?: boolean): T
 
-        addKey(prop: string, value: boolean | number | string | Object): void
+        addKey(prop: string, value: boolean | number | string | Object | Ref | Dictionary): void
 
         getKeys(): string[]
 
@@ -1007,6 +1018,7 @@ export namespace nopodofo {
         readonly contents: Object
         readonly contentsForAppending: Object
         readonly resources: Object
+        readonly reference: Ref
         readonly pageMediaBox: Rect
 
         /**
@@ -1186,9 +1198,9 @@ export namespace nopodofo {
 
         getMultiLineText(width: number, text: string, skipSpaces?: boolean): Array
 
-        bt(point: NPDFPoint): void
+        beginText(point: NPDFPoint): void
 
-        et(): void
+        endText(): void
 
         addText(text: string): void
 

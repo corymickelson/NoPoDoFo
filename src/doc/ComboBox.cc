@@ -48,8 +48,11 @@ ComboBox::Initialize(Napi::Env& env, Napi::Object& target)
     "ComboBox",
     { InstanceAccessor(
         "editable", &ComboBox::GetEditable, &ComboBox::SetEditable),
+      InstanceAccessor("AP", &ComboBox::GetAppearanceStream, &ComboBox::SetAppearanceStream),
+      InstanceAccessor("DA", &ComboBox::GetDefaultAppearance, &ComboBox::SetDefaultAppearance),
       InstanceAccessor(
         "selected", &ComboBox::GetSelectedItem, &ComboBox::SetSelectedItem),
+        InstanceAccessor("widgetAnnotation", &ComboBox::GetAnnotation, nullptr),
       InstanceAccessor("length", &ComboBox::GetItemCount, nullptr),
       InstanceAccessor("spellCheckEnabled",
                        &ComboBox::IsSpellCheckEnabled,

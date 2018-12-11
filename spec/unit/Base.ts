@@ -1,5 +1,5 @@
 import {AsyncSetup, AsyncTeardown, AsyncTest, Expect, TestCase, TestFixture, Timeout} from 'alsatian'
-import {nopodofo} from '../../'
+import {nopodofo, NPDFDataType} from '../../'
 import Document = nopodofo.Document;
 import StreamDocument = nopodofo.StreamDocument;
 import Rect = nopodofo.Rect;
@@ -85,5 +85,15 @@ export class BaseSpec {
         })
     }
 
+    @AsyncTest("Document resolve reference")
+    @TestCase("mem")
+    @TestCase("stream")
+    public async resolveReference(m: string) {
+        const doc: Base = (this as any)[m]
+        const first = doc.body[0]
+        const subject = doc.getObject(first.reference)
+        Expect(subject).toBeDefined()
+        Expect(first.reference).toEqual(subject.reference)
+    }
 
 }

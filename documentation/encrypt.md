@@ -1,22 +1,22 @@
 # API Documentation for Encrypt
 
 - [API Documentation for Encrypt](#api-documentation-for-encrypt)
-  - [NoPoDoFo Encrypt](#nopodofo-encrypt)
-  - [Constructors](#constructors)
-    - [Example](#example)
-  - [Properties](#properties)
-    - [owner](#owner)
-    - [user](#user)
-    - [encryptionKey](#encryptionkey)
-    - [keyLength](#keylength)
-    - [protections](#protections)
-  - [Methods](#methods)
-    - [isAllowed](#isallowed)
+    - [NoPoDoFo Encrypt](#nopodofo-encrypt)
+    - [Constructors](#constructors)
+        - [Example](#example)
+    - [Properties](#properties)
+        - [owner](#owner)
+        - [user](#user)
+        - [encryptionKey](#encryptionkey)
+        - [keyLength](#keylength)
+        - [protections](#protections)
+    - [Methods](#methods)
+        - [isAllowed](#isallowed)
 
 ## NoPoDoFo Encrypt
 
 A PDF can encrypt it's contents, all strings and stream objects, to prevent unauthorized user's from viewing sensitive information.
-EncryptOption(s) are dependent on PoDoFo built with libidn and OpenSSL.
+EncryptOption(s) are dependent on PoDoFo built with libidn (used for AES256, if libidn is absent only rc4v1 and rv4v2 are available) and OpenSSL.
 
 ```typescript
 class Encrypt {

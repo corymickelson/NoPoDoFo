@@ -48,6 +48,8 @@ public:
   void SetDate(const Napi::CallbackInfo&);
   void SetFieldName(const Napi::CallbackInfo&);
   void AddCertificateReference(const Napi::CallbackInfo&);
+  Napi::Value GetAnnotation(const Napi::CallbackInfo&);
+  Napi::Value GetFieldObject(const Napi::CallbackInfo&);
   Napi::Value GetSignatureObject(const Napi::CallbackInfo&);
   Napi::Value EnsureSignatureObject(const Napi::CallbackInfo&);
   Napi::Value GetInfo(const Napi::CallbackInfo&);

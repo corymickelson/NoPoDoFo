@@ -21,6 +21,7 @@
 #include "../ErrorHandler.h"
 #include "Array.h"
 #include "Dictionary.h"
+#include "Ref.h"
 
 using namespace Napi;
 using namespace PoDoFo;
@@ -177,11 +178,10 @@ Obj::GetDataType(const CallbackInfo& info)
 Napi::Value
 Obj::Reference(const CallbackInfo& info)
 {
-  Object js = Object::New(info.Env());
-  js.Set("object", Number::New(info.Env(), obj.Reference().ObjectNumber()));
-  js.Set("generation",
-         Number::New(info.Env(), obj.Reference().GenerationNumber()));
-  return js;
+  auto r = GetObject().Reference();
+  return Ref::constructor.New({
+    External<PdfReference>::New(info.Env(), &r)
+  });
 }
 
 void
@@ -324,7 +324,6 @@ private:
 Napi::Value
 Obj::GetByteOffset(const CallbackInfo& info)
 {
-
   string arg = info[0].As<String>().Utf8Value();
   auto cb = info[1].As<Function>();
   ObjOffsetAsync* worker = new ObjOffsetAsync(cb, this, arg);
@@ -373,4 +372,5 @@ Obj::Write(const CallbackInfo& info)
   worker->Queue();
   return info.Env().Undefined();
 }
+
 }

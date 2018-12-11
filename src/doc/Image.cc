@@ -22,11 +22,7 @@
 #include "Document.h"
 #include "StreamDocument.h"
 
-<<<<<<< HEAD
 #include <filesystem>
-=======
-#include <experimental/filesystem>
->>>>>>> master
 
 using namespace Napi;
 using namespace PoDoFo;
@@ -34,11 +30,7 @@ using namespace PoDoFo;
 using std::make_unique;
 using std::string;
 
-<<<<<<< HEAD
 namespace fs = std::filesystem;
-=======
-namespace fs = std::experimental::filesystem;
->>>>>>> master
 
 namespace NoPoDoFo {
 

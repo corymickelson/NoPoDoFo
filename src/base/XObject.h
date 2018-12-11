@@ -35,6 +35,7 @@ public:
   Napi::Value GetContentsForAppending(const Napi::CallbackInfo&);
   Napi::Value GetResources(const Napi::CallbackInfo&);
   Napi::Value GetPageSize(const Napi::CallbackInfo&);
+  Napi::Value Reference(const Napi::CallbackInfo&);
   PoDoFo::PdfXObject& GetXObject() { return *xobj; }
 
 private:

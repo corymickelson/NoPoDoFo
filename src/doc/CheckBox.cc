@@ -44,8 +44,11 @@ CheckBox::Initialize(Napi::Env& env, Napi::Object& target)
     env,
     "Checkbox",
     { InstanceAccessor("checked", &CheckBox::IsChecked, &CheckBox::SetChecked),
+      InstanceAccessor("AP", &CheckBox::GetAppearanceStream, &CheckBox::SetAppearanceStream),
+      InstanceAccessor("DA", &CheckBox::GetDefaultAppearance, &CheckBox::SetDefaultAppearance),
       InstanceAccessor(
         "readOnly", &CheckBox::IsReadOnly, &CheckBox::SetReadOnly),
+        InstanceAccessor("widgetAnnotation", &CheckBox::GetAnnotation, nullptr),
       InstanceAccessor(
         "required", &CheckBox::IsRequired, &CheckBox::SetRequired),
       InstanceAccessor("exported", &CheckBox::IsExport, &CheckBox::SetExport),
