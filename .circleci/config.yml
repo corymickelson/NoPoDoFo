@@ -46,7 +46,7 @@ jobs:
           - v1-dependencies-{{ checksum "package.json" }}
           # fallback to using the latest cache if no exact match is found
           - v1-dependencies-
-
+      - run: source /opt/rh/devtoolset-7/enable
       - run: npm install --ignore-scripts
       - run: apk add ttf-freefont
       - save_cache:

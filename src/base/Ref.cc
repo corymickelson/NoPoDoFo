@@ -3,6 +3,7 @@
 //
 
 #include "Ref.h"
+#include <iostream>
 
 using namespace Napi;
 using std::cout;
