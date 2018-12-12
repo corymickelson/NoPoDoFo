@@ -102,6 +102,9 @@ BaseDocument::~BaseDocument()
   delete base;
   delete streamDocOutputDevice;
   delete streamDocRefCountedBuffer;
+  for(auto i : encodings) {
+    delete i;
+  }
 }
 
 Napi::Value
@@ -672,6 +675,9 @@ BaseDocument::CreateFontObject(napi_env env, Napi::Object opts, bool subset)
       encoding = new PdfIdentityEncoding(0, 0xffff, true);
   }
   try {
+    if(!encoding->IsAutoDelete()) {
+      encodings.emplace_back(const_cast<PdfEncoding*>(encoding));
+    }
     PdfFont* font;
     if (subset) {
       font =
