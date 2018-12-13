@@ -31,6 +31,17 @@ proper location, ex `cmake-js build --CDCMAKE_TOOLCHAIN_FILE=C:\vcpkg\scripts\bu
 NoPoDoFo also provides pre-built binaries for Windows.
 To install a pre-built in your npm project run `npm install https://github.com/corymickelson/NoPoDoFo/releases/download/{version}/nopodofo-{version}-win-x86_64.tar.gz`
 
+## Mac
+
+PoDoFo v0.9.6 is available in MacPorts. Please visit [MacPorts](https://www.macports.org/) for installation instructions.
+
+Building NoPoDoFo
+
+- `npm i nopodofo`
+- `cd nopodofo`
+- `./node_modules/.bin/cmake-js build -s=c++17`
+
+
 ## Linux
 
 Please use your native package manager, the following is for arch (pacman). Other distro's will have similar

@@ -69,8 +69,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 target_link_libraries(${PROJECT_NAME} PRIVATE
         ${CMAKE_JS_LIB}
         ${OPENSSL_LIBRARIES}
-        Threads::Threads
-        stdc++fs)
+        Threads::Threads )
 
 message("CMAKE-JS includes: ${CMAKE_JS_INC}")
 message("Openssl version: ${OPENSSL_VERSION}")
@@ -113,10 +112,12 @@ if (MSVC)
 else ()
     message("Creating build output directory: build/${CMAKE_BUILD_TYPE}")
     file(MAKE_DIRECTORY ${CMAKE_SOURCE_DIR}/build/${CMAKE_BUILD_TYPE})
-    find_path(PODOFO_INCLUDE_DIR podofo/podofo.h PATHS /sources/local /usr/include /usr/local/include)
-    find_library(PODOFO_LIBRARY NAMES podofo PATHS /sources/local /usr/lib64 /usr/lib /usr/local/lib)
+    find_path(PODOFO_INCLUDE_DIR podofo/podofo.h PATHS /opt/local/include /usr/include /usr/local/include)
+    find_library(PODOFO_LIBRARY NAMES podofo PATHS /opt/local/lib /usr/lib64 /usr/lib /usr/local/lib)
     target_include_directories(${PROJECT_NAME} PRIVATE ${PODOFO_INCLUDE_DIR})
-    target_link_libraries(${PROJECT_NAME} PRIVATE ${PODOFO_LIBRARY})
+    target_link_libraries(${PROJECT_NAME} PRIVATE
+            ${PODOFO_LIBRARY}
+            stdc++fs)
     add_custom_command(TARGET nopodofo
             POST_BUILD
             COMMAND "${CMAKE_COMMAND}"

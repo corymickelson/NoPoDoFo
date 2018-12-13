@@ -119,5 +119,6 @@ Napi::Value
 StreamDocument::InsertExistingPage(const Napi::CallbackInfo &)
 {
   cout << "StreamDocument does not currently support this operation" << endl;
+  return {};
 }
 }
