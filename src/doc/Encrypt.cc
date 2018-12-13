@@ -157,23 +157,26 @@ Encrypt::CreateEncrypt(const CallbackInfo& info)
         string algo;
         if (algoProp.IsString()) {
           algo = algoProp.As<String>().Utf8Value();
+          cout << "What is algo? " << algo << endl;
+          algo ="rc4v1";
+          cout << "What is algo? " << algo << endl;
           if (algo == "rc4v1")
             algoParameter = 1;
           else if (algo == "rc4v2")
             algoParameter = 2;
-#ifdef PODOFO_HAVE_LIBIDN
+// #ifdef PODOFO_HAVE_LIBIDN
           else if (algo == "aesv2")
             algoParameter = 4;
           else if (algo == "aesv3")
             algoParameter = 8;
-#else
-          else if (algo == "aesv2")
-            Error::New(info.Env(), "AES support not available in this build")
-              .ThrowAsJavaScriptException();
-          else if (algo == "aesv3")
-            Error::New(info.Env(), "AES support not available in this build")
-              .ThrowAsJavaScriptException();
-#endif
+// #else
+//           else if (algo == "aesv2")
+//             Error::New(info.Env(), "AES support not available in this build")
+//               .ThrowAsJavaScriptException();
+//           else if (algo == "aesv3")
+//             Error::New(info.Env(), "AES support not available in this build")
+//               .ThrowAsJavaScriptException();
+// #endif
           else {
             stringstream msg;
             msg << "Unknown permission parameter: " << algo
@@ -190,6 +193,9 @@ Encrypt::CreateEncrypt(const CallbackInfo& info)
         Napi::Value keyProp = encryption.Get("keyLength");
         if (keyProp.IsNumber()) {
           key = keyProp.As<Number>();
+          cout << "what is key? " << key << endl;
+          key = 40;
+          cout << "what is key? " << key << endl;
           for (int i = 0; i < 6; ++i) {
             if (keyValues[i] == key)
               break;

@@ -26,10 +26,6 @@
 #include "StreamDocument.h"
 
 #include <map>
-#include <openssl/err.h>
-#include <openssl/pem.h>
-#include <openssl/pkcs7.h>
-#include <openssl/ssl.h>
 #include <sstream>
 #include <vector>
 

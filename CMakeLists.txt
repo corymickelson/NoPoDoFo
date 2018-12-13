@@ -22,13 +22,13 @@ if (MSVC)
     message("Windows VCPKG PATH: ${VCPKG_PATH}")
 
     if(CMAKE_BUILD_TYPE STREQUAL "DEBUG")
-        set(PODOFO_LIBRARY "${VCPKG_PATH}\\debug\\lib\\podofo.lib")
+        set(PODOFO_LIBRARY "C:\\vcpkg\\installed\\x64-windows\\lib\\podofo.lib")
     else()
-        set(PODOFO_LIBRARY "${VCPKG_PATH}\\lib\\podofo.lib")
+        set(PODOFO_LIBRARY "C:\\vcpkg\\installed\\x64-windows\\lib\\podofo.lib")
     endif(CMAKE_BUILD_TYPE STREQUAL "DEBUG")
     message("PODOFO_LIBRARY: ${PODOFO_LIBRARY}")
 
-    set(PODOFO_INCLUDE_DIR "${VCPKG_PATH}\\include")
+    set(PODOFO_INCLUDE_DIR "C:\\vcpkg\\installed\\x64-windows\\include")
     message("PODOFO_INCLUDE_DIR: ${PODOFO_INCLUDE_DIR}")
 
     set(CMAKE_CXX_FLAGS /EH)
@@ -64,7 +64,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE
         ${NAPI_SRC}
         ${OPENSSL_INCLUDE_DIR}
         ${CMAKE_JS_INC})
-target_link_libraries(${PROJECT_NAME} PRIVATE ${CMAKE_JS_LIB} ${OPENSSL_LIBRARIES} stdc++fs)
+target_link_libraries(${PROJECT_NAME} PRIVATE ${CMAKE_JS_LIB} ${OPENSSL_LIBRARIES})
 
 message("Openssl version: ${OPENSSL_VERSION}")
 message("CMAKE-JS version: ${CMAKE_JS_VERSION}")
@@ -94,7 +94,7 @@ if (MSVC)
       "zlib1.dll" 
     )
     foreach(file_i ${WIN_REQUIRED_DLLS})
-        set (DLL "$ENV{vcpkg_path}\\installed\\x64-windows\\bin\\${file_i}")
+        set (DLL "C:\\vcpkg\\installed\\x64-windows\\bin\\${file_i}")
         if(EXISTS "${DLL}")
             add_custom_command(TARGET nopodofo
             POST_BUILD
@@ -113,7 +113,7 @@ else ()
     find_path(PODOFO_INCLUDE_DIR podofo/podofo.h PATHS /sources/local /usr/include /usr/local/include)
     find_library(PODOFO_LIBRARY NAMES podofo PATHS /sources/local /usr/lib64 /usr/lib /usr/local/lib)
     target_include_directories(${PROJECT_NAME} PRIVATE ${PODOFO_INCLUDE_DIR})
-    target_link_libraries(${PROJECT_NAME} PRIVATE ${PODOFO_LIBRARY})
+    target_link_libraries(${PROJECT_NAME} PRIVATE ${PODOFO_LIBRARY}  stdc++fs)
     add_custom_command(TARGET nopodofo
             POST_BUILD
             COMMAND "${CMAKE_COMMAND}"

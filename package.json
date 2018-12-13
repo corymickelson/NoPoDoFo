@@ -10,7 +10,7 @@
   },
   "scripts": {
     "coverage": "nyc tape spec/unit/*.js && nyc report --reporter=text-lcov | coveralls",
-    "test": "mkdir -p spec/tmp && tsc -p tsconfig.json && node --expose-gc ./node_modules/.bin/alsatian spec/unit/*.js",
+    "test": "node ./install.js && tsc -p tsconfig.json && node --expose-gc ./node_modules/.bin/alsatian ./spec/unit/*.js",
     "tsc:spec": "tsc -p tsconfig.json"
   },
   "nyc": {
