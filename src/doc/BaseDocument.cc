@@ -676,6 +676,9 @@ BaseDocument::CreateFontObject(napi_env env, Napi::Object opts, bool subset)
       encoding = new PdfIdentityEncoding(0, 0xffff, true);
   }
   try {
+    if(!encoding->IsAutoDelete()) {
+      encodings.emplace_back(const_cast<PdfEncoding*>(encoding));
+    }
     PdfFont* font;
     if (!encoding->IsAutoDelete()) {
       encodings.emplace_back(const_cast<PdfEncoding*>(encoding));
