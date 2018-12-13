@@ -13,6 +13,13 @@ The recommended installation process is as follows:
 
 <mark>Windows support is still a work in progress</mark>
 
+NoPoDoFo does provide a prebuilt package for windows x64, the prebuilt is built on windows 10 and can be installed into your npm project with
+`npm i https://github.com/corymickelson/NoPoDoFo/releases/download/v0.8.0/nopodofo-v0.8.0-win-x64.tar.gz`
+
+Below are instructions for building PoDoFo and NoPoDoFo from source. Please note that the below instructions do __not__ include all features.
+Encryption and Signing will not be available from the instructions below as vcpkg does not include the optional libraries (libidn and openssl) in
+their port of PoDoFo.
+
 Please install [vcpkg](https://github.com/Microsoft/vcpkg) as your package manager for building and installing PoDoFo.
 To install PoDoFo with vcpkg run `vcpkg install podofo:x64-windows`[^1]. NoPoDoFo requires the path to vcpkg root directory as environment variable `vcpkg_path`.
 Install OpenSSL (required by NoPoDoFo) using the same command used to install PoDoFo `vcpkg install openssl:x64-windows`.

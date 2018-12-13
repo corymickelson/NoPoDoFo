@@ -78,8 +78,10 @@ message("CMAKE-JS version: ${CMAKE_JS_VERSION}")
 if (MSVC)
     add_definitions(-DUSING_SHARED_PODOFO=1)
     target_include_directories(${PROJECT_NAME} PRIVATE ${PODOFO_INCLUDE_DIR})
-    target_link_libraries(${PROJECT_NAME} PRIVATE ${PODOFO_LIBRARY})
-    target_link_libraries(${PROJECT_NAME} PRIVATE OpenSSL::SSL OpenSSL::Crypto)
+    target_link_libraries(${PROJECT_NAME} PRIVATE
+            ${PODOFO_LIBRARY}
+            OpenSSL::SSL
+            OpenSSL::Crypto )
     message("what is the output directory: ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}")
     set(WIN_REQUIRED_DLLS
       "freetype.dll"
