@@ -1,8 +1,6 @@
 import {Expect, AsyncTest, TestFixture, TestCase, AsyncSetup, AsyncTeardown, Timeout} from 'alsatian'
-import {nopodofo, NPDFFieldType, NPDFName} from '../../'
+import {nopodofo, NPDFName} from '../../'
 import {join} from "path"
-import {homedir} from 'os'
-import Base = nopodofo.Base;
 
 @TestFixture('Acro Form')
 export class FormSpec {
@@ -43,12 +41,20 @@ export class FormSpec {
                 const apDict = new nopodofo.Dictionary()
                 apDict.addKey(NPDFName.N, xobj.reference)
                 field.AP = apDict
-                field.DA = `0 0 0 rg /${firaCode.identifier} tf`
-                doc.write("/tmp/form_ap_test.pdf", err => {
+                const daStr = `0 0 0 rg /${firaCode.identifier} tf`
+                field.DA = daStr
+                const tmp = join(__dirname, '../tmp/form_ap_test.pdf')
+                doc.write(tmp, err => {
                     if (err) {
                         return reject(err)
                     }
-                    return resolve()
+                    const td = new nopodofo.Document()
+                    td.load(tmp, e => {
+                        if(e) return reject(e)
+                        const tf = td.getPage(0).getField<nopodofo.TextField>(0)
+                        Expect(tf.DA).toEqual(daStr)
+                        return resolve()
+                    })
                 })
             })
         })
