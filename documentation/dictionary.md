@@ -22,8 +22,7 @@
 ## NoPoDoFo Dictionary
 
 A Dictionary is one of the primary building blocks of a PDF. The PDF dictionary type data structure is similar to a nodejs object data structure in
-that it is simply a collection of key value pairs. NoPoDoFo does not support the creation of new Dictionary objects, actions that require creating
-a new Dictionary are handled implicitly by PoDoFo.
+that it is simply a collection of key value pairs.
 
 ```typescript
 class Dictionary {
@@ -49,7 +48,7 @@ class Dictionary {
 ## Constructors
 
 A public constructor is available for instantiating a new empty dictionary. This dictionary does not belong to any document, and
-therefore must be explicitly added to the document for it to take effect.
+therefore must be explicitly added to the document for it to take effect. An example of this can be seen in the [AP Cookbook](./cookbook/ap.md).
 
 ```typescript
 constructor()

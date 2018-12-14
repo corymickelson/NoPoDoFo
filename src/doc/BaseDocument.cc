@@ -22,6 +22,7 @@
 #include "../ValidateArguments.h"
 #include "../base/Names.h"
 #include "../base/Obj.h"
+#include "../base/Ref.h"
 #include "../base/XObject.h"
 #include "../doc/Rect.h"
 #include "Document.h"
@@ -32,7 +33,6 @@
 #include "Outline.h"
 #include "Page.h"
 #include "StreamDocument.h"
-#include "../base/Ref.h"
 
 #if defined(_WIN32) || defined(_WIN64)
 /* This is intended as a drop-in replacement for unistd.h on Windows.
@@ -40,20 +40,20 @@
  * https://stackoverflow.com/a/826027/1202830
  */
 
-#include <stdlib.h>
+#include <direct.h> /* for _getcwd() and _chdir() */
 #include <io.h>
 #include <process.h> /* for getpid() and the exec..() family */
-#include <direct.h> /* for _getcwd() and _chdir() */
+#include <stdlib.h>
 
 #define srandom srand
 #define random rand
 
 /* Values for the second argument to access.
    These may be OR'd together.  */
-#define R_OK    4       /* Test for read permission.  */
-#define W_OK    2       /* Test for write permission.  */
+#define R_OK 4 /* Test for read permission.  */
+#define W_OK 2 /* Test for write permission.  */
 //#define   X_OK    1       /* execute permission - unsupported in windows*/
-#define F_OK    0       /* Test for existence.  */
+#define F_OK 0 /* Test for existence.  */
 
 #define access _access
 #else
@@ -67,8 +67,8 @@ using std::cout;
 using std::endl;
 using std::make_shared;
 using std::string;
-using tl::nullopt;
 using std::stringstream;
+using tl::nullopt;
 
 namespace NoPoDoFo {
 
@@ -119,12 +119,12 @@ BaseDocument::BaseDocument(const Napi::CallbackInfo& info, bool inMem)
 BaseDocument::~BaseDocument()
 {
   cout << "Cleanup" << endl;
+  for (auto i : encodings) {
+    delete i;
+  }
   delete base;
   delete streamDocOutputDevice;
   delete streamDocRefCountedBuffer;
-  for(auto i : encodings) {
-    delete i;
-  }
 }
 
 Napi::Value
@@ -327,7 +327,7 @@ BaseDocument::GetObjects(const CallbackInfo& info)
 Napi::Value
 BaseDocument::GetObject(const CallbackInfo& info)
 {
-  PdfReference *ref = nullptr;
+  PdfReference* ref = nullptr;
   if (info[0].IsArray()) {
     unsigned long g = info[0]
                         .As<Array>()
@@ -339,17 +339,20 @@ BaseDocument::GetObject(const CallbackInfo& info)
     auto gen = static_cast<pdf_gennum>(g);
     PdfReference r(o, gen);
     ref = &r;
-  } else if(info[0].IsObject() && info[0].As<Object>().InstanceOf(Ref::constructor.Value())) {
+  } else if (info[0].IsObject() &&
+             info[0].As<Object>().InstanceOf(Ref::constructor.Value())) {
     ref = Ref::Unwrap(info[0].As<Object>())->self;
   }
   if (!ref) {
-    Error::New(info.Env(), "NoPoDoFo is unable to resolve null reference").ThrowAsJavaScriptException();
+    Error::New(info.Env(), "NoPoDoFo is unable to resolve null reference")
+      .ThrowAsJavaScriptException();
     return {};
   }
   PdfObject* target = base->GetObjects()->GetObject(*ref);
   if (!target) {
     stringstream oss;
-    oss << "NoPoDoFo is unable to resolve reference " << ref->ObjectNumber() << " : " << ref->GenerationNumber();
+    oss << "NoPoDoFo is unable to resolve reference " << ref->ObjectNumber()
+        << " : " << ref->GenerationNumber();
     Error::New(info.Env(), oss.str()).ThrowAsJavaScriptException();
     return {};
   }
@@ -499,8 +502,9 @@ BaseDocument::CreatePages(const Napi::CallbackInfo& info)
 {
   auto coll = info[0].As<Array>();
   vector<PdfRect> rects;
-  for(uint32_t i = 0; i < coll.Length(); i++) {
-    rects.emplace_back(Rect::Unwrap(coll.Get(static_cast<uint32_t>(i)).As<Object>())->GetRect());
+  for (uint32_t i = 0; i < coll.Length(); i++) {
+    rects.emplace_back(
+      Rect::Unwrap(coll.Get(static_cast<uint32_t>(i)).As<Object>())->GetRect());
   }
   base->CreatePages(rects);
   return Number::New(info.Env(), base->GetPageCount());
@@ -695,9 +699,6 @@ BaseDocument::CreateFontObject(napi_env env, Napi::Object opts, bool subset)
       encoding = new PdfIdentityEncoding(0, 0xffff, true);
   }
   try {
-    if(!encoding->IsAutoDelete()) {
-      encodings.emplace_back(const_cast<PdfEncoding*>(encoding));
-    }
     PdfFont* font;
     if (!encoding->IsAutoDelete()) {
       encodings.emplace_back(const_cast<PdfEncoding*>(encoding));

@@ -1,9 +1,11 @@
 import {Expect, AsyncTest, TestFixture, TestCase, AsyncSetup, AsyncTeardown, Timeout} from 'alsatian'
-import {nopodofo, NPDFName} from '../../'
+import {nopodofo, NPDFFontEncoding, NPDFName as name} from '../../'
 import {join} from "path"
 
 @TestFixture('Acro Form')
 export class FormSpec {
+
+    private readonly filePath = join(__dirname, '../test-documents/test.pdf')
 
     @AsyncTest('text field custom AP')
     public async memDocTextFieldAP() {
@@ -39,7 +41,7 @@ export class FormSpec {
                 painter.finishPage()
                 field.readOnly = true
                 const apDict = new nopodofo.Dictionary()
-                apDict.addKey(NPDFName.N, xobj.reference)
+                apDict.addKey(name.N, xobj.reference)
                 field.AP = apDict
                 const daStr = `0 0 0 rg /${firaCode.identifier} tf`
                 field.DA = daStr
@@ -50,12 +52,46 @@ export class FormSpec {
                     }
                     const td = new nopodofo.Document()
                     td.load(tmp, e => {
-                        if(e) return reject(e)
+                        if (e) return reject(e)
                         const tf = td.getPage(0).getField<nopodofo.TextField>(0)
                         Expect(tf.DA).toEqual(daStr)
                         return resolve()
                     })
                 })
+            })
+        })
+    }
+
+    @AsyncTest('Accessors & Methods')
+    public async instanceProperties() {
+        return new Promise(resolve => {
+
+            let doc = new nopodofo.Document()
+            doc.load(this.filePath, e => {
+                if (e instanceof Error) {
+                    Expect.fail(e.message)
+                }
+                let acroformKeys = doc.form.dictionary.getKeys()
+                Expect(
+                    [name.DA, name.DR, name.FIELDS, name.SIG_FLAGS, name.XFA]
+                        .every(i => acroformKeys.includes(i))).toBeTruthy()
+                Expect((doc.form.DA as string).includes('Helv')).toBeTruthy()
+                Expect((doc.form.DR as any) instanceof (nopodofo.Dictionary as any)).toBeTruthy()
+                Expect(doc.form.needAppearances).toBe(false)
+                let dr = doc.form.DR as nopodofo.Dictionary
+                let font = doc.createFont({fontName: 'Helvetica', encoding: NPDFFontEncoding.WinAnsi})
+                let fontObj = dr.hasKey(name.FONT) ? dr.getKey<nopodofo.Object>(name.FONT, false) : null
+                let fontDict: nopodofo.Dictionary
+                if (!fontObj) Expect.fail('Font Object undefined')
+                else {
+                    fontDict = fontObj.getDictionary()
+                    fontDict.addKey(font.identifier, font.object)
+                    Expect(fontDict.getKeys().includes(font.identifier)).toBeTruthy()
+                    let da = `0 0 0 rg /${font.identifier} ${font.size} Tf`
+                    doc.form.DA = da
+                    Expect(doc.form.DA).toBe(da)
+                }
+                return resolve()
             })
         })
     }

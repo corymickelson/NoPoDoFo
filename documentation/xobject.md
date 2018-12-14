@@ -8,6 +8,7 @@
     - [contentsForAppending](#contentsforappending)
     - [resources](#resources)
     - [pageMediaBox](#pagemediabox)
+    - [reference](#reference)
   - [## Methods](#methods)
 
 ## NoPoDoFo XObject
@@ -22,6 +23,7 @@ class XObject {
     readonly contentsForAppending: Object
     readonly resources: Object
     readonly pageMediaBox: Rect
+    readonly reference: Ref
 }
 ```
 
@@ -46,6 +48,10 @@ Readonly property. Get the XObjects resources dictionary.
 ### pageMediaBox
 
 Readonly property. Get the XObject's media box. See [Page](./page.md) for a diagram of page boxes.
+
+### reference
+
+Readonly property. Get the XObject's [Ref](./ref.md)
 
 ## Methods
 -----------

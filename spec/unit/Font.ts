@@ -1,7 +1,6 @@
 import {Expect, AsyncTest, TestFixture, TestCase, AsyncSetup, AsyncTeardown} from 'alsatian'
 import {nopodofo} from '../../'
 import {join} from "path"
-import {homedir} from 'os'
 import Base = nopodofo.Base;
 
 @TestFixture('Fonts')

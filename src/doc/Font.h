@@ -62,7 +62,6 @@ public:
 
 private:
   PoDoFo::PdfFont& font; // owned by the document
-  PoDoFo::PdfEncoding* encoding;
 };
 }
 #endif // NPDF_FONT_H

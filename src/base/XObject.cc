@@ -63,7 +63,6 @@ XObject::Initialize(Napi::Env& env, Object& target)
       InstanceAccessor("reference", &XObject::Reference, nullptr),
       InstanceAccessor(
         "contentsForAppending", &XObject::GetContentsForAppending, nullptr),
-      InstanceAccessor("contents", &XObject::GetContents, nullptr),
       InstanceAccessor("resource", &XObject::GetResources, nullptr),
       InstanceAccessor("pageMediaBox", &XObject::GetPageSize, nullptr) });
   constructor = Napi::Persistent(ctor);

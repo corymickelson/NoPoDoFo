@@ -28,7 +28,6 @@ Ref::Ref(const CallbackInfo &info)
 }
 Ref::~Ref() {
   cout << "Cleaning up Ref " << self->ObjectNumber() << " : " << self->GenerationNumber() << endl;
-  HandleScope scope(Env());
   delete self;
 }
 void
