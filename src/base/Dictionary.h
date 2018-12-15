@@ -36,7 +36,6 @@ public:
   static void Initialize(Napi::Env& env, Napi::Object& target);
   void AddKey(const Napi::CallbackInfo&);
   Napi::Value GetKey(const Napi::CallbackInfo&);
-  Napi::Value GetObject(const Napi::CallbackInfo&);
   Napi::Value GetKeyType(const Napi::CallbackInfo&);
   Napi::Value GetKeys(const Napi::CallbackInfo&);
   Napi::Value RemoveKey(const Napi::CallbackInfo&);
@@ -50,15 +49,16 @@ public:
   Napi::Value Write(const Napi::CallbackInfo&);
   void WriteSync(const Napi::CallbackInfo&);
   Napi::Value Eq(const Napi::CallbackInfo&);
-  PoDoFo::PdfDictionary* GetDictionary()
+  PoDoFo::PdfDictionary&
+  GetDictionary()
   {
-    return self == nullptr ? &(obj.GetDictionary()) : self;
+    return init ? *init : self;
   }
 
 private:
   vector<PoDoFo::PdfObject*> children;
-  PoDoFo::PdfObject obj;
-  PoDoFo::PdfDictionary* self = nullptr;
+  PoDoFo::PdfDictionary& self;
+  PoDoFo::PdfDictionary* init = nullptr;
 };
 }
 #endif

@@ -262,19 +262,19 @@ void
 Field::SetMouseAction(const Napi::CallbackInfo& info)
 {
   int onMouse = info[0].As<Number>();
-  PdfAction* action = Action::Unwrap(info[1].As<Object>())->GetAction();
+  PdfAction& action = Action::Unwrap(info[1].As<Object>())->GetAction();
   switch (onMouse) {
     case 0: // up
-      field->SetMouseUpAction(*action);
+      field->SetMouseUpAction(action);
       break;
     case 1: // down
-      field->SetMouseDownAction(*action);
+      field->SetMouseDownAction(action);
       break;
     case 2: // enter
-      field->SetMouseEnterAction(*action);
+      field->SetMouseEnterAction(action);
       break;
     case 3: // exit
-      field->SetMouseLeaveAction(*action);
+      field->SetMouseLeaveAction(action);
       break;
     default:
       TypeError::New(info.Env(), "Unknown mouse action. See NPDFMouseEvents")
@@ -285,19 +285,19 @@ void
 Field::SetPageAction(const Napi::CallbackInfo& info)
 {
   int onMouse = info[0].As<Number>();
-  PdfAction* action = Action::Unwrap(info[1].As<Object>())->GetAction();
+  PdfAction& action = Action::Unwrap(info[1].As<Object>())->GetAction();
   switch (onMouse) {
     case 0: // open
-      field->SetPageOpenAction(*action);
+      field->SetPageOpenAction(action);
       break;
     case 1: // close
-      field->SetPageCloseAction(*action);
+      field->SetPageCloseAction(action);
       break;
     case 2: // visible
-      field->SetPageVisibleAction(*action);
+      field->SetPageVisibleAction(action);
       break;
     case 3: // invisible
-      field->SetPageInvisibleAction(*action);
+      field->SetPageInvisibleAction(action);
       break;
     default:
       TypeError::New(info.Env(), "Unknown mouse action. See NPDFMouseEvents")
@@ -317,7 +317,7 @@ Field::GetAppearanceStream(const Napi::CallbackInfo& info)
   if (GetFieldDictionary().HasKey(Name::AP)) {
     auto ap = field->GetFieldObject()->MustGetIndirectKey(Name::AP);
     return Dictionary::constructor.New(
-      { External<PdfObject>::New(info.Env(), ap) });
+      { External<PdfDictionary>::New(info.Env(), &ap->GetDictionary()) });
   } else {
     return info.Env().Null();
   }
@@ -336,9 +336,9 @@ Field::SetAppearanceStream(const Napi::CallbackInfo& info,
 
   if (value.IsObject() &&
       value.As<Object>().InstanceOf(Dictionary::constructor.Value())) {
-    PdfDictionary* dict =
+    PdfDictionary dict =
       Dictionary::Unwrap(value.As<Object>())->GetDictionary();
-    GetFieldDictionary().AddKey(PdfName(Name::AP), *dict);
+    GetFieldDictionary().AddKey(PdfName(Name::AP), dict);
   }
 }
 value
@@ -359,7 +359,8 @@ Field::SetDefaultAppearance(const Napi::CallbackInfo& info,
     GetFieldDictionary().RemoveKey(Name::DA);
   }
   if (value.IsNull()) {
-    cout << "The DA value you've provided is null. Removing field DA from field dictionary"
+    cout << "The DA value you've provided is null. Removing field DA from "
+            "field dictionary"
          << endl;
   }
 
@@ -369,21 +370,25 @@ Field::SetDefaultAppearance(const Napi::CallbackInfo& info,
   }
 }
 value
-Field::GetJustification(const Napi::CallbackInfo &info)
+Field::GetJustification(const Napi::CallbackInfo& info)
 {
   if (field->GetFieldObject()->GetDictionary().HasKey(Name::Q)) {
-    return Number::New(info.Env(), field->GetFieldObject()->MustGetIndirectKey(Name::Q)->GetNumber());
+    return Number::New(
+      info.Env(),
+      field->GetFieldObject()->MustGetIndirectKey(Name::Q)->GetNumber());
   } else {
     return info.Env().Null();
   }
 }
 void
-Field::SetJustification(const Napi::CallbackInfo &info, const Napi::Value &value)
+Field::SetJustification(const Napi::CallbackInfo& info,
+                        const Napi::Value& value)
 {
-  if(value.IsNumber()) {
+  if (value.IsNumber()) {
     pdf_int64 qValue = value.As<Number>();
     if (qValue > 3 || qValue < 0) {
-      RangeError::New(info.Env(), "Please see NPDFAlignment for valid values").ThrowAsJavaScriptException();
+      RangeError::New(info.Env(), "Please see NPDFAlignment for valid values")
+        .ThrowAsJavaScriptException();
       return;
     }
     if (GetFieldDictionary().HasKey(Name::Q)) {
@@ -391,6 +396,13 @@ Field::SetJustification(const Napi::CallbackInfo &info, const Napi::Value &value
     }
     GetFieldDictionary().AddKey(Name::Q, PdfVariant(qValue));
   }
+}
+
+value
+Field::GetFieldObject(const CallbackInfo& info)
+{
+  return Obj::constructor.New(
+    { External<PdfObject>::New(info.Env(), field->GetFieldObject()) });
 }
 
 }

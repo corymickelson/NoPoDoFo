@@ -32,9 +32,15 @@ PushButton::Initialize(Napi::Env& env, Napi::Object& target)
                        &PushButton::GetAlternateCaption,
                        &PushButton::SetAlternateCaption),
 
-      InstanceAccessor("AP", &PushButton::GetAppearanceStream, &PushButton::SetAppearanceStream),
-      InstanceAccessor("DA", &PushButton::GetDefaultAppearance, &PushButton::SetDefaultAppearance),
+      InstanceAccessor("AP",
+                       &PushButton::GetAppearanceStream,
+                       &PushButton::SetAppearanceStream),
+      InstanceAccessor("DA",
+                       &PushButton::GetDefaultAppearance,
+                       &PushButton::SetDefaultAppearance),
       InstanceAccessor("widgetAnnotation", &PushButton::GetAnnotation, nullptr),
+
+      InstanceAccessor("obj", &Field::GetFieldObject, nullptr),
       InstanceAccessor(
         "readOnly", &PushButton::IsReadOnly, &PushButton::SetReadOnly),
       InstanceAccessor(

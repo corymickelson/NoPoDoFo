@@ -275,7 +275,7 @@ Obj::GetDictionary(const CallbackInfo& info)
     throw Napi::Error::New(info.Env(), "Obj only accessible as Dictionary");
   }
   return Dictionary::constructor.New(
-    { External<PdfObject>::New(info.Env(), &obj) });
+    { External<PdfDictionary>::New(info.Env(), &obj.GetDictionary()) });
 }
 
 Napi::Value

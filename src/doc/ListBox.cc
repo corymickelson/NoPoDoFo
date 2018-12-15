@@ -45,8 +45,12 @@ ListBox::Initialize(Napi::Env& env, Napi::Object& target)
         "selected", &ListBox::GetSelectedItem, &ListBox::SetSelectedItem),
       InstanceAccessor("length", &ListBox::GetItemCount, nullptr),
       InstanceAccessor("widgetAnnotation", &ListBox::GetAnnotation, nullptr),
-      InstanceAccessor("AP", &ListBox::GetAppearanceStream, &ListBox::SetAppearanceStream),
-      InstanceAccessor("DA", &ListBox::GetDefaultAppearance, &ListBox::SetDefaultAppearance),
+      InstanceAccessor(
+        "AP", &ListBox::GetAppearanceStream, &ListBox::SetAppearanceStream),
+      InstanceAccessor(
+        "DA", &ListBox::GetDefaultAppearance, &ListBox::SetDefaultAppearance),
+
+      InstanceAccessor("obj", &Field::GetFieldObject, nullptr),
       InstanceAccessor("spellCheckEnabled",
                        &ListBox::IsSpellCheckEnabled,
                        &ListBox::SetSpellCheckEnabled),

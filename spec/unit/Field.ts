@@ -15,7 +15,6 @@ export class FieldSpec {
         const painter = new npdf.Painter(doc)
         const defaultPageMediaBox = new npdf.Rect(0, 0, 612, 792)
         const page = doc.createPage(defaultPageMediaBox)
-        // const appearanceStream = doc.createXObject(new npdf.Rect(0, 0, 612, 792))
         const nameLabel = 'First name:'
         const nameFieldAnnot = page.createAnnotation(
             NPDFAnnotation.Widget,

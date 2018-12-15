@@ -187,8 +187,8 @@ void
 Destination::AddToDictionary(const Napi::CallbackInfo& info)
 {
   if (info[0].As<Object>().InstanceOf(Dictionary::constructor.Value())) {
-    PdfDictionary* d = Dictionary::Unwrap(info[0].As<Object>())->GetDictionary();
-    GetDestination().AddToDictionary(*d);
+    PdfDictionary d = Dictionary::Unwrap(info[0].As<Object>())->GetDictionary();
+    GetDestination().AddToDictionary(d);
   }
 }
 }

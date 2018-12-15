@@ -210,7 +210,7 @@ Annotation::SetAction(const CallbackInfo& info, const Napi::Value& value)
     return;
   }
   auto action = Action::Unwrap(value.As<Object>());
-  GetAnnotation().SetAction(*action->GetAction());
+  GetAnnotation().SetAction(action->GetAction());
 }
 
 Napi::Value

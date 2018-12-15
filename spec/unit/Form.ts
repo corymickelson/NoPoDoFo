@@ -42,6 +42,8 @@ export class FormSpec {
                 field.readOnly = true
                 const apDict = new nopodofo.Dictionary()
                 apDict.addKey(name.N, xobj.reference)
+                field.obj.getDictionary().addKey('Test', true)
+                console.log(field.obj.getDictionary().getKeys())
                 field.AP = apDict
                 const daStr = `0 0 0 rg /${firaCode.identifier} tf`
                 field.DA = daStr

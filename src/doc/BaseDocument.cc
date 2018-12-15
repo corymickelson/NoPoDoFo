@@ -119,9 +119,6 @@ BaseDocument::BaseDocument(const Napi::CallbackInfo& info, bool inMem)
 BaseDocument::~BaseDocument()
 {
   cout << "Cleanup" << endl;
-  for (auto i : encodings) {
-    delete i;
-  }
   delete base;
   delete streamDocOutputDevice;
   delete streamDocRefCountedBuffer;
@@ -700,9 +697,6 @@ BaseDocument::CreateFontObject(napi_env env, Napi::Object opts, bool subset)
   }
   try {
     PdfFont* font;
-    if (!encoding->IsAutoDelete()) {
-      encodings.emplace_back(const_cast<PdfEncoding*>(encoding));
-    }
     if (subset) {
       font =
         base->CreateFontSubset(fontName.c_str(),

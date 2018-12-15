@@ -29,8 +29,7 @@ Action::Action(const Napi::CallbackInfo& info)
                          { 1, { nullopt, option(napi_number) } } });
   // Create Copy Constructor Action
   if (opts[0] == 0 && info.Length() == 1) {
-    action = make_unique<PdfAction>(
-      info[0].As<External<PdfAction>>().Data()->GetObject());
+    action = new PdfAction(info[0].As<External<PdfAction>>().Data()->GetObject());
   }
   // Create a new Action
   else if (opts[0] == 1 && opts[1] == 1) {
@@ -40,9 +39,12 @@ Action::Action(const Napi::CallbackInfo& info)
     } else if (info[0].As<Object>().InstanceOf(
                  StreamDocument::constructor.Value())) {
       doc = StreamDocument::Unwrap(info[0].As<Object>())->base;
+    } else {
+      Error::New(info.Env(), "Instance of Base is required").ThrowAsJavaScriptException();
+      return;
     }
     EPdfAction t = static_cast<EPdfAction>(info[1].As<Number>().Uint32Value());
-    action = make_unique<PdfAction>(t, doc);
+    action = new PdfAction(t, doc);
   } else {
     TypeError::New(
       info.Env(),
@@ -50,7 +52,10 @@ Action::Action(const Napi::CallbackInfo& info)
       .ThrowAsJavaScriptException();
   }
 }
-
+Action::~Action()
+{
+  delete action;
+}
 void
 Action::Initialize(Napi::Env& env, Napi::Object& target)
 {
@@ -70,8 +75,8 @@ Action::Initialize(Napi::Env& env, Napi::Object& target)
 Napi::Value
 Action::GetUri(const Napi::CallbackInfo& info)
 {
-  if (GetAction()->HasURI()) {
-    return String::New(info.Env(), GetAction()->GetURI().GetStringUtf8());
+  if (GetAction().HasURI()) {
+    return String::New(info.Env(), GetAction().GetURI().GetStringUtf8());
   } else {
     return info.Env().Null();
   }
@@ -79,8 +84,8 @@ Action::GetUri(const Napi::CallbackInfo& info)
 Napi::Value
 Action::GetScript(const Napi::CallbackInfo& info)
 {
-  if (GetAction()->HasScript()) {
-    return String::New(info.Env(), GetAction()->GetScript().GetStringUtf8());
+  if (GetAction().HasScript()) {
+    return String::New(info.Env(), GetAction().GetScript().GetStringUtf8());
   } else {
     return info.Env().Null();
   }
@@ -88,28 +93,28 @@ Action::GetScript(const Napi::CallbackInfo& info)
 Napi::Value
 Action::GetType(const Napi::CallbackInfo& info)
 {
-  return Number::New(info.Env(), static_cast<int>(GetAction()->GetType()));
+  return Number::New(info.Env(), static_cast<int>(GetAction().GetType()));
 }
 void
 Action::SetUri(const Napi::CallbackInfo& info, const Napi::Value& value)
 {
-  GetAction()->SetURI(PdfString(value.As<String>().Utf8Value()));
+  GetAction().SetURI(PdfString(value.As<String>().Utf8Value()));
 }
 void
 Action::SetScript(const Napi::CallbackInfo& info, const Napi::Value& value)
 {
-  GetAction()->SetScript(PdfString(value.As<String>().Utf8Value()));
+  GetAction().SetScript(PdfString(value.As<String>().Utf8Value()));
 }
 Napi::Value
 Action::GetObject(const Napi::CallbackInfo& info)
 {
-  PdfObject* o = GetAction()->GetObject();
+  PdfObject* o = GetAction().GetObject();
   return Obj::constructor.New({ External<PdfObject>::New(info.Env(), o) });
 }
 void
 Action::AddToDictionary(const Napi::CallbackInfo& info)
 {
   auto dictionary = Dictionary::Unwrap(info[0].As<Object>())->GetDictionary();
-  GetAction()->AddToDictionary(*dictionary);
+  GetAction().AddToDictionary(dictionary);
 }
 }

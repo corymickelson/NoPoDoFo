@@ -61,10 +61,13 @@ public:
   void SetDefaultAppearance(const Napi::CallbackInfo&, const Napi::Value&);
   value GetJustification(const Napi::CallbackInfo&);
   void SetJustification(const Napi::CallbackInfo&, const Napi::Value&);
-
+  value GetFieldObject(const Napi::CallbackInfo&);
 
   PoDoFo::PdfField& GetField() { return *field; }
-  PoDoFo::PdfDictionary& GetFieldDictionary() { return field->GetFieldObject()->GetDictionary(); }
+  PoDoFo::PdfDictionary& GetFieldDictionary()
+  {
+    return field->GetFieldObject()->GetDictionary();
+  }
 
   string fieldName;
   string fieldType;
@@ -72,7 +75,8 @@ public:
 protected:
   string TypeString();
 
-  // void SetColor(const Napi::CallbackInfo&, std::function<void (double, double, double, double)>);
+  // void SetColor(const Napi::CallbackInfo&, std::function<void (double,
+  // double, double, double)>);
 
 private:
   PoDoFo::PdfField* field;

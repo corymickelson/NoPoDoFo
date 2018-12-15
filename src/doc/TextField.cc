@@ -90,9 +90,15 @@ TextField::Initialize(Napi::Env& env, Napi::Object& target)
     "TextField",
     { InstanceAccessor("text", &TextField::Text, &TextField::SetText),
       InstanceAccessor("maxLen", &TextField::GetMaxLen, &TextField::SetMaxLen),
-      InstanceAccessor("AP", &TextField::GetAppearanceStream, &TextField::SetAppearanceStream),
-      InstanceAccessor("DA", &TextField::GetDefaultAppearance, &TextField::SetDefaultAppearance),
-      InstanceAccessor("alignment", &TextField::GetJustification, &TextField::SetJustification),
+      InstanceAccessor(
+        "AP", &TextField::GetAppearanceStream, &TextField::SetAppearanceStream),
+      InstanceAccessor("DA",
+                       &TextField::GetDefaultAppearance,
+                       &TextField::SetDefaultAppearance),
+      InstanceAccessor("alignment",
+                       &TextField::GetJustification,
+                       &TextField::SetJustification),
+      InstanceAccessor("obj", &Field::GetFieldObject, nullptr),
       InstanceAccessor(
         "multiLine", &TextField::IsMultiLine, &TextField::SetMultiLine),
       InstanceAccessor("passwordField",
