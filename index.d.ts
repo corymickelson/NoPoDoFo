@@ -941,6 +941,8 @@ export namespace nopodofo {
         getBuffer(): Buffer
 
         clear(): void
+        
+        resolveIndirectKey(key: string): Object
     }
 
     export class Array {

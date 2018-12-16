@@ -60,7 +60,8 @@ Obj::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceMethod("getName", &Obj::GetName),
       InstanceMethod("getArray", &Obj::GetArray),
       InstanceMethod("getRawData", &Obj::GetRawData),
-      InstanceMethod("clear", &Obj::Clear) });
+      InstanceMethod("clear", &Obj::Clear),
+      InstanceMethod("resolveIndirectKey", &Obj::MustGetIndirect)});
   constructor = Persistent(ctor);
   constructor.SuppressDestruct();
   target.Set("Object", ctor);
@@ -371,6 +372,17 @@ Obj::Write(const CallbackInfo& info)
     new ObjWriteAsync(cb, this, info[0].As<String>().Utf8Value());
   worker->Queue();
   return info.Env().Undefined();
+}
+Napi::Value
+Obj::MustGetIndirect(const CallbackInfo& info)
+{
+  if(info.Length() != 1 && !info[0].IsString()) {
+    TypeError::New(info.Env(), "The name of the indirect key is required, this does a lookup in a Dictionary, and resolves"
+                               "any Indirects to their Object value").ThrowAsJavaScriptException();
+  }
+  PdfName name = PdfName(info[0].As<String>());
+  PdfObject* target = obj.MustGetIndirectKey(name);
+  return Obj::constructor.New({External<PdfObject>::New(info.Env(), target)});
 }
 
 }

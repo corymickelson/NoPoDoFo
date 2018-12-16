@@ -371,7 +371,7 @@ Field::SetDefaultAppearance(const Napi::CallbackInfo& info,
 value
 Field::GetJustification(const Napi::CallbackInfo &info)
 {
-  if (field->GetFieldObject()->GetDictionary().HasKey(Name::Q)) {
+  if (GetFieldDictionary().HasKey(Name::Q)) {
     return Number::New(info.Env(), field->GetFieldObject()->MustGetIndirectKey(Name::Q)->GetNumber());
   } else {
     return info.Env().Null();
