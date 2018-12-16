@@ -14,6 +14,7 @@ class Action : public Napi::ObjectWrap<Action>
 {
 public:
   explicit Action(const Napi::CallbackInfo& info);
+  ~Action();
   static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
   Napi::Value GetUri(const Napi::CallbackInfo&);
@@ -23,10 +24,11 @@ public:
   void SetScript(const Napi::CallbackInfo&, const Napi::Value&);
   Napi::Value GetObject(const Napi::CallbackInfo&);
   void AddToDictionary(const Napi::CallbackInfo&);
-  PoDoFo::PdfAction* GetAction() { return action.get(); }
+  PoDoFo::PdfAction &
+  GetAction() { return *action; }
 
 private:
-  std::unique_ptr<PoDoFo::PdfAction> action;
+  PoDoFo::PdfAction* action;
 };
 }
 #endif // NPDF_ACTION_H

@@ -103,8 +103,8 @@ Outline::CreateNext(const Napi::CallbackInfo& info)
     return Outline::constructor.New(
       { External<PdfOutlineItem>::New(info.Env(), item) });
   } else if (info[1].As<Object>().InstanceOf(Action::constructor.Value())) {
-    PdfAction* action = Action::Unwrap(info[1].As<Object>())->GetAction();
-    auto item = GetOutline().CreateNext(name, *action);
+    PdfAction& action = Action::Unwrap(info[1].As<Object>())->GetAction();
+    auto item = GetOutline().CreateNext(name, action);
     return Outline::constructor.New(
       { External<PdfOutlineItem>::New(info.Env(), item) });
   }
@@ -198,7 +198,7 @@ Outline::GetAction(const Napi::CallbackInfo& info)
 void
 Outline::SetAction(const Napi::CallbackInfo& info, const Napi::Value& value)
 {
-  GetOutline().SetAction(*Action::Unwrap(value.As<Object>())->GetAction());
+  GetOutline().SetAction(Action::Unwrap(value.As<Object>())->GetAction());
 }
 Napi::Value
 Outline::GetTitle(const Napi::CallbackInfo& info)

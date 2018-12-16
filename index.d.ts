@@ -545,6 +545,7 @@ export namespace nopodofo {
         DA?: string | null
         readonly widgetAnnotation: Annotation
         readonly type: NPDFFieldType
+        readonly obj: nopodofo.Object
 
         setBackgroundColor(color: Color): void
 

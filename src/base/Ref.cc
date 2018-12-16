@@ -16,7 +16,7 @@ FunctionReference Ref::constructor; // NOLINT
 Ref::Ref(const CallbackInfo &info)
   : ObjectWrap(info)
 {
-  if(info.Length() < 2 && info[0].IsNumber() && info[1].IsNumber()) {
+  if(info.Length() == 2 && info[0].IsNumber() && info[1].IsNumber()) {
     self = new PdfReference(info[0].As<Number>(),
                             static_cast<const PoDoFo::pdf_gennum>(info[1].As<Number>().Uint32Value()));
   } else if(info.Length() == 1 && info[0].IsExternal()) {

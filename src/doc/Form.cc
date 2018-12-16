@@ -90,9 +90,9 @@ Form::GetNeedAppearances(const CallbackInfo& info)
 Napi::Value
 Form::GetFormDictionary(const CallbackInfo& info)
 {
-  auto obj = GetForm()->GetObject();
+  PdfDictionary& obj = GetForm()->GetObject()->GetDictionary();
   auto ptr =
-    Dictionary::constructor.New({ External<PdfObject>::New(info.Env(), obj) });
+    Dictionary::constructor.New({ External<PdfDictionary>::New(info.Env(), &obj) });
   return ptr;
 }
 
@@ -175,7 +175,7 @@ Form::GetResource(const CallbackInfo& info)
       drObj = doc.GetObjects()->GetObject(drObj->GetReference());
     }
     return Dictionary::constructor.New(
-      { External<PdfObject>::New(info.Env(), drObj) });
+      { External<PdfDictionary>::New(info.Env(), &drObj->GetDictionary()) });
   }
   return info.Env().Null();
 }
@@ -229,7 +229,7 @@ Form::GetCalculationOrder(const CallbackInfo& info)
           } else {
             js.Set(n,
                    Dictionary::constructor.New(
-                     { External<PdfObject>::New(info.Env(), value) }));
+                     { External<PdfDictionary>::New(info.Env(), &value->GetDictionary()) }));
             n++;
           }
         }

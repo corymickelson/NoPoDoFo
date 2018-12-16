@@ -7,6 +7,7 @@ import Base = nopodofo.Base;
 import Object = nopodofo.Object;
 import Dictionary = nopodofo.Dictionary;
 import Rect = nopodofo.Rect;
+import Ref = nopodofo.Ref;
 
 @TestFixture("File Spec")
 export class FileSpecPreWrite {
@@ -32,7 +33,7 @@ export class FileSpecPreWrite {
     @AsyncTeardown
     public async teardown() {
         await new Promise(resolve => {
-            this.mem.write( (err, data) => err ? Expect.fail(err.message) : resolve())
+            this.mem.write((err, data) => err ? Expect.fail(err.message) : resolve())
         })
         this.stream.close()
         return Promise.resolve()
@@ -52,7 +53,7 @@ export class FileSpecPreWrite {
                         if (err) Expect.fail(err.message)
                         const spec = child.getAttachment('scratch.txt')
                         Expect(spec).toBeDefined()
-                        Expect((spec.getContents() as  Buffer).toString()).toEqual('TEST file :)\n')
+                        Expect((spec.getContents() as Buffer).toString()).toContain('TEST file :)')
                         resolve()
                     })
                 })
@@ -82,8 +83,19 @@ export class FileSpecPreWrite {
             src.attachFile(attachment)
             Expect(src.getNames(false)).toBeDefined()
             Expect((src.getNames(false) as Object).getDictionary().getKeys().includes(NPDFName.EMBEDDED_FILES)).toBeTruthy()
-            let embeddedFiles = (src.getNames(false) as Object).getDictionary().getKey<Dictionary>(NPDFName.EMBEDDED_FILES).getKey<nopodofo.Array>(NPDFName.KIDS)
-            Expect(((embeddedFiles.at(0) as Object).getDictionary().getKey<nopodofo.Array>(NPDFName.NAMES).at(0) as Object).getString().includes('scratch2Etxt'))
+            let embeddedFiles = (src.getNames(false) as Object).getDictionary()
+            console.log('here')
+            let embeddedFilesRef = embeddedFiles.getKey<Ref>(NPDFName.EMBEDDED_FILES)
+            if (embeddedFilesRef instanceof Ref) {
+                embeddedFiles = src.getObject(embeddedFilesRef).getDictionary()
+            }
+            let embeddedFilesArray = embeddedFiles.getKey<nopodofo.Array>(NPDFName.KIDS)
+            let files = embeddedFilesArray.at(0) instanceof Ref ? src.getObject(embeddedFilesArray.at(0) as Ref) :  embeddedFilesArray.at(0)
+            let fileNames = (files as Object).getDictionary().getKey<nopodofo.Array>(NPDFName.NAMES)
+            if(fileNames instanceof Ref) {
+                fileNames = src.getObject(fileNames).getArray()
+            }
+            Expect((fileNames.at(0) as Object).getString().includes('scratch2Etxt'))
         }
     }
 
