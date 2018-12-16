@@ -24,3 +24,9 @@ that number to the PoDoFo::Painter instance in memory, no value is returned from
 There are however a handful of NoPoDoFo operations that can be somewhat expensive in terms of copy overhead, one such method being
 `Document.body`. The Document body accessor iterates each object of the PDF Document creating a new NoPoDoFo::Object and returning
 all NoPoDoFo::Objects as a new Javascript Array.
+
+The NoPoDoFo low level api's, specifically [Dictionary](./dictionary.md) and [Array](./array.md) expose methods for iterating the
+values of the containter. When iterating the keys of an array, or the key(s)/value(s) of a dictionary the caller must check
+that the return value has been resolved, if the value has not been resolved a [Ref](./ref.md) will be returned. The caller then
+can take this ref and pass it to [document.getObject](./document.md#getobject) to get the actual object value. Examples of this can be
+seen in unit tests Image, and FileAttachment.

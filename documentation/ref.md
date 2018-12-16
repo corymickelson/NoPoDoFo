@@ -12,7 +12,9 @@
 
 A Ref in NoPoDoFo is a simple class encapsulating the PoDoFo PdfReference class. A Ref(erence) is any object
 in a pdf file that is labeled as an __indirect object__.  An indirect object provides a unique id for the object
-consisting of two parts, an object number, and a generation number.
+consisting of two parts, an object number, and a generation number. The Ref type is a commonly seen return type when
+using NoPoDoFo low level api's. 
+The Ref (indirect object) can be resolved by the parent [document](./document.md).
 
 ```typescript
 class Ref {

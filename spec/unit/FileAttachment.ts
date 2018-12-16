@@ -5,7 +5,6 @@ import StreamDocument = nopodofo.StreamDocument;
 import {join} from "path";
 import Base = nopodofo.Base;
 import Object = nopodofo.Object;
-import Dictionary = nopodofo.Dictionary;
 import Rect = nopodofo.Rect;
 import Ref = nopodofo.Ref;
 

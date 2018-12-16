@@ -30,7 +30,7 @@ class Dictionary {
   immutable: boolean
   readonly obj: nopodofo.Object
 
-  constructor()
+  new(): Dictionary
 
   getKey<T>(k: string, resolveType?: boolean): T
   getKeyType(k:string): NPDFDataType
@@ -51,7 +51,7 @@ A public constructor is available for instantiating a new empty dictionary. This
 therefore must be explicitly added to the document for it to take effect. An example of this can be seen in the [AP Cookbook](./cookbook/ap.md).
 
 ```typescript
-constructor()
+new(): Dictionary
 ```
 
 ## Properties
@@ -87,9 +87,10 @@ Get the NPDFDataType of the value of the `k` key.
 getKey<T>(k: string, resolveType?: boolean): T
 ```
 
-Get the value of the `k` key. Value is returned as `T` unless resolveType is false which will return an [Object](./object.md).
+Get the value of the `k` key. Value is returned as `T` or [Ref](./ref.md).
 It is good practice to check the type; [getKeyType](#getkeytype) of the object before casting a value to `T`.
-NoPoDoFo will always try to resolve Ref types to their corresponding [Object](./object.md) or `T` type, but in the instance a value can not be resolved an error will be thrown.
+NoPoDoFo will always try to resolve Ref types to their corresponding [Object](./object.md) or `T` type, but when the object can not be resolved a [Ref](./ref.md)
+to the object is returned. This [Ref](./ref.md) object can be passed to [Document.getObject](./document.md#getobject) to resolve the reference.
 
 ### addKey
 

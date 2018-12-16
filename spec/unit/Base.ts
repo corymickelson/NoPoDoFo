@@ -1,5 +1,5 @@
 import {AsyncSetup, AsyncTeardown, AsyncTest, Expect, TestCase, TestFixture, Timeout} from 'alsatian'
-import {nopodofo, NPDFDataType} from '../../'
+import {nopodofo} from '../../'
 import Document = nopodofo.Document;
 import StreamDocument = nopodofo.StreamDocument;
 import Rect = nopodofo.Rect;

@@ -949,8 +949,7 @@ export namespace nopodofo {
         readonly length: number
         immutable: boolean
 
-        // JsArray(): Array<any>
-
+        constructor()
         /**
          * If the item at the index is a Reference that can not be resolved by the array object owner.
          * A Ref will be returned, the Ref can be resolved using getObject on the document itself.

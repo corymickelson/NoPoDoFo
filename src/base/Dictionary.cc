@@ -225,7 +225,7 @@ Dictionary::GetKey(const CallbackInfo& info)
       return String::New(info.Env(), v->GetName().GetName());
     case ePdfDataType_Array:
       return NoPoDoFo::Array::constructor.New(
-        { Napi::External<PdfObject>::New(info.Env(), v) });
+        { Napi::External<PdfArray>::New(info.Env(), &v->GetArray()) });
     case ePdfDataType_Dictionary:
       return Dictionary::constructor.New({ Napi::External<PdfDictionary>::New(
         info.Env(), &v->GetDictionary()) });

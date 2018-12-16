@@ -34,9 +34,14 @@ Napi::FunctionReference Array::constructor; // NOLINT
 
 Array::Array(const CallbackInfo& info)
   : ObjectWrap<Array>(info)
-  , obj(info[0].IsObject() ? Obj::Unwrap(info[0].As<Object>())->GetObject()
-                           : *info[0].As<External<PdfObject>>().Data())
-{}
+  , self(info.Length() >= 1 && info[0].IsExternal()
+           ? *info[0].As<External<PdfArray>>().Data()
+           : *(init = new PdfArray()))
+{
+  if (info.Length() == 2 && info[1].IsObject()) {
+    parent = &NoPoDoFo::Obj::Unwrap(info[1].As<Object>())->GetObject();
+  }
+}
 
 Array::~Array()
 {
@@ -166,16 +171,19 @@ Array::GetObjAtIndex(const CallbackInfo& info)
   PdfObject* item;
   if (GetArray()[index].IsReference()) {
     PdfReference indirect = GetArray()[index].GetReference();
-    auto owner = obj.GetOwner();
-    if (!owner) {
-      cout << "NoPoDoFo.Array does not have access to the owner of this array."
-           << "To resolve the value at " << index
-           << " please take the returned Ref"
-           << "for the first argument in Base.GetObject" << endl;
-      return Ref::constructor.New(
-        { External<PdfReference>::New(info.Env(), &indirect) });
+    if (parent) {
+      auto owner = parent->GetOwner();
+      if (!owner) {
+        cout
+          << "NoPoDoFo.Array does not have access to the owner of this array."
+          << "To resolve the value at " << index
+          << " please take the returned Ref"
+          << "for the first argument in Base.GetObject" << endl;
+        return Ref::constructor.New(
+          { External<PdfReference>::New(info.Env(), &indirect) });
+      }
+      item = parent->GetOwner()->GetObject(GetArray()[index].GetReference());
     }
-    item = obj.GetOwner()->GetObject(GetArray()[index].GetReference());
 
   } else {
     item = &(GetArray()[index]);

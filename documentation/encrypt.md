@@ -1,17 +1,17 @@
 # API Documentation for Encrypt
 
 - [API Documentation for Encrypt](#api-documentation-for-encrypt)
-    - [NoPoDoFo Encrypt](#nopodofo-encrypt)
-    - [Constructors](#constructors)
-        - [Example](#example)
-    - [Properties](#properties)
-        - [owner](#owner)
-        - [user](#user)
-        - [encryptionKey](#encryptionkey)
-        - [keyLength](#keylength)
-        - [protections](#protections)
-    - [Methods](#methods)
-        - [isAllowed](#isallowed)
+  - [NoPoDoFo Encrypt](#nopodofo-encrypt)
+  - [Constructors](#constructors)
+    - [Example](#example)
+  - [## Properties](#properties)
+    - [owner](#owner)
+    - [user](#user)
+    - [encryptionKey](#encryptionkey)
+    - [keyLength](#keylength)
+    - [protections](#protections)
+  - [## Methods](#methods)
+    - [isAllowed](#isallowed)
 
 ## NoPoDoFo Encrypt
 

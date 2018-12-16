@@ -2,11 +2,12 @@
 
 - [API Documentation for Array](#api-documentation-for-array)
   - [NoPoDoFo Array](#nopodofo-array)
-  - [Properties](#properties)
+  - [Constructor](#constructor)
+  - [## Properties](#properties)
     - [dirty](#dirty)
     - [length](#length)
     - [immutable](#immutable)
-  - [Methods](#methods)
+  - [## Methods](#methods)
     - [at](#at)
     - [pop](#pop)
     - [clear](#clear)
@@ -25,12 +26,23 @@ class Array {
   readonly length: number
   immutable: boolean
 
+  new(): Array
+
   at(i: number): Ref | Object
   pop(): Object
   clear(): void
   push(v: Object): void
   write(destination: string): void
 }
+```
+
+## Constructor
+
+A new pdf array can be instantiated  with the nopodof array constructor. This is an empty array, and does not belong to any
+document. It is the creators responsibility to assign the array to the document.
+
+```typescript
+new(): Array
 ```
 
 ## Properties
