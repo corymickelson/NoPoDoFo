@@ -79,7 +79,7 @@ public:
 
 protected:
   PoDoFo::PdfFont* CreateFontObject(napi_env, Napi::Object, bool subset);
-
+private:
 };
 }
 #endif
