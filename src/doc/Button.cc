@@ -26,9 +26,6 @@ using namespace PoDoFo;
 
 using std::cout;
 using std::endl;
-using std::make_shared;
-using std::make_unique;
-using std::shared_ptr;
 
 namespace NoPoDoFo {
 Button::Button(PdfField& field)

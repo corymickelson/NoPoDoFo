@@ -30,7 +30,6 @@ using namespace PoDoFo;
 
 using std::cout;
 using std::endl;
-using std::map;
 using std::string;
 using std::stringstream;
 using std::vector;
@@ -46,8 +45,12 @@ FunctionReference Dictionary::constructor; // NOLINT
  */
 Dictionary::Dictionary(const CallbackInfo& info)
   : ObjectWrap(info)
-  , self(info.Length() == 1 && info[0].IsExternal()
-           ? *info[0].As<External<PdfDictionary>>().Data()
+  , self(info.Length() == 2
+           ? (info[0].IsExternal() && info[1].IsNumber() &&
+                  info[1].As<Number>().Int32Value() == 0
+                ? (parent = info[0].As<External<PdfObject>>().Data())
+                    ->GetDictionary()
+                : *info[0].As<External<PdfDictionary>>().Data())
            : *(init = new PdfDictionary()))
 {}
 
@@ -83,7 +86,13 @@ Dictionary::~Dictionary()
   for (auto i : children) {
     delete i;
   }
+  for (auto i : childArrays) {
+    delete i;
+  }
   delete init;
+  if (parent) {
+    parent = nullptr;
+  }
 }
 
 Napi::Value
@@ -225,10 +234,12 @@ Dictionary::GetKey(const CallbackInfo& info)
       return String::New(info.Env(), v->GetName().GetName());
     case ePdfDataType_Array:
       return NoPoDoFo::Array::constructor.New(
-        { Napi::External<PdfArray>::New(info.Env(), &v->GetArray()) });
+        { External<PdfObject>::New(info.Env(), v),
+          Number::New(info.Env(), 0) });
     case ePdfDataType_Dictionary:
-      return Dictionary::constructor.New({ Napi::External<PdfDictionary>::New(
-        info.Env(), &v->GetDictionary()) });
+      return Dictionary::constructor.New(
+        { External<PdfObject>::New(info.Env(), v),
+          Number::New(info.Env(), 0) });
     case ePdfDataType_Null:
       return info.Env().Null();
     case ePdfDataType_RawData: {
@@ -251,6 +262,7 @@ Dictionary::GetKey(const CallbackInfo& info)
     case ePdfDataType_Unknown:
       return info.Env().Undefined();
   }
+  return info.Env().Undefined();
 }
 
 Napi::Value

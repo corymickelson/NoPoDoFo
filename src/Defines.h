@@ -24,12 +24,45 @@
 #define CONCAT(a, b) CONCAT_(a, b)
 #define DEFER(fn) ScopeGuard CONCAT(__defer__, __LINE__) = [&]() { fn; }
 
-#include <node_api.h>
-#define NAPI_EXPERIMENTAL
-
 #include "base/Color.h"
 #include <napi.h>
 #include <podofo/podofo.h>
+
+#if defined(_WIN32) || defined(_WIN64)
+/* This is intended as a drop-in replacement for unistd.h on Windows.
+ * Please add functionality as neeeded.
+ * https://stackoverflow.com/a/826027/1202830
+ */
+
+#include <direct.h> /* for _getcwd() and _chdir() */
+#include <io.h>
+#include <process.h> /* for getpid() and the exec..() family */
+#include <stdlib.h>
+
+#define srandom srand
+#define random rand
+
+/* Values for the second argument to access.
+   These may be OR'd together.  */
+#define R_OK 4 /* Test for read permission.  */
+#define W_OK 2 /* Test for write permission.  */
+//#define   X_OK    1       /* execute permission - unsupported in windows*/
+#define F_OK 0 /* Test for existence.  */
+
+#define access _access
+#else
+#include <unistd.h>
+#endif
+
+#ifdef __APPLE__
+#include <unistd.h>
+#elif defined _WIN32 || defined _WIN64
+#include <experimental/filesystem>
+namespace fs = std::experimental::filesystem;
+#elif defined __linux__
+#include <experimental/filesystem>
+namespace fs = std::experimental::filesystem;
+#endif
 
 using namespace Napi;
 using namespace PoDoFo;
@@ -41,6 +74,8 @@ enum DocumentInputDevice
   Disk,
   Memory
 };
+int
+FileAccess(std::string& file);
 
 #define TryLoad(doc, file, buffer, pwd, forUpdate, typeE)                      \
   {                                                                            \
@@ -123,37 +158,6 @@ enum NPDFColorFormat
       }                                                                        \
     }                                                                          \
   }
-
-/**
- *https://oded.blog/2017/10/05/go-defer-in-cpp/
- */
-class ScopeGuard
-{
-public:
-  template<class Callable>
-  ScopeGuard(Callable&& fn)
-    : fn_(std::forward<Callable>(fn))
-  {}
-
-  ScopeGuard(ScopeGuard&& other) noexcept
-    : fn_(std::move(other.fn_))
-  {
-    other.fn_ = nullptr;
-  }
-
-  ~ScopeGuard()
-  {
-    if (fn_)
-      fn_();
-  }
-
-  ScopeGuard(const ScopeGuard&) = delete;
-
-  void operator=(const ScopeGuard&) = delete;
-
-private:
-  std::function<void()> fn_;
-};
 }
 
 #endif // NOPODOFO_DEFINES_H

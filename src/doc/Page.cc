@@ -37,8 +37,6 @@ using namespace PoDoFo;
 using std::cout;
 using std::endl;
 using std::get;
-using std::make_shared;
-using std::make_tuple;
 using std::stringstream;
 using std::tuple;
 

@@ -92,7 +92,8 @@ Form::GetFormDictionary(const CallbackInfo& info)
 {
   PdfDictionary& obj = GetForm()->GetObject()->GetDictionary();
   auto ptr =
-    Dictionary::constructor.New({ External<PdfDictionary>::New(info.Env(), &obj) });
+    Dictionary::constructor.New({ External<PdfDictionary>::New(info.Env(), &obj),
+                                  Number::New(info.Env(), 1)});
   return ptr;
 }
 
@@ -175,7 +176,8 @@ Form::GetResource(const CallbackInfo& info)
       drObj = doc.GetObjects()->GetObject(drObj->GetReference());
     }
     return Dictionary::constructor.New(
-      { External<PdfDictionary>::New(info.Env(), &drObj->GetDictionary()) });
+      { External<PdfObject>::New(info.Env(), drObj),
+        Number::New(info.Env(), 0)});
   }
   return info.Env().Null();
 }
@@ -229,7 +231,8 @@ Form::GetCalculationOrder(const CallbackInfo& info)
           } else {
             js.Set(n,
                    Dictionary::constructor.New(
-                     { External<PdfDictionary>::New(info.Env(), &value->GetDictionary()) }));
+                     { External<PdfObject>::New(info.Env(), value),
+                       Number::New(info.Env(), 0)}));
             n++;
           }
         }

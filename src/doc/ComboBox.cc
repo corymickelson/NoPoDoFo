@@ -26,7 +26,6 @@ using namespace PoDoFo;
 
 using std::cout;
 using std::endl;
-using std::make_unique;
 
 namespace NoPoDoFo {
 

@@ -6,7 +6,6 @@
 
 using namespace Napi;
 using namespace PoDoFo;
-using std::make_unique;
 
 namespace NoPoDoFo {
 

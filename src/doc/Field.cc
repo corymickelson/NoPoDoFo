@@ -37,8 +37,6 @@ using namespace PoDoFo;
 using std::cout;
 using std::endl;
 using std::find;
-using std::make_shared;
-using std::make_unique;
 using std::vector;
 using tl::nullopt;
 
@@ -317,7 +315,8 @@ Field::GetAppearanceStream(const Napi::CallbackInfo& info)
   if (GetFieldDictionary().HasKey(Name::AP)) {
     auto ap = field->GetFieldObject()->MustGetIndirectKey(Name::AP);
     return Dictionary::constructor.New(
-      { External<PdfDictionary>::New(info.Env(), &ap->GetDictionary()) });
+      { External<PdfObject>::New(info.Env(), ap),
+        Number::New(info.Env(), 0)});
   } else {
     return info.Env().Null();
   }

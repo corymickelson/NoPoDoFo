@@ -35,7 +35,6 @@
 using std::cout;
 using std::endl;
 using std::find;
-using std::make_unique;
 using std::stringstream;
 
 namespace NoPoDoFo {

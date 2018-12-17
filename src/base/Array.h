@@ -51,9 +51,9 @@ public:
 private:
   vector<PoDoFo::PdfObject*> children;
   Napi::Value GetObjAtIndex(const Napi::CallbackInfo&);
-  PoDoFo::PdfObject* parent;
   PoDoFo::PdfArray& self;
-  PoDoFo::PdfArray* init;
+  PoDoFo::PdfArray* init = nullptr;
+  PoDoFo::PdfObject* parent = nullptr;
 };
 }
 #endif

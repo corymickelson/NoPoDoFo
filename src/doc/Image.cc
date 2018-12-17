@@ -18,19 +18,16 @@
  */
 
 #include "Image.h"
+#include "../Defines.h"
 #include "../ErrorHandler.h"
 #include "Document.h"
 #include "StreamDocument.h"
-
-#include <experimental/filesystem>
 
 using namespace Napi;
 using namespace PoDoFo;
 
 using std::make_unique;
 using std::string;
-
-namespace fs = std::experimental::filesystem;
 
 namespace NoPoDoFo {
 
@@ -65,8 +62,7 @@ Image::Image(const CallbackInfo& info)
   size_t bufLen = 0;
   if (info[1].IsString()) {
     file = info[1].As<String>().Utf8Value();
-    fs::path p(file.c_str());
-    if (!fs::exists(p)) {
+    if (!FileAccess(file)) {
       Error::New(info.Env(), "File not found").ThrowAsJavaScriptException();
       return;
     }

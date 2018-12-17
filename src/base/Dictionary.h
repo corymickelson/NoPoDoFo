@@ -57,8 +57,10 @@ public:
 
 private:
   vector<PoDoFo::PdfObject*> children;
+  vector<PoDoFo::PdfArray*> childArrays;
   PoDoFo::PdfDictionary& self;
   PoDoFo::PdfDictionary* init = nullptr;
+  PoDoFo::PdfObject* parent = nullptr;
 };
 }
 #endif

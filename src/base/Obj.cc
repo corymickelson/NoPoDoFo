@@ -61,7 +61,7 @@ Obj::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceMethod("getArray", &Obj::GetArray),
       InstanceMethod("getRawData", &Obj::GetRawData),
       InstanceMethod("clear", &Obj::Clear),
-      InstanceMethod("resolveIndirectKey", &Obj::MustGetIndirect)});
+      InstanceMethod("resolveIndirectKey", &Obj::MustGetIndirect) });
   constructor = Persistent(ctor);
   constructor.SuppressDestruct();
   target.Set("Object", ctor);
@@ -71,7 +71,8 @@ Obj::Obj(const Napi::CallbackInfo& info)
   : ObjectWrap<Obj>(info)
   , obj(*info[0].As<External<PdfObject>>().Data())
 {
-  // Object resource(s) are managed by the Document; will be removed by the Document
+  // Object resource(s) are managed by the Document; will be removed by the
+  // Document
 }
 
 void
@@ -180,9 +181,7 @@ Napi::Value
 Obj::Reference(const CallbackInfo& info)
 {
   auto r = GetObject().Reference();
-  return Ref::constructor.New({
-    External<PdfReference>::New(info.Env(), &r)
-  });
+  return Ref::constructor.New({ External<PdfReference>::New(info.Env(), &r) });
 }
 
 void
@@ -256,7 +255,8 @@ Obj::GetArray(const CallbackInfo& info)
   if (!obj.IsArray()) {
     throw Napi::Error::New(info.Env(), "Obj only accessible as array");
   }
-  auto instance = Array::constructor.New({ this->Value() });
+  auto instance = Array::constructor.New(
+    { External<PdfArray>::New(info.Env(), &obj.GetArray()) });
   return instance;
 }
 
@@ -276,7 +276,8 @@ Obj::GetDictionary(const CallbackInfo& info)
     throw Napi::Error::New(info.Env(), "Obj only accessible as Dictionary");
   }
   return Dictionary::constructor.New(
-    { External<PdfDictionary>::New(info.Env(), &obj.GetDictionary()) });
+    { External<PdfObject>::New(info.Env(), &obj),
+      Number::New(info.Env(), 0)});
 }
 
 Napi::Value
@@ -376,13 +377,16 @@ Obj::Write(const CallbackInfo& info)
 Napi::Value
 Obj::MustGetIndirect(const CallbackInfo& info)
 {
-  if(info.Length() != 1 && !info[0].IsString()) {
-    TypeError::New(info.Env(), "The name of the indirect key is required, this does a lookup in a Dictionary, and resolves"
-                               "any Indirects to their Object value").ThrowAsJavaScriptException();
+  if (info.Length() != 1 && !info[0].IsString()) {
+    TypeError::New(info.Env(),
+                   "The name of the indirect key is required, this does a "
+                   "lookup in a Dictionary, and resolves"
+                   "any Indirects to their Object value")
+      .ThrowAsJavaScriptException();
   }
   PdfName name = PdfName(info[0].As<String>());
   PdfObject* target = obj.MustGetIndirectKey(name);
-  return Obj::constructor.New({External<PdfObject>::New(info.Env(), target)});
+  return Obj::constructor.New({ External<PdfObject>::New(info.Env(), target) });
 }
 
 }

@@ -29,15 +29,12 @@
 #include "SignatureField.h"
 #include <iostream>
 #include <sstream>
-#include <utility>
 
 using namespace Napi;
 using namespace PoDoFo;
 
 using std::cout;
 using std::endl;
-using std::map;
-using std::pair;
 using std::string;
 using std::stringstream;
 

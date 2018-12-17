@@ -29,7 +29,6 @@ using namespace Napi;
 
 using std::cout;
 using std::endl;
-using std::make_unique;
 using std::string;
 
 namespace NoPoDoFo {

@@ -34,20 +34,24 @@ Napi::FunctionReference Array::constructor; // NOLINT
 
 Array::Array(const CallbackInfo& info)
   : ObjectWrap<Array>(info)
-  , self(info.Length() >= 1 && info[0].IsExternal()
-           ? *info[0].As<External<PdfArray>>().Data()
+  , self(info.Length() == 2
+           ? (info[0].IsExternal() && info[1].IsNumber() &&
+                  info[1].As<Number>().Int32Value() == 0
+                ? (parent = info[0].As<External<PdfObject>>().Data())
+                    ->GetArray()
+                : *info[0].As<External<PdfArray>>().Data())
            : *(init = new PdfArray()))
-{
-  if (info.Length() == 2 && info[1].IsObject()) {
-    parent = &NoPoDoFo::Obj::Unwrap(info[1].As<Object>())->GetObject();
-  }
-}
+{}
 
 Array::~Array()
 {
   HandleScope scope(Env());
   for (auto child : children) {
     delete child;
+  }
+  delete init;
+  if(parent) {
+    parent = nullptr;
   }
 }
 void
@@ -171,20 +175,8 @@ Array::GetObjAtIndex(const CallbackInfo& info)
   PdfObject* item;
   if (GetArray()[index].IsReference()) {
     PdfReference indirect = GetArray()[index].GetReference();
-    if (parent) {
-      auto owner = parent->GetOwner();
-      if (!owner) {
-        cout
-          << "NoPoDoFo.Array does not have access to the owner of this array."
-          << "To resolve the value at " << index
-          << " please take the returned Ref"
-          << "for the first argument in Base.GetObject" << endl;
-        return Ref::constructor.New(
-          { External<PdfReference>::New(info.Env(), &indirect) });
-      }
-      item = parent->GetOwner()->GetObject(GetArray()[index].GetReference());
-    }
-
+      return Ref::constructor.New(
+        { External<PdfReference>::New(info.Env(), &indirect) });
   } else {
     item = &(GetArray()[index]);
   }

@@ -31,7 +31,6 @@ using namespace Napi;
 using namespace PoDoFo;
 
 using std::find;
-using std::make_unique;
 using std::string;
 using std::vector;
 

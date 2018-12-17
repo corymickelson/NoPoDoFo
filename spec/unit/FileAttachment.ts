@@ -81,20 +81,32 @@ export class FileSpecPreWrite {
         } else {
             src.attachFile(attachment)
             Expect(src.getNames(false)).toBeDefined()
-            Expect((src.getNames(false) as Object).getDictionary().getKeys().includes(NPDFName.EMBEDDED_FILES)).toBeTruthy()
+            let srcNamesDict = (src.getNames(false) as Object).getDictionary().getKeys()
+            Expect(srcNamesDict.includes(NPDFName.EMBEDDED_FILES)).toBeTruthy()
             let embeddedFiles = (src.getNames(false) as Object).getDictionary()
-            console.log('here')
             let embeddedFilesRef = embeddedFiles.getKey<Ref>(NPDFName.EMBEDDED_FILES)
             if (embeddedFilesRef instanceof Ref) {
                 embeddedFiles = src.getObject(embeddedFilesRef).getDictionary()
             }
             let embeddedFilesArray = embeddedFiles.getKey<nopodofo.Array>(NPDFName.KIDS)
-            let files = embeddedFilesArray.at(0) instanceof Ref ? src.getObject(embeddedFilesArray.at(0) as Ref) :  embeddedFilesArray.at(0)
+            if(embeddedFilesArray instanceof Ref) {
+                embeddedFilesArray = src.getObject(embeddedFilesArray as Ref).getArray()
+            }
+            let files = embeddedFilesArray.at(0)
+            if(files instanceof Ref) {
+                files = src.getObject(files)
+            }
             let fileNames = (files as Object).getDictionary().getKey<nopodofo.Array>(NPDFName.NAMES)
             if(fileNames instanceof Ref) {
                 fileNames = src.getObject(fileNames).getArray()
             }
-            Expect((fileNames.at(0) as Object).getString().includes('scratch2Etxt'))
+            if(fileNames.at(0) instanceof Ref) {
+                let name0 = src.getObject(fileNames.at(0) as Ref)
+                Expect(name0.getString().includes('scratch')).toBeTruthy()
+            } else {
+                let name0 = (fileNames.at(0) as Object).getString()
+                Expect(name0.includes('scratch')).toBeTruthy()
+            }
         }
     }
 
