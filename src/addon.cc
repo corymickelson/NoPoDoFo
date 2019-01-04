@@ -60,6 +60,11 @@ init(Napi::Env env, Napi::Object exports)
 Napi::Error::New(env, "PoDoFo Version must be >= 0.9.6").ThrowAsJavaScriptException();
 return;
 #endif
+#ifdef NOPODOFO_DEBUG
+cout << "/******************************************************/" << endl;
+cout << "/***** You are running a Debug build of NoPoDoFo ******/" << endl;
+cout << "/******************************************************/" << endl;
+#endif
   NoPoDoFo::Action::Initialize(env, exports);
   NoPoDoFo::Date::Initialize(env, exports);
   NoPoDoFo::Annotation::Initialize(env, exports);

@@ -92,7 +92,9 @@ BaseDocument::BaseDocument(const Napi::CallbackInfo& info, bool inMem)
 
 BaseDocument::~BaseDocument()
 {
-  cout << "Cleanup" << endl;
+#ifdef NOPODOFO_DEBUG
+  cout << "Base document cleanup" << endl;
+#endif
   delete base;
   delete streamDocOutputDevice;
   delete streamDocRefCountedBuffer;
@@ -640,43 +642,33 @@ BaseDocument::CreateFontObject(napi_env env, Napi::Object opts, bool subset)
   int n = opts.Has("encoding") ? opts.Get("encoding").As<Number>() : 1;
   switch (n) {
     case 1:
-      //      encoding = new PdfWinAnsiEncoding();
       encoding = PdfEncodingFactory::GlobalWinAnsiEncodingInstance();
       break;
     case 2:
-      //      encoding = new PdfStandardEncoding();
       encoding = PdfEncodingFactory::GlobalStandardEncodingInstance();
       break;
     case 3:
-      //      encoding = new PdfDocEncoding();
       encoding = PdfEncodingFactory::GlobalPdfDocEncodingInstance();
       break;
     case 4:
-      //      encoding = new PdfMacRomanEncoding();
       encoding = PdfEncodingFactory::GlobalMacRomanEncodingInstance();
       break;
     case 5:
-      //      encoding = new PdfMacExpertEncoding();
       encoding = PdfEncodingFactory::GlobalMacExpertEncodingInstance();
       break;
     case 6:
-      //      encoding = new PdfSymbolEncoding();
       encoding = PdfEncodingFactory::GlobalSymbolEncodingInstance();
       break;
     case 7:
-      //      encoding = new PdfZapfDingbatsEncoding();
       encoding = PdfEncodingFactory::GlobalZapfDingbatsEncodingInstance();
       break;
     case 8:
-      //      encoding = new PdfWin1250Encoding();
       encoding = PdfEncodingFactory::GlobalWin1250EncodingInstance();
       break;
     case 9:
-      //      encoding = new PdfIso88592Encoding();
       encoding = PdfEncodingFactory::GlobalIso88592EncodingInstance();
       break;
     default:
-      //      encoding = new PdfIdentityEncoding(0, 0xffff, true);
       encoding = PdfEncodingFactory::GlobalIdentityEncodingInstance();
   }
   try {

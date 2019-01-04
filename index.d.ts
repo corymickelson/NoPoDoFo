@@ -3,9 +3,6 @@
 export const CONVERSION = 0.0028346456693
 export type NPDFExternal<T> = Object
 export type Callback<T> = (err: Error, data: T) => void
-/**
- * Indirect object reference [GenerationNumber, ObjectNumber]
- */
 
 export function pdfDate(d: Date): string
 
@@ -915,6 +912,11 @@ export namespace nopodofo {
         readonly type: NPDFDataType
         immutable: boolean
 
+        constructor()
+        constructor(s: string)
+        constructor(a: string[] | number[])
+        constructor(d: number)
+
         hasStream(): boolean
 
         getOffset(key: string): Promise<number>
@@ -939,7 +941,10 @@ export namespace nopodofo {
 
         getArray(): Array
 
-        getBuffer(): Buffer
+        /**
+         * Copies the raw data to a nodejs buffer.
+         */
+        getRawData(): Buffer
 
         clear(): void
         

@@ -35,6 +35,58 @@ namespace NoPoDoFo {
 
 FunctionReference Obj::constructor; // NOLINT
 
+/**
+ * Creates a new instance of PdfObject, this object is assigned in the
+ * constructor of NoPoDoFo::Object and is removed with the NoPoDoFo::Object
+ * instance.
+ *
+ * @param info
+ * @return
+ */
+PdfObject*
+InitObject(const CallbackInfo &info)
+{
+  if (info.Length() == 0) {
+    return new PdfObject();
+  }
+  if (info.Length() == 1) {
+    if (info[0].IsArray()) {
+      auto array = info[0].As<Napi::Array>();
+      PdfArray pdfArray;
+      for (uint32_t i = 0; i < array.Length(); i++) {
+        auto ii = array.Get(i);
+        if (ii.IsBoolean()) {
+          bool x = ii.As<Boolean>();
+          pdfArray[i] = x;
+        }
+        if (ii.IsNumber()) {
+          pdfArray[i] = ii.As<Number>().DoubleValue();
+        }
+        if (ii.IsString()) {
+          string x = ii.As<String>().Utf8Value();
+          pdfArray[i] = PdfString(x);
+        } else {
+          Error::New(
+            info.Env(),
+            "NoPoDoFo currently only supports homogeneous primitive type array")
+            .ThrowAsJavaScriptException();
+        }
+      }
+      return new PdfObject(pdfArray);
+    }
+    if (info[0].IsString()) {
+      PdfString s(info[0].As<String>());
+      return new PdfObject(s);
+    }
+    if (info[0].IsNumber()) {
+      return new PdfObject(info[0].As<Number>().DoubleValue());
+    }
+    if (info[0].IsBoolean()) {
+      return new PdfObject(info[0].As<Boolean>());
+    }
+  }
+  return new PdfObject();
+}
 void
 Obj::Initialize(Napi::Env& env, Napi::Object& target)
 {
@@ -69,11 +121,10 @@ Obj::Initialize(Napi::Env& env, Napi::Object& target)
 
 Obj::Obj(const Napi::CallbackInfo& info)
   : ObjectWrap<Obj>(info)
-  , obj(*info[0].As<External<PdfObject>>().Data())
-{
-  // Object resource(s) are managed by the Document; will be removed by the
-  // Document
-}
+  , obj(info.Length() == 1 && info[0].IsExternal()
+          ? *info[0].As<External<PdfObject>>().Data()
+          : *(init = InitObject(info)))
+{}
 
 void
 Obj::Clear(const Napi::CallbackInfo& info)
@@ -89,12 +140,14 @@ Obj::GetStream(const CallbackInfo& info)
 {
   try {
     if (!obj.HasStream()) {
+#ifdef NOPODOFO_DEBUG
       cout << "This Object does not have a stream associated with it" << endl;
       stringstream output;
       output << "/tmp/" << obj.Reference().GenerationNumber() << "."
              << obj.Reference().ObjectNumber() << ".txt" << endl;
       const char* outfile = output.str().c_str();
       cout << "Writing Object to: " << outfile << endl;
+#endif
       PdfOutputDevice outDevice(outfile);
       obj.WriteObject(&outDevice, ePdfWriteMode_Clean, nullptr);
       return info.Env().Undefined();
@@ -256,7 +309,8 @@ Obj::GetArray(const CallbackInfo& info)
     throw Napi::Error::New(info.Env(), "Obj only accessible as array");
   }
   auto instance = Array::constructor.New(
-    { External<PdfArray>::New(info.Env(), &obj.GetArray()) });
+    { External<PdfArray>::New(info.Env(), &obj.GetArray()),
+      Number::New(info.Env(), 1) });
   return instance;
 }
 
@@ -276,8 +330,7 @@ Obj::GetDictionary(const CallbackInfo& info)
     throw Napi::Error::New(info.Env(), "Obj only accessible as Dictionary");
   }
   return Dictionary::constructor.New(
-    { External<PdfObject>::New(info.Env(), &obj),
-      Number::New(info.Env(), 0)});
+    { External<PdfObject>::New(info.Env(), &obj), Number::New(info.Env(), 0) });
 }
 
 Napi::Value

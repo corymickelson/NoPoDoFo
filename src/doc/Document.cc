@@ -174,9 +174,8 @@ Document::GetTrailer(const CallbackInfo& info)
 Napi::Value
 Document::GetCatalog(const CallbackInfo& info)
 {
-  const PdfObject* catalog = GetDocument().GetCatalog();
-  auto ptr = const_cast<PdfObject*>(catalog);
-  auto initPtr = Napi::External<PdfObject>::New(info.Env(), ptr);
+  PdfObject* catalog = GetDocument().GetCatalog();
+  auto initPtr = Napi::External<PdfObject>::New(info.Env(), catalog);
   auto instance = Obj::constructor.New({ initPtr });
   return instance;
 }

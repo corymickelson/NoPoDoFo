@@ -30,8 +30,16 @@ using std::string;
 
 namespace NoPoDoFo {
 
-Napi::FunctionReference Array::constructor; // NOLINT
+FunctionReference Array::constructor; // NOLINT
 
+/**
+ * The NoPoDoFo::Array constructor excepts the following arguments:
+ *  (PdfExternal, Number)
+ *  if the Number is 0, the external is a pointer to a PdfObject
+ *  if the number is 1, the external is a pointer to a PdfArray
+ *  if no arguments are provided a new PdfArray is created
+ * @param info
+ */
 Array::Array(const CallbackInfo& info)
   : ObjectWrap<Array>(info)
   , self(info.Length() == 2

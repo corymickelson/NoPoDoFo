@@ -24,8 +24,7 @@ public:
   void SetScript(const Napi::CallbackInfo&, const Napi::Value&);
   Napi::Value GetObject(const Napi::CallbackInfo&);
   void AddToDictionary(const Napi::CallbackInfo&);
-  PoDoFo::PdfAction &
-  GetAction() { return *action; }
+  PoDoFo::PdfAction& GetAction() { return *action; }
 
 private:
   PoDoFo::PdfAction* action;

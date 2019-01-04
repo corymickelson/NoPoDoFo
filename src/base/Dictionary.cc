@@ -39,8 +39,11 @@ namespace NoPoDoFo {
 FunctionReference Dictionary::constructor; // NOLINT
 
 /**
- * @note
- * @brief Dictionary::Dictionary
+ * The NoPoDoFo::Dictionary constructor excepts the following arguments:
+ *  (PdfExternal, Number)
+ *  if the Number is 0, the external is a pointer to a PdfObject
+ *  if the number is 1, the external is a pointer to a PdfDictionary
+ *  if no arguments are provided a new PdfDictionary is created
  * @param info
  */
 Dictionary::Dictionary(const CallbackInfo& info)

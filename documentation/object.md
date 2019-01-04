@@ -24,6 +24,7 @@
     - [getArray](#getarray)
     - [getBuffer](#getbuffer)
     - [clear](#clear)
+    - [resolveIndirectKey](#resolveindirectkey)
 
 ## NoPoDoFo Object
 
@@ -34,6 +35,11 @@ class Object {
   readonly stream: Stream
   readonly type: NPDFDataType
   immutable: boolean
+  
+  constructor()
+  constructor(s: string)
+  constructor(a: string[] | number[])
+  constructor(d: number)
 
   hasStream(): boolean
   getOffset(key: string, cb: Callback<number>): void
@@ -47,16 +53,38 @@ class Object {
   getReal(): number
   getNumber(): number
   getArray(): Array
-  getBuffer(): Buffer
+  getRawData(): Buffer
   clear(): void
+  resolveIndirectKey(key: string): nopodofo.Object
 }
 ```
 
 ## Constructors
 --------------
 
-NoPoDoFo does not support the creation of new objects by the Object class, however many of the methods used in NoPoDoFo
-will return or expose an accessor to retrieve the underlying PDF object data type.
+```typescript
+constructor()
+```
+
+The default constructor, calling NoPoDoFo.Object() will create a new instance of a PoDoFo::PdfObject as type [Dictionary](./dictionary.md)
+
+```typescript
+constructor(s: string)
+```
+
+Creates a new instance of NoPoDoFo::Object as type string.
+
+```typescript
+constructor(a: string[] |  number[])
+```
+
+Create a new instance of NoPoDoFo::Object with type of array. Currently only supports single dimension, homogeneous arrays.
+
+```typescript
+constructor(n: number)
+```
+
+Create a new instance of NoPoDoFo::Object as type number.
 
 ## Properties
 --------------
@@ -190,7 +218,7 @@ Get the object as an [Array](./array.md) value
 getBuffer(): Buffer
 ```
 
-Get the object as a Buffer value
+Get the object as a Buffer value, __data__ is copied into a nodejs buffer.
 
 ### clear
 
@@ -199,3 +227,12 @@ clear(): void
 ```
 
 Clear the object from memory and all internal variables.
+
+### resolveIndirectKey
+
+```typescript
+resolveIndirectKey(key: string): nopodofo.Object
+```
+
+Resolve a [Dictionary](./dictionary.md) key. The object type must be a Dictionary. If the key could not be resolved
+an error will be thrown.

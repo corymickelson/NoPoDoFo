@@ -57,10 +57,11 @@ public:
   void SetImmutable(const Napi::CallbackInfo&, const Napi::Value&);
   void Clear(const Napi::CallbackInfo&);
   Napi::Value MustGetIndirect(const Napi::CallbackInfo&);
-  PoDoFo::PdfObject& GetObject() { return obj; }
+  PoDoFo::PdfObject& GetObject() { return init == nullptr ? obj : *init; }
 
 private:
   PoDoFo::PdfObject& obj;
+  PoDoFo::PdfObject* init = nullptr;
 };
 }
 #endif
