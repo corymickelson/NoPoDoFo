@@ -30,9 +30,7 @@
 using namespace Napi;
 using namespace PoDoFo;
 
-using std::find;
 using std::string;
-using std::vector;
 
 namespace NoPoDoFo {
 
@@ -44,8 +42,9 @@ Outline::Outline(const CallbackInfo& info)
 {}
 Outline::~Outline()
 {
-  HandleScope scope(Env());
+#ifdef NOPODOFO_DEBUG
   cout << "Outline Destructor" << endl;
+#endif
 }
 void
 Outline::Initialize(Napi::Env& env, Napi::Object& target)
@@ -76,7 +75,7 @@ Outline::Initialize(Napi::Env& env, Napi::Object& target)
   target.Set("Outline", ctor);
 }
 void
-Outline::SetDestination(const Napi::CallbackInfo& info,
+Outline::SetDestination(const Napi::CallbackInfo& /*info*/,
                         const Napi::Value& value)
 {
   auto child = new PdfDestination(
@@ -101,7 +100,8 @@ Outline::CreateNext(const Napi::CallbackInfo& info)
     PdfOutlineItem* item = GetOutline().CreateNext(name, d);
     return Outline::constructor.New(
       { External<PdfOutlineItem>::New(info.Env(), item) });
-  } else if (info[1].As<Object>().InstanceOf(Action::constructor.Value())) {
+  }
+  if (info[1].As<Object>().InstanceOf(Action::constructor.Value())) {
     PdfAction& action = Action::Unwrap(info[1].As<Object>())->GetAction();
     auto item = GetOutline().CreateNext(name, action);
     return Outline::constructor.New(
@@ -195,7 +195,7 @@ Outline::GetAction(const Napi::CallbackInfo& info)
   return Action::constructor.New({ External<PdfAction>::New(info.Env(), a) });
 }
 void
-Outline::SetAction(const Napi::CallbackInfo& info, const Napi::Value& value)
+Outline::SetAction(const Napi::CallbackInfo&, const Napi::Value& value)
 {
   GetOutline().SetAction(Action::Unwrap(value.As<Object>())->GetAction());
 }
@@ -206,7 +206,7 @@ Outline::GetTitle(const Napi::CallbackInfo& info)
   return String::New(info.Env(), title);
 }
 void
-Outline::SetTitle(const Napi::CallbackInfo& info, const Napi::Value& value)
+Outline::SetTitle(const Napi::CallbackInfo&, const Napi::Value& value)
 {
   GetOutline().SetTitle(PdfString(value.As<String>().Utf8Value()));
 }
@@ -216,7 +216,7 @@ Outline::GetTextFormat(const Napi::CallbackInfo& info)
   return Number::New(info.Env(), GetOutline().GetTextFormat());
 }
 void
-Outline::SetTextFormat(const Napi::CallbackInfo& info, const Napi::Value& value)
+Outline::SetTextFormat(const Napi::CallbackInfo&, const Napi::Value& value)
 {
   GetOutline().SetTextFormat(
     static_cast<EPdfOutlineFormat>(value.As<Number>().Int32Value()));
@@ -233,7 +233,12 @@ Outline::GetTextColor(const Napi::CallbackInfo& info)
 void
 Outline::SetTextColor(const Napi::CallbackInfo& info, const Napi::Value& value)
 {
-  PdfColor color = *Color::Unwrap(info[0].As<Object>())->color;
+  if (!value.IsObject()) {
+    TypeError::New(info.Env(), "TextColor must be an instance of Color")
+      .ThrowAsJavaScriptException();
+    return;
+  }
+  PdfColor color = *Color::Unwrap(value.As<Object>())->color;
   if (!color.IsRGB()) {
     cout << "Outline text coloring only supports color format RGB, color "
             "automatically converted to RGB"
