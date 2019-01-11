@@ -44,7 +44,7 @@ FunctionReference Obj::constructor; // NOLINT
  * @return
  */
 PdfObject*
-InitObject(const CallbackInfo &info)
+InitObject(const CallbackInfo& info)
 {
   if (info.Length() == 0) {
     return new PdfObject();
@@ -140,12 +140,12 @@ Obj::GetStream(const CallbackInfo& info)
 {
   try {
     if (!obj.HasStream()) {
-#ifdef NOPODOFO_DEBUG
-      cout << "This Object does not have a stream associated with it" << endl;
       stringstream output;
       output << "/tmp/" << obj.Reference().GenerationNumber() << "."
              << obj.Reference().ObjectNumber() << ".txt" << endl;
       const char* outfile = output.str().c_str();
+#ifdef NOPODOFO_DEBUG
+      cout << "This Object does not have a stream associated with it" << endl;
       cout << "Writing Object to: " << outfile << endl;
 #endif
       PdfOutputDevice outDevice(outfile);
@@ -441,5 +441,4 @@ Obj::MustGetIndirect(const CallbackInfo& info)
   PdfObject* target = obj.MustGetIndirectKey(name);
   return Obj::constructor.New({ External<PdfObject>::New(info.Env(), target) });
 }
-
 }
