@@ -471,7 +471,11 @@ Annotation::SetRect(const CallbackInfo &info, const Napi::Value &value)
     Error::New(info.Env(), "NoPoDoFo Rect required").ThrowAsJavaScriptException();
     return;
   }
-  auto rect = Rect::Unwrap(value.As<Object>());;
+  auto rect = Rect::Unwrap(value.As<Object>());
+#ifdef __linux__
   GetAnnotation().SetRect(rect->GetRect());
+#elif defined _WIN32 || defined _WIN64
+  cout << "SetRect is not available in this build" << endl;
+#endif
 }
 }
