@@ -238,11 +238,11 @@ Dictionary::GetKey(const CallbackInfo& info)
     case ePdfDataType_Array:
       return NoPoDoFo::Array::constructor.New(
         { External<PdfObject>::New(info.Env(), v),
-          Number::New(info.Env(), 0) });
+          Number::New(info.Env(), 0).Int32Value() });
     case ePdfDataType_Dictionary:
       return Dictionary::constructor.New(
         { External<PdfObject>::New(info.Env(), v),
-          Number::New(info.Env(), 0) });
+          Number::New(info.Env(), 0).Int32Value() });
     case ePdfDataType_Null:
       return info.Env().Null();
     case ePdfDataType_RawData: {
@@ -259,8 +259,8 @@ Dictionary::GetKey(const CallbackInfo& info)
     }
     case ePdfDataType_Reference: {
       return Ref::constructor.New(
-        { Number::New(info.Env(), v->GetReference().ObjectNumber()),
-          Number::New(info.Env(), v->GetReference().GenerationNumber()) });
+        { Number::New(info.Env(), v->GetReference().ObjectNumber()).Int32Value(),
+          Number::New(info.Env(), v->GetReference().GenerationNumber()).Int64Value() });
     }
     case ePdfDataType_Unknown:
       return info.Env().Undefined();
@@ -403,7 +403,7 @@ protected:
   void OnOK() override
   {
     HandleScope scope(Env());
-    Callback().Call({ Env().Null(), Napi::String::New(Env(), arg) });
+    Callback().Call({ Env().Null(), String::New(Env(), arg) });
   }
 
 private:
