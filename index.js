@@ -806,7 +806,7 @@ var NPDFAlignment;
 (function (NPDFAlignment) {
     NPDFAlignment[NPDFAlignment["Left"] = 0] = "Left";
     NPDFAlignment[NPDFAlignment["Center"] = 1] = "Center";
-    NPDFAlignment[NPDFAlignment["Bottom"] = 2] = "Bottom";
+    NPDFAlignment[NPDFAlignment["Right"] = 2] = "Right";
 })(NPDFAlignment = exports.NPDFAlignment || (exports.NPDFAlignment = {}));
 var NPDFBlendMode;
 (function (NPDFBlendMode) {

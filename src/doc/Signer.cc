@@ -178,9 +178,7 @@ protected:
       if (self.field->GetFieldName().GetStringUtf8().empty()) {
         self.field->SetFieldName("NoPoDoFo.SignatureField");
       }
-      /**
-       * todo: Add user facing support for creating/modifying PdfDate objects.
-       */
+
       self.field->SetSignatureDate(PdfDate());
 
       // Set output device to write signature to designated area.

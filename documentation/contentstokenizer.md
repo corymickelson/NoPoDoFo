@@ -17,7 +17,7 @@ class ContentsTokenizer {
   new(doc: Base, pageIndex: number): ContentsTokenizer
 
   readSync(): Iterator<string>
-  read(cb: Callback<Buffer>): void
+  read(cb: Callback<string>): void
 }
 ```
 
@@ -48,7 +48,7 @@ Reads a [Page](./page.md)'s contents stream into an array returning an array ite
 ### read
 
 ```typescript
-read(cb: Callback<Buffer>): void
+read(cb: Callback<string>): void
 ```
 
-Reads a [Page](./page.md)'s contents stream into an Buffer. Async operation.
+Reads a [Page](./page.md)'s contents stream, decodes when/where the stream has been encoded and returns as a string.

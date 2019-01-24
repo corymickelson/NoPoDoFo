@@ -1018,7 +1018,7 @@ export namespace nopodofo {
 
         readSync(): Iterator<string>
 
-        read(cb: Callback<Buffer>): void
+        read(cb: Callback<string>): void
     }
 
     export class XObject {
