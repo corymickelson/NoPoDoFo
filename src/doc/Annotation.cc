@@ -157,7 +157,8 @@ Annotation::SetTitle(const CallbackInfo& info, const Napi::Value& value)
 Napi::Value
 Annotation::GetTitle(const CallbackInfo& info)
 {
-  return Napi::String::New(info.Env(), GetAnnotation().GetTitle().GetStringUtf8());
+  return Napi::String::New(info.Env(),
+                           GetAnnotation().GetTitle().GetStringUtf8());
 }
 
 void
@@ -193,7 +194,8 @@ Annotation::SetDestination(const CallbackInfo& info, const Napi::Value& value)
 Napi::Value
 Annotation::GetDestination(const CallbackInfo& info)
 {
-  if(!GetAnnotation().HasDestination()) return info.Env().Null();
+  if (!GetAnnotation().HasDestination())
+    return info.Env().Null();
   auto doc = Document::Unwrap(info[0].As<Object>())->base;
   PdfDestination d = GetAnnotation().GetDestination(doc);
   return Destination::constructor.New(
@@ -258,7 +260,8 @@ Napi::Value
 Annotation::GetColor(const CallbackInfo& info)
 {
   auto color = GetAnnotation().GetColor();
-  if(color.empty()) return info.Env().Null();
+  if (color.empty())
+    return info.Env().Null();
   switch (color.size()) {
     case 1: { // greyscale
       return Color::constructor.New(
@@ -454,24 +457,24 @@ void
 Annotation::SetAttachment(const CallbackInfo& info, const Napi::Value& value)
 {}
 Napi::Value
-Annotation::GetRect(const CallbackInfo &info)
+Annotation::GetRect(const CallbackInfo& info)
 {
   PdfRect rect = GetAnnotation().GetRect();
-  return Rect::constructor.New({
-    Number::New(info.Env(), rect.GetLeft()),
-    Number::New(info.Env(), rect.GetBottom()),
-    Number::New(info.Env(), rect.GetWidth()),
-    Number::New(info.Env(), rect.GetHeight())
-    });
+  return Rect::constructor.New({ Number::New(info.Env(), rect.GetLeft()),
+                                 Number::New(info.Env(), rect.GetBottom()),
+                                 Number::New(info.Env(), rect.GetWidth()),
+                                 Number::New(info.Env(), rect.GetHeight()) });
 }
 void
-Annotation::SetRect(const CallbackInfo &info, const Napi::Value &value)
+Annotation::SetRect(const CallbackInfo& info, const Napi::Value& value)
 {
-  if(!value.As<Object>().InstanceOf(Rect::constructor.Value())) {
-    Error::New(info.Env(), "NoPoDoFo Rect required").ThrowAsJavaScriptException();
+  if (!value.As<Object>().InstanceOf(Rect::constructor.Value())) {
+    Error::New(info.Env(), "NoPoDoFo Rect required")
+      .ThrowAsJavaScriptException();
     return;
   }
-  auto rect = Rect::Unwrap(value.As<Object>());;
+  auto rect = Rect::Unwrap(value.As<Object>());
+  ;
   GetAnnotation().SetRect(rect->GetRect());
 }
 }

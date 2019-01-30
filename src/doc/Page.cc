@@ -27,9 +27,9 @@
 #include "Form.h"
 #include "ListBox.h"
 #include "PushButton.h"
+#include "Rect.h"
 #include "SignatureField.h"
 #include "TextField.h"
-#include "Rect.h"
 
 using namespace Napi;
 using namespace PoDoFo;

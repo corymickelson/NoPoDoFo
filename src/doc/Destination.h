@@ -20,15 +20,16 @@
 #ifndef NPDF_DESTINATION_H
 #define NPDF_DESTINATION_H
 
-#include <podofo/podofo.h>
 #include <napi.h>
+#include <podofo/podofo.h>
 
 namespace NoPoDoFo {
 
-class Destination: public Napi::ObjectWrap<Destination> {
+class Destination : public Napi::ObjectWrap<Destination>
+{
 public:
   static Napi::FunctionReference constructor;
-  explicit Destination(const Napi::CallbackInfo &info);
+  explicit Destination(const Napi::CallbackInfo& info);
   ~Destination();
   static void Initialize(Napi::Env& env, Napi::Object& target);
   Napi::Value GetType(const Napi::CallbackInfo&);
@@ -44,4 +45,4 @@ public:
 };
 
 }
-#endif //NPDF_DESTINATION_H
+#endif // NPDF_DESTINATION_H

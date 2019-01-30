@@ -2,7 +2,7 @@
  * This file is part of the NoPoDoFo (R) project.
  * Copyright (c) 2017-2018
  * Authors: Cory Mickelson, et al.
- * 
+ *
  * NoPoDoFo is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -23,7 +23,6 @@
 #include <napi.h>
 #include <podofo/podofo.h>
 #include <string>
-
 
 namespace NoPoDoFo {
 class Stream : public Napi::ObjectWrap<Stream>

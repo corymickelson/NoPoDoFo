@@ -28,4 +28,35 @@ FileAccess(std::string& file)
 #endif
   return found;
 }
+/**
+ * https://oded.blog/2017/10/05/go-defer-in-cpp/
+ * Scope Guard, based off of go's defer
+ */
+class ScopeGuard
+{
+public:
+  template<class Callable>
+  explicit ScopeGuard(Callable&& fn)
+    : fn_(std::forward<Callable>(fn))
+  {}
+
+  ScopeGuard(ScopeGuard&& other) noexcept
+    : fn_(std::move(other.fn_))
+  {
+    other.fn_ = nullptr;
+  }
+
+  ~ScopeGuard()
+  {
+    if (fn_)
+      fn_();
+  }
+
+  ScopeGuard(const ScopeGuard&) = delete;
+
+  void operator=(const ScopeGuard&) = delete;
+
+private:
+  std::function<void()> fn_;
+};
 }

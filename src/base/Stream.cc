@@ -2,7 +2,7 @@
  * This file is part of the NoPoDoFo (R) project.
  * Copyright (c) 2017-2018
  * Authors: Cory Mickelson, et al.
- * 
+ *
  * NoPoDoFo is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -19,7 +19,6 @@
 
 #include "Stream.h"
 #include "../ErrorHandler.h"
-
 
 using namespace Napi;
 using namespace PoDoFo;
@@ -55,7 +54,7 @@ Napi::Value
 Stream::GetBuffer(const CallbackInfo& info)
 {
   pdf_long bufferLength = stream->GetLength();
-  auto * copy = static_cast<char*>(
+  auto* copy = static_cast<char*>(
     malloc(sizeof(char) * static_cast<unsigned long>(bufferLength)));
   stream->GetCopy(&copy, &bufferLength);
   auto value =
@@ -84,8 +83,7 @@ public:
     : AsyncWorker(cb)
     , stream(stream)
     , arg(std::move(arg))
-  {
-  }
+  {}
   ~StreamWriteAsync() {}
 
 private:

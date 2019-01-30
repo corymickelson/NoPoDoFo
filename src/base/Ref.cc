@@ -13,21 +13,26 @@ namespace NoPoDoFo {
 
 FunctionReference Ref::constructor; // NOLINT
 
-Ref::Ref(const CallbackInfo &info)
+Ref::Ref(const CallbackInfo& info)
   : ObjectWrap(info)
 {
-  if(info.Length() == 2 && info[0].IsNumber() && info[1].IsNumber()) {
+  if (info.Length() == 2 && info[0].IsNumber() && info[1].IsNumber()) {
     self = new PdfReference(info[0].As<Number>(),
-                            static_cast<const PoDoFo::pdf_gennum>(info[1].As<Number>().Uint32Value()));
-  } else if(info.Length() == 1 && info[0].IsExternal()) {
+                            static_cast<const PoDoFo::pdf_gennum>(
+                              info[1].As<Number>().Uint32Value()));
+  } else if (info.Length() == 1 && info[0].IsExternal()) {
     cout << "Creating a new PdfReference Copy" << endl;
     self = new PdfReference(*info[0].As<External<PdfReference>>().Data());
   } else {
-    Error::New(info.Env(), "References can only be created from already existing objects").ThrowAsJavaScriptException();
+    Error::New(info.Env(),
+               "References can only be created from already existing objects")
+      .ThrowAsJavaScriptException();
   }
 }
-Ref::~Ref() {
-  cout << "Cleaning up Ref " << self->ObjectNumber() << " : " << self->GenerationNumber() << endl;
+Ref::~Ref()
+{
+  cout << "Cleaning up Ref " << self->ObjectNumber() << " : "
+       << self->GenerationNumber() << endl;
   delete self;
 }
 void
@@ -45,12 +50,12 @@ Ref::Initialize(Napi::Env& env, Napi::Object& target)
   target.Set("Ref", ctor);
 }
 value
-Ref::GetObjectNumber(const CallbackInfo &info)
+Ref::GetObjectNumber(const CallbackInfo& info)
 {
   return Number::New(info.Env(), self->ObjectNumber());
 }
 value
-Ref::GetGenerationNumber(const CallbackInfo &info)
+Ref::GetGenerationNumber(const CallbackInfo& info)
 {
   return Number::New(info.Env(), self->GenerationNumber());
 }

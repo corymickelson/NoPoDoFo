@@ -31,8 +31,7 @@ using namespace PoDoFo;
 using std::make_unique;
 using std::stringstream;
 
-namespace NoPoDoFo
-{
+namespace NoPoDoFo {
 
 FunctionReference ContentsTokenizer::constructor; // NOLINT
 
@@ -40,21 +39,23 @@ FunctionReference ContentsTokenizer::constructor; // NOLINT
  * @note JS new ContentsTokenizer(doc: IBase, pageIndex: number)
  * @param info
  */
-ContentsTokenizer::ContentsTokenizer(const Napi::CallbackInfo &info)
-  : ObjectWrap(info), doc(*Document::Unwrap(info[0].As<Object>())), pIndex(info[1].As<Number>().Int32Value())
+ContentsTokenizer::ContentsTokenizer(const Napi::CallbackInfo& info)
+  : ObjectWrap(info)
+  , doc(*Document::Unwrap(info[0].As<Object>()))
+  , pIndex(info[1].As<Number>().Int32Value())
 {
   self = make_unique<PdfContentsTokenizer>(doc.GetDocument().GetPage(pIndex));
 }
 
 void
-ContentsTokenizer::Initialize(Napi::Env &env, Napi::Object &target)
+ContentsTokenizer::Initialize(Napi::Env& env, Napi::Object& target)
 {
   HandleScope scope(env);
   Function ctor =
     DefineClass(env,
                 "ContentsTokenizer",
-                {InstanceMethod("readSync", &ContentsTokenizer::ReadSync),
-                 InstanceMethod("read", &ContentsTokenizer::Read)});
+                { InstanceMethod("readSync", &ContentsTokenizer::ReadSync),
+                  InstanceMethod("read", &ContentsTokenizer::Read) });
   constructor = Napi::Persistent(ctor);
   constructor.SuppressDestruct();
   target.Set("ContentsTokenizer", ctor);
@@ -63,12 +64,12 @@ ContentsTokenizer::Initialize(Napi::Env &env, Napi::Object &target)
 void
 ContentsTokenizer::ReadIntoData()
 {
-  const char *token = nullptr;
+  const char* token = nullptr;
   PdfVariant var;
   EPdfContentsType type;
   std::stack<PdfVariant> stack;
   bool blockText = false;
-  PdfFont *font = nullptr;
+  PdfFont* font = nullptr;
   while (self->ReadNext(type, token, var)) {
     if (type == ePdfContentsType_Keyword) {
       if (strcmp(token, "l") == 0 || strcmp(token, "m") == 0) {
@@ -90,7 +91,7 @@ ContentsTokenizer::ReadIntoData()
           }
           stack.pop();
           PdfName fontName = stack.top().GetName();
-          PdfObject *pFont =
+          PdfObject* pFont =
             doc.GetDocument().GetPage(pIndex)->GetFromResources(PdfName("Font"),
                                                                 fontName);
           if (!pFont) {
@@ -121,7 +122,7 @@ ContentsTokenizer::ReadIntoData()
             continue;
           PdfArray array = stack.top().GetArray();
           stack.pop();
-          for (auto &i : array) {
+          for (auto& i : array) {
             if (i.IsString() || i.IsHexString()) {
               AddText(font, i.GetString());
             }
@@ -138,7 +139,7 @@ ContentsTokenizer::ReadIntoData()
   }
 }
 Napi::Value
-ContentsTokenizer::ReadSync(const CallbackInfo &info)
+ContentsTokenizer::ReadSync(const CallbackInfo& info)
 {
   if (!data.empty()) {
     cout << "Clearing previous results from ContentsTokenizer::Read" << endl;
@@ -164,27 +165,27 @@ ContentsTokenizer::ReadSync(const CallbackInfo &info)
 }
 
 void
-ContentsTokenizer::AddText(PdfFont *font, const PdfString &text)
+ContentsTokenizer::AddText(PdfFont* font, const PdfString& text)
 {
   if (!font || !font->GetEncoding()) {
     // handle error
     return;
   }
   PdfString unicode = font->GetEncoding()->ConvertToUnicode(text, font);
-  const char *chunk = unicode.GetStringUtf8().c_str();
+  const char* chunk = unicode.GetStringUtf8().c_str();
   data.emplace_back(chunk);
 }
 
-class AsyncContentReader: public AsyncWorker
+class AsyncContentReader : public AsyncWorker
 {
 public:
-  AsyncContentReader(Function &cb, Napi::Object self)
-    : AsyncWorker(cb, "async_content_reader", self), Tokenizer(ContentsTokenizer::Unwrap(self))
+  AsyncContentReader(Function& cb, Napi::Object self)
+    : AsyncWorker(cb, "async_content_reader", self)
+    , Tokenizer(ContentsTokenizer::Unwrap(self))
   {}
 
 protected:
-  void
-  Execute() override
+  void Execute() override
   {
     try {
       Tokenizer->ReadIntoData();
@@ -192,27 +193,26 @@ protected:
       SetError("Async Reader failure");
     }
   }
-  void
-  OnOK() override
+  void OnOK() override
   {
     if (Tokenizer->data.empty()) {
-      Callback().Call({Env().Null(), Env().Null()});
+      Callback().Call({ Env().Null(), Env().Null() });
       return;
     }
     string all;
-    for (auto &i : Tokenizer->data) {
+    for (auto& i : Tokenizer->data) {
       all += i;
     }
     Tokenizer->contentsString = all;
-    Callback().Call({Env().Null(), String::New(Env(), all)});
+    Callback().Call({ Env().Null(), String::New(Env(), all) });
   }
 
 private:
-  ContentsTokenizer *Tokenizer;
+  ContentsTokenizer* Tokenizer;
 };
 
 void
-ContentsTokenizer::Read(const CallbackInfo &info)
+ContentsTokenizer::Read(const CallbackInfo& info)
 {
   if (!data.empty()) {
     cout << "Clearing previous results from ContentsTokenizer::Read" << endl;
@@ -225,7 +225,7 @@ ContentsTokenizer::Read(const CallbackInfo &info)
     return;
   }
   Function cb = info[0].As<Function>();
-  AsyncWorker *async = new AsyncContentReader(cb, this->Value());
+  AsyncWorker* async = new AsyncContentReader(cb, this->Value());
   async->Queue();
 }
 }

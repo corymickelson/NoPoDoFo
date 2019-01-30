@@ -111,12 +111,13 @@ StreamDocument::Close(const CallbackInfo& info)
   return String::New(info.Env(), output);
 }
 void
-StreamDocument::Append(const Napi::CallbackInfo &info)
+StreamDocument::Append(const Napi::CallbackInfo& info)
 {
-  cout << "StreamDocument does not currently support the append operation" << endl;
+  cout << "StreamDocument does not currently support the append operation"
+       << endl;
 }
 Napi::Value
-StreamDocument::InsertExistingPage(const Napi::CallbackInfo &)
+StreamDocument::InsertExistingPage(const Napi::CallbackInfo&)
 {
   cout << "StreamDocument does not currently support this operation" << endl;
   return {};

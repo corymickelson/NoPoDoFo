@@ -49,11 +49,7 @@ public:
   Napi::Value Write(const Napi::CallbackInfo&);
   void WriteSync(const Napi::CallbackInfo&);
   Napi::Value Eq(const Napi::CallbackInfo&);
-  PoDoFo::PdfDictionary&
-  GetDictionary()
-  {
-    return init ? *init : self;
-  }
+  PoDoFo::PdfDictionary& GetDictionary() { return init ? *init : self; }
 
 private:
   vector<PoDoFo::PdfObject*> children;

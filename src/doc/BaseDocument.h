@@ -67,7 +67,7 @@ public:
   virtual Napi::Value CreatePage(const Napi::CallbackInfo&);
   Napi::Value CreatePages(const Napi::CallbackInfo&);
   Napi::Value InsertPage(const Napi::CallbackInfo&);
-  virtual void Append(const Napi::CallbackInfo &);
+  virtual void Append(const Napi::CallbackInfo&);
   Napi::Value GetAttachment(const Napi::CallbackInfo&);
   void AddNamedDestination(const Napi::CallbackInfo&);
   Napi::Value CreateXObject(const Napi::CallbackInfo&);
@@ -79,6 +79,7 @@ public:
 
 protected:
   PoDoFo::PdfFont* CreateFontObject(napi_env, Napi::Object, bool subset);
+
 private:
 };
 }

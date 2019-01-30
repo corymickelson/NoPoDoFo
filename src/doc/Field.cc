@@ -315,8 +315,7 @@ Field::GetAppearanceStream(const Napi::CallbackInfo& info)
   if (GetFieldDictionary().HasKey(Name::AP)) {
     auto ap = field->GetFieldObject()->MustGetIndirectKey(Name::AP);
     return Dictionary::constructor.New(
-      { External<PdfObject>::New(info.Env(), ap),
-        Number::New(info.Env(), 0)});
+      { External<PdfObject>::New(info.Env(), ap), Number::New(info.Env(), 0) });
   } else {
     return info.Env().Null();
   }

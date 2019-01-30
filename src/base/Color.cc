@@ -18,13 +18,13 @@
  */
 
 #include "Color.h"
-#include <optional/optional.hpp>
 #include "../ValidateArguments.h"
+#include <optional/optional.hpp>
 
 using namespace PoDoFo;
 using namespace Napi;
-using tl::nullopt;
 using std::vector;
+using tl::nullopt;
 
 namespace NoPoDoFo {
 
@@ -34,23 +34,22 @@ void
 Color::Initialize(Napi::Env& env, Napi::Object& target)
 {
   HandleScope scope(env);
-  Function ctor = DefineClass(env,
-                              "Color",
-                              {
-                                InstanceMethod("isRGB", &Color::IsRGB),
-                                InstanceMethod("isCMYK", &Color::IsCMYK),
-                                InstanceMethod("isGreyScale", &Color::IsGreyScale),
-                                InstanceMethod("convertToRGB", &Color::ConvertToRGB),
-                                InstanceMethod("convertToCMYK", &Color::ConvertToCMYK),
-                                InstanceMethod("convertToGreyScale", &Color::ConvertToGreyScale),
-                                InstanceMethod("getRed", &Color::GetRed),
-                                InstanceMethod("getGreen", &Color::GetGreen),
-                                InstanceMethod("getBlue", &Color::GetBlue),
-                                InstanceMethod("getCyan", &Color::GetCyan),
-                                InstanceMethod("getMagenta", &Color::GetMagenta),
-                                InstanceMethod("getBlack", &Color::GetBlack),
-                                InstanceMethod("getGrey", &Color::GetGrey)
-                              });
+  Function ctor = DefineClass(
+    env,
+    "Color",
+    { InstanceMethod("isRGB", &Color::IsRGB),
+      InstanceMethod("isCMYK", &Color::IsCMYK),
+      InstanceMethod("isGreyScale", &Color::IsGreyScale),
+      InstanceMethod("convertToRGB", &Color::ConvertToRGB),
+      InstanceMethod("convertToCMYK", &Color::ConvertToCMYK),
+      InstanceMethod("convertToGreyScale", &Color::ConvertToGreyScale),
+      InstanceMethod("getRed", &Color::GetRed),
+      InstanceMethod("getGreen", &Color::GetGreen),
+      InstanceMethod("getBlue", &Color::GetBlue),
+      InstanceMethod("getCyan", &Color::GetCyan),
+      InstanceMethod("getMagenta", &Color::GetMagenta),
+      InstanceMethod("getBlack", &Color::GetBlack),
+      InstanceMethod("getGrey", &Color::GetGrey) });
   constructor = Persistent(ctor);
   constructor.SuppressDestruct();
   target.Set("Color", ctor);
@@ -59,17 +58,18 @@ Color::Initialize(Napi::Env& env, Napi::Object& target)
 Color::Color(const CallbackInfo& info)
   : ObjectWrap(info)
 {
-  vector<int> opts =
-    AssertCallbackInfo(info,
-                       { { 0, { option(napi_number), option(napi_object), option(napi_external) } },
-                         { 1, { nullopt, option(napi_number) } },
-                         { 2, { nullopt, option(napi_number) } },
-                         { 3, { nullopt, option(napi_number) } } });
+  vector<int> opts = AssertCallbackInfo(
+    info,
+    { { 0,
+        { option(napi_number), option(napi_object), option(napi_external) } },
+      { 1, { nullopt, option(napi_number) } },
+      { 2, { nullopt, option(napi_number) } },
+      { 3, { nullopt, option(napi_number) } } });
   if (opts[0] == 0 && opts[1] == 0) {
     color = new PdfColor(info[0].As<Number>().FloatValue());
-  } else if(opts[0] == 1) {
+  } else if (opts[0] == 1) {
     color = new PdfColor(*Color::Unwrap(info[0].As<Object>())->color);
-  } else if(opts[0] == 2) {
+  } else if (opts[0] == 2) {
     color = new PdfColor(*info[0].As<External<PdfColor>>().Data());
   } else if (opts[0] == 0 && opts[1] == 1 && opts[2] == 1 && opts[3] == 0) {
     color = new PdfColor(info[0].As<Number>().FloatValue(),
