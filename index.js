@@ -1,6 +1,6 @@
 exports.nopodofo = require('bindings')('nopodofo')
 exports.CONVERSION = 0.0028346456693
-Object.defineProperty(exports, "__esModule", { value: true });
+Object.defineProperty(exports, "__esModule", {value: true});
 var NPDFActions;
 (function (NPDFActions) {
     NPDFActions[NPDFActions["GoTo"] = 0] = "GoTo";
@@ -31,6 +31,41 @@ var NPDFMouseEvent;
     NPDFMouseEvent[NPDFMouseEvent["enter"] = 2] = "enter";
     NPDFMouseEvent[NPDFMouseEvent["exit"] = 3] = "exit";
 })(NPDFMouseEvent = exports.NPDFMouseEvent || (exports.NPDFMouseEvent = {}));
+var NPDFPaintOp;
+(function (NPDFPaintOp) {
+    NPDFPaintOp["RectOp"] = "re";
+    NPDFPaintOp["ConcatMatrixOp"] = "cm";
+    NPDFPaintOp["CurveToOp"] = "c";
+    NPDFPaintOp["EndPathNoFillOrStrokeOp"] = "n";
+    NPDFPaintOp["FillOp"] = "f";
+    NPDFPaintOp["FillEvenOddOp"] = "f*";
+    NPDFPaintOp["InvokeXObjectOp"] = "Do";
+    NPDFPaintOp["LineToOp"] = "l";
+    NPDFPaintOp["BeginMarkedContentOp"] = "BMC";
+    NPDFPaintOp["EndMarkedContentOp"] = "EMC";
+    NPDFPaintOp["TextPosOp"] = "Td";
+    NPDFPaintOp["MoveToOp"] = "m";
+    NPDFPaintOp["CharSpacingOp"] = "Tc";
+    NPDFPaintOp["CMYKOp"] = "k";
+    NPDFPaintOp["CMYKStrokeOp"] = "K";
+    NPDFPaintOp["DashOp"] = "d";
+    NPDFPaintOp["GreyOp"] = "g";
+    NPDFPaintOp["GreyStrokeOp"] = "G";
+    NPDFPaintOp["LineCapOp"] = "J";
+    NPDFPaintOp["LineJoinOp"] = "j";
+    NPDFPaintOp["LineWidthOp"] = "w";
+    NPDFPaintOp["NonZeroWindingClipOp"] = "W";
+    NPDFPaintOp["RGBOp"] = "rg";
+    NPDFPaintOp["RGBStrokeOp"] = "RG";
+    NPDFPaintOp["FontAndSizeOp"] = "Tf";
+    NPDFPaintOp["ShowTextOp"] = "Tj";
+    NPDFPaintOp["RestoreOp"] = "Q";
+    NPDFPaintOp["SaveOp"] = "q";
+    NPDFPaintOp["StrokeOp"] = "S";
+    NPDFPaintOp["BeginTextOp"] = "BT";
+    NPDFPaintOp["EndTextOp"] = "ET";
+
+}(NPDFPaintOp = exports.NPDFPaintOp || (exports.NPDFPaintOp = {})));
 var NPDFPageEvent;
 (function (NPDFPageEvent) {
     NPDFPageEvent[NPDFPageEvent["open"] = 0] = "open";
@@ -126,9 +161,11 @@ var NPDFWriteMode;
     NPDFWriteMode[NPDFWriteMode["Default"] = 1] = "Default";
     NPDFWriteMode[NPDFWriteMode["Compact"] = 2] = "Compact";
 })(NPDFWriteMode = exports.NPDFWriteMode || (exports.NPDFWriteMode = {}));
+
 function doubleDigit(v) {
     return `${v}`.length === 1 ? `0${v}` : `${v}`;
 }
+
 /**
  * Convert node Date to Pdf Date string
  * @param {Date} d - The Date to convert

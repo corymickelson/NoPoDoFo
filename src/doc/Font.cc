@@ -225,7 +225,7 @@ Font::WriteToStream(const Napi::CallbackInfo& info)
   }
   Stream* stream = Stream::Unwrap(streamWrap);
   try {
-    GetFont().WriteStringToStream(PdfString(content), stream->GetStream());
+    GetFont().WriteStringToStream(PdfString(content), &stream->GetStream());
   } catch (PdfError& err) {
     ErrorHandler(err, info);
   }

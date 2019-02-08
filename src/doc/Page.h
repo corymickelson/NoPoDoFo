@@ -62,7 +62,7 @@ public:
   Napi::Value GetNumAnnots(const Napi::CallbackInfo&);
   void DeleteAnnotation(const Napi::CallbackInfo&);
   void DeleteField(const Napi::CallbackInfo&);
-  bool DeleteFormField(Napi::Env, PoDoFo::PdfObject&, PoDoFo::PdfObject&);
+  static bool DeleteFormField(PoDoFo::PdfPage&, PoDoFo::PdfObject&, PoDoFo::PdfObject&);
   void FlattenFields(const Napi::CallbackInfo&);
   PoDoFo::PdfPage& page;
   Napi::Object ExtractAndApplyRectValues(const Napi::CallbackInfo&,

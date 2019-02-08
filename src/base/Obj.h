@@ -34,6 +34,7 @@ class Obj : public Napi::ObjectWrap<Obj>
 {
 public:
   explicit Obj(const Napi::CallbackInfo&);
+  ~Obj();
   static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
   Napi::Value GetStream(const Napi::CallbackInfo&);

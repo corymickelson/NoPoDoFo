@@ -25,12 +25,14 @@
 #include <iostream>
 #include <napi.h>
 #include <podofo/podofo.h>
+#include <string_view>
 
 using std::cout;
 using std::endl;
 using std::map;
 using std::pair;
 using std::string;
+using std::string_view;
 using std::vector;
 
 namespace NoPoDoFo {
@@ -40,9 +42,12 @@ class Document
 {
 public:
   static Napi::FunctionReference constructor;
-  explicit Document(const Napi::CallbackInfo&);
+  static PoDoFo::PdfFont* GetPdfFont(PoDoFo::PdfMemDocument &, string_view);
+  static vector<PoDoFo::PdfFont*> GetFonts(PoDoFo::PdfMemDocument&);
   static void Initialize(Napi::Env& env, Napi::Object& target);
   static Napi::Value GC(const Napi::CallbackInfo&);
+
+  explicit Document(const Napi::CallbackInfo&);
   Napi::Value Load(const Napi::CallbackInfo&);
   Napi::Value CreatePage(const Napi::CallbackInfo&) override;
   void DeletePages(const Napi::CallbackInfo&);
@@ -54,6 +59,8 @@ public:
   Napi::Value GetCatalog(const Napi::CallbackInfo&);
   Napi::Value InsertPages(const Napi::CallbackInfo&);
   Napi::Value HasSignature(const Napi::CallbackInfo&);
+  Napi::Value GetFont(const Napi::CallbackInfo&);
+  Napi::Value ListFonts(const Napi::CallbackInfo&);
   Napi::Value GetSignatures(const Napi::CallbackInfo&);
   bool LoadedForIncrementalUpdates() { return loadForIncrementalUpdates; }
   inline PoDoFo::PdfMemDocument& GetDocument()
@@ -63,6 +70,7 @@ public:
 
 private:
   bool loadForIncrementalUpdates = false;
+  vector<PoDoFo::PdfFont*> fonts;
 };
 }
 #endif // NPDF_PDFMEMDOCUMENT_H

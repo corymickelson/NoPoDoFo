@@ -57,6 +57,7 @@ public:
   value ConvertToGreyScale(const CallbackInfo&);
   value ConvertToRGB(const CallbackInfo&);
   value ConvertToCMYK(const CallbackInfo&);
+  value GetColorStreamString(const CallbackInfo &);
   PdfColor* color;
 };
 }

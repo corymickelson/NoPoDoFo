@@ -94,6 +94,8 @@ Document::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceMethod("createPages", &Document::CreatePages),
       InstanceMethod("createXObject", &Document::CreateXObject),
       InstanceMethod("getAttachment", &Document::GetAttachment),
+      InstanceMethod("getFont", &Document::GetFont),
+      InstanceMethod("listFonts", &Document::ListFonts),
       InstanceMethod("addNamedDestination", &Document::AddNamedDestination) });
   constructor = Napi::Persistent(ctor);
   constructor.SuppressDestruct();
@@ -121,6 +123,107 @@ Document::SetPassword(const CallbackInfo& info)
   } catch (Error& err) {
     ErrorHandler(err, info);
   }
+}
+Napi::Value
+Document::ListFonts(const CallbackInfo& info)
+{
+  fonts.clear();
+  this->fonts = Document::GetFonts(GetDocument());
+  auto list = Array::New(info.Env());
+  uint32_t n = 0;
+  for (auto item : fonts) {
+    string itemId = item->GetIdentifier().GetName();
+    string itemName = item->GetFontMetrics()->GetFontname();
+    auto v = Object::New(info.Env());
+    v.Set("id", String::New(info.Env(), itemId));
+    v.Set("name", String::New(info.Env(), itemName));
+    v.Set("file", String::New(info.Env(), item->GetFontMetrics()->GetFilename()));
+    list.Set(n, v);
+    n++;
+  }
+  return list;
+}
+
+PoDoFo::PdfFont*
+Document::GetPdfFont(PdfMemDocument &doc, string_view id)
+{
+  vector<PdfFont*> fonts = Document::GetFonts(doc);
+    for (auto item : fonts) {
+    string itemId = item->GetIdentifier().GetName();
+    string itemName = item->GetFontMetrics()->GetFontname();
+    if (itemId == id || itemName == id) {
+      if (item->IsSubsetting()) {
+        cout << "WARNING: This is a font subset" << endl;
+      }
+      return item;
+    }
+  }
+  return nullptr;
+}
+Value
+Document::GetFont(const CallbackInfo& info)
+{
+  try {
+    auto id = info[0].As<String>().Utf8Value();
+    if (fonts.empty()) {
+      this->fonts = Document::GetFonts(GetDocument());
+    }
+    for (auto item : fonts) {
+      string itemId = item->GetIdentifier().GetName();
+      string itemName = item->GetFontMetrics()->GetFontname();
+      if (itemId == id || itemName == id) {
+        //        EscapableHandleScope scope(info.Env());
+        //        return scope.Escape(
+        //          Font::constructor.New({ External<PdfFont>::New(info.Env(),
+        //          item) }));
+        if (item->IsSubsetting()) {
+          cout << "WARNING: This is a font subset" << endl;
+        }
+        return Font::constructor.New(
+          { External<PdfFont>::New(info.Env(), item) });
+      }
+    }
+    return info.Env().Null();
+  } catch (PdfError& err) {
+    ErrorHandler(err, info);
+  }
+  return info.Env().Undefined();
+}
+vector<PdfFont*>
+Document::GetFonts(PdfMemDocument& doc)
+{
+  vector<PdfObject*> fontObjs;
+  vector<PdfFont*> fonts;
+  for (auto item : doc.GetObjects()) {
+    if (item->IsDictionary()) {
+      if (item->GetDictionary().HasKey(Name::TYPE) &&
+          item->GetDictionary().GetKey(Name::TYPE)->IsName() &&
+          item->GetDictionary().GetKey(Name::TYPE)->GetName().GetName() ==
+            Name::FONT) {
+        fontObjs.push_back(item);
+      }
+    }
+    if (item->IsReference()) {
+      auto ref = doc.GetObjects().GetObject(item->GetReference());
+      if (ref->IsDictionary()) {
+        if (ref->GetDictionary().HasKey(Name::TYPE) &&
+            ref->GetDictionary().GetKey(Name::TYPE)->IsName() &&
+            ref->GetDictionary().GetKey(Name::TYPE)->GetName().GetName() ==
+              Name::FONT) {
+          fontObjs.push_back(ref);
+        }
+      }
+    }
+  }
+  for (auto o : fontObjs) {
+    auto font = doc.GetFont(o);
+    if (!font) {
+      continue;
+    } else {
+      fonts.push_back(font);
+    }
+  }
+  return fonts;
 }
 
 void

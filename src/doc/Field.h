@@ -23,6 +23,7 @@
 #include <iostream>
 #include <napi.h>
 #include <podofo/podofo.h>
+#include <string_view>
 
 using std::cout;
 using std::endl;
@@ -31,6 +32,14 @@ using std::vector;
 using value = Napi::Value;
 
 namespace NoPoDoFo {
+
+typedef struct AppearanceCtx
+{
+  PoDoFo::PdfDocument* doc;
+  PoDoFo::PdfFont* font;
+  int fontSize;
+  int pageIndex;
+} AppearanceCtx;
 class Field
 {
 public:
@@ -62,13 +71,15 @@ public:
   value GetJustification(const Napi::CallbackInfo&);
   void SetJustification(const Napi::CallbackInfo&, const Napi::Value&);
   value GetFieldObject(const Napi::CallbackInfo&);
-
+  virtual void RefreshAppearanceStream();
   PoDoFo::PdfField& GetField() { return *field; }
   PoDoFo::PdfDictionary& GetFieldDictionary()
   {
     return field->GetFieldObject()->GetDictionary();
   }
-
+  std::map<std::string, PoDoFo::PdfObject*> GetFieldRefreshKeys(
+    PoDoFo::PdfField*);
+  PoDoFo::PdfFont* GetDAFont(std::string_view);
   string fieldName;
   string fieldType;
 

@@ -130,4 +130,13 @@ export class MemDocSpec {
             return resolve()
         })
     }
+
+    @AsyncTest("Get Document Fonts")
+    public async fontsTest() {
+        const doc = this.subject
+        const fonts = doc.listFonts()
+        Expect(fonts.length).toBeGreaterThan(0)
+        const font = doc.getFont(fonts[0].name)
+        Expect(font).toBeDefined()
+    }
 }

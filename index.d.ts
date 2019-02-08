@@ -465,7 +465,7 @@ export namespace nopodofo {
         attachment: FileSpec
         rect: Rect
 
-        setBorderStyle(v: NPDFAnnotationBorderStyle): void
+        setBorderStyle(v: { horizontal: number, vertical: number, width: number }, stroke?: nopodofo.Array): void
 
         hasAppearanceStream(): boolean
 
@@ -552,7 +552,7 @@ export namespace nopodofo {
 
         setMouseAction(on: NPDFMouseEvent, action: Action): void
 
-        setDate(dateTime?: string|nopodofo.Date): void
+        setDate(dateTime?: string | nopodofo.Date): void
 
         setPageAction(on: NPDFPageEvent, action: Action): void
     }
@@ -560,8 +560,14 @@ export namespace nopodofo {
     export class Color {
         constructor()
         constructor(grey: number)
+        constructor(fromString: string)
         constructor(red: number, green: number, blue: number)
         constructor(cyan: number, magenta: number, yellow: number, black: number)
+
+        /**
+         * Get the stream representation of this color
+         */
+        getColorStreamString(): string
 
         isRGB(): boolean
 
@@ -613,6 +619,8 @@ export namespace nopodofo {
         combs: boolean
         richText: boolean
         alignment?: NPDFAlignment
+
+        refreshAppearanceStream(): void
     }
 
     export class Checkbox extends Field {
@@ -690,6 +698,7 @@ export namespace nopodofo {
     export class SignatureField {
         readonly widgetAnnotation: Annotation
         readonly obj: Object
+
         constructor(annotation: Annotation, doc: Document)
 
         setAppearanceStream(xObj: any, appearance: NPDFAnnotationAppearance, name: string): void
@@ -743,6 +752,8 @@ export namespace nopodofo {
         DR?: Dictionary
         CO?: Dictionary
         SigFlags?: NPDFSigFlags
+
+        // createAppearanceStream<T extends Field>(bg: Color, fg: Color, font: Font, size: number)
     }
 
     export class Image {
@@ -783,6 +794,17 @@ export namespace nopodofo {
         load(file: string | Buffer, cb: Callback<Document>): void
 
         setPassword(pwd: string): void
+
+        /**
+         * Find a font in the Documents font cache by name or id
+         * @param name
+         */
+        getFont(name: string): Font
+
+        /**
+         * Get a list of font {name, id} from the current document
+         */
+        listFonts(): {name:string, id: string, file: string}[]
 
         /**
          * Deletes one or more pages from the document by removing the pages reference
@@ -835,7 +857,7 @@ export namespace nopodofo {
          */
         getSignatures(): SignatureField[]
 
-        append(doc: Document|Document[]): void
+        append(doc: Document | Document[]): void
 
         insertExistingPage(memDoc: Document, index: number, insertIndex: number): number
     }
@@ -947,7 +969,7 @@ export namespace nopodofo {
         getRawData(): Buffer
 
         clear(): void
-        
+
         resolveIndirectKey(key: string): Object
     }
 
@@ -957,6 +979,7 @@ export namespace nopodofo {
         immutable: boolean
 
         constructor()
+
         /**
          * If the item at the index is a Reference that can not be resolved by the array object owner.
          * A Ref will be returned, the Ref can be resolved using getObject on the document itself.
@@ -973,10 +996,12 @@ export namespace nopodofo {
 
         write(destination: string): void
     }
+
     export class Ref {
         readonly gennum: number
         readonly objnum: number
     }
+
     export class Dictionary {
         dirty: boolean
         immutable: boolean
@@ -1372,7 +1397,26 @@ export namespace nopodofo {
     }
 
     export class Stream {
+        constructor(parent: nopodofo.Object)
 
+        write(cb: Callback<Buffer>): void
+        write(data: string, cb: Callback<string>): void
+
+        beginAppend(): void
+
+        append(data: string | Buffer): void
+
+        endAppend(): void
+
+        inAppendMode(): boolean
+
+        set(data: string | Buffer): void
+
+        /**
+         * Copy creates and returns a copy of `this.data`
+         * @param filtered - Get the copy as a filtered or unfiltered copy.
+         */
+        copy(filtered?: boolean): Buffer
     }
 
     export class SimpleTable {
@@ -1924,4 +1968,38 @@ export enum NPDFName {
     XREF_STM = "XRefStm",
     Y_STEP = "YStep",
     YES = "Yes"
+}
+
+export enum NPDFPaintOp {
+    RectOp = "re",
+    ConcatMatrixOp = "cm",
+    CurveToOp = "c",
+    EndPathNoFillOrStrokeOp = "n",
+    FillOp = "f",
+    FillEvenOddOp = "f*",
+    InvokeXObjectOp = "Do",
+    LineToOp = "l",
+    BeginMarkedContentOp = "BMC",
+    EndMarkedContentOp = "EMC",
+    TextPosOp = "Td",
+    MoveToOp = "m",
+    CharSpacingOp = "Tc",
+    CMYKOp = "k",
+    CMYKStrokeOp = "K",
+    DashOp = "d",
+    GreyOp = "g",
+    GreyStrokeOp = "G",
+    LineCapOp = "J",
+    LineJoinOp = "j",
+    LineWidthOp = "w",
+    NonZeroWindingClipOp = "W",
+    RGBOp = "rg",
+    RGBStrokeOp = "RG",
+    FontAndSizeOp = "Tf",
+    ShowTextOp = "Tj",
+    RestoreOp = "Q",
+    SaveOp = "q",
+    StrokeOp = "S",
+    BeginTextOp = "BT",
+    EndTextOp = "ET"
 }

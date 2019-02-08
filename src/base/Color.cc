@@ -19,10 +19,13 @@
 
 #include "Color.h"
 #include "../ValidateArguments.h"
+#include "../Defines.h"
 #include <optional/optional.hpp>
 
 using namespace PoDoFo;
 using namespace Napi;
+using std::string;
+using std::stringstream;
 using std::vector;
 using tl::nullopt;
 
@@ -49,7 +52,8 @@ Color::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceMethod("getCyan", &Color::GetCyan),
       InstanceMethod("getMagenta", &Color::GetMagenta),
       InstanceMethod("getBlack", &Color::GetBlack),
-      InstanceMethod("getGrey", &Color::GetGrey) });
+      InstanceMethod("getGrey", &Color::GetGrey),
+      InstanceMethod("getColorStreamString", &Color::GetColorStreamString)});
   constructor = Persistent(ctor);
   constructor.SuppressDestruct();
   target.Set("Color", ctor);
@@ -58,14 +62,20 @@ Color::Initialize(Napi::Env& env, Napi::Object& target)
 Color::Color(const CallbackInfo& info)
   : ObjectWrap(info)
 {
-  vector<int> opts = AssertCallbackInfo(
-    info,
-    { { 0,
-        { option(napi_number), option(napi_object), option(napi_external) } },
-      { 1, { nullopt, option(napi_number) } },
-      { 2, { nullopt, option(napi_number) } },
-      { 3, { nullopt, option(napi_number) } } });
-  if (opts[0] == 0 && opts[1] == 0) {
+  vector<int> opts =
+    AssertCallbackInfo(info,
+                       { { 0,
+                           { option(napi_number),
+                             option(napi_object),
+                             option(napi_external),
+                             option(napi_string) } },
+                         { 1, { nullopt, option(napi_number) } },
+                         { 2, { nullopt, option(napi_number) } },
+                         { 3, { nullopt, option(napi_number) } } });
+  if (opts[0] == 3) {
+    const char* cs = info[0].As<String>().Utf8Value().c_str();
+    color = new PdfColor(PdfColor::FromString(cs));
+  } else if (opts[0] == 0 && opts[1] == 0) {
     color = new PdfColor(info[0].As<Number>().FloatValue());
   } else if (opts[0] == 1) {
     color = new PdfColor(*Color::Unwrap(info[0].As<Object>())->color);
@@ -183,5 +193,22 @@ value
 Color::GetGreen(const CallbackInfo& info)
 {
   return Number::New(info.Env(), color->GetGreen());
+}
+value
+Color::GetColorStreamString(const CallbackInfo &info)
+{
+  stringstream ss;
+  PdfLocaleImbue(ss);
+  if (color->IsCMYK()) {
+    ss << color->GetCyan() << " " << color->GetMagenta() << " " << color->GetYellow() << " " << color->GetBlack() << " " << CMYKOp;
+  } else if (color->IsGrayScale()) {
+    ss << color->GetGrayScale() << " " << GreyOp;
+  } else if (color->IsRGB()) {
+    ss << color->GetRed() << " " << color->GetGreen() << " " << color->GetBlue() << " " << RGBOp;
+  } else {
+    Error::New(info.Env(), "Color StringStream currently supports CMYK, RGB, and GreyScale").ThrowAsJavaScriptException();
+    return {};
+  }
+  return String::New(info.Env(), ss.str());
 }
 }

@@ -29,16 +29,22 @@ class Stream : public Napi::ObjectWrap<Stream>
 {
 public:
   explicit Stream(const Napi::CallbackInfo& callbackInfo);
-  ~Stream();
   static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
   Napi::Value Write(const Napi::CallbackInfo&);
   Napi::Value GetBuffer(const Napi::CallbackInfo&);
   Napi::Value GetFilteredBuffer(const Napi::CallbackInfo&);
-  PoDoFo::PdfStream* GetStream() { return stream; }
+  void Set(const Napi::CallbackInfo&);
+  void BeginAppend(const Napi::CallbackInfo&);
+  void Append(const Napi::CallbackInfo&);
+  void EndAppend(const Napi::CallbackInfo&);
+  Napi::Value IsAppending(const Napi::CallbackInfo&);
+  Napi::Value Length(const Napi::CallbackInfo&);
+  Napi::Value GetCopy(const Napi::CallbackInfo&);
+  PoDoFo::PdfStream& GetStream() { return  stream; }
 
 private:
-  PoDoFo::PdfStream* stream;
+  PoDoFo::PdfStream& stream;
 };
 }
 #endif // NPDF_STREAM_H

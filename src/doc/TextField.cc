@@ -20,6 +20,7 @@
 #include "TextField.h"
 #include "Document.h"
 #include "StreamDocument.h"
+#include "../ErrorHandler.h"
 
 using namespace Napi;
 using namespace PoDoFo;
@@ -132,7 +133,8 @@ TextField::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceMethod("setBorderColor", &TextField::SetBorder),
       InstanceMethod("setMouseAction", &TextField::SetMouseAction),
       InstanceMethod("setPageAction", &TextField::SetPageAction),
-      InstanceMethod("setHighlightingMode", &TextField::SetHighlightingMode) });
+      InstanceMethod("setHighlightingMode", &TextField::SetHighlightingMode),
+      InstanceMethod("refreshAppearanceStream", &TextField::RefreshAppearanceStream)});
   constructor = Napi::Persistent(ctor);
   constructor.SuppressDestruct();
 
@@ -236,5 +238,16 @@ Napi::Value
 TextField::IsRichText(const Napi::CallbackInfo& info)
 {
   return Boolean::New(info.Env(), GetText().IsRichText());
+}
+void
+TextField::RefreshAppearanceStream(const Napi::CallbackInfo &info)
+{
+  try {
+    Field::RefreshAppearanceStream();
+  } catch(PdfError& pdferr) {
+    ErrorHandler(pdferr, info);
+  } catch(...) {
+    Error::New(info.Env(), "An unknown error occurred").ThrowAsJavaScriptException();
+  }
 }
 }

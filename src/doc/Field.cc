@@ -26,6 +26,7 @@
 #include "../base/Obj.h"
 #include "Action.h"
 #include "Annotation.h"
+#include "Document.h"
 #include "Form.h"
 #include "Page.h"
 #include <algorithm>
@@ -37,6 +38,10 @@ using namespace PoDoFo;
 using std::cout;
 using std::endl;
 using std::find;
+using std::map;
+using std::string;
+using std::string_view;
+using std::stringstream;
 using std::vector;
 using tl::nullopt;
 
@@ -403,4 +408,145 @@ Field::GetFieldObject(const CallbackInfo& info)
     { External<PdfObject>::New(info.Env(), field->GetFieldObject()) });
 }
 
+std::map<std::string, PoDoFo::PdfObject*>
+Field::GetFieldRefreshKeys(PoDoFo::PdfField* f)
+{
+  map<string, PdfObject*> keys;
+  PdfObject* formDA = f->GetFieldObject()
+                        ->GetOwner()
+                        ->GetParentDocument()
+                        ->GetAcroForm()
+                        ->GetObject()
+                        ->MustGetIndirectKey(Name::DA);
+  if (!formDA || !formDA->GetString().IsValid()) {
+    if (!f->GetWidgetAnnotation()->GetObject()->GetDictionary().HasKey(
+          Name::DA)) {
+      f->GetWidgetAnnotation()->GetObject()->GetDictionary().AddKey(
+        Name::DA, PdfString());
+    }
+    keys.insert(std::pair<string, PdfObject*>(
+      Name::DA,
+      f->GetWidgetAnnotation()->GetObject()->MustGetIndirectKey(Name::DA)));
+  } else {
+    keys.insert(std::pair<string, PdfObject*>(Name::DA, formDA));
+  }
+
+  if (!f->GetWidgetAnnotation()->GetObject()->GetDictionary().HasKey(
+        Name::AP)) {
+    f->GetWidgetAnnotation()->GetObject()->GetDictionary().AddKey(
+      Name::AP, PdfDictionary());
+    PdfXObject x(f->GetWidgetAnnotation()->GetRect(),
+                 f->GetFieldObject()->GetOwner()->GetParentDocument());
+    f->GetWidgetAnnotation()
+      ->GetObject()
+      ->MustGetIndirectKey(Name::AP)
+      ->GetDictionary()
+      .AddKey(Name::N, x.GetObjectReference());
+  }
+  keys.insert(std::pair<string, PdfObject*>(
+    Name::AP,
+    f->GetWidgetAnnotation()->GetObject()->MustGetIndirectKey(Name::AP)));
+  if (f->GetWidgetAnnotation()->GetObject()->GetDictionary().HasKey(Name::V)) {
+    keys.insert(std::pair<string, PdfObject*>(
+      Name::V,
+      f->GetWidgetAnnotation()->GetObject()->MustGetIndirectKey(Name::V)));
+  }
+  if (f->GetWidgetAnnotation()->GetObject()->GetDictionary().HasKey(Name::DV)) {
+    keys.insert(std::pair<string, PdfObject*>(
+      Name::DV,
+      f->GetWidgetAnnotation()->GetObject()->MustGetIndirectKey(Name::DV)));
+  }
+  return keys;
+}
+
+/**
+ * @todo: how to handle fonts that do not have an object (default fonts)
+ */
+void
+Field::RefreshAppearanceStream()
+{
+  stringstream ss;
+  PdfLocaleImbue(ss);
+  map<string, PdfObject*> apKeys;
+  PdfRefCountedBuffer buffer;
+  apKeys = GetFieldRefreshKeys(&GetField());
+  if (apKeys.find(Name::V) == apKeys.end() &&
+      apKeys.find(Name::DV) == apKeys.end()) {
+    throw std::exception();
+  }
+  if (!apKeys.find(Name::V)->second->GetString().IsValid() ||
+      apKeys.find(Name::V)->second->GetString().GetCharacterLength() <= 0) {
+    throw std::exception();
+  }
+  PdfXObject xObj(apKeys.find(Name::AP)->second->MustGetIndirectKey(Name::N));
+  xObj.GetContentsForAppending()->GetStream()->BeginAppend();
+  PdfOutputDevice device(&buffer);
+  apKeys.find(Name::V)->second->GetString().Write(&device,
+                                                  ePdfWriteMode_Compact);
+  ss << "/Tx " << BeginMarkedContentOp << endl;
+  ss << SaveOp << endl;
+  ss << BeginTextOp << endl;
+  if (apKeys.find(Name::DA) != apKeys.end()) {
+    ss << apKeys.find(Name::DA)->second->GetString().GetString() << endl;
+    if (!xObj.GetResources()->GetDictionary().HasKey(Name::FONT)) {
+      PdfFont* f = GetDAFont(
+        string_view(apKeys.find(Name::DA)->second->GetString().GetString()));
+      xObj.AddResource(
+        f->GetIdentifier(), f->GetObject()->Reference(), Name::FONT);
+    }
+    if (field->GetWidgetAnnotation()->GetObject()->GetDictionary().HasKey(
+          Name::DA)) {
+      field->GetWidgetAnnotation()->GetObject()->GetDictionary().RemoveKey(
+        Name::DA);
+    }
+    // Add the DA key from apKeys in case the DA was taken from the form
+    field->GetWidgetAnnotation()->GetObject()->GetDictionary().AddKey(
+      Name::DA, apKeys.find(Name::DA)->second);
+  }
+  ss << "2.0 2.0 " << TextPosOp << endl;
+  ss << buffer.GetBuffer() << ShowTextOp << endl;
+  ss << EndTextOp << endl;
+  ss << RestoreOp << endl;
+  ss << EndMarkedContentOp << endl;
+
+  xObj.GetContentsForAppending()->GetStream()->Append(ss.str());
+  xObj.GetContentsForAppending()->GetStream()->EndAppend();
+
+  PdfRect r(0,
+            0,
+            field->GetWidgetAnnotation()->GetRect().GetWidth(),
+            field->GetWidgetAnnotation()->GetRect().GetHeight());
+  xObj.GetObject()->GetDictionary().RemoveKey(Name::BBOX);
+  PdfVariant ra;
+  r.ToVariant(ra);
+  xObj.GetObject()->GetDictionary().AddKey(Name::BBOX, ra.GetArray());
+}
+PoDoFo::PdfFont*
+Field::GetDAFont(string_view da)
+{
+  // 0 0 1 rg /Ft20 12 Tf
+  // find Tf
+  // go back 2 /space char
+  // read from index of second /space to '/' for PdfFont name
+  // use Document.listFonts to find the font
+  long ftIndex = da.find(FontAndSizeOp);
+  if (ftIndex == -1) {
+    throw std::exception();
+  }
+  long nameIndex = da.find("/");
+  if (nameIndex == -1) {
+    throw std::exception();
+  }
+  string_view fontAndSize = da.substr(static_cast<size_t>(nameIndex),
+                                      static_cast<size_t>(ftIndex - nameIndex));
+  long firstSpace = fontAndSize.find_first_of(" ");
+  string_view ftName =
+    fontAndSize.substr(1, static_cast<size_t>(firstSpace - 1));
+  PdfFont* font;
+  auto memDoc = dynamic_cast<PdfMemDocument*>(
+    field->GetWidgetAnnotation()->GetObject()->GetOwner()->GetParentDocument());
+  if ((font = Document::GetPdfFont(*memDoc, ftName)) == nullptr) {
+  }
+  return font;
+}
 }

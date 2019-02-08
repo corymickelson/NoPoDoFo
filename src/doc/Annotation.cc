@@ -474,7 +474,6 @@ Annotation::SetRect(const CallbackInfo& info, const Napi::Value& value)
     return;
   }
   auto rect = Rect::Unwrap(value.As<Object>());
-  ;
   GetAnnotation().SetRect(rect->GetRect());
 }
 }
