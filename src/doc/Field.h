@@ -82,7 +82,22 @@ public:
   PoDoFo::PdfFont* GetDAFont(std::string_view);
   string fieldName;
   string fieldType;
-
+  string defaultFonts [14] = {
+    "Times-Roman",
+    "Times-Bold",
+    "Time-Italic",
+    "Time-BoldItalic",
+    "Courier",
+    "Courier",
+    "Courier-Bold",
+    "Courier-Oblique",
+    "Helvetica",
+    "Helvetica-Bold",
+    "Helvetica-Oblique",
+    "Helvetica-BoldOblique",
+    "Symbol",
+    "ZapfDingbats",
+  };
 protected:
   string TypeString();
 

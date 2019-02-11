@@ -1,14 +1,5 @@
-import {readFileSync} from 'fs'
 import {AsyncTest, Expect, Test, TestCase, TestFixture, Timeout} from 'alsatian'
-import {
-    nopodofo as npdf,
-    NPDFFieldType,
-    NPDFAnnotation,
-    NPDFAnnotationBorderStyle,
-    nopodofo,
-    NPDFPaintOp,
-    NPDFName
-} from '../../'
+import {nopodofo as npdf, nopodofo, NPDFAnnotation, NPDFFieldType, NPDFName, NPDFPaintOp} from '../../'
 import {join} from 'path'
 import Dictionary = nopodofo.Dictionary;
 
@@ -114,25 +105,33 @@ export class FieldSpec {
 
     @AsyncTest('Field refresh AP')
     @Timeout(100000)
-    @TestCase(0)
-    public async refreshAppearances(idx: number) {
+    @TestCase(0, 'Helvetica', null, new nopodofo.Color(1.0, 0.0, 0.0))
+    @TestCase(1, 'FiraCode', join(__dirname, '../test-documents/FiraCode_Regular.ttf'), new nopodofo.Color(0.0, 1.0, 0.0))
+    @TestCase(2, 'Courier', null, new nopodofo.Color(0.0, 0.0, 1.0))
+    public async refreshAppearances(idx: number, name:string, file:string, color:nopodofo.Color) {
         return new Promise((resolve, reject) => {
             const doc = new nopodofo.Document()
             doc.load(join(__dirname, '../test-documents/test.pdf'), err => {
                 if (err) Expect.fail(err.message)
                 const p1 = doc.getPage(0)
                 const field = p1.getField<nopodofo.TextField>(idx)
+                if(field.type !== NPDFFieldType.TextField) {
+                    return resolve()
+                }
                 field.text = 'TESTING'
                 field.readOnly = true
-                const blue = new nopodofo.Color(0.0, 0.0, 1.0)
-                const firaCode = doc.createFont({
-                    fontName: 'Fira Code',
-                    fileName: join(__dirname, '../test-documents/FiraCode_Regular.ttf'),
+                const font = file ? doc.createFont({
+                    fontName: name,
+                    fileName: file,
+                    bold: false,
+                    embed: true
+                }) : doc.createFont({
+                    fontName: name,
                     bold: false,
                     embed: true
                 })
-                firaCode.size = 12
-                const daStr = `${blue.getColorStreamString()} /${firaCode.identifier} ${firaCode.size} ${NPDFPaintOp.FontAndSizeOp}`
+                font.size = 12
+                const daStr = `${color.getColorStreamString()} /${font.identifier} ${font.size} ${NPDFPaintOp.FontAndSizeOp}`
                 // set the default appearance
                 if (doc.form.needAppearances) {
                     if (doc.form.DA === undefined || doc.form.DA === '') {
@@ -148,7 +147,7 @@ export class FieldSpec {
                 // this pattern is a good practice as not all pdf readers conform to the rendering specification
                 // for default appearances
                 field.refreshAppearanceStream()
-                const tmp = join(__dirname, '../tmp/form_ap_testx.pdf')
+                const tmp = join(__dirname, `../tmp/refresh-appearances_${idx}.pdf`)
                 doc.write(tmp, err => {
                     if (err) {
                         return reject(err)
@@ -156,15 +155,14 @@ export class FieldSpec {
                     const td = new nopodofo.Document()
                     td.load(tmp, e => {
                         if (e) return reject(e)
-                        const tf = td.getPage(0).getField<nopodofo.TextField>(0)
+                        const tf = td.getPage(0).getField<nopodofo.TextField>(idx)
                         const n = doc.getObject((tf.AP as Dictionary).getKey(NPDFName.N))
                         if (!n.hasStream()) {
                             Expect.fail("Stream not found")
                         }
                         const apStream = new nopodofo.Stream(n)
                         const streamContent = apStream.copy(true)
-                        const expectedStreamRx =`/Tx BMC\nq\nBT\n0 0 1 rg /Ft[0-9]{1,2} 12 Tf\n2.0 2.0 Td\n(TESTING)Tj\nET\nQ\nEMC\n`
-                        Expect(streamContent.toString().replace(/[ \n]/ig, '').match(/\/TxBMCqBT001rg\/Ft[0-9]{1,2}2Tf2\.02\.0Td\(TESTING\)TjETQEMC/)).toBeTruthy()
+                        Expect(streamContent.toString().replace(/[ \n]/ig, '').match(/\/TxBMCqBT[0-1]{3}rg\/Ft[0-9]{1,2}2Tf2\.02\.0Td\(TESTING\)TjETQEMC/)).toBeTruthy()
                         return resolve()
                     })
                 })

@@ -478,6 +478,7 @@ Field::RefreshAppearanceStream()
       apKeys.find(Name::V)->second->GetString().GetCharacterLength() <= 0) {
     throw std::exception();
   }
+  PdfFont* f = nullptr;
   PdfXObject xObj(apKeys.find(Name::AP)->second->MustGetIndirectKey(Name::N));
   xObj.GetContentsForAppending()->GetStream()->BeginAppend();
   PdfOutputDevice device(&buffer);
@@ -489,19 +490,22 @@ Field::RefreshAppearanceStream()
   if (apKeys.find(Name::DA) != apKeys.end()) {
     ss << apKeys.find(Name::DA)->second->GetString().GetString() << endl;
     if (!xObj.GetResources()->GetDictionary().HasKey(Name::FONT)) {
-      PdfFont* f = GetDAFont(
+      f = GetDAFont(
         string_view(apKeys.find(Name::DA)->second->GetString().GetString()));
-      xObj.AddResource(
-        f->GetIdentifier(), f->GetObject()->Reference(), Name::FONT);
+      if (f == nullptr) {
+      } else {
+        xObj.AddResource(
+          f->GetIdentifier(), f->GetObject()->Reference(), Name::FONT);
+        if (field->GetWidgetAnnotation()->GetObject()->GetDictionary().HasKey(
+              Name::DA)) {
+          field->GetWidgetAnnotation()->GetObject()->GetDictionary().RemoveKey(
+            Name::DA);
+        }
+        // Add the DA key from apKeys in case the DA was taken from the form
+        field->GetWidgetAnnotation()->GetObject()->GetDictionary().AddKey(
+          Name::DA, apKeys.find(Name::DA)->second);
+      }
     }
-    if (field->GetWidgetAnnotation()->GetObject()->GetDictionary().HasKey(
-          Name::DA)) {
-      field->GetWidgetAnnotation()->GetObject()->GetDictionary().RemoveKey(
-        Name::DA);
-    }
-    // Add the DA key from apKeys in case the DA was taken from the form
-    field->GetWidgetAnnotation()->GetObject()->GetDictionary().AddKey(
-      Name::DA, apKeys.find(Name::DA)->second);
   }
   ss << "2.0 2.0 " << TextPosOp << endl;
   ss << buffer.GetBuffer() << ShowTextOp << endl;
@@ -511,7 +515,6 @@ Field::RefreshAppearanceStream()
 
   xObj.GetContentsForAppending()->GetStream()->Append(ss.str());
   xObj.GetContentsForAppending()->GetStream()->EndAppend();
-
   PdfRect r(0,
             0,
             field->GetWidgetAnnotation()->GetRect().GetWidth(),
@@ -546,7 +549,14 @@ Field::GetDAFont(string_view da)
   auto memDoc = dynamic_cast<PdfMemDocument*>(
     field->GetWidgetAnnotation()->GetObject()->GetOwner()->GetParentDocument());
   if ((font = Document::GetPdfFont(*memDoc, ftName)) == nullptr) {
+    return nullptr;
   }
-  return font;
+  string fId = font->GetIdentifier().GetName();
+  string n = font->GetFontMetrics()->GetFontname();
+  if (defaultFonts->find(fId, 0) == string::npos ||
+      defaultFonts->find(n, 0) == string::npos) {
+    return font;
+  }
+  return nullptr;
 }
 }
