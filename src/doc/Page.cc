@@ -18,7 +18,9 @@
  */
 
 #include "Page.h"
+#if NOPODOFO_SDK
 #include "../../sdk/FlattenFields.h"
+#endif // NOPODOFO_SDK
 #include "../ErrorHandler.h"
 #include "../base/Names.h"
 #include "../base/Obj.h"
@@ -54,10 +56,8 @@ void
 Page::Initialize(Napi::Env& env, Napi::Object& target)
 {
   HandleScope scope(env);
-  Function ctor = DefineClass(
-    env,
-    "Page",
-    { InstanceAccessor("rotation", &Page::GetRotation, &Page::SetRotation),
+  Function ctor = DefineClass(env, "Page", {
+    InstanceAccessor("rotation", &Page::GetRotation, &Page::SetRotation),
       InstanceAccessor("trimBox", &Page::GetTrimBox, &Page::SetTrimBox),
       InstanceAccessor("number", &Page::GetPageNumber, nullptr),
       InstanceAccessor("width", &Page::GetPageWidth, &Page::SetPageWidth),
@@ -69,7 +69,9 @@ Page::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceMethod("createField", &Page::CreateField),
       InstanceMethod("deleteField", &Page::DeleteField),
       InstanceMethod("getFields", &Page::GetFields),
+#if NOPODOFO_SDK
       InstanceMethod("flattenFields", &Page::FlattenFields),
+#endif // NOPODOFO_SDK
       InstanceMethod("fieldCount", &Page::GetNumFields),
       InstanceMethod("getFieldIndex", &Page::GetFieldIndex),
       InstanceMethod("getMediaBox", &Page::GetMediaBox),
@@ -78,7 +80,8 @@ Page::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceMethod("createAnnotation", &Page::CreateAnnotation),
       InstanceMethod("getAnnotation", &Page::GetAnnotation),
       InstanceMethod("annotationCount", &Page::GetNumAnnots),
-      InstanceMethod("deleteAnnotation", &Page::DeleteAnnotation) });
+      InstanceMethod("deleteAnnotation", &Page::DeleteAnnotation)
+  });
   constructor = Napi::Persistent(ctor);
   constructor.SuppressDestruct();
   target.Set("Page", ctor);
@@ -441,19 +444,19 @@ Page::DeleteFormField(PdfPage& page, PdfObject& item, PdfObject& coll)
   }
   return false;
 }
+#if NOPODOFO_SDK
 void
 Page::FlattenFields(const Napi::CallbackInfo& info)
 {
-  class FlattenFields ff(page);
-  FlattenFieldsResponse resp = ff.Flatten();
-  if(!resp.err.empty()) {
-    Error::New(info.Env(), resp.err).ThrowAsJavaScriptException();
-  } else {
-    stringstream log;
-    log << "Fields affected= " << resp.fieldsAffected << endl;
+    class FlattenFields ff(page);
+    FlattenFieldsResponse resp = ff.Flatten();
+    if(!resp.err.empty()) {
+      Error::New(info.Env(), resp.err).ThrowAsJavaScriptException();
+    } else {
+      stringstream log;
+      log << "Fields affected= " << resp.fieldsAffected << endl;
 
-  }
-
+    }
 }
-
+#endif // NOPODOFO_BUILD_SDK
 }

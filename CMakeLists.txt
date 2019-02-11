@@ -40,7 +40,10 @@ endif()
 add_subdirectory(src)
 
 if(NOPODOFO_BUILD_SDK)
-  add_subdirectory(sdk)
+    set(NOPODOFO_SDK 1)
+    add_subdirectory(sdk)
+else()
+    set(NOPODOFO_SDK 0)
 endif(NOPODOFO_BUILD_SDK)
 
 if(NOPODOFO_BUILD_TESTS)

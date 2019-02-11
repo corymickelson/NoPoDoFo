@@ -23,7 +23,7 @@
 #include <iostream>
 #include <napi.h>
 #include <podofo/podofo.h>
-#include <string_view>
+#include <experimental/string_view>
 
 using std::cout;
 using std::endl;
@@ -79,7 +79,7 @@ public:
   }
   std::map<std::string, PoDoFo::PdfObject*> GetFieldRefreshKeys(
     PoDoFo::PdfField*);
-  PoDoFo::PdfFont* GetDAFont(std::string_view);
+  PoDoFo::PdfFont* GetDAFont(std::experimental::string_view);
   string fieldName;
   string fieldType;
   string defaultFonts [14] = {

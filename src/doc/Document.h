@@ -21,18 +21,16 @@
 #define NPDF_DOCUMENT_H
 
 #include "BaseDocument.h"
-
 #include <iostream>
 #include <napi.h>
 #include <podofo/podofo.h>
-#include <string_view>
+#include <experimental/string_view>
 
 using std::cout;
 using std::endl;
 using std::map;
 using std::pair;
 using std::string;
-using std::string_view;
 using std::vector;
 
 namespace NoPoDoFo {
@@ -42,7 +40,7 @@ class Document
 {
 public:
   static Napi::FunctionReference constructor;
-  static PoDoFo::PdfFont* GetPdfFont(PoDoFo::PdfMemDocument &, string_view);
+  static PoDoFo::PdfFont* GetPdfFont(PoDoFo::PdfMemDocument &, std::experimental::string_view);
   static vector<PoDoFo::PdfFont*> GetFonts(PoDoFo::PdfMemDocument&);
   static void Initialize(Napi::Env& env, Napi::Object& target);
   static Napi::Value GC(const Napi::CallbackInfo&);

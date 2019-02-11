@@ -40,7 +40,7 @@ using std::endl;
 using std::find;
 using std::map;
 using std::string;
-using std::string_view;
+using std::experimental::string_view;
 using std::stringstream;
 using std::vector;
 using tl::nullopt;
@@ -459,9 +459,6 @@ Field::GetFieldRefreshKeys(PoDoFo::PdfField* f)
   return keys;
 }
 
-/**
- * @todo: how to handle fonts that do not have an object (default fonts)
- */
 void
 Field::RefreshAppearanceStream()
 {
@@ -524,6 +521,8 @@ Field::RefreshAppearanceStream()
   r.ToVariant(ra);
   xObj.GetObject()->GetDictionary().AddKey(Name::BBOX, ra.GetArray());
 }
+
+// todo: enforce PdfMemDocument
 PoDoFo::PdfFont*
 Field::GetDAFont(string_view da)
 {

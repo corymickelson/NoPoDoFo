@@ -11,7 +11,10 @@
   "scripts": {
     "coverage": "nyc tape spec/unit/*.js && nyc report --reporter=text-lcov | coveralls",
     "test": "node ./scripts/test-setup.js && tsc -p tsconfig.json && node --expose-gc ./node_modules/.bin/alsatian ./spec/unit/*.js",
-    "tsc:spec": "tsc -p tsconfig.json"
+    "tsc:spec": "tsc -p tsconfig.json",
+    "build:debug": "cmake-js build -D -s=c++17",
+    "build:release": "cmake-js build -s=c++17",
+    "clean": "cmake-js clean"
   },
   "nyc": {
     "exclude": [
