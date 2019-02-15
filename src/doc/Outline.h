@@ -38,7 +38,7 @@ public:
   ~Outline();
   static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
-//  void CreateRoot(const Napi::CallbackInfo&);
+  //  void CreateRoot(const Napi::CallbackInfo&);
   Napi::Value CreateChild(const Napi::CallbackInfo&);
   Napi::Value CreateNext(const Napi::CallbackInfo&);
   Napi::Value InsertChild(const Napi::CallbackInfo&);
@@ -59,6 +59,7 @@ public:
   Napi::Value GetTextColor(const Napi::CallbackInfo&);
   void SetTextColor(const Napi::CallbackInfo&, const Napi::Value&);
   PoDoFo::PdfOutlineItem& GetOutline() { return outline; }
+
 private:
   PoDoFo::PdfOutlineItem& outline; // owned by the document
 };

@@ -46,7 +46,7 @@ public:
   void Push(const Napi::CallbackInfo&);
   Napi::Value Pop(const Napi::CallbackInfo&);
   void Clear(const Napi::CallbackInfo&);
-  PoDoFo::PdfArray& GetArray() { return init ? *init : self;  }
+  PoDoFo::PdfArray& GetArray() { return init ? *init : self; }
 
 private:
   vector<PoDoFo::PdfObject*> children;

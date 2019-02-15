@@ -2,7 +2,7 @@
  * This file is part of the NoPoDoFo (R) project.
  * Copyright (c) 2017-2018
  * Authors: Cory Mickelson, et al.
- * 
+ *
  * NoPoDoFo is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -28,13 +28,13 @@ class Data : public Napi::ObjectWrap<Data>
 {
 public:
   explicit Data(const Napi::CallbackInfo&);
-//  ~Data();
+  //  ~Data();
   static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
   void Write(const Napi::CallbackInfo&);
   Napi::Value Value(const Napi::CallbackInfo&);
 
-//  PoDoFo::PdfData* GetData() { return self; }
+  //  PoDoFo::PdfData* GetData() { return self; }
 
 private:
   std::unique_ptr<PoDoFo::PdfData> self;

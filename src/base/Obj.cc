@@ -125,7 +125,11 @@ Obj::Obj(const Napi::CallbackInfo& info)
           ? *info[0].As<External<PdfObject>>().Data()
           : *(init = InitObject(info)))
 {}
-
+Obj::~Obj()
+{
+  HandleScope scope(Env());
+  delete init;
+}
 void
 Obj::Clear(const Napi::CallbackInfo& info)
 {
@@ -441,4 +445,5 @@ Obj::MustGetIndirect(const CallbackInfo& info)
   PdfObject* target = obj.MustGetIndirectKey(name);
   return Obj::constructor.New({ External<PdfObject>::New(info.Env(), target) });
 }
+
 }

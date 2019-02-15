@@ -18,13 +18,16 @@
  */
 
 #include "Color.h"
-#include <optional/optional.hpp>
 #include "../ValidateArguments.h"
+#include "../Defines.h"
+#include <optional/optional.hpp>
 
 using namespace PoDoFo;
 using namespace Napi;
-using tl::nullopt;
+using std::string;
+using std::stringstream;
 using std::vector;
+using tl::nullopt;
 
 namespace NoPoDoFo {
 
@@ -34,23 +37,23 @@ void
 Color::Initialize(Napi::Env& env, Napi::Object& target)
 {
   HandleScope scope(env);
-  Function ctor = DefineClass(env,
-                              "Color",
-                              {
-                                InstanceMethod("isRGB", &Color::IsRGB),
-                                InstanceMethod("isCMYK", &Color::IsCMYK),
-                                InstanceMethod("isGreyScale", &Color::IsGreyScale),
-                                InstanceMethod("convertToRGB", &Color::ConvertToRGB),
-                                InstanceMethod("convertToCMYK", &Color::ConvertToCMYK),
-                                InstanceMethod("convertToGreyScale", &Color::ConvertToGreyScale),
-                                InstanceMethod("getRed", &Color::GetRed),
-                                InstanceMethod("getGreen", &Color::GetGreen),
-                                InstanceMethod("getBlue", &Color::GetBlue),
-                                InstanceMethod("getCyan", &Color::GetCyan),
-                                InstanceMethod("getMagenta", &Color::GetMagenta),
-                                InstanceMethod("getBlack", &Color::GetBlack),
-                                InstanceMethod("getGrey", &Color::GetGrey)
-                              });
+  Function ctor = DefineClass(
+    env,
+    "Color",
+    { InstanceMethod("isRGB", &Color::IsRGB),
+      InstanceMethod("isCMYK", &Color::IsCMYK),
+      InstanceMethod("isGreyScale", &Color::IsGreyScale),
+      InstanceMethod("convertToRGB", &Color::ConvertToRGB),
+      InstanceMethod("convertToCMYK", &Color::ConvertToCMYK),
+      InstanceMethod("convertToGreyScale", &Color::ConvertToGreyScale),
+      InstanceMethod("getRed", &Color::GetRed),
+      InstanceMethod("getGreen", &Color::GetGreen),
+      InstanceMethod("getBlue", &Color::GetBlue),
+      InstanceMethod("getCyan", &Color::GetCyan),
+      InstanceMethod("getMagenta", &Color::GetMagenta),
+      InstanceMethod("getBlack", &Color::GetBlack),
+      InstanceMethod("getGrey", &Color::GetGrey),
+      InstanceMethod("getColorStreamString", &Color::GetColorStreamString)});
   constructor = Persistent(ctor);
   constructor.SuppressDestruct();
   target.Set("Color", ctor);
@@ -61,15 +64,22 @@ Color::Color(const CallbackInfo& info)
 {
   vector<int> opts =
     AssertCallbackInfo(info,
-                       { { 0, { option(napi_number), option(napi_object), option(napi_external) } },
+                       { { 0,
+                           { option(napi_number),
+                             option(napi_object),
+                             option(napi_external),
+                             option(napi_string) } },
                          { 1, { nullopt, option(napi_number) } },
                          { 2, { nullopt, option(napi_number) } },
                          { 3, { nullopt, option(napi_number) } } });
-  if (opts[0] == 0 && opts[1] == 0) {
+  if (opts[0] == 3) {
+    const char* cs = info[0].As<String>().Utf8Value().c_str();
+    color = new PdfColor(PdfColor::FromString(cs));
+  } else if (opts[0] == 0 && opts[1] == 0) {
     color = new PdfColor(info[0].As<Number>().FloatValue());
-  } else if(opts[0] == 1) {
+  } else if (opts[0] == 1) {
     color = new PdfColor(*Color::Unwrap(info[0].As<Object>())->color);
-  } else if(opts[0] == 2) {
+  } else if (opts[0] == 2) {
     color = new PdfColor(*info[0].As<External<PdfColor>>().Data());
   } else if (opts[0] == 0 && opts[1] == 1 && opts[2] == 1 && opts[3] == 0) {
     color = new PdfColor(info[0].As<Number>().FloatValue(),
@@ -183,5 +193,22 @@ value
 Color::GetGreen(const CallbackInfo& info)
 {
   return Number::New(info.Env(), color->GetGreen());
+}
+value
+Color::GetColorStreamString(const CallbackInfo &info)
+{
+  stringstream ss;
+  PdfLocaleImbue(ss);
+  if (color->IsCMYK()) {
+    ss << color->GetCyan() << " " << color->GetMagenta() << " " << color->GetYellow() << " " << color->GetBlack() << " " << CMYKOp;
+  } else if (color->IsGrayScale()) {
+    ss << color->GetGrayScale() << " " << GreyOp;
+  } else if (color->IsRGB()) {
+    ss << color->GetRed() << " " << color->GetGreen() << " " << color->GetBlue() << " " << RGBOp;
+  } else {
+    Error::New(info.Env(), "Color StringStream currently supports CMYK, RGB, and GreyScale").ThrowAsJavaScriptException();
+    return {};
+  }
+  return String::New(info.Env(), ss.str());
 }
 }

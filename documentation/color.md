@@ -5,6 +5,7 @@
     - [Constructors](#constructors)
     - [Properties](#properties)
     - [Methods](#methods)
+        - [getColorStreamString](#getcolorstreamstring)
         - [isRGB](#isrgb)
         - [isCMYK](#iscmyk)
         - [isGreyScale](#isgreyscale)
@@ -27,10 +28,13 @@ All color values must be between 0.0 and 1.0
 
 ```typescript
 class Color {
-    constructor(grey: number)
-    constructor(red:number, green: number, blue: number)
-    constructor(cyan: number, magenta: number, yellow: number, black: number)
-    isRGB(): boolean
+		constructor()
+		constructor(grey: number)
+		constructor(fromString: string)
+		constructor(red: number, green: number, blue: number)
+		constructor(cyan: number, magenta: number, yellow: number, black: number)
+    getColorStreamString(): string
+		isRGB(): boolean
     isCMYK(): boolean
     isGreyScale(): boolean
     convertToGreyScale(): Color
@@ -50,6 +54,17 @@ class Color {
 ## Constructors
 --------------
 
+```typescript
+const color = new nopodofo.Color('magenta')
+```
+
+Create a color from a string. Valid string arguments are:
+
+- single grey value, e.g. '0.5'
+- named color, e.g. 'aquamarine'
+- hex value, e.g. '#FF002A'
+
+If the argument passed could not be parsed, Black is returned.
 ```typescript
 constructor(grey: number)
 ```
@@ -74,6 +89,14 @@ Create a new CMYK Color
 ## Methods
 --------------
 
+### getColorStreamString
+
+```typescript
+getColorStreamString()
+```
+
+Get the stream representation of this color. For use when writing directly to a PdfStream, such as a PdfField AppearanceStream.
+ 
 ### isRGB
 
 ```typescript

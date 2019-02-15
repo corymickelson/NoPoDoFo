@@ -48,15 +48,14 @@ export class PrimitiveSpec {
     }
 
     @AsyncTest('Create new')
-    @TestCase('mem')
-    @TestCase('stream')
-    public async instantiateNew(m: string) {
-        let doc: Document = (this as any)[m]
+    public async instantiateNew() {
         let stringObj = new nopodofo.Object('')
         Expect(stringObj.type).toBe('String')
         let arrayObj = new nopodofo.Object([])
         Expect(arrayObj.type).toBe('Array')
         let noObj = new nopodofo.Object(0.0)
         Expect(noObj.type).toBe('Real')
+        let dObj = new nopodofo.Object()
+        Expect(dObj.type).toBe('Dictionary')
     }
 }

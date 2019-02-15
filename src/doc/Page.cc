@@ -18,6 +18,7 @@
  */
 
 #include "Page.h"
+#include "../../sdk/FlattenFields.h"
 #include "../ErrorHandler.h"
 #include "../base/Names.h"
 #include "../base/Obj.h"
@@ -27,9 +28,9 @@
 #include "Form.h"
 #include "ListBox.h"
 #include "PushButton.h"
+#include "Rect.h"
 #include "SignatureField.h"
 #include "TextField.h"
-#include "Rect.h"
 
 using namespace Napi;
 using namespace PoDoFo;
@@ -53,10 +54,8 @@ void
 Page::Initialize(Napi::Env& env, Napi::Object& target)
 {
   HandleScope scope(env);
-  Function ctor = DefineClass(
-    env,
-    "Page",
-    { InstanceAccessor("rotation", &Page::GetRotation, &Page::SetRotation),
+  Function ctor = DefineClass(env, "Page", {
+    InstanceAccessor("rotation", &Page::GetRotation, &Page::SetRotation),
       InstanceAccessor("trimBox", &Page::GetTrimBox, &Page::SetTrimBox),
       InstanceAccessor("number", &Page::GetPageNumber, nullptr),
       InstanceAccessor("width", &Page::GetPageWidth, &Page::SetPageWidth),
@@ -68,7 +67,9 @@ Page::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceMethod("createField", &Page::CreateField),
       InstanceMethod("deleteField", &Page::DeleteField),
       InstanceMethod("getFields", &Page::GetFields),
+#if NOPODOFO_SDK
       InstanceMethod("flattenFields", &Page::FlattenFields),
+#endif
       InstanceMethod("fieldCount", &Page::GetNumFields),
       InstanceMethod("getFieldIndex", &Page::GetFieldIndex),
       InstanceMethod("getMediaBox", &Page::GetMediaBox),
@@ -77,7 +78,8 @@ Page::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceMethod("createAnnotation", &Page::CreateAnnotation),
       InstanceMethod("getAnnotation", &Page::GetAnnotation),
       InstanceMethod("annotationCount", &Page::GetNumAnnots),
-      InstanceMethod("deleteAnnotation", &Page::DeleteAnnotation) });
+      InstanceMethod("deleteAnnotation", &Page::DeleteAnnotation)
+  });
   constructor = Napi::Persistent(ctor);
   constructor.SuppressDestruct();
   target.Set("Page", ctor);
@@ -392,7 +394,7 @@ Page::DeleteField(const Napi::CallbackInfo& info)
     page.GetObject()->GetOwner()->GetParentDocument()->GetAcroForm(false);
   auto item = page.GetField(index).GetFieldObject();
   auto fields = form->GetObject()->MustGetIndirectKey(Name::FIELDS);
-  bool found = this->DeleteFormField(info.Env(), *item, *fields);
+  bool found = DeleteFormField(page, *item, *fields);
   if (!found) {
     Error::New(info.Env(), "Failed to find field in AcroForm Fields")
       .ThrowAsJavaScriptException();
@@ -401,11 +403,9 @@ Page::DeleteField(const Napi::CallbackInfo& info)
   page.DeleteAnnotation(item->Reference());
 }
 bool
-Page::DeleteFormField(const Napi::Env env, PdfObject& item, PdfObject& coll)
+Page::DeleteFormField(PdfPage& page, PdfObject& item, PdfObject& coll)
 {
   if (!coll.IsArray()) {
-    Error::New(env, "Delete Form Fields, collection is not an array")
-      .ThrowAsJavaScriptException();
     return false;
   }
   auto it = coll.GetArray().begin();
@@ -423,75 +423,37 @@ Page::DeleteFormField(const Napi::Env env, PdfObject& item, PdfObject& coll)
                  ->GetObject(it->GetReference())
                  ->GetDictionary()
                  .HasKey(Name::KIDS)) {
-      if (this->DeleteFormField(env,
-                                item,
-                                *page.GetObject()
-                                   ->GetOwner()
-                                   ->GetObject(it->GetReference())
-                                   ->MustGetIndirectKey(Name::KIDS))) {
+      if (DeleteFormField(page,
+                          item,
+                          *page.GetObject()
+                             ->GetOwner()
+                             ->GetObject(it->GetReference())
+                             ->MustGetIndirectKey(Name::KIDS))) {
         return true;
       }
     } else if (it->IsDictionary() && it->GetDictionary().HasKey(Name::KIDS)) {
-      if (this->DeleteFormField(
-            env, item, *it->MustGetIndirectKey(Name::KIDS))) {
+      if (DeleteFormField(page, item, *it->MustGetIndirectKey(Name::KIDS))) {
         return true;
       }
     } else {
-      Error::New(env, "Delete Form Fields Unknown error")
-        .ThrowAsJavaScriptException();
       return false;
     }
     ++it;
   }
   return false;
 }
+#if NOPODOFO_SDK
 void
 Page::FlattenFields(const Napi::CallbackInfo& info)
 {
-  PdfPainter painter;
-  painter.SetPage(&page);
-  int n = 0;
-  auto annots = page.GetObject()->GetIndirectKey(Name::ANNOTS);
-  if (!annots || !annots->IsArray()) {
-    Error::New(info.Env(), "Failed to get Page Annotations Array")
-      .ThrowAsJavaScriptException();
-    return;
+  class FlattenFields ff(page);
+  FlattenFieldsResponse resp = ff.Flatten();
+  if (!resp.err.empty()) {
+    Error::New(info.Env(), resp.err).ThrowAsJavaScriptException();
+  } else {
+    stringstream log;
+    log << "Fields affected= " << resp.fieldsAffected << endl;
   }
-  vector<tuple<int, PdfAnnotation>> fields;
-  auto it = annots->GetArray().begin();
-  while (it != annots->GetArray().end()) {
-    auto o = page.GetObject()->GetOwner()->GetObject(it->GetReference());
-    PdfAnnotation a(o, &page);
-    if (a.GetType() == ePdfAnnotation_Widget) {
-      if (a.HasAppearanceStream()) {
-        fields.emplace_back(n, a);
-        --n; // keep n in sync with index as fields are deleted
-      }
-      ++n;
-    }
-    ++it;
-  }
-  while (!fields.empty()) { // erase ALL fields added to fields array
-    PdfObject* appearance = get<1>(fields.at(0))
-                              .GetObject()
-                              ->MustGetIndirectKey(Name::AP)
-                              ->MustGetIndirectKey(Name::N);
-    PdfXObject xApp(appearance);
-    painter.DrawXObject(get<1>(fields.at(0)).GetRect().GetLeft(),
-                        get<1>(fields.at(0)).GetRect().GetBottom(),
-                        &xApp);
-    PdfObject* fieldObj = page.GetField(get<0>(fields.at(0))).GetFieldObject();
-    this->DeleteFormField(info.Env(),
-                          *fieldObj,
-                          *page.GetObject()
-                             ->GetOwner()
-                             ->GetParentDocument()
-                             ->GetAcroForm(false)
-                             ->GetObject()
-                             ->MustGetIndirectKey(Name::FIELDS));
-    page.DeleteAnnotation(fieldObj->Reference());
-    fields.erase(fields.begin());
-  }
-  painter.FinishPage();
 }
+#endif
 }

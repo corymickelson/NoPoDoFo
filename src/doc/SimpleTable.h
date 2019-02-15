@@ -20,7 +20,6 @@
 #ifndef NPDF_SIMPLETABLE_H
 #define NPDF_SIMPLETABLE_H
 
-
 #include <napi.h>
 #include <podofo/podofo.h>
 

@@ -18,10 +18,14 @@
  */
 
 #include "Form.h"
+#include "../Defines.h"
 #include "../ErrorHandler.h"
+#include "../ValidateArguments.h"
 #include "../base/Dictionary.h"
 #include "../base/Names.h"
 #include "../base/Obj.h"
+#include "../base/Ref.h"
+#include "../base/XObject.h"
 #include "Document.h"
 #include "StreamDocument.h"
 #include <iostream>
@@ -44,8 +48,8 @@ Form::Form(const Napi::CallbackInfo& info)
   , doc(info[0].IsExternal()
           ? *info[0].As<External<BaseDocument>>().Data()->base
           : *(info[0].As<Object>().InstanceOf(Document::constructor.Value())
-               ? Document::Unwrap(info[0].As<Object>())->base
-               : StreamDocument::Unwrap(info[0].As<Object>())->base))
+                ? Document::Unwrap(info[0].As<Object>())->base
+                : StreamDocument::Unwrap(info[0].As<Object>())->base))
 {}
 
 void
@@ -91,9 +95,9 @@ Napi::Value
 Form::GetFormDictionary(const CallbackInfo& info)
 {
   PdfDictionary& obj = GetForm()->GetObject()->GetDictionary();
-  auto ptr =
-    Dictionary::constructor.New({ External<PdfDictionary>::New(info.Env(), &obj),
-                                  Number::New(info.Env(), 1)});
+  auto ptr = Dictionary::constructor.New(
+    { External<PdfDictionary>::New(info.Env(), &obj),
+      Number::New(info.Env(), 1) });
   return ptr;
 }
 
@@ -177,7 +181,7 @@ Form::GetResource(const CallbackInfo& info)
     }
     return Dictionary::constructor.New(
       { External<PdfObject>::New(info.Env(), drObj),
-        Number::New(info.Env(), 0)});
+        Number::New(info.Env(), 0) });
   }
   return info.Env().Null();
 }
@@ -217,7 +221,7 @@ Form::GetCalculationOrder(const CallbackInfo& info)
   if (d.HasKey(Name::CO)) {
     auto co = d.GetKey(Name::CO);
     if (!co->IsArray()) {
-      TypeError::New(info.Env(), "CO expected an array");
+      TypeError::New(info.Env(), "CO expected an array").ThrowAsJavaScriptException();
     } else {
       auto arr = co->GetArray();
       for (const auto& item : arr) {
@@ -232,7 +236,7 @@ Form::GetCalculationOrder(const CallbackInfo& info)
             js.Set(n,
                    Dictionary::constructor.New(
                      { External<PdfObject>::New(info.Env(), value),
-                       Number::New(info.Env(), 0)}));
+                       Number::New(info.Env(), 0) }));
             n++;
           }
         }
@@ -248,22 +252,115 @@ Form::SetCalculationOrder(const CallbackInfo& info, const Napi::Value& value)
   Error::New(info.Env(), "Not yet implemented").ThrowAsJavaScriptException();
 }
 
+/**
+ * @brief Refresh the appearance stream for all fields on all pages
+ * @param info -
+ * PdfXObject
+ */
 void
-Form::AddFont(PdfFont* font)
+Form::RefreshAppearances(const CallbackInfo& info)
 {
-
-  if (GetDictionary()->HasKey(Name::DR)) {
-    PdfObject* drObj = GetDictionary()->GetKey(Name::DR);
-    //    auto dr = Dictionary::Resolve(doc->GetDocument(), drObj);
-    auto fd = drObj->GetDictionary().GetKey(Name::FONT)->IsReference()
-                ? doc.GetObjects()
-                    ->GetObject(
-                      drObj->GetDictionary().GetKey(Name::FONT)->GetReference())
-                    ->GetDictionary()
-                : drObj->GetDictionary().GetKey(Name::FONT)->GetDictionary();
-    if (!fd.HasKey(font->GetIdentifier())) {
-      fd.AddKey(font->GetIdentifier(), font->GetObject()->Reference());
+  PdfXObject* xApp = nullptr;
+  vector<PdfField*> fields;
+  vector<PdfAnnotation*> annots;
+  vector<int> opts =
+    AssertCallbackInfo(info, { { 0, { napi_object, napi_external } } });
+  if (opts[0] == 0) {
+    auto obj = info[0].As<Object>();
+    if (obj.InstanceOf(Ref::constructor.Value())) {
+      auto r = Ref::Unwrap(obj);
+      PdfObject* appObj = doc.GetObjects()->GetObject(*r->self);
+      PdfXObject x(appObj);
+      xApp = &x;
+    } else if (obj.InstanceOf(XObject::constructor.Value())) {
+      auto xo = XObject::Unwrap(obj);
+      xApp = &xo->GetXObject();
+    } else {
+      TypeError::New(info.Env(),
+                     "Reference to an XObject or an XObject is required")
+        .ThrowAsJavaScriptException();
+    }
+  } else if (opts[0] == 1) {
+    xApp = info[0].As<External<PdfXObject>>().Data();
+  }
+  if (!xApp) {
+    TypeError::New(info.Env(),
+                   "Reference to an XObject or an XObject is required")
+      .ThrowAsJavaScriptException();
+  }
+  if (!GetDictionary()->HasKey(Name::FIELDS)) {
+    return;
+  }
+  for (int i = 0; i < doc.GetPageCount(); i++) {
+    PdfPage* page = doc.GetPage(i);
+    for (int ii = 0; ii < page->GetNumFields(); ++ii) {
+      if (page->GetField(ii).GetWidgetAnnotation()->HasAppearanceStream()) {
+        PdfField iiField = page->GetField(ii);
+        fields.emplace_back(&iiField);
+      }
+    }
+    for (int ii = 0; ii < page->GetNumAnnots(); ++ii) {
+      PdfAnnotation* a = page->GetAnnotation(ii);
+      if (a->GetType() == ePdfAnnotation_Widget && a->HasAppearanceStream()) {
+        annots.push_back(a);
+      }
     }
   }
+  for (auto f : fields) {
+    if (f->GetType() == ePdfField_ListBox ||
+        f->GetType() == ePdfField_ComboBox) {
+      f->GetWidgetAnnotation()->SetAppearanceStream(xApp);
+    } else if (f->GetType() == ePdfField_CheckBox ||
+               f->GetType() == ePdfField_PushButton ||
+               f->GetType() == ePdfField_RadioButton) {
+      f->GetWidgetAnnotation()->SetAppearanceStream(xApp);
+      //    } else if (f->GetType() == ePdfField_Signature) {
+      //      auto [da, ap] = apKeys();
+    } else if (f->GetType() == ePdfField_TextField) {
+      f->GetWidgetAnnotation()->SetAppearanceStream(xApp);
+    } else { // ePdfField_Unknown
+      Error::New(info.Env(), "Unknown Field Type").ThrowAsJavaScriptException();
+    }
+  }
+}
+
+/**
+ * @brief Get AP, V, DV, and DA keys from a field's appearance stream
+ * Only keys that exist in the stream are returned in the map.
+ * @param f
+ * @return std::map<std::string, PoDoFo::PdfObject*>
+ */
+std::map<std::string, PoDoFo::PdfObject*>
+Form::GetFieldAPKeys(PoDoFo::PdfField* f)
+{
+  std::map<string, PdfObject*> keys;
+  if (!f->GetWidgetAnnotation()->GetObject()->GetDictionary().HasKey(
+        Name::DA)) {
+    f->GetWidgetAnnotation()->GetObject()->GetDictionary().AddKey(Name::DA,
+                                                                  PdfString());
+  }
+  keys.insert(std::pair<string, PdfObject*>(
+    Name::DA,
+    f->GetWidgetAnnotation()->GetObject()->MustGetIndirectKey(Name::DA)));
+  if (!f->GetWidgetAnnotation()->GetObject()->GetDictionary().HasKey(
+        Name::AP)) {
+
+    f->GetWidgetAnnotation()->GetObject()->GetDictionary().AddKey(Name::AP,
+                                                                  PdfObject());
+  }
+  keys.insert(std::pair<string, PdfObject*>(
+    Name::AP,
+    f->GetWidgetAnnotation()->GetObject()->MustGetIndirectKey(Name::AP)));
+  if (f->GetWidgetAnnotation()->GetObject()->GetDictionary().HasKey(Name::V)) {
+    keys.insert(std::pair<string, PdfObject*>(
+      Name::V,
+      f->GetWidgetAnnotation()->GetObject()->MustGetIndirectKey(Name::V)));
+  }
+  if (f->GetWidgetAnnotation()->GetObject()->GetDictionary().HasKey(Name::DV)) {
+    keys.insert(std::pair<string, PdfObject*>(
+      Name::DV,
+      f->GetWidgetAnnotation()->GetObject()->MustGetIndirectKey(Name::DV)));
+  }
+  return keys;
 }
 }

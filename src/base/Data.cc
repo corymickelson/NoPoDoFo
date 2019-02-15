@@ -23,8 +23,8 @@
 using namespace PoDoFo;
 using namespace Napi;
 
-using std::string;
 using std::make_unique;
+using std::string;
 
 namespace NoPoDoFo {
 
@@ -42,21 +42,20 @@ Data::Data(const Napi::CallbackInfo& info)
       .ThrowAsJavaScriptException();
     return;
   }
-    if (info[0].IsString()) {
+  if (info[0].IsString()) {
     string strData = info[0].As<String>().Utf8Value();
     self = make_unique<PdfData>(strData.c_str());
-    } else if (info[0].IsBuffer()) {
-      auto bData = info[0].As<Buffer<char>>().Data();
-      self = make_unique<PdfData>(bData);
-    } else {
-      TypeError::New(info.Env(), "Requires a string or Buffer")
-        .ThrowAsJavaScriptException();
-      return;
-    }
-
+  } else if (info[0].IsBuffer()) {
+    auto bData = info[0].As<Buffer<char>>().Data();
+    self = make_unique<PdfData>(bData);
+  } else {
+    TypeError::New(info.Env(), "Requires a string or Buffer")
+      .ThrowAsJavaScriptException();
+    return;
+  }
 }
 
-//Data::~Data()
+// Data::~Data()
 //{
 //  if (self != nullptr) {
 //    HandleScope scope(Env());

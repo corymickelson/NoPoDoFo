@@ -23,10 +23,10 @@
 
 using namespace Napi;
 using namespace PoDoFo;
-using std::vector;
-using tl::nullopt;
 using std::cout;
 using std::endl;
+using std::vector;
+using tl::nullopt;
 
 namespace NoPoDoFo {
 

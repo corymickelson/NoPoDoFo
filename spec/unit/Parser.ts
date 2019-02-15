@@ -34,11 +34,10 @@ export class ParserSpec {
                 if (e) Expect.fail(e.message)
                 let tokenizer = new npdf.ContentsTokenizer(doc, 0)
 
-                const pageContents = tokenizer.read((err, data) => {
+                tokenizer.read((err, data) => {
                     if (err) Expect.fail('Contents Tokenizer read into buffer failed')
                     else {
-                        Expect(Buffer.isBuffer(data)).toBeTruthy()
-                        Expect(data.length).toBe(183776)
+                        Expect(data.length).toBe(5709)
                         return resolve()
                     }
                 })
