@@ -101,17 +101,15 @@ XObject::GetPageSize(const CallbackInfo& info)
   width = rect.GetWidth();
   height = rect.GetHeight();
 
-  return Rect::constructor.New({
-    Number::New(info.Env(), left),
-    Number::New(info.Env(), bottom),
-    Number::New(info.Env(), width),
-    Number::New(info.Env(), height)
-  });
+  return Rect::constructor.New({ Number::New(info.Env(), left),
+                                 Number::New(info.Env(), bottom),
+                                 Number::New(info.Env(), width),
+                                 Number::New(info.Env(), height) });
 }
 Napi::Value
-XObject::Reference(const Napi::CallbackInfo &info)
+XObject::Reference(const Napi::CallbackInfo& info)
 {
-  auto r =xobj->GetObject()->Reference();
-  return Ref::constructor.New({External<PdfReference>::New(info.Env(), &r)});
+  auto r = xobj->GetObject()->Reference();
+  return Ref::constructor.New({ External<PdfReference>::New(info.Env(), &r) });
 }
 }

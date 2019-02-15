@@ -107,7 +107,8 @@ FileSpec::Data(const Napi::CallbackInfo& info)
         char* copy = new char[f->GetStream()->GetLength()];
         pdf_long copyLen = f->GetStream()->GetLength();
         f->GetStream()->GetFilteredCopy(&copy, &copyLen);
-        return Buffer<char>::Copy(info.Env(), copy, static_cast<size_t>(copyLen));
+        return Buffer<char>::Copy(
+          info.Env(), copy, static_cast<size_t>(copyLen));
       }
     }
   }

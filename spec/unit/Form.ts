@@ -1,5 +1,5 @@
 import {Expect, AsyncTest, TestFixture, TestCase, AsyncSetup, AsyncTeardown, Timeout} from 'alsatian'
-import {nopodofo, NPDFFontEncoding, NPDFName as name} from '../../'
+import {nopodofo, NPDFFontEncoding, NPDFName as name, NPDFPaintOp} from '../../'
 import {join} from "path"
 
 @TestFixture('Acro Form')
@@ -45,7 +45,7 @@ export class FormSpec {
                 field.obj.getDictionary().addKey('Test', true)
                 Expect(field.obj.getDictionary().getKeys().indexOf('Test')).toBeGreaterThan(-1)
                 field.AP = apDict
-                const daStr = `0 0 0 rg /${firaCode.identifier} tf`
+                const daStr = `1 1 1 rg / ${firaCode.identifier} ${firaCode.size} ${NPDFPaintOp.FontAndSizeOp}`
                 field.DA = daStr
                 const tmp = join(__dirname, '../tmp/form_ap_test.pdf')
                 doc.write(tmp, err => {
@@ -89,7 +89,7 @@ export class FormSpec {
                     fontDict = fontObj.getDictionary()
                     fontDict.addKey(font.identifier, font.object)
                     Expect(fontDict.getKeys().includes(font.identifier)).toBeTruthy()
-                    let da = `0 0 0 rg /${font.identifier} ${font.size} Tf`
+                    let da = `0 0 1 rg /${font.identifier} ${font.size} Tf`
                     doc.form.DA = da
                     Expect(doc.form.DA).toBe(da)
                 }

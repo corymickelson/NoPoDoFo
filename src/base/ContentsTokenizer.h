@@ -38,6 +38,7 @@ public:
   void ReadIntoData();
   vector<string> data;
   string contentsString;
+
 private:
   std::unique_ptr<PoDoFo::PdfContentsTokenizer> self;
   Document& doc;

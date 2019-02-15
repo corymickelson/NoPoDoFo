@@ -203,11 +203,8 @@ protected:
     for (auto& i : Tokenizer->data) {
       all += i;
     }
-    //    string all(Tokenizer->data.begin(), Tokenizer->data.end());
     Tokenizer->contentsString = all;
-    Buffer<string> buffer = Buffer<string>::New(
-      Env(), &Tokenizer->contentsString, Tokenizer->contentsString.size());
-    Callback().Call({ Env().Null(), buffer });
+    Callback().Call({ Env().Null(), String::New(Env(), all) });
   }
 
 private:

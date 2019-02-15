@@ -53,7 +53,7 @@ public:
   Napi::Value IsCombs(const Napi::CallbackInfo&);
   void SetRichText(const Napi::CallbackInfo&, const Napi::Value&);
   Napi::Value IsRichText(const Napi::CallbackInfo&);
-
+  void RefreshAppearanceStream(const Napi::CallbackInfo&);
   PoDoFo::PdfTextField GetText() { return PoDoFo::PdfTextField(field); }
   PoDoFo::PdfField& field;
 };

@@ -2,7 +2,7 @@
  * This file is part of the NoPoDoFo (R) project.
  * Copyright (c) 2017-2018
  * Authors: Cory Mickelson, et al.
- * 
+ *
  * NoPoDoFo is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -24,22 +24,27 @@
 #include <podofo/podofo.h>
 #include <string>
 
-
 namespace NoPoDoFo {
 class Stream : public Napi::ObjectWrap<Stream>
 {
 public:
   explicit Stream(const Napi::CallbackInfo& callbackInfo);
-  ~Stream();
   static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
   Napi::Value Write(const Napi::CallbackInfo&);
   Napi::Value GetBuffer(const Napi::CallbackInfo&);
   Napi::Value GetFilteredBuffer(const Napi::CallbackInfo&);
-  PoDoFo::PdfStream* GetStream() { return stream; }
+  void Set(const Napi::CallbackInfo&);
+  void BeginAppend(const Napi::CallbackInfo&);
+  void Append(const Napi::CallbackInfo&);
+  void EndAppend(const Napi::CallbackInfo&);
+  Napi::Value IsAppending(const Napi::CallbackInfo&);
+  Napi::Value Length(const Napi::CallbackInfo&);
+  Napi::Value GetCopy(const Napi::CallbackInfo&);
+  PoDoFo::PdfStream& GetStream() { return  stream; }
 
 private:
-  PoDoFo::PdfStream* stream;
+  PoDoFo::PdfStream& stream;
 };
 }
 #endif // NPDF_STREAM_H
