@@ -113,7 +113,8 @@ SignatureField::Initialize(Napi::Env& env, Napi::Object& target)
     env,
     "SignatureField",
     { InstanceAccessor("info", &SignatureField::GetInfo, nullptr),
-      InstanceAccessor("widgetAnnotation", &SignatureField::GetAnnotation, nullptr),
+      InstanceAccessor(
+        "widgetAnnotation", &SignatureField::GetAnnotation, nullptr),
       InstanceAccessor("obj", &SignatureField::GetFieldObject, nullptr),
       InstanceMethod("setAppearanceStream",
                      &SignatureField::SetAppearanceStream),
@@ -134,10 +135,10 @@ SignatureField::Initialize(Napi::Env& env, Napi::Object& target)
 }
 
 Napi::Value
-SignatureField::GetFieldObject(const Napi::CallbackInfo &info)
+SignatureField::GetFieldObject(const Napi::CallbackInfo& info)
 {
   auto o = field->GetFieldObject();
-  return Obj::constructor.New({External<PdfObject>::New(info.Env(), o)});
+  return Obj::constructor.New({ External<PdfObject>::New(info.Env(), o) });
 }
 void
 SignatureField::SetAppearanceStream(const CallbackInfo& info)
@@ -231,29 +232,30 @@ SignatureField::EnsureSignatureObject(const CallbackInfo& info)
   return info.Env().Undefined();
 }
 Napi::Value
-SignatureField::GetInfo(const Napi::CallbackInfo &info)
+SignatureField::GetInfo(const Napi::CallbackInfo& info)
 {
   Object infoObj = Object::New(info.Env());
-  if(!signatureInfo.range.empty()) {
+  if (!signatureInfo.range.empty()) {
     Napi::Array byteRange = Napi::Array::New(info.Env());
-    for(uint32_t i = 0; i < signatureInfo.range.size(); i++) {
+    for (uint32_t i = 0; i < signatureInfo.range.size(); i++) {
       byteRange.Set(i, Number::New(info.Env(), signatureInfo.range[i]));
     }
     infoObj.Set("byteRange", byteRange);
   } else {
     infoObj.Set("byteRange", info.Env().Undefined());
   }
-  if(!signatureInfo.contents.empty()){
+  if (!signatureInfo.contents.empty()) {
     infoObj.Set("signature", String::New(info.Env(), signatureInfo.contents));
   } else {
-    infoObj.Set("signature",info.Env().Undefined());
+    infoObj.Set("signature", info.Env().Undefined());
   }
   return infoObj;
 }
 Napi::Value
-SignatureField::GetAnnotation(const Napi::CallbackInfo &info)
+SignatureField::GetAnnotation(const Napi::CallbackInfo& info)
 {
   PdfAnnotation* annot = field->GetWidgetAnnotation();
-  return Annotation::constructor.New({External<PdfAnnotation>::New(info.Env(), annot)});
+  return Annotation::constructor.New(
+    { External<PdfAnnotation>::New(info.Env(), annot) });
 }
 }

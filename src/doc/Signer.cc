@@ -19,8 +19,8 @@
 
 #include "Signer.h"
 #include "../ErrorHandler.h"
-#include "../base/Names.h"
 #include "../ValidateArguments.h"
+#include "../base/Names.h"
 #include "Document.h"
 #include "SignatureField.h"
 #include "StreamDocument.h"
@@ -32,9 +32,9 @@
 using namespace Napi;
 using namespace PoDoFo;
 
-using tl::nullopt;
 using std::string;
 using std::stringstream;
+using tl::nullopt;
 
 #if defined(_WIN64)
 #define fseeko _fseeki64
@@ -178,9 +178,7 @@ protected:
       if (self.field->GetFieldName().GetStringUtf8().empty()) {
         self.field->SetFieldName("NoPoDoFo.SignatureField");
       }
-      /**
-       * todo: Add user facing support for creating/modifying PdfDate objects.
-       */
+
       self.field->SetSignatureDate(PdfDate());
 
       // Set output device to write signature to designated area.
@@ -279,7 +277,7 @@ protected:
   {
     HandleScope scope(Env());
     if (!self.output.empty()) {
-      if (FILE* file = fopen(self.output.c_str(), "r")) {
+      if (FILE* file = fopen(self.output.c_str(), "rb")) {
         fclose(file);
         Callback().Call({ Env().Undefined() });
       } else {
@@ -305,7 +303,7 @@ Signer::SignWorker(const CallbackInfo& info)
 {
   pdf_int32 minSigSize = info[0].As<Number>();
   Function cb = info[1].As<Function>();
-  auto * worker = new SignAsync(cb, *this, minSigSize);
+  auto* worker = new SignAsync(cb, *this, minSigSize);
   worker->Queue();
   return info.Env().Undefined();
 }
@@ -407,12 +405,12 @@ Signer::LoadCertificateAndKey(const CallbackInfo& info)
   string cert, key, pwd;
   Function cb;
 
-  vector<int> optsIndices = AssertCallbackInfo(
-    info,
-    { { 0, { option(napi_string) } },
-      { 1, { option(napi_string) } },
-      { 2, { option(napi_string), option(napi_function) } },
-      { 3, { nullopt, option(napi_function) } } });
+  vector<int> optsIndices =
+    AssertCallbackInfo(info,
+                       { { 0, { option(napi_string) } },
+                         { 1, { option(napi_string) } },
+                         { 2, { option(napi_string), option(napi_function) } },
+                         { 3, { nullopt, option(napi_function) } } });
 
   cert = info[0].As<String>().Utf8Value();
   key = info[1].As<String>().Utf8Value();

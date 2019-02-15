@@ -21,12 +21,12 @@
 #define NPDF_SIGNER_H
 
 #include <napi.h>
-#include <openssl/ssl.h>
 #include <openssl/crypto.h>
 #include <openssl/err.h>
+#include <openssl/evp.h>
 #include <openssl/pem.h>
 #include <openssl/pkcs7.h>
-#include <openssl/evp.h>
+#include <openssl/ssl.h>
 #include <openssl/x509.h>
 #include <podofo/podofo.h>
 

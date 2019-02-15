@@ -42,13 +42,13 @@ FunctionReference Array::constructor; // NOLINT
  */
 Array::Array(const CallbackInfo& info)
   : ObjectWrap<Array>(info)
-  , self(info.Length() == 2
-           ? (info[0].IsExternal() && info[1].IsNumber() &&
-                  info[1].As<Number>().Int32Value() == 0
-                ? (parent = info[0].As<External<PdfObject>>().Data())
-                    ->GetArray()
-                : *info[0].As<External<PdfArray>>().Data())
-           : *(init = new PdfArray()))
+  , self(
+      info.Length() == 2
+        ? (info[0].IsExternal() && info[1].IsNumber() &&
+               info[1].As<Number>().Int32Value() == 0
+             ? (parent = info[0].As<External<PdfObject>>().Data())->GetArray()
+             : *info[0].As<External<PdfArray>>().Data())
+        : *(init = new PdfArray()))
 {}
 
 Array::~Array()
@@ -58,7 +58,7 @@ Array::~Array()
     delete child;
   }
   delete init;
-  if(parent) {
+  if (parent) {
     parent = nullptr;
   }
 }
@@ -183,8 +183,8 @@ Array::GetObjAtIndex(const CallbackInfo& info)
   PdfObject* item;
   if (GetArray()[index].IsReference()) {
     PdfReference indirect = GetArray()[index].GetReference();
-      return Ref::constructor.New(
-        { External<PdfReference>::New(info.Env(), &indirect) });
+    return Ref::constructor.New(
+      { External<PdfReference>::New(info.Env(), &indirect) });
   } else {
     item = &(GetArray()[index]);
   }

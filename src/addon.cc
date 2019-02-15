@@ -18,12 +18,13 @@
  */
 
 #include "base/Array.h"
-#include "base/Date.h"
-#include "base/ContentsTokenizer.h"
 #include "base/Color.h"
+#include "base/ContentsTokenizer.h"
 #include "base/Data.h"
+#include "base/Date.h"
 #include "base/Dictionary.h"
 #include "base/Obj.h"
+#include "base/Ref.h"
 #include "base/Stream.h"
 #include "base/XObject.h"
 #include "doc/Action.h"
@@ -41,29 +42,29 @@
 #include "doc/ListBox.h"
 #include "doc/ListField.h"
 #include "doc/Outline.h"
+#include "doc/Page.h"
 #include "doc/Painter.h"
 #include "doc/PushButton.h"
+#include "doc/Rect.h"
 #include "doc/SignatureField.h"
 #include "doc/Signer.h"
 #include "doc/SimpleTable.h"
 #include "doc/StreamDocument.h"
 #include "doc/TextField.h"
-#include "doc/Page.h"
-#include "doc/Rect.h"
-#include "base/Ref.h"
 #include <napi.h>
 
 Napi::Object
 init(Napi::Env env, Napi::Object exports)
 {
 #if PODOFO_VERSION_MINOR < 9 && PODOFO_VERSION_PATCH < 6
-Napi::Error::New(env, "PoDoFo Version must be >= 0.9.6").ThrowAsJavaScriptException();
-return;
+  Napi::Error::New(env, "PoDoFo Version must be >= 0.9.6")
+    .ThrowAsJavaScriptException();
+  return;
 #endif
 #ifdef NOPODOFO_DEBUG
-cout << "/******************************************************/" << endl;
-cout << "/***** You are running a Debug build of NoPoDoFo ******/" << endl;
-cout << "/******************************************************/" << endl;
+  cout << "/******************************************************/" << endl;
+  cout << "/***** You are running a Debug build of NoPoDoFo ******/" << endl;
+  cout << "/******************************************************/" << endl;
 #endif
   NoPoDoFo::Action::Initialize(env, exports);
   NoPoDoFo::Date::Initialize(env, exports);

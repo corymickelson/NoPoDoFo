@@ -21,15 +21,16 @@
 #define NPDF_SIGNATUREFIELD_H
 
 #include <napi.h>
-#include <podofo/podofo.h>
 #include <openssl/evp.h>
+#include <podofo/podofo.h>
 
-using std::vector;
 using std::string;
+using std::vector;
 
 namespace NoPoDoFo {
 
-struct SignatureInfo {
+struct SignatureInfo
+{
 public:
   vector<uint32_t> range = {};
   string contents;

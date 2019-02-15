@@ -46,8 +46,10 @@ Encrypt::Encrypt(const Napi::CallbackInfo& info)
 #if defined(PODOFO_HAVE_OPENSSL) || defined(PODOFO_HAVE_OPENSSL_1_1)
   if (info[0].As<Object>().InstanceOf(Document::constructor.Value())) {
     auto doc = Document::Unwrap(info[0].As<Object>());
-    if(doc->GetDocument().GetEncrypt() == nullptr) {
-      Error::New(info.Env(), "The document provided does not have an Encrypt value.").ThrowAsJavaScriptException();
+    if (doc->GetDocument().GetEncrypt() == nullptr) {
+      Error::New(info.Env(),
+                 "The document provided does not have an Encrypt value.")
+        .ThrowAsJavaScriptException();
       return;
     }
     encrypt = doc->GetDocument().GetEncrypt();

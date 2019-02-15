@@ -61,14 +61,12 @@ Destination::Destination(const CallbackInfo& info)
         destination = new PdfDestination(
           &page->page,
           static_cast<EPdfDestinationFit>(info[1].As<Number>().Int32Value()));
-      }
-      else if (opts[2] == 0) {
+      } else if (opts[2] == 0) {
         destination = new PdfDestination(
           &page->page,
           static_cast<EPdfDestinationFit>(info[1].As<Number>().Int32Value()),
           info[2].As<Number>().DoubleValue());
-      }
-      else if (opts[2] == 0 && opts[3] == 0) {
+      } else if (opts[2] == 0 && opts[3] == 0) {
         destination =
           new PdfDestination(&page->page,
                              info[1].As<Number>().DoubleValue(),  // left
@@ -78,8 +76,7 @@ Destination::Destination(const CallbackInfo& info)
 
     } else if (opts[1] == 1) {
       destination = new PdfDestination(
-        &page->page,
-        Rect::Unwrap(info[1].As<Object>())->GetRect());
+        &page->page, Rect::Unwrap(info[1].As<Object>())->GetRect());
     } else {
       Error::New(info.Env()).ThrowAsJavaScriptException();
     }

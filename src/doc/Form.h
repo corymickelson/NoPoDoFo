@@ -45,16 +45,14 @@ public:
   void SetResource(const Napi::CallbackInfo&, const Napi::Value&);
   Napi::Value GetCalculationOrder(const Napi::CallbackInfo&);
   void SetCalculationOrder(const Napi::CallbackInfo&, const Napi::Value&);
-
+  void RefreshAppearances(const Napi::CallbackInfo&);
   PoDoFo::PdfAcroForm* GetForm() { return doc.GetAcroForm(create); }
   PoDoFo::PdfDictionary* GetDictionary()
   {
     return &(doc.GetAcroForm()->GetObject()->GetDictionary());
   }
 
-protected:
-  void AddFont(PoDoFo::PdfFont*);
-
+  std::map<std::string, PoDoFo::PdfObject*> GetFieldAPKeys(PoDoFo::PdfField*);
 private:
   bool create = true;
   PoDoFo::PdfDocument& doc;

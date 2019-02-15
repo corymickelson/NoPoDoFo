@@ -37,7 +37,7 @@ AssertCallbackInfo(const Napi::CallbackInfo& info,
   vector<int> argIndex;
   for (auto item : vars) {
     bool valid = false;
-    if (static_cast<int>(info.Length()) -1 < item.first) {
+    if (static_cast<int>(info.Length()) - 1 < item.first) {
       for (size_t i = 0; i < item.second.size(); i++) {
         if (!item.second[i].has_value()) {
           valid = true;
