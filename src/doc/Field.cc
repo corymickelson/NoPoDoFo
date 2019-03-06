@@ -45,8 +45,6 @@ using tl::nullopt;
 
 namespace NoPoDoFo {
 
-// FunctionReference Field::constructor; // NOLINT
-
 /**
  * @brief Field::Field
  * @param info

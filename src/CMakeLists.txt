@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.8)
 
+project(nopodofo)
+
 file(GLOB NOPODOFO_SOURCES
           "*.cc"
           "base/*.cc"

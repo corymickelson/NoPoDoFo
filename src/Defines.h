@@ -159,39 +159,6 @@ enum NPDFColorFormat
   }
 }
 
-// #define APPEND_RECT_OP = "re"
-// #define CONCAT_MATRIX_OP = "cm"
-// #define CURVE_TO_OP = "c"
-// #define END_PATH_NO_F_S_OP = "n"
-// #define FILL_OP = "f"
-// #define FILL_EVENT_ODD_OP = "f*"
-// #define INVOKE_XOBJECT_OP = "Do"
-// #define LINE_TO_OP = "l"
-// #define BEGIN_MARKED_CONTENT_OP = "BMC"
-// #define END_MARKED_CONTENT_OP = "EMC"
-// #define MOVE_TXT_POS_OP = "Td"
-// #define MOVE_TO_OP = "m"
-// #define CHAR_SPACING_OP = "Tc"
-// #define CMYK_OP = "k"
-// #define CMYK_S_OP = "K"
-// #define DASH_OP = "d"
-// #define GREY_OP = "g"
-// #define GREY_S_OP = "G"
-// #define LINE_CAP_OP = "J"
-// #define LINE_JOIN_OP = "j"
-// #define LINE_WIDTH_OP = "w"
-// #define NON_ZERO_WINDING_CLIP_OP = "W"
-// #define RGB_OP = "rg"
-// #define RGB_S_OP = "RG"
-// #define FONT_AND_SIZE_OP = "Tf"
-// #define SHOW_TEXT_OP = "Tj"
-// #define RESTORE_OP = "Q"
-// #define SAVE_OP = "q"
-// #define STROKE_OP = "S"
-// #define BEGIN_TXT_OP = "BT"
-// #define END_TXT_OP = "ET"
-
-
 const char RectOp[] = "re";
 const char ConcatMatrixOp[] = "cm";
 const char CurveToOp[] = "c";

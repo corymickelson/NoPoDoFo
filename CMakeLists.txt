@@ -1,7 +1,5 @@
 cmake_minimum_required(VERSION 3.8)
 
-project(nopodofo)
-
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
@@ -33,7 +31,7 @@ if("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_CURRENT_SOURCE_DIR}")
 
   option(NOPODOFO_BUILD_TESTS "Build native bindings tests" OFF)
 
-  option(NOPODOFO_BUILD_SDK "Build the NoPoDoFo SDK" OFF)
+  option(NOPODOFO_BUILD_SDK "Build the NoPoDoFo SDK" ON)
 
   option(NOPODOFO_BUILD_LAMBDA "Build NoPoDoFo for use in AWS Lambda" OFF)
 endif()
