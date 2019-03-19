@@ -1,15 +1,5 @@
 #include "Defines.h"
 
-#ifdef __APPLE__
-#include <unistd.h>
-#elif defined _WIN32 || defined _WIN64
-#include <experimental/filesystem>
-namespace fs = std::experimental::filesystem;
-#elif defined __linux__
-#include <experimental/filesystem>
-namespace fs = std::experimental::filesystem;
-#endif
-
 namespace NoPoDoFo {
 int
 FileAccess(std::string& file)

@@ -18,9 +18,7 @@
  */
 
 #include "Field.h"
-#include "../Defines.h"
 #include "../ValidateArguments.h"
-#include "../base/Color.h"
 #include "../base/Dictionary.h"
 #include "../base/Names.h"
 #include "../base/Obj.h"
@@ -29,8 +27,6 @@
 #include "Document.h"
 #include "Form.h"
 #include "Page.h"
-#include <algorithm>
-#include <iostream>
 
 using namespace Napi;
 using namespace PoDoFo;
@@ -40,14 +36,11 @@ using std::endl;
 using std::find;
 using std::map;
 using std::string;
-using std::experimental::string_view;
 using std::stringstream;
 using std::vector;
 using tl::nullopt;
 
 namespace NoPoDoFo {
-
-// FunctionReference Field::constructor; // NOLINT
 
 /**
  * @brief Field::Field
@@ -459,6 +452,9 @@ Field::GetFieldRefreshKeys(PoDoFo::PdfField* f)
   return keys;
 }
 
+/**
+ * @todo: how to handle fonts that do not have an object (default fonts)
+ */
 void
 Field::RefreshAppearanceStream()
 {
@@ -475,7 +471,6 @@ Field::RefreshAppearanceStream()
       apKeys.find(Name::V)->second->GetString().GetCharacterLength() <= 0) {
     throw std::exception();
   }
-  PdfFont* f = nullptr;
   PdfXObject xObj(apKeys.find(Name::AP)->second->MustGetIndirectKey(Name::N));
   xObj.GetContentsForAppending()->GetStream()->BeginAppend();
   PdfOutputDevice device(&buffer);
@@ -487,22 +482,19 @@ Field::RefreshAppearanceStream()
   if (apKeys.find(Name::DA) != apKeys.end()) {
     ss << apKeys.find(Name::DA)->second->GetString().GetString() << endl;
     if (!xObj.GetResources()->GetDictionary().HasKey(Name::FONT)) {
-      f = GetDAFont(
+      PdfFont* f = GetDAFont(
         string_view(apKeys.find(Name::DA)->second->GetString().GetString()));
-      if (f == nullptr) {
-      } else {
-        xObj.AddResource(
-          f->GetIdentifier(), f->GetObject()->Reference(), Name::FONT);
-        if (field->GetWidgetAnnotation()->GetObject()->GetDictionary().HasKey(
-              Name::DA)) {
-          field->GetWidgetAnnotation()->GetObject()->GetDictionary().RemoveKey(
-            Name::DA);
-        }
-        // Add the DA key from apKeys in case the DA was taken from the form
-        field->GetWidgetAnnotation()->GetObject()->GetDictionary().AddKey(
-          Name::DA, apKeys.find(Name::DA)->second);
-      }
+      xObj.AddResource(
+        f->GetIdentifier(), f->GetObject()->Reference(), Name::FONT);
     }
+    if (field->GetWidgetAnnotation()->GetObject()->GetDictionary().HasKey(
+          Name::DA)) {
+      field->GetWidgetAnnotation()->GetObject()->GetDictionary().RemoveKey(
+        Name::DA);
+    }
+    // Add the DA key from apKeys in case the DA was taken from the form
+    field->GetWidgetAnnotation()->GetObject()->GetDictionary().AddKey(
+      Name::DA, apKeys.find(Name::DA)->second);
   }
   ss << "2.0 2.0 " << TextPosOp << endl;
   ss << buffer.GetBuffer() << ShowTextOp << endl;
@@ -512,6 +504,7 @@ Field::RefreshAppearanceStream()
 
   xObj.GetContentsForAppending()->GetStream()->Append(ss.str());
   xObj.GetContentsForAppending()->GetStream()->EndAppend();
+
   PdfRect r(0,
             0,
             field->GetWidgetAnnotation()->GetRect().GetWidth(),
@@ -521,8 +514,6 @@ Field::RefreshAppearanceStream()
   r.ToVariant(ra);
   xObj.GetObject()->GetDictionary().AddKey(Name::BBOX, ra.GetArray());
 }
-
-// todo: enforce PdfMemDocument
 PoDoFo::PdfFont*
 Field::GetDAFont(string_view da)
 {
@@ -548,14 +539,7 @@ Field::GetDAFont(string_view da)
   auto memDoc = dynamic_cast<PdfMemDocument*>(
     field->GetWidgetAnnotation()->GetObject()->GetOwner()->GetParentDocument());
   if ((font = Document::GetPdfFont(*memDoc, ftName)) == nullptr) {
-    return nullptr;
   }
-  string fId = font->GetIdentifier().GetName();
-  string n = font->GetFontMetrics()->GetFontname();
-  if (defaultFonts->find(fId, 0) == string::npos ||
-      defaultFonts->find(n, 0) == string::npos) {
-    return font;
-  }
-  return nullptr;
+  return font;
 }
 }

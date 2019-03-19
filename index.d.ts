@@ -837,13 +837,13 @@ export namespace nopodofo {
 
         /**
          * Performs garbage collection on the document. All objects not
-         * reachable by the trailer or deleted.
+         * reachable by the trailer are deleted.
          * @param file - pdf document
          * @param pwd - if document is password protected this parameter is required
          * @param output - file location
          * @param cb - function
          */
-        gc(file: string, pwd: string, output: string, cb: Callback<string | Buffer>): void
+        static gc(file: string, pwd: string, output: string, cb: Callback<string | Buffer>): void
 
         /**
          * Check for the existence of a signature field(s)
@@ -860,6 +860,15 @@ export namespace nopodofo {
         append(doc: Document | Document[]): void
 
         insertExistingPage(memDoc: Document, index: number, insertIndex: number): number
+
+        /**
+         * @desc Saves the document to an internal buffer, and passes that buffer to a new instance
+         * of Document. Use this method for saving a document before adding / inserting the entire document
+         * or specific pages of the document to another document
+         * @param {Function} cb - callback
+         * @see {insertExistingPage}
+         */
+        reload(cb: Callback<Document>): void
     }
 
     abstract class Base {

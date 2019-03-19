@@ -21,7 +21,6 @@
 #include "../Defines.h"
 #include "../ErrorHandler.h"
 #include "../ValidateArguments.h"
-#include "../base/Color.h"
 #include "../base/XObject.h"
 #include "Action.h"
 #include "Destination.h"
@@ -29,7 +28,6 @@
 #include "FileSpec.h"
 #include "Page.h"
 #include "Rect.h"
-#include "StreamDocument.h"
 #include <algorithm>
 
 using std::cout;
@@ -473,7 +471,11 @@ Annotation::SetRect(const CallbackInfo& info, const Napi::Value& value)
       .ThrowAsJavaScriptException();
     return;
   }
+#ifdef __linux__
   auto rect = Rect::Unwrap(value.As<Object>());
   GetAnnotation().SetRect(rect->GetRect());
+#elif defined _WIN32 || defined _WIN64
+  cout << "SetRect is not available in this build" << endl;
+#endif
 }
 }

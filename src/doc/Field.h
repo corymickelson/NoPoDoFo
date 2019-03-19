@@ -23,7 +23,7 @@
 #include <iostream>
 #include <napi.h>
 #include <podofo/podofo.h>
-#include <experimental/string_view>
+#include "../Defines.h" 
 
 using std::cout;
 using std::endl;
@@ -79,25 +79,10 @@ public:
   }
   std::map<std::string, PoDoFo::PdfObject*> GetFieldRefreshKeys(
     PoDoFo::PdfField*);
-  PoDoFo::PdfFont* GetDAFont(std::experimental::string_view);
+  PoDoFo::PdfFont* GetDAFont(string_view);
   string fieldName;
   string fieldType;
-  string defaultFonts [14] = {
-    "Times-Roman",
-    "Times-Bold",
-    "Time-Italic",
-    "Time-BoldItalic",
-    "Courier",
-    "Courier",
-    "Courier-Bold",
-    "Courier-Oblique",
-    "Helvetica",
-    "Helvetica-Bold",
-    "Helvetica-Oblique",
-    "Helvetica-BoldOblique",
-    "Symbol",
-    "ZapfDingbats",
-  };
+
 protected:
   string TypeString();
 

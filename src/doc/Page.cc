@@ -71,7 +71,7 @@ Page::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceMethod("getFields", &Page::GetFields),
 #if NOPODOFO_SDK
       InstanceMethod("flattenFields", &Page::FlattenFields),
-#endif // NOPODOFO_SDK
+#endif
       InstanceMethod("fieldCount", &Page::GetNumFields),
       InstanceMethod("getFieldIndex", &Page::GetFieldIndex),
       InstanceMethod("getMediaBox", &Page::GetMediaBox),
@@ -448,15 +448,14 @@ Page::DeleteFormField(PdfPage& page, PdfObject& item, PdfObject& coll)
 void
 Page::FlattenFields(const Napi::CallbackInfo& info)
 {
-    class FlattenFields ff(page);
-    FlattenFieldsResponse resp = ff.Flatten();
-    if(!resp.err.empty()) {
-      Error::New(info.Env(), resp.err).ThrowAsJavaScriptException();
-    } else {
-      stringstream log;
-      log << "Fields affected= " << resp.fieldsAffected << endl;
-
-    }
+  class FlattenFields ff(page);
+  FlattenFieldsResponse resp = ff.Flatten();
+  if (!resp.err.empty()) {
+    Error::New(info.Env(), resp.err).ThrowAsJavaScriptException();
+  } else {
+    stringstream log;
+    log << "Fields affected= " << resp.fieldsAffected << endl;
+  }
 }
-#endif // NOPODOFO_BUILD_SDK
+#endif
 }

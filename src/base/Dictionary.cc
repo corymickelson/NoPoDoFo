@@ -23,7 +23,6 @@
 #include "Obj.h"
 #include "Ref.h"
 #include <algorithm>
-#include <sstream>
 
 using namespace Napi;
 using namespace PoDoFo;
@@ -403,7 +402,7 @@ protected:
   void OnOK() override
   {
     HandleScope scope(Env());
-    Callback().Call({ Env().Null(), Napi::String::New(Env(), arg) });
+    Callback().Call({ Env().Null(), String::New(Env(), arg) });
   }
 
 private:
