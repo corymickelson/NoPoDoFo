@@ -79,6 +79,7 @@ public:
 
 protected:
   PoDoFo::PdfFont* CreateFontObject(napi_env, Napi::Object, bool subset);
+  std::string pwd;
 
 private:
 };

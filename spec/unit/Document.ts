@@ -3,7 +3,6 @@ import {nopodofo, nopodofo as npdf} from '../../'
 import {join} from "path";
 import {readFileSync} from "fs";
 import Document = nopodofo.Document;
-import Base = nopodofo.Base;
 
 @TestFixture("(Mem)Document")
 export class MemDocSpec {
@@ -32,7 +31,7 @@ export class MemDocSpec {
     public async teardown() {
         return new Promise(resolve => {
             if (!this.subject) {
-                return Promise.resolve()
+                return resolve()
             }
             this.subject.write((err, data) => {
                 if (err) Expect.fail(err.message);
@@ -55,7 +54,7 @@ export class MemDocSpec {
         return Promise.resolve()
     }
 
-    public resolveLoad(src:string|Buffer): Promise<Document> {
+    public resolveLoad(src: string | Buffer): Promise<Document> {
         return new Promise<Document>((resolve, reject) => {
             new npdf.Document().load(src, (err, data) => err ? reject(err) : resolve(data))
         })
@@ -77,9 +76,9 @@ export class MemDocSpec {
     @TestCase(1, 2)
     @TestCase(0, 22)
     @TestCase(-1, 4)
-    public async pageSplicing(start:number, end:number) {
+    public async pageSplicing(start: number, end: number) {
         const startingCount = this.subject.getPageCount()
-        if(start < 0 || start + end > startingCount) {
+        if (start < 0 || start + end > startingCount) {
             Expect(() => this.subject.splicePages(start, end)).toThrowError(RangeError, "Pages out of range")
         } else {
             this.subject.splicePages(start, end)
@@ -95,7 +94,7 @@ export class MemDocSpec {
         const other = new Document()
         await new Promise(resolve => {
             other.load(join(__dirname, '../test-documents/test.pdf'), e => {
-                if(e) Expect.fail(e.message)
+                if (e) Expect.fail(e.message)
                 return resolve()
             })
         })
@@ -129,6 +128,89 @@ export class MemDocSpec {
             Expect(doc.getPageCount()).toEqual(total)
             return resolve()
         })
+    }
+
+    @AsyncTest('Insert Existing')
+    public async insertExistingTest() {
+        const magic = 'INSERT EXISTING PRE-PAINT'
+        const prepend = await new Promise<Document>(resolve => {
+            const p = new Document()
+            p.load(join(__dirname, '../test-documents/test.pdf'), e => {
+                if (e instanceof Error) {
+                    Expect.fail(e.message)
+                } else {
+                    const painter = new nopodofo.Painter(p)
+                    painter.setPage(p.getPage(0))
+                    painter.font = p.createFont({
+                        fontName: 'Helvetica',
+                        bold: true
+                    })
+                    painter.setColor(new npdf.Color(0.9))
+                    painter.drawText({x: 0, y: 0}, magic)
+                    painter.finishPage()
+                    // p.write((e, d) => {
+                    //     if(e) Expect.fail(e.message)
+                    //     else {
+                    //         const rl = new Document()
+                    //         rl.load(d, (ee, dd) => {
+                    //             if(ee) Expect.fail(ee.message)
+                    //             else {
+                    //                 return resolve(dd)
+                    //             }
+                    //         })
+                    //     }
+                    // })
+                    p.reload((err, d) => {
+                        if (err) {
+                            Expect.fail(err.message)
+                        } else {
+                            return resolve(d)
+                        }
+                    })
+                }
+            })
+        })
+
+        const added = this.subject.insertExistingPage(prepend, 0, 0)
+        Expect(added).toBe(prepend.getPageCount() + 1)
+
+        const found = await new Promise((resolve, reject) => {
+            this.subject.write((e, d) => {
+                const fail = (e: Error) => {
+                    // set to null to force skipping the teardown step
+                    // @ts-ignore
+                    this.subject = null
+                    Expect.fail(e.message)
+                }
+                if (e) {
+                    fail(e)
+                } else {
+                    // require('fs').writeFileSync('/mnt/c/Tmp/test.pdf', d)
+                    const rDoc = new Document()
+                    rDoc.load(d, e => {
+                        if (e) {
+                            fail(e)
+                        }
+                        const parser = new nopodofo.ContentsTokenizer(rDoc, 0)
+                        const tokens = parser.readSync()
+                        let item = tokens.next()
+                        while (!item.done) {
+                            if (item.value.includes(magic)) {
+                                // set to null to force skipping the teardown step
+                                // @ts-ignore
+                                this.subject = null
+                                return resolve(true)
+                            }
+                            item = tokens.next()
+                        }
+                        return resolve(false)
+                    })
+                }
+            })
+        })
+        if (!found) {
+            Expect.fail('Magic string not found')
+        }
     }
 
     @AsyncTest("Get Document Fonts")

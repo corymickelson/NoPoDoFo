@@ -18,7 +18,6 @@
  */
 
 #include "Document.h"
-#include "../Defines.h"
 #include "../ErrorHandler.h"
 #include "../base/Names.h"
 #include "../base/Obj.h"
@@ -27,8 +26,6 @@
 #include "Form.h"
 #include "Page.h"
 #include "SignatureField.h"
-#include <iostream>
-#include <sstream>
 
 using namespace Napi;
 using namespace PoDoFo;
@@ -96,6 +93,7 @@ Document::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceMethod("getAttachment", &Document::GetAttachment),
       InstanceMethod("getFont", &Document::GetFont),
       InstanceMethod("listFonts", &Document::ListFonts),
+      InstanceMethod("reload", &Document::Reload),
       InstanceMethod("addNamedDestination", &Document::AddNamedDestination) });
   constructor = Napi::Persistent(ctor);
   constructor.SuppressDestruct();
@@ -137,7 +135,8 @@ Document::ListFonts(const CallbackInfo& info)
     auto v = Object::New(info.Env());
     v.Set("id", String::New(info.Env(), itemId));
     v.Set("name", String::New(info.Env(), itemName));
-    v.Set("file", String::New(info.Env(), item->GetFontMetrics()->GetFilename()));
+    v.Set("file",
+          String::New(info.Env(), item->GetFontMetrics()->GetFilename()));
     list.Set(n, v);
     n++;
   }
@@ -145,10 +144,10 @@ Document::ListFonts(const CallbackInfo& info)
 }
 
 PoDoFo::PdfFont*
-Document::GetPdfFont(PdfMemDocument &doc, string_view id)
+Document::GetPdfFont(PdfMemDocument& doc, string_view id)
 {
   vector<PdfFont*> fonts = Document::GetFonts(doc);
-    for (auto item : fonts) {
+  for (auto item : fonts) {
     string itemId = item->GetIdentifier().GetName();
     string itemName = item->GetFontMetrics()->GetFontname();
     if (itemId == id || itemName == id) {
@@ -318,16 +317,16 @@ protected:
 class DocumentLoadBufferAsync : public AsyncWorker
 {
 public:
-  DocumentLoadBufferAsync(Function& cb,
-                          Document& doc,
-                          PdfRefCountedInputDevice* input,
-                          bool forUpdate,
-                          string pwd)
-    : AsyncWorker(cb, "document_load_buffer_async", doc.Value())
-    , doc(doc)
-    , data(input)
-    , forUpdate(forUpdate)
-    , pwd(std::move(pwd))
+  DocumentLoadBufferAsync(Function& _cb,
+                          Document& _doc,
+                          PdfRefCountedInputDevice* _input,
+                          bool _forUpdate,
+                          string _pwd)
+    : AsyncWorker(_cb, "document_load_buffer_async", _doc.Value())
+    , doc(_doc)
+    , data(_input)
+    , forUpdate(_forUpdate)
+    , pwd(std::move(_pwd))
   {}
   ~DocumentLoadBufferAsync() { delete data; }
 
@@ -358,15 +357,15 @@ class DocumentLoadAsync : public AsyncWorker
 {
 public:
   DocumentLoadAsync(Function& cb,
-                    Document& doc,
-                    string arg,
-                    bool forUpdate,
-                    string pwd)
-    : AsyncWorker(cb, "document_load_async", doc.Value())
-    , doc(doc)
-    , arg(std::move(arg))
-    , pwd(std::move(pwd))
-    , forUpdate(forUpdate)
+                    Document& _doc,
+                    string _arg,
+                    bool _forUpdate,
+                    string _pwd)
+    : AsyncWorker(cb, "document_load_async", _doc.Value())
+    , doc(_doc)
+    , arg(std::move(_arg))
+    , pwd(std::move(_pwd))
+    , forUpdate(_forUpdate)
   {}
 
 private:
@@ -419,6 +418,7 @@ Document::Load(const CallbackInfo& info)
     }
     if (opts.Has("password")) {
       pwd = opts.Get("password").As<String>().Utf8Value();
+      this->pwd = pwd;
     }
   }
   if (!info[info.Length() - 1].IsFunction()) {
@@ -509,11 +509,11 @@ Document::Write(const CallbackInfo& info)
 class GCAsync : public AsyncWorker
 {
 public:
-  GCAsync(const Function& callback, string doc, string pwd, string output)
+  GCAsync(const Function& callback, string& _doc, string _pwd, string _output)
     : AsyncWorker(callback, "gc_async")
-    , doc(std::move(doc))
-    , pwd(std::move(pwd))
-    , output(std::move(output))
+    , doc(std::move(_doc))
+    , pwd(std::move(_pwd))
+    , output(std::move(_output))
     , size(0)
   {}
 
@@ -649,5 +649,60 @@ Document::GetSignatures(const CallbackInfo& info)
   }
 
   return js;
+}
+class ReloadAsync : public AsyncWorker
+{
+public:
+  ReloadAsync(const Function& _cb, Document& _doc, string* _pwd)
+    : AsyncWorker(_cb, "reload_async")
+    , doc(_doc)
+    , pwd(_pwd)
+  {}
+
+protected:
+  void Execute() override
+  {
+    PdfRefCountedBuffer output;
+    PdfOutputDevice device(&output);
+    doc.GetDocument().Write(&device);
+    delete doc.base;
+    auto reload = new PdfMemDocument();
+    PdfRefCountedInputDevice in(output.GetBuffer(), output.GetSize());
+    try {
+      reload->LoadFromDevice(in);
+    } catch (PdfError& err) {
+      if (err.GetError() == ePdfError_InvalidPassword) {
+        if (pwd) {
+          reload->SetPassword(*pwd);
+        }
+      } else {
+        SetError("Failure Reloading Document");
+      }
+    }
+    doc.base = reload;
+  }
+  void OnOK() override { Callback().Call({ Env().Null(), doc.Value() }); }
+
+private:
+  Document& doc;
+  PdfRefCountedBuffer output;
+  string* pwd;
+};
+void
+Document::Reload(const Napi::CallbackInfo& info)
+{
+  if (info.Length() != 1 || !info[0].IsFunction()) {
+    TypeError::New(info.Env(), "Callback Function required")
+      .ThrowAsJavaScriptException();
+  }
+  string* p;
+  if (this->pwd.empty()) {
+    p = nullptr;
+  } else {
+    p = &this->pwd;
+  }
+  Function cb = info[0].As<Function>();
+  AsyncWorker* worker = new ReloadAsync(cb, *this, p);
+  worker->Queue();
 }
 }
