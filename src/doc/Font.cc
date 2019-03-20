@@ -158,6 +158,8 @@ Napi::Value
 Font::GetEncoding(const Napi::CallbackInfo& info)
 {
   const PdfEncoding* encoding = GetFont().GetEncoding();
+  // Encoding must be const cast to a pointer to pass via Napi ObjectWrap Constructor
+  // Encoding is immediately set back to const in the constructor.
   return Encoding::constructor.New({ External<PdfEncoding>::New(
     info.Env(), const_cast<PdfEncoding*>(encoding)) });
 }

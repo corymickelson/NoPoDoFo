@@ -74,7 +74,7 @@ BaseDocument::BaseDocument(const Napi::CallbackInfo& info, bool inMem)
       }
       if (nObj.Has("encrypt")) {
         auto nEncObj = Encrypt::Unwrap(nObj.Get("encrypt").As<Object>());
-        encrypt = const_cast<PdfEncrypt*>(nEncObj->encrypt);
+        encrypt = PdfEncrypt::CreatePdfEncrypt(*nEncObj->encrypt);
       }
     }
     if (info.Length() > 0 && info[0].IsString()) {
@@ -95,6 +95,9 @@ BaseDocument::~BaseDocument()
 #ifdef NOPODOFO_DEBUG
   cout << "Base document cleanup" << endl;
 #endif
+  for (auto c : copies) {
+    delete c; 
+  }
   delete base;
   delete streamDocOutputDevice;
   delete streamDocRefCountedBuffer;

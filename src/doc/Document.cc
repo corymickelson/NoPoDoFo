@@ -103,9 +103,7 @@ Document::Initialize(Napi::Env& env, Napi::Object& target)
 Document::Document(const CallbackInfo& info)
   : ObjectWrap(info)
   , BaseDocument(info, true)
-{
-  cout << "Memory Document" << endl;
-}
+{}
 
 void
 Document::SetPassword(const CallbackInfo& info)
@@ -268,8 +266,9 @@ Napi::Value
 Document::GetTrailer(const CallbackInfo& info)
 {
   const PdfObject* trailerPdObject = GetDocument().GetTrailer();
-  auto ptr = const_cast<PdfObject*>(trailerPdObject);
-  auto initPtr = Napi::External<PdfObject>::New(info.Env(), ptr);
+  auto trailerCopy = new PdfObject(*trailerPdObject);
+  copies.emplace_back(trailerCopy);
+  auto initPtr = Napi::External<PdfObject>::New(info.Env(), trailerCopy);
   auto instance = Obj::constructor.New({ initPtr });
   return instance;
 }
@@ -587,6 +586,8 @@ Document::GetEncrypt(const Napi::CallbackInfo& info)
   if (!enc) {
     return info.Env().Null();
   }
+  // Encrypt is immediately set back to const in the Encrypt constructor.
+  // This const_cast is only necessary for passing the pointer via Napi.
   return Encrypt::constructor.New(
     { External<PdfEncrypt>::New(info.Env(), const_cast<PdfEncrypt*>(enc)) });
 }

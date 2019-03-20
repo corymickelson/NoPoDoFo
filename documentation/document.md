@@ -49,6 +49,7 @@
         - [write](#write)
         - [hasSignatures](#hassignatures)
         - [getSignatures](#getsignatures)
+        - [reload](#reload)
         - [gc](#gc)
 
 ## NoPoDoFo Document
@@ -531,6 +532,23 @@ getSignatures(): ISignatureField[]
 Iterates each page of the document for signature fields and returns an array of all signature fields found.
 
 See [ISignatureField](https://corymickelson.github.io/NoPoDoFo/interfaces/_field_.isignaturefield.html)
+
+### reload
+
+```typescript
+reload(cb: Callback<nopodofo.Document>): void
+```
+
+Reload the current document. This process is a short cut for writing the document to a buffer and then immediately 
+taking that buffer to load into a new instance of a `nopodofo.Document`. This has been added specifically for the use case
+of: 
+Document A is executed with painting operators
+Document B is loaded and only needs Document A for appending or inserting pages into this document.
+
+If the document is not first written, Document B will fail to insert/append Document A properly. 
+
+This is where `reload` is best used.
+Before appending / inserting, finish any paint operations, and reload the document to ensure all changes persist.
 
 ### gc
 

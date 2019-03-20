@@ -131,6 +131,7 @@ export class MemDocSpec {
     }
 
     @AsyncTest('Insert Existing')
+    @Timeout(1000)
     public async insertExistingTest() {
         const magic = 'INSERT EXISTING PRE-PAINT'
         const prepend = await new Promise<Document>(resolve => {
