@@ -39,9 +39,11 @@ message("CMAKE-JS version: ${CMAKE_JS_VERSION}")
 
 if (MSVC)
     set(LITEPDF_PATH "$ENV{litepdf_path}")
-    set(PODOFO_LIBRARY "${LITEPDF_PATH}\\lib\\x64\\litePDF.lib")
+#    set(PODOFO_LIBRARY "${LITEPDF_PATH}\\lib\\x64\\litePDF.lib")
+    set(PODOFO_LIBRARY "C:\\Users\\micke\\CMakeBuilds\\podofo\\build\\x64-Debug\\src\\Debug\\podofo.lib")
     message("PODOFO_LIBRARY: ${PODOFO_LIBRARY}")
-    set(PODOFO_INCLUDE_DIR "${LITEPDF_PATH}\\include")
+#    set(PODOFO_INCLUDE_DIR "${LITEPDF_PATH}\\include")
+        set(PODOFO_INCLUDE_DIR "C:\\Users\\micke\\CMakeBuilds\\podofo\\95126ad7-30b9-6631-b83a-ea33f4537cf1\\install\\x64-Debug\\include")
     message("PODOFO_INCLUDE_DIR: ${PODOFO_INCLUDE_DIR}")
     set(CMAKE_CXX_FLAGS "/std:c++latest /EHsc /EH /MT ${CMAKE_CXX_FLAGS}")
     add_definitions(-DUSING_SHARED_PODOFO=1)
@@ -60,7 +62,8 @@ if (MSVC)
             ${PODOFO_LIBRARY}
 			OpenSSL::SSL
 			OpenSSL::Crypto)
-    set(DLL "${LITEPDF_PATH}\\bin\\x64\\litePDF.dll")
+#    set(DLL "${LITEPDF_PATH}\\bin\\x64\\litePDF.dll")
+        set(DLL "C:\\Users\\micke\\CMakeBuilds\\podofo\\build\\x64-Debug\\src\\Debug\\podofo.dll")
     if (EXISTS "${DLL}")
         add_custom_command(TARGET nopodofo POST_BUILD
                 COMMAND "${CMAKE_COMMAND}"

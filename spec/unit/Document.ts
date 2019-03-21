@@ -2,6 +2,7 @@ import {AsyncSetup, AsyncTeardown, AsyncTest, Expect, TestCase, TestFixture, Tim
 import {nopodofo, nopodofo as npdf} from '../../'
 import {join} from "path";
 import {readFileSync} from "fs";
+import {platform} from 'os'
 import Document = nopodofo.Document;
 
 @TestFixture("(Mem)Document")
@@ -131,43 +132,45 @@ export class MemDocSpec {
     }
 
     @AsyncTest('Insert Existing')
-    @Timeout(1000)
+    @Timeout(1000000)
     public async insertExistingTest() {
         const magic = 'INSERT EXISTING PRE-PAINT'
         const prepend = await new Promise<Document>(resolve => {
             const p = new Document()
-            p.load(join(__dirname, '../test-documents/test.pdf'), e => {
-                if (e instanceof Error) {
+            p.load(join(__dirname, '../test-documents/test.pdf'), async e => {
+                if (e) {
                     Expect.fail(e.message)
                 } else {
                     const painter = new nopodofo.Painter(p)
                     painter.setPage(p.getPage(0))
-                    painter.font = p.createFont({
-                        fontName: 'Helvetica',
+                    const fObj = Object.assign({
+                        fontName: 'FiraCode',
                         bold: true
-                    })
+                    }, (o => o === 'win32' ? {fileName: 'C:\\Users\\micke\\WebstormProjects\\lp-welcome-letter-state-machine\\fonts\\Carlito-Regular.ttf'} : null)(platform()))
+                    painter.font = p.createFont(fObj)
                     painter.setColor(new npdf.Color(0.9))
                     painter.drawText({x: 0, y: 0}, magic)
                     painter.finishPage()
-                    // p.write((e, d) => {
-                    //     if(e) Expect.fail(e.message)
-                    //     else {
-                    //         const rl = new Document()
-                    //         rl.load(d, (ee, dd) => {
-                    //             if(ee) Expect.fail(ee.message)
-                    //             else {
-                    //                 return resolve(dd)
-                    //             }
-                    //         })
-                    //     }
-                    // })
-                    p.reload((err, d) => {
-                        if (err) {
-                            Expect.fail(err.message)
-                        } else {
-                            return resolve(d)
+                    try {
+
+                    let nd = await new Promise<Document>(rr => {
+                        p.write((e, d) => {
+                        if(e) Expect.fail(e.message)
+                        else {
+                            const rl = new Document()
+                            rl.load(d, (ee, dd) => {
+                                if(ee) Expect.fail(ee.message)
+                                else {
+                                    return rr(dd)
+                                }
+                            })
                         }
                     })
+                    })
+                    return resolve(nd)
+                    } catch(e) {
+                       console.error(e)
+                    }
                 }
             })
         })
@@ -176,7 +179,7 @@ export class MemDocSpec {
         Expect(added).toBe(prepend.getPageCount() + 1)
 
         const found = await new Promise((resolve, reject) => {
-            this.subject.write((e, d) => {
+            this.subject.write(async (e, d) => {
                 const fail = (e: Error) => {
                     // set to null to force skipping the teardown step
                     // @ts-ignore
@@ -186,7 +189,9 @@ export class MemDocSpec {
                 if (e) {
                     fail(e)
                 } else {
-                    // require('fs').writeFileSync('/mnt/c/Tmp/test.pdf', d)
+                    console.log('size before: ', d.length)
+                    d = await new Promise<Buffer>(resolve => Document.gc(d, (ee, dd) => ee ? fail(ee) : resolve(dd as Buffer)))
+                    console.log('size after: ', d.length)
                     const rDoc = new Document()
                     rDoc.load(d, e => {
                         if (e) {

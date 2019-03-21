@@ -61,8 +61,6 @@ public:
   Napi::Value GetFont(const Napi::CallbackInfo&);
   Napi::Value ListFonts(const Napi::CallbackInfo&);
   Napi::Value GetSignatures(const Napi::CallbackInfo&);
-  void
-  Reload(const Napi::CallbackInfo &);
   bool LoadedForIncrementalUpdates() { return loadForIncrementalUpdates; }
   inline PoDoFo::PdfMemDocument& GetDocument()
   {

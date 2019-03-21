@@ -17,9 +17,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "../Defines.h"
 #include "Document.h"
+#include "../Defines.h"
 #include "../ErrorHandler.h"
+#include "../ValidateArguments.h"
 #include "../base/Names.h"
 #include "../base/Obj.h"
 #include "Encrypt.h"
@@ -94,7 +95,6 @@ Document::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceMethod("getAttachment", &Document::GetAttachment),
       InstanceMethod("getFont", &Document::GetFont),
       InstanceMethod("listFonts", &Document::ListFonts),
-      InstanceMethod("reload", &Document::Reload),
       InstanceMethod("addNamedDestination", &Document::AddNamedDestination) });
   constructor = Napi::Persistent(ctor);
   constructor.SuppressDestruct();
@@ -509,66 +509,85 @@ Document::Write(const CallbackInfo& info)
 class GCAsync : public AsyncWorker
 {
 public:
-  GCAsync(const Function& callback, string& _doc, string _pwd, string _output)
-    : AsyncWorker(callback, "gc_async")
-    , doc(std::move(_doc))
+  GCAsync(const Function& _cb, PdfRefCountedInputDevice* _in, string& _pwd)
+    : AsyncWorker(_cb, "gc_async")
+    , in(_in)
     , pwd(std::move(_pwd))
-    , output(std::move(_output))
-    , size(0)
   {}
+  ~GCAsync() { delete in; }
 
 protected:
   void Execute() override
   {
-    PdfVecObjects vecObjects;
-    PdfParser parser(&vecObjects);
-    vecObjects.SetAutoDelete(true);
-    parser.ParseFile(doc.c_str(), false);
-    PdfWriter writer(&parser);
-    writer.SetPdfVersion(parser.GetPdfVersion());
-    if (parser.GetEncrypted()) {
-      writer.SetEncrypted(*(parser.GetEncrypt()));
-    }
-    if (output.empty()) {
-      PdfRefCountedBuffer r;
+    try {
+      PdfVecObjects vecObjects;
+      PdfParser parser(&vecObjects);
+      bool incorrect = false;
+      vecObjects.SetAutoDelete(true);
+      do {
+        try {
+          if (!incorrect) {
+            parser.ParseFile(*in, false);
+          } else {
+            parser.SetPassword(pwd);
+          }
+        } catch (PdfError& e) {
+          if (e.GetError() == ePdfError_InvalidPassword) {
+            incorrect = true;
+          } else {
+            SetError(e.what());
+          }
+        }
+      } while (incorrect);
+      PdfWriter writer(&parser);
+      writer.SetPdfVersion(parser.GetPdfVersion());
+      if (parser.GetEncrypted()) {
+        writer.SetEncrypted(*(parser.GetEncrypt()));
+      }
       PdfOutputDevice device(&r);
       writer.Write(&device);
-      value = string(r.GetBuffer());
-      size = r.GetSize();
-    } else {
-      writer.SetWriteMode(ePdfWriteMode_Compact);
-      writer.Write(output.c_str());
-      size = 0;
-      value = output;
+    } catch (PdfError& e) {
+      SetError(e.what());
     }
   }
   void OnOK() override
   {
     HandleScope scope(Env());
-    if (size > 0) {
-      auto buffer =
-        Buffer<char>::Copy(Env(), value.c_str(), static_cast<size_t>(size));
-      Callback().Call({ Env().Null(), buffer });
-    }
-    Callback().Call({ Env().Null(), String::New(Env(), value) });
+    auto buffer = Buffer<char>::Copy(Env(), r.GetBuffer(), r.GetSize());
+    Callback().Call({ Env().Null(), buffer });
   }
 
 private:
-  string doc;
+  PdfRefCountedInputDevice* in;
+  PdfRefCountedBuffer r;
   string pwd;
-  string output;
-  string value;
-  long size;
 };
 
 Napi::Value
 Document::GC(const Napi::CallbackInfo& info)
 {
-  string source = info[0].As<String>().Utf8Value(), pwd, output;
-  pwd = info[1].IsString() ? info[1].As<String>().Utf8Value() : "";
-  output = info[2].IsString() ? info[2].As<String>().Utf8Value() : "";
-  auto cb = info[3].As<Function>();
-  auto worker = new GCAsync(cb, source, pwd, output);
+  if (info.Length() < 2) {
+    Error::New(info.Env(), "Required parameters: Buffer, [pwd], callback")
+      .ThrowAsJavaScriptException();
+  }
+  string pwd;
+  PdfRefCountedInputDevice* in;
+  if (info.Length() > 2 && info[1].IsString()) {
+    pwd = info[1].As<String>().Utf8Value();
+    cout << "PWD: " << pwd << endl;
+  }
+  if (!info[0].IsBuffer()) {
+    Error::New(info.Env(), "Required parameters: Buffer, [pwd], callback")
+      .ThrowAsJavaScriptException();
+  }
+  auto data = info[0].As<Buffer<char>>();
+  in = new PdfRefCountedInputDevice(data.Data(), data.Length());
+  if (!info[info.Length() - 1].IsFunction()) {
+    Error::New(info.Env(), "Required parameters: Buffer, [pwd], callback")
+      .ThrowAsJavaScriptException();
+  }
+  Function cb = info[info.Length() - 1].As<Function>();
+  auto worker = new GCAsync(cb, in, pwd);
   worker->Queue();
   return info.Env().Undefined();
 }
@@ -651,60 +670,5 @@ Document::GetSignatures(const CallbackInfo& info)
   }
 
   return js;
-}
-class ReloadAsync : public AsyncWorker
-{
-public:
-  ReloadAsync(const Function& _cb, Document& _doc, string* _pwd)
-    : AsyncWorker(_cb, "reload_async")
-    , doc(_doc)
-    , pwd(_pwd)
-  {}
-
-protected:
-  void Execute() override
-  {
-    PdfRefCountedBuffer output;
-    PdfOutputDevice device(&output);
-    doc.GetDocument().Write(&device);
-    delete doc.base;
-    auto reload = new PdfMemDocument();
-    PdfRefCountedInputDevice in(output.GetBuffer(), output.GetSize());
-    try {
-      reload->LoadFromDevice(in);
-    } catch (PdfError& err) {
-      if (err.GetError() == ePdfError_InvalidPassword) {
-        if (pwd) {
-          reload->SetPassword(*pwd);
-        }
-      } else {
-        SetError("Failure Reloading Document");
-      }
-    }
-    doc.base = reload;
-  }
-  void OnOK() override { Callback().Call({ Env().Null(), doc.Value() }); }
-
-private:
-  Document& doc;
-  PdfRefCountedBuffer output;
-  string* pwd;
-};
-void
-Document::Reload(const Napi::CallbackInfo& info)
-{
-  if (info.Length() != 1 || !info[0].IsFunction()) {
-    TypeError::New(info.Env(), "Callback Function required")
-      .ThrowAsJavaScriptException();
-  }
-  string* p;
-  if (this->pwd.empty()) {
-    p = nullptr;
-  } else {
-    p = &this->pwd;
-  }
-  Function cb = info[0].As<Function>();
-  AsyncWorker* worker = new ReloadAsync(cb, *this, p);
-  worker->Queue();
 }
 }
