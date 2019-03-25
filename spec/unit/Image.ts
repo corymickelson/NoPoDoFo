@@ -1,6 +1,8 @@
-import {AsyncSetup, AsyncTeardown, AsyncTest, Expect, TestCase, TestFixture, Timeout} from 'alsatian'
+import {AsyncTest, Expect, TestFixture, Timeout} from 'alsatian'
 import {join} from "path";
 import {nopodofo, NPDFName} from '../../'
+import {readFileSync, writeFileSync} from "fs";
+import {v4} from 'uuid'
 import Rect = nopodofo.Rect;
 import StreamDocument = nopodofo.StreamDocument;
 import Document = nopodofo.Document;
@@ -9,8 +11,6 @@ import Painter = nopodofo.Painter;
 import Image = nopodofo.Image;
 import Page = nopodofo.Page;
 import Dictionary = nopodofo.Dictionary;
-import {writeFileSync, readFileSync} from "fs";
-import {v4} from 'uuid'
 
 @TestFixture('Image')
 export class ImageSpec {
@@ -27,7 +27,7 @@ export class ImageSpec {
                     const image = new Image(document, join(__dirname, '../test-documents/test.jpg'))
                     const page = document.getPage(0)
                     painter.setPage(page)
-                    painter.drawImage(image, 0, page.height - image.height)
+                    painter.drawImage(image, 0, page.height - image.height, {height: 0.5, width: 0.5})
                     painter.finishPage();
                     (document as Document).write((err1, data1) => {
                         if (err1) Expect.fail(err1.message)

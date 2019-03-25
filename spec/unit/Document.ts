@@ -144,7 +144,7 @@ export class MemDocSpec {
                     const painter = new nopodofo.Painter(p)
                     painter.setPage(p.getPage(0))
                     const fObj = Object.assign({
-                        fontName: 'FiraCode',
+                        fontName: 'Carlito',
                         bold: true
                     }, (o => o === 'win32' ? {fileName: 'C:\\Users\\micke\\WebstormProjects\\lp-welcome-letter-state-machine\\fonts\\Carlito-Regular.ttf'} : null)(platform()))
                     painter.font = p.createFont(fObj)

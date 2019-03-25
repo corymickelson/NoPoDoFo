@@ -43,7 +43,8 @@ if (MSVC)
     message("PODOFO_LIBRARY: ${PODOFO_LIBRARY}")
     set(PODOFO_INCLUDE_DIR "C:\\Users\\micke\\CMakeBuilds\\podofo\\95126ad7-30b9-6631-b83a-ea33f4537cf1\\install\\x64-Release\\include")
     message("PODOFO_INCLUDE_DIR: ${PODOFO_INCLUDE_DIR}")
-    set(CMAKE_CXX_FLAGS "/std:c++latest /EHsc /EH /MT ${CMAKE_CXX_FLAGS}")
+    set(CMAKE_CXX_FLAGS "/std:c++latest /EHsc /MT ${CMAKE_CXX_FLAGS}")
+
     add_definitions(-DUSING_SHARED_PODOFO=1)
     target_include_directories(${PROJECT_NAME}
             PRIVATE
@@ -60,8 +61,44 @@ if (MSVC)
             ${PODOFO_LIBRARY}
 			OpenSSL::SSL
 			OpenSSL::Crypto)
-        file(GLOB NOPODOFO_DEP_DLLS "C:\\Users\\micke\\CMakeBuilds\\podofo\\build\\x64-Release\\src\\Release\\*.dll")
-        file(COPY ${NOPODOFO_DEP_DLLS} DESTINATION "${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}")
+ set(WIN_REQUIRED_DLLS
+      "freetype.dll"
+      "freetyped.dll"
+      "jpeg62.dll"
+      "bz2.dll"
+      "bz2d.dll"
+      "LIBEAY.dll"
+      "libpng16d.dll"
+      "libpng16.dll"
+      "lzma.dll"
+      "podofo.dll"
+      "podofo.pdb"
+      "ssleay32.dll"
+      "tiff.dll"
+      "tiffd.dll"
+      "turbojpeg.dll"
+      "zlib1d.dll"
+      "zlib1.dll")
+
+  if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+        set(CMAKE_CXX_FLAGS "/Zi ${CMAKE_CXX_FLAGS}")
+  endif(CMAKE_BUILD_TYPE STREQUAL "Debug")
+  
+  foreach(file_i ${WIN_REQUIRED_DLLS})
+    set(DLL "C:\\Users\\micke\\CMakeBuilds\\podofo\\build\\x64-Debug\\src\\Debug\\${file_i}")
+    if(EXISTS "${DLL}")
+      add_custom_command(TARGET nopodofo POST_BUILD
+                         COMMAND "${CMAKE_COMMAND}"
+                                 ARGS -E
+                                      copy
+                                      "${DLL}"
+                                      "${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}")
+    else()
+      message(WARNING "DLL not found: ${DLL}")
+    endif(EXISTS "${DLL}")
+  endforeach(file_i)
+
+
 else ()
     message("Creating build output directory: build/${CMAKE_BUILD_TYPE}")
     file(MAKE_DIRECTORY ${CMAKE_SOURCE_DIR}/build/${CMAKE_BUILD_TYPE})

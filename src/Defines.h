@@ -58,7 +58,7 @@
 using std::experimental::string_view;
 #endif
 
-#if defined _WIN32 || defined _WIN64 || __linux__
+#if defined(_WIN32) || defined(_WIN64) || defined(__linux__)
 #include <experimental/filesystem>
 namespace fs = std::experimental::filesystem;
 #endif

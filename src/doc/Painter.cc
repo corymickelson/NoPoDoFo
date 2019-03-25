@@ -296,7 +296,7 @@ Painter::DrawImage(const CallbackInfo& info)
     PdfImage img = imgInstance->GetImage();
 
     // Coordinates
-    float x, y;
+    double x, y;
     if (!info[1].IsNumber() || !info[2].IsNumber()) {
       throw Napi::Error::New(info.Env(), "coorindates must be of type number");
     }
@@ -304,20 +304,17 @@ Painter::DrawImage(const CallbackInfo& info)
     y = info[2].As<Number>().DoubleValue();
 
     // Scaling
-    float width = 0.0, height = 0.0;
-    if (info.Length() == 5) {
-      if (!info[3].IsNumber() || !info[4].IsNumber()) {
-        throw Napi::Error::New(info.Env(),
-                               "scaling width & height must be of type number");
+    double width = 1.0, height = 1.0;
+    if(info.Length() >= 4 && info[3].IsObject()) {
+      auto optObj = info[3].As<Object>();
+      if(optObj.HasOwnProperty("width") && optObj.HasOwnProperty("height")) {
+        width = optObj.Get("width").As<Number>().DoubleValue();
+        height = optObj.Get("height").As<Number>().DoubleValue();
+      } else {
+        TypeError::New(info.Env(), "Scaling option requires width and height").ThrowAsJavaScriptException();
       }
-      width = info[3].As<Number>().DoubleValue();
-      height = info[4].As<Number>().DoubleValue();
     }
-    if (width != 0.0 && height != 0.0)
-      painter->DrawImage(x, y, &img, width, height);
-    else
-      painter->DrawImage(x, y, &img);
-
+    painter->DrawImage(x, y, &img, width, height);
   } catch (PdfError& err) {
     ErrorHandler(err, info);
   } catch (Napi::Error& err) {
