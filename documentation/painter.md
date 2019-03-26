@@ -118,9 +118,9 @@ class Painter {
    * @param {Image} img - an instance of Image
    * @param {number} x - x coordinate (bottom left position of image)
    * @param {number} y - y coordinate (bottom position of image)
-   * @param {{width:number, heigth:number}} scale - optional scaling
+   * @param {{[width]:number, [heigth]:number, [x]: number, [y]: number}} scale - optional scaling
    */
-  drawImage(img: Image, x: number, y: number, scale?: { width: number, height: number }): void
+  drawImage(img: Image, x: number, y: number, opts?: { width?: number, height?: number, scaleX?: number, scaleY?: number }): void
 
 }
 ```
@@ -463,7 +463,14 @@ Finish drawing on the page. This has to be called whenever drawing operations on
 
 ### drawImage
 ```typescript
-drawImage(img: Image, x: number, y: number, scale?: { width: number, height: number }): void
+drawImage(img: Image, x: number, y: number, opts?: { width?: number, height?: number, scaleX?: number, scaleY?: number }): void
 ```
 
-Draw an image to the current path.
+Draw an image to the current path, img is an instance of [Image](./image.md), x and y are the coordinates of the pdf page in pdf points.
+The options object accepts either a scaling factor or width and height values. If both are provided the width and height will be used.
+All values are in PDF points.
+
+`opts` provides two forms of image sizing properties: scaleX and scaleY or
+width and height. The latter (width and height) are simply helpers for calculating the scaling factor. To determine the correct
+scaling factor for a given width and height we only need divide the desired width/height by the images width/height to get the correct
+scaling factor. Again, this is done for you if you pass `width, height` in the options object. 

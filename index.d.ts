@@ -1243,14 +1243,7 @@ export namespace nopodofo {
 
         finishPage(): void
 
-        /**
-         *
-         * @param {Image} img - an instance of Image
-         * @param {number} x - x coordinate (bottom left position of image)
-         * @param {number} y - y coordinate (bottom position of image)
-         * @param {{width:number, heigth:number}} scale - optional scaling
-         */
-        drawImage(img: Image, x: number, y: number, scale?: { width: number, height: number }): void
+        drawImage(img: Image, x: number, y: number, opts?: { width?: number, height?: number, scaleX?: number, scaleY?: number }): void
 
     }
 

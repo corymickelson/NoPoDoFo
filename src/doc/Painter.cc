@@ -305,13 +305,22 @@ Painter::DrawImage(const CallbackInfo& info)
 
     // Scaling
     double width = 1.0, height = 1.0;
-    if(info.Length() >= 4 && info[3].IsObject()) {
+    if (info.Length() >= 4 && info[3].IsObject()) {
       auto optObj = info[3].As<Object>();
-      if(optObj.HasOwnProperty("width") && optObj.HasOwnProperty("height")) {
-        width = optObj.Get("width").As<Number>().DoubleValue();
-        height = optObj.Get("height").As<Number>().DoubleValue();
+      if (optObj.HasOwnProperty("width") && optObj.HasOwnProperty("height")) {
+        auto w = optObj.Get("width").As<Number>().DoubleValue();
+        auto h = optObj.Get("height").As<Number>().DoubleValue();
+        width = w / img.GetWidth();
+        height = h / img.GetHeight();
+      } else if (optObj.HasOwnProperty("scaleX") &&
+                 optObj.HasOwnProperty("scaleY")) {
+        width = optObj.Get("scaleX").As<Number>().DoubleValue();
+        height = optObj.Get("scaleY").As<Number>().DoubleValue();
       } else {
-        TypeError::New(info.Env(), "Scaling option requires width and height").ThrowAsJavaScriptException();
+        TypeError::New(info.Env(),
+                       "Options include either defining the width and height "
+                       "(in pdf points) or a scaling factor")
+          .ThrowAsJavaScriptException();
       }
     }
     painter->DrawImage(x, y, &img, width, height);

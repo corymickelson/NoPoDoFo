@@ -38,10 +38,10 @@ Create a new Image object from the source provided, to be embedded in the [Docum
 -------------
 
 ### width
-Get the width of the image
+Readonly, get the width of the image
 
 ### height
-Get the height of the image
+Readonly, get the height of the image
 
 ## Methods
 -----------

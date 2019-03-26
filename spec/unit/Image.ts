@@ -27,7 +27,7 @@ export class ImageSpec {
                     const image = new Image(document, join(__dirname, '../test-documents/test.jpg'))
                     const page = document.getPage(0)
                     painter.setPage(page)
-                    painter.drawImage(image, 0, page.height - image.height, {height: 0.5, width: 0.5})
+                    painter.drawImage(image, 0, page.height - image.height, {scaleY: 0.5, scaleX: 0.5})
                     painter.finishPage();
                     (document as Document).write((err1, data1) => {
                         if (err1) Expect.fail(err1.message)
@@ -50,7 +50,7 @@ export class ImageSpec {
         const imgSrc = readFileSync(join(__dirname, '../test-documents/test.jpg'))
         const image = new Image(doc, imgSrc)
         painter.setPage(page)
-        painter.drawImage(image, 0, page.height - image.height)
+        painter.drawImage(image, 0, page.height - image.height, {width: 20, height: 30})
         painter.finishPage();
         const data = doc.close()
         await this.testDocument(data)
