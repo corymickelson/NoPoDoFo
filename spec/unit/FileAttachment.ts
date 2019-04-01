@@ -1,8 +1,8 @@
-import {AsyncSetup, AsyncTeardown, AsyncTest, Expect, TestCase, TestFixture, Timeout} from 'alsatian'
+import {AsyncSetup, AsyncTeardown, AsyncTest, Expect, TestCase, TestFixture} from 'alsatian'
+import {join} from "path";
 import {nopodofo, NPDFName} from '../../'
 import Document = nopodofo.Document;
 import StreamDocument = nopodofo.StreamDocument;
-import {join} from "path";
 import Base = nopodofo.Base;
 import Object = nopodofo.Object;
 import Rect = nopodofo.Rect;
@@ -109,6 +109,5 @@ export class FileSpecPreWrite {
             }
         }
     }
-
 }
 

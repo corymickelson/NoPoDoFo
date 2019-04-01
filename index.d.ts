@@ -1064,7 +1064,6 @@ export namespace nopodofo {
         constructor(rect: Rect, native: NPDFExternal<Base>)
     }
 
-
     export class StreamDocument extends Base {
         /**
          *
@@ -1120,7 +1119,6 @@ export namespace nopodofo {
          */
         write(minSignatureSize: Number, cb: Callback<Buffer | string>): void
     }
-
 
     export class Rect {
         /**

@@ -7,6 +7,7 @@
   * [Annotation](documentation/annotations.md)
   * [Array](documentation/array.md)
   * [CheckBox](documentation/checkbox.md)
+  * [Color](documentation/color.md)
   * [ComboBox](documentation/combobox.md)
   * [ContentsTokenizer](documentation/contentstokenizer.md)
   * [Data](documentation/data.md)
@@ -30,6 +31,7 @@
   * [Painter](documentation/painter.md)
   * [PushButton](documentation/pushbutton.md)
   * [Rect](documentation/rect.md)
+  * [Ref](documentation/ref.md)
   * [SignatureField](documentation/signaturefield.md)
   * [Signer](documentation/signer.md)
   * [SimpleTable](documentation/simpletable.md)
@@ -37,6 +39,7 @@
   * [XObject](documentation/xobject.md)
 
 * [Cookbook]()
+	* [AP](documentation/cookbook/ap.md)
   * [Bookmarks](documentation/cookbook/bookmark.md)
   * [Images](documentation/cookbook/images.md)
   * [Data Types](documentation/cookbook/datatypes.md)

@@ -1,31 +1,31 @@
 import {AsyncTest, Expect, Test, TestCase, TestFixture, Timeout} from 'alsatian'
-import {nopodofo as npdf, nopodofo, NPDFAnnotation, NPDFFieldType, NPDFName, NPDFPaintOp} from '../../'
+import {nopodofo, NPDFAnnotation, NPDFFieldType, NPDFName, NPDFPaintOp} from '../../'
 import {join} from 'path'
 import Dictionary = nopodofo.Dictionary;
 
 @TestFixture('Form Field')
 export class FieldSpec {
     private readonly filePath = join(__dirname, '../test-documents/iss.16.checkbox-field-state-options.pdf')
-    private readonly outfile = join(__dirname, '../tmp/npdf.values.test.pdf')
+    private readonly outfile = join(__dirname, '../tmp/nopodofo.values.test.pdf')
     private readonly streamTestFile = join(__dirname, '../tmp/fields.create.pdf')
 
     @Test('Create Simple Form')
     public createSimpleForm() {
-        const doc = new npdf.StreamDocument(this.streamTestFile)
+        const doc = new nopodofo.StreamDocument(this.streamTestFile)
         let courier = doc.createFont({fontName: 'Courier'})
-        const painter = new npdf.Painter(doc)
-        const defaultPageMediaBox = new npdf.Rect(0, 0, 612, 792)
+        const painter = new nopodofo.Painter(doc)
+        const defaultPageMediaBox = new nopodofo.Rect(0, 0, 612, 792)
         const page = doc.createPage(defaultPageMediaBox)
         const nameLabel = 'First name:'
         const nameFieldAnnot = page.createAnnotation(
             NPDFAnnotation.Widget,
-            new npdf.Rect(100 + courier.stringWidth(nameLabel), 500, 100, 40))
+            new nopodofo.Rect(100 + courier.stringWidth(nameLabel), 500, 100, 40))
 
-        nameFieldAnnot.color = new npdf.Color(0, 0, 1)
+        nameFieldAnnot.color = new nopodofo.Color(0, 0, 1)
         nameFieldAnnot.setBorderStyle({horizontal: 1, vertical: 1, width: 1})
         // Add field label to page
         painter.setPage(page)
-        const black = new npdf.Color(1.0)
+        const black = new nopodofo.Color(1.0)
         painter.setColor(black)
         courier.size = 11
         painter.font = courier
@@ -34,7 +34,7 @@ export class FieldSpec {
 
         const nameField = page.createField(NPDFFieldType.TextField, nameFieldAnnot, doc.form);
         nameField.fieldName = 'FirstName'
-        const red = new npdf.Color(1.0, 0.0, 0.0)
+        const red = new nopodofo.Color(1.0, 0.0, 0.0)
         nameField.setBackgroundColor(red)
         doc.close()
     }
@@ -43,7 +43,7 @@ export class FieldSpec {
     public async simpleFieldsTest() {
         return new Promise((resolve, reject) => {
 
-            const doc = new npdf.Document()
+            const doc = new nopodofo.Document()
             doc.load(this.filePath, (e: Error) => {
                 if (e) Expect.fail(e.message)
                 else {
@@ -58,13 +58,13 @@ export class FieldSpec {
                         Expect(typeof field.required === 'boolean').toBeTruthy()
                         switch (field.type) {
                             case NPDFFieldType.TextField:
-                                (field as npdf.TextField).text = 'TEST'
+                                (field as nopodofo.TextField).text = 'TEST'
                                 break
                             case NPDFFieldType.Checkbox:
-                                (field as npdf.Checkbox).checked = true
+                                (field as nopodofo.Checkbox).checked = true
                                 break
                             case NPDFFieldType.ComboBox:
-                                (field as npdf.ComboBox).selected = 0 // set to first value
+                                (field as nopodofo.ComboBox).selected = 0 // set to first value
                                 break
                             default:
                                 break
@@ -73,21 +73,21 @@ export class FieldSpec {
                     doc.write(this.outfile, (err, data) => {
                         if (err) Expect.fail(err.message)
                         else {
-                            let fieldsDoc = new npdf.Document()
+                            let fieldsDoc = new nopodofo.Document()
                             fieldsDoc.load(this.outfile, () => {
                                 let tPage = fieldsDoc.getPage(0)
                                 tPage.getFields().forEach(field => {
                                     switch (field.type) {
                                         case NPDFFieldType.TextField:
-                                            let text = field as npdf.TextField
+                                            let text = field as nopodofo.TextField
                                             Expect(text.text).toEqual('TEST')
                                             break
                                         case NPDFFieldType.Checkbox:
-                                            let check = field as npdf.Checkbox
+                                            let check = field as nopodofo.Checkbox
                                             Expect(check.checked).toBeTruthy()
                                             break
                                         case NPDFFieldType.ComboBox:
-                                            let lf = field as npdf.ComboBox
+                                            let lf = field as nopodofo.ComboBox
                                             Expect(lf.selected).toEqual(0)
                                             break
                                         default:

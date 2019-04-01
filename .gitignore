@@ -47,3 +47,5 @@ coverage
 *temp*
 .fuse*
 releases/
+yarn*
+node_modules*

@@ -1,5 +1,5 @@
-import {AsyncTest, Expect, TestCase, TestFixture, Timeout} from 'alsatian'
-import {EncryptOption, nopodofo as npdf, ProtectionOption} from '../../'
+import {AsyncTest, Expect, TestCase, TestFixture} from 'alsatian'
+import {nopodofo, ProtectionOption} from '../../'
 import {join} from "path";
 
 @TestFixture("Encryption")
@@ -19,20 +19,20 @@ export class EncryptionSpec {
     ) {
         return new Promise((resolve, reject) => {
             try {
-                const subject = npdf.Encrypt.createEncrypt({
+                const subject = nopodofo.Encrypt.createEncrypt({
                     ownerPassword,
                     userPassword,
                     keyLength,
                     protection,
                     algorithm
-                }) as npdf.Encrypt
-                const doc = new npdf.Document()
+                }) as nopodofo.Encrypt
+                const doc = new nopodofo.Document()
                 doc.load(join(__dirname, '../test-documents/test.pdf'), err => {
                     if (err) Expect.fail(err.message)
                     doc.encrypt = subject
                     doc.write((e, data) => {
                         if (e) Expect.fail(e.message)
-                        const secured = new npdf.Document()
+                        const secured = new nopodofo.Document()
                         secured.load(data, {password: 'secret'}, err => {
                             if (err) Expect.fail(err.message)
                             Expect(secured.encrypt).toBeDefined()
@@ -49,16 +49,14 @@ export class EncryptionSpec {
             } catch (e) {
                 reject(e)
             }
-
         })
-
     }
 
     @AsyncTest("Password validation")
     @TestCase('secret', 'secret')
     @TestCase('secret')
     public async passwordValidationSpec(owner: string, user?: string) {
-        const doc = new npdf.Document()
+        const doc = new nopodofo.Document()
         return new Promise((resolve, reject) => {
             doc.load(join(__dirname, '../test-documents/test.pdf'), err => {
                 if (err) Expect.fail(err.message)
@@ -68,10 +66,10 @@ export class EncryptionSpec {
                     algorithm: 'aesv2'
                 }, user ? {userPassword: user, ownerPassword: owner}
                     : {ownerPassword: owner})
-                doc.encrypt = npdf.Encrypt.createEncrypt(opts) as npdf.Encrypt
+                doc.encrypt = nopodofo.Encrypt.createEncrypt(opts) as nopodofo.Encrypt
                 doc.write(async (err, data) => {
                     if (err) Expect.fail(err.message)
-                    const child = new npdf.Document()
+                    const child = new nopodofo.Document()
                     if (user) { // Expect a failure since a user pwd has been provided
                         await Expect(() =>
                             new Promise((resolve, reject) => {

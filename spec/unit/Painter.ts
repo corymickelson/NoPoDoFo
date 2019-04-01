@@ -1,6 +1,6 @@
 import {AsyncTest, Expect, Test, TestFixture} from 'alsatian'
-import {nopodofo as npdf, CONVERSION, NPDFFontEncoding} from '../../'
-import {join} from 'path';
+import {CONVERSION, nopodofo, NPDFFontEncoding} from '../../'
+import {join} from 'path'
 
 if (!global.gc) {
     global.gc = () => {
@@ -14,9 +14,9 @@ export class PainterSpec {
 
     @Test('Stream Painter setPage')
     public streamPainterSetPageTest() {
-        const doc = new npdf.StreamDocument(join(__dirname, '../tmp/streamPainterSetPage.pdf'))
-        const painter = new npdf.Painter(doc)
-        const page = doc.createPage(new npdf.Rect(0, 0, 612, 792))
+        const doc = new nopodofo.StreamDocument(join(__dirname, '../tmp/streamPainterSetPage.pdf'))
+        const painter = new nopodofo.Painter(doc)
+        const page = doc.createPage(new nopodofo.Rect(0, 0, 612, 792))
         // Expect(() => painter.addText('TEST')).toThrow()
         painter.setPage(page)
         // painter.addText('TEST')
@@ -24,15 +24,15 @@ export class PainterSpec {
 
     @Test('Paint Simple Table')
     public simpleTablePainterTest() {
-        const doc = new npdf.StreamDocument()
-        const painter = new npdf.Painter(doc)
-        const page = doc.createPage(new npdf.Rect(0, 0, 612, 792))
+        const doc = new nopodofo.StreamDocument()
+        const painter = new nopodofo.Painter(doc)
+        const page = doc.createPage(new nopodofo.Rect(0, 0, 612, 792))
         painter.setPage(page)
         const font = doc.createFont({fontName: 'Carlito', embed: true})
         painter.font = font
-        const table = new npdf.SimpleTable(doc, 5, 5)
-        const purple = new npdf.Color(0.21, 0.15, 0.34)
-        const red = new npdf.Color(1.0, 0.0, 0.0)
+        const table = new nopodofo.SimpleTable(doc, 5, 5)
+        const purple = new nopodofo.Color(0.21, 0.15, 0.34)
+        const red = new nopodofo.Color(1.0, 0.0, 0.0)
         table.setFont(font)
         table.foregroundColor = purple
         table.backgroundColor = red
@@ -56,12 +56,12 @@ export class PainterSpec {
 
     @AsyncTest('Painter drawing apis')
     public async painter() {
-        let doc = new npdf.Document()
+        let doc = new nopodofo.Document()
         return new Promise(resolve => {
             doc.load(this.filePath, (err: Error) => {
                 if (err) Expect.fail(err.message)
                 else {
-                    let painter = new npdf.Painter(doc)
+                    let painter = new nopodofo.Painter(doc)
                     let page = doc.getPage(0)
                     painter.setPage(page)
                     let font = doc.createFont({
@@ -87,7 +87,7 @@ export class PainterSpec {
                     y = page.height - 10000 * CONVERSION
 
                     painter.drawText({x: 12000 * CONVERSION, y: y - h}, msg)
-                    let rect = new npdf.Rect(12000 * CONVERSION, y - h, w, h)
+                    let rect = new nopodofo.Rect(12000 * CONVERSION, y - h, w, h)
                     painter.rectangle(rect)
                     painter.stroke()
 
@@ -100,7 +100,7 @@ export class PainterSpec {
                         painter.drawLine({x, y}, {x, y: y - lineLength})
                     }
 
-                    const table = new npdf.SimpleTable(doc, 5, 5)
+                    const table = new nopodofo.SimpleTable(doc, 5, 5)
                     table.setFont(font)
                     for (let c = 0; c < 5; c++) {
                         for (let r = 0; r < 5; r++) {
@@ -111,22 +111,22 @@ export class PainterSpec {
                     table.tableHeight = 200
                     table.draw({x: 300, y: 300}, painter)
 
-                    let multiLineContainer = new npdf.Rect(300, 300, 150, 50)
+                    let multiLineContainer = new nopodofo.Rect(300, 300, 150, 50)
                     painter.drawMultiLineText(multiLineContainer, 'MULTILINE\nTEST')
                     painter.finishPage()
                     doc.write(this.outFile, (e: Error, d: any) => {
                         if (e instanceof Error) Expect.fail(e.message)
                         else {
-                            let subject = new npdf.Document()
+                            let subject = new nopodofo.Document()
                             subject.load(this.outFile, e => {
                                 if (e) Expect.fail(e.message)
                                 else {
-                                    let contentsParser = new npdf.ContentsTokenizer(doc, 0)
+                                    let contentsParser = new nopodofo.ContentsTokenizer(doc, 0)
                                     let contents = contentsParser.readSync();
                                     let it = contents.next()
                                     let expects = ['MULTILINE', 'TEST', 'SingleLineText']
                                     let found = 0
-                                    while (it.done === false) {
+                                    while (!it.done) {
                                         for (let i = 0; i < expects.length; i++) {
                                             if (it.value.includes(expects[i])) {
                                                 found++

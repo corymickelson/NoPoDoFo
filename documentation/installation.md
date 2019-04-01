@@ -11,42 +11,89 @@ The recommended installation process is as follows:
 
 ## Windows
 
-<mark>Windows support is still a work in progress</mark>
+NoPoDoFo **does** provide a prebuilt package for windows x64, the prebuilt is built on windows 10 and can be installed into your npm project with
+`npm i https://github.com/corymickelson/NoPoDoFo/releases/download/v1.0.0/nopodofo-v1.0.0-pre-win64.tar.gz`
 
-NoPoDoFo does provide a prebuilt package for windows x64, the prebuilt is built on windows 10 and can be installed into your npm project with
-`npm i https://github.com/corymickelson/NoPoDoFo/releases/download/v0.8.0/nopodofo-v0.8.0-win-x64.tar.gz`
+The recommended build for NoPoDoFo on Windows requires building PoDoFo from source.
 
-Below are instructions for building PoDoFo and NoPoDoFo from source. Please note that the below instructions do __not__ include all features.
-Encryption and Signing will not be available from the instructions below as vcpkg does not include the optional libraries (libidn and openssl) in
-their port of PoDoFo.
+To build from source first fetch the source code; podofo source code is available via github at `https://github.com/corymickelson/podofo.git .` or svn at `https://sourceforge.net/p/podofo/code/HEAD/tree/podofo/trunk .`
 
-Please install [vcpkg](https://github.com/Microsoft/vcpkg) as your package manager for building and installing PoDoFo.
-To install PoDoFo with vcpkg run `vcpkg install podofo:x64-windows`[^1]. NoPoDoFo requires the path to vcpkg root directory as environment variable `vcpkg_path`.
-Install OpenSSL (required by NoPoDoFo) using the same command used to install PoDoFo `vcpkg install openssl:x64-windows`.
-To enable [CMake find_package](https://cmake.org/cmake/help/v3.8/command/find_package.html), used to find openssl, run `vcpkg integrate install`.
-Building NoPoDoFo from source requires CMake.
+The following instructions are for building PoDoFo via visual studio 2019, the same instructions should work for 2017.
 
-- Set environment variable `vcpkg_path` to the root of your vcpkg installation, ex: `set vcpkg_path=C:\\vcpkg`
-- run `git clone https://github.com/corymickelson/NoPoDoFo`
-- run `npm install`
-- run `./node_modules/.bin/cmake-js build`
-- run `./node_modules/.bin/tsc -p tsconfig.json`
+PoDoFo required libraries can be installed via vcpkg. If you do not have vcpkg setup,
+please go to [vcpkg](https://github.com/Microsoft/vcpkg) and follow the installation instructions.
 
-**Note** If `cmake-js build` fails with the error 'Unable to find OpenSSL' try running the build command again with CMAKE_TOOLCHAIN_FILE set to the 
-proper location, ex `cmake-js build --CDCMAKE_TOOLCHAIN_FILE=C:\vcpkg\scripts\buildsystems\vcpkg.cmake`
+Please take not that libidn v1 is not available via vcpkg, these instructions will **not** include libidn.
+PoDoFo and thus NoPoDoFo built without libidn will **not** include support for AES256 encryption. 
 
-NoPoDoFo also provides pre-built binaries for Windows.
-To install a pre-built in your npm project run `npm install https://github.com/corymickelson/NoPoDoFo/releases/download/{version}/nopodofo-{version}-win-x86_64.tar.gz`
+With vcpkg installed; install the following packages (all packages are windows-x64)
+
+- libjpeg-turbo
+- tiff
+- libpng
+- openssl
+- freetype
+- zlib
+
+After all the above have installed ensure they are accessible to our project, this is easily accomplished
+with the `vcpkg integrate install` command.
+
+Open visual studio, select open folder and then select the PoDoFo root directory. Once this has loaded, 
+right click the CMakeLists.txt file at the root of the project and click `CMake Settings for PoDoFo`
+
+Update to match the following, replace cmakeToolchainFile path with the correct path on your system:
+
+```json
+{
+    "name": "x64-Release",
+    "generator": "Ninja",
+    "configurationType": "Release",
+    "inheritEnvironments": [ "msvc_x64_x64" ],
+    "buildRoot": "${env.USERPROFILE}\\CMakeBuilds\\podofo\\${name}",
+    "installRoot": "${env.USERPROFILE}\\CMakeBuilds\\podofo\\install\\${name}",
+    "cmakeCommandArgs": "",
+    "buildCommandArgs": "-v",
+    "ctestCommandArgs": "",
+    "variables": [
+    {
+        "name": "LIBCRYPTO_LIBRARY_NAMES",
+        "value": "libeay32",
+        "type": "STRING"
+    }
+    ],
+    "cmakeToolchain": "${Path to vcpkg.cmake file, if you do not know run vcpkg integrate install}"
+}
+```
+
+On save this should re-generate the cmake cache, but if it does not right click the CMakeLists.txt file
+at the root of the project and select `Generate cache for PoDoFo`.
+
+Now we can select the `Build All` from the `Build` dropdown.
+After the build has completed select `Install PoDoFo` from the `Build` dropdown.
+
+This concludes building PoDoFo.
+
+Building NoPoDoFo:
+
+Clone NoPoDoFo `git clone git@github:corymickelson/NoPoDoFo.git .`
+
+To build NoPoDoFo run:
+
+- `cd nopodofo`
+- `npm install`
+- `npm run build -- --CDPODOFO_BUILD_PATH={path to buildRoot} --CDPODOFO_INSTALL_PATH={path to installRoot} --CDCMAKE_TOOLCHAIN_FILE={path to vcpkg.cmake}`
+
+ex npm run command: `npm run build -- --CDCMAKE_TOOLCHAIN_FILE=C:\LIBS\VCPKG\SCRIPTS\BUILDSYSTEMS\VCPKG.CMAKE --CDPODOFO_BUILD_PATH=C:\Users\micke\CMakeBuilds\podofo\build\x64-Debug-Ninja --CDPODOFO_INSTALL_PATH=C:\Users\micke\CMakeBuilds\podofo\install\x64-Debug-Ninja`
 
 ## Mac
 
-PoDoFo v0.9.6 is available in MacPorts. Please visit [MacPorts](https://www.macports.org/) for installation instructions.
+PoDoFo v0.9.6 is available in MacPorts or vcpkg.
 
 Building NoPoDoFo
 
-- `npm i nopodofo`
 - `cd nopodofo`
-- `./node_modules/.bin/cmake-js build -s=c++17`
+- `npm i nopodofo`
+- `npm run build`
 
 
 ## Linux
