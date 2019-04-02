@@ -153,13 +153,7 @@ class Document extends Base {
     append(doc: Document|Document[]): void
 }
 export class StreamDocument extends Base {
-        /**
-         *
-         * @param {string} [file]
-         * @param {{version: NPDFVersion, writer: NPDFWriteMode, encrypt: Encrypt}} [opts] -
-         *      defaults to {pdf1.7, writeMode_default, null}
-         * @returns {StreamDocument}
-         */
+
         constructor(file?: string, opts?: { version: NPDFVersion, writer: NPDFWriteMode, encrypt?: Encrypt })
 
         /**
