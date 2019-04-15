@@ -783,7 +783,7 @@ export namespace nopodofo {
 
         encrypt: Encrypt
         readonly trailer: Object
-        readonly catalog: Object
+        catalog: Object
 
         load(file: string | Buffer,
              opts: {

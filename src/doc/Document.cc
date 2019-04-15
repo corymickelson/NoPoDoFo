@@ -276,10 +276,12 @@ Document::GetTrailer(const CallbackInfo& info)
 Napi::Value
 Document::GetCatalog(const CallbackInfo& info)
 {
-  PdfObject* catalog = GetDocument().GetCatalog();
-  auto initPtr = Napi::External<PdfObject>::New(info.Env(), catalog);
-  auto instance = Obj::constructor.New({ initPtr });
-  return instance;
+  auto* catalog = GetDocument().GetCatalog();
+  if (catalog == nullptr) {
+    return info.Env().Null();
+  }
+  return Obj::constructor.New(
+    { External<PdfObject>::New(info.Env(), catalog) });
 }
 
 class DocumentWriteAsync : public AsyncWorker

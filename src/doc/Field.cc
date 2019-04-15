@@ -428,7 +428,12 @@ Field::GetFieldRefreshKeys(PoDoFo::PdfField* f)
         Name::AP)) {
     f->GetWidgetAnnotation()->GetObject()->GetDictionary().AddKey(
       Name::AP, PdfDictionary());
-    PdfXObject x(f->GetWidgetAnnotation()->GetRect(),
+    PdfRect xRect;
+    xRect.SetLeft(0.0);
+    xRect.SetBottom(0.0);
+    xRect.SetWidth(f->GetWidgetAnnotation()->GetRect().GetWidth());
+    xRect.SetHeight(f->GetWidgetAnnotation()->GetRect().GetHeight());
+    PdfXObject x(xRect,
                  f->GetFieldObject()->GetOwner()->GetParentDocument());
     f->GetWidgetAnnotation()
       ->GetObject()

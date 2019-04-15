@@ -283,7 +283,7 @@ Obj::GetReal(const CallbackInfo& info)
 Napi::Value
 Obj::GetString(const CallbackInfo& info)
 {
-  if (!obj.IsString() || !obj.IsHexString()) {
+  if (!obj.IsString() && !obj.IsHexString()) {
     throw Napi::Error::New(info.Env(), "Obj only accessible as a String");
   }
   return String::New(info.Env(), obj.GetString().GetStringUtf8());
