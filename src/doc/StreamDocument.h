@@ -33,6 +33,7 @@ class StreamDocument
 public:
   static Napi::FunctionReference constructor;
   explicit StreamDocument(const Napi::CallbackInfo&);
+  ~StreamDocument();
   static void Initialize(Napi::Env& env, Napi::Object& target);
   Napi::Value Close(const Napi::CallbackInfo&);
   void Append(const Napi::CallbackInfo&) override;
@@ -41,6 +42,9 @@ public:
   {
     return *dynamic_cast<PoDoFo::PdfStreamedDocument*>(BaseDocument::base);
   }
+
+private:
+  std::shared_ptr<spdlog::logger> dbglog;
 };
 };
 #endif

@@ -24,6 +24,7 @@
 
 #include <napi.h>
 #include <podofo/podofo.h>
+#include <spdlog/logger.h>
 
 namespace NoPoDoFo {
 class Painter : public Napi::ObjectWrap<Painter>
@@ -96,6 +97,7 @@ private:
   PoDoFo::PdfDocument* document;
   void GetCMYK(Napi::Value&, float* cmyk);
   void GetRGB(Napi::Value&, float* rgb);
+  std::shared_ptr<spdlog::logger> dbglog;
 };
 }
 #endif // NPDF_PAINTER_H

@@ -20,6 +20,7 @@
 #include "CheckBox.h"
 #include "Field.h"
 #include <iostream>
+#include <spdlog/spdlog.h>
 
 using std::cout;
 using std::endl;
@@ -33,7 +34,14 @@ CheckBox::CheckBox(const CallbackInfo& info)
   , Field(ePdfField_CheckBox, info)
   , Button(Field::GetField())
   , field(Field::GetField())
-{}
+{
+  dbglog = spdlog::get("dbglog");
+}
+
+CheckBox::~CheckBox()
+{
+  dbglog->debug("CheckBox Cleanup");
+}
 
 void
 CheckBox::Initialize(Napi::Env& env, Napi::Object& target)

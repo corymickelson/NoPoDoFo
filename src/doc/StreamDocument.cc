@@ -21,6 +21,7 @@
 #include "Encrypt.h"
 
 #include <iostream>
+#include <spdlog/spdlog.h>
 
 using namespace PoDoFo;
 using namespace Napi;
@@ -41,9 +42,13 @@ StreamDocument::StreamDocument(const CallbackInfo& info)
   : ObjectWrap(info)
   , BaseDocument(info, false)
 {
+  dbglog = spdlog::get("dbglog");
   cout << "Stream Document" << endl;
 }
-
+StreamDocument::~StreamDocument()
+{
+ dbglog->debug("StreamDocument Cleanup");
+}
 void
 StreamDocument::Initialize(Napi::Env& env, Napi::Object& target)
 {

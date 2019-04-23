@@ -23,6 +23,7 @@
 #include <iostream>
 #include <napi.h>
 #include <podofo/podofo.h>
+#include <spdlog/logger.h>
 
 using std::cout;
 using std::endl;
@@ -83,6 +84,7 @@ protected:
   vector<PoDoFo::PdfObject*> copies;
 
 private:
+  std::shared_ptr<spdlog::logger> dbglog;
 };
 }
 #endif

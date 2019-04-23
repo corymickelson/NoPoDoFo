@@ -21,6 +21,7 @@
 #include "../ErrorHandler.h"
 #include "../base/Dictionary.h"
 #include "Font.h"
+#include <spdlog/spdlog.h>
 
 using namespace PoDoFo;
 using namespace Napi;
@@ -34,12 +35,18 @@ FunctionReference Encoding::constructor; // NOLINT
 Encoding::Encoding(const Napi::CallbackInfo& info)
   : ObjectWrap(info)
   , encoding(info[0].As<External<PdfEncoding>>().Data())
-{}
+{
+  dbglog = spdlog::get("dbglog");
+}
 Encoding::~Encoding()
 {
+  dbglog->debug("Encoding Cleanup");
   HandleScope scope(Env());
   if (!encoding->IsAutoDelete()) {
+    dbglog->debug("Encoding is NOT auto deleted, deleting now");
     delete encoding;
+  } else {
+    dbglog->debug("Encoding is an auto deleted object, nothing deleted");
   }
 }
 void

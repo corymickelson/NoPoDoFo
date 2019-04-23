@@ -22,6 +22,7 @@
 #include "../ErrorHandler.h"
 #include "Document.h"
 #include "StreamDocument.h"
+#include <spdlog/spdlog.h>
 
 using namespace Napi;
 using namespace PoDoFo;
@@ -36,7 +37,7 @@ FunctionReference Image::constructor; // NOLINT
 Image::Image(const CallbackInfo& info)
   : ObjectWrap(info)
 {
-
+  dbglog = spdlog::get("dbglog");
 #if defined(PODOFO_HAVE_JPEG_LIB) && defined(PODOFO_HAVE_PNG_LIB) &&           \
   defined(PODOFO_HAVE_TIFF_LIB)
   if (info.Length() < 2 || !info[0].IsObject() ||
@@ -108,6 +109,7 @@ Image::Image(const CallbackInfo& info)
 
 Image::~Image()
 {
+  dbglog->debug("Image Cleanup");
   HandleScope scope(Env());
   doc = nullptr;
 }

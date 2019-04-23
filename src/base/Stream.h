@@ -22,6 +22,7 @@
 
 #include <napi.h>
 #include <podofo/podofo.h>
+#include <spdlog/logger.h>
 #include <string>
 
 namespace NoPoDoFo {
@@ -29,6 +30,7 @@ class Stream : public Napi::ObjectWrap<Stream>
 {
 public:
   explicit Stream(const Napi::CallbackInfo& callbackInfo);
+  ~Stream();
   static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
   Napi::Value Write(const Napi::CallbackInfo&);
@@ -45,6 +47,7 @@ public:
 
 private:
   PoDoFo::PdfStream& stream;
+  std::shared_ptr<spdlog::logger> dbglog;
 };
 }
 #endif // NPDF_STREAM_H

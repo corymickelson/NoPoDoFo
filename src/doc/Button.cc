@@ -20,6 +20,7 @@
 #include "Button.h"
 #include "Field.h"
 #include <iostream>
+#include <spdlog/spdlog.h>
 
 using namespace Napi;
 using namespace PoDoFo;
@@ -31,10 +32,12 @@ namespace NoPoDoFo {
 Button::Button(PdfField& field)
 {
   button = new PdfButton(field);
+  dbglog = spdlog::get("dbglog");
 }
 
 Button::~Button()
 {
+  dbglog->debug("Button Cleanup");
   delete button;
 }
 Napi::Value

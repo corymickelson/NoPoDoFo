@@ -23,6 +23,7 @@
 #include "Obj.h"
 #include "Ref.h"
 #include <algorithm>
+#include <spdlog/spdlog.h>
 
 using namespace Napi;
 using namespace PoDoFo;
@@ -54,7 +55,12 @@ Dictionary::Dictionary(const CallbackInfo& info)
                     ->GetDictionary()
                 : *info[0].As<External<PdfDictionary>>().Data())
            : *(init = new PdfDictionary()))
-{}
+{
+  dbglog = spdlog::get("dbglog");
+  if(init != nullptr) {
+    dbglog->debug("New Dictionary Created");
+  }
+}
 
 void
 Dictionary::Initialize(Napi::Env& env, Napi::Object& target)
@@ -84,6 +90,7 @@ Dictionary::Initialize(Napi::Env& env, Napi::Object& target)
 }
 Dictionary::~Dictionary()
 {
+  dbglog->debug("Dictionary Cleanup");
   HandleScope scope(Env());
   for (auto i : children) {
     delete i;

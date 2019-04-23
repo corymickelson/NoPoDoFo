@@ -28,6 +28,7 @@
 #include "Form.h"
 #include "Page.h"
 #include "SignatureField.h"
+#include <spdlog/spdlog.h>
 
 using namespace Napi;
 using namespace PoDoFo;
@@ -103,7 +104,14 @@ Document::Initialize(Napi::Env& env, Napi::Object& target)
 Document::Document(const CallbackInfo& info)
   : ObjectWrap(info)
   , BaseDocument(info, true)
-{}
+{
+  dbglog = spdlog::get("dbglog");
+}
+
+Document::~Document()
+{
+  dbglog->debug("Document Cleanup");
+}
 
 void
 Document::SetPassword(const CallbackInfo& info)

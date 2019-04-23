@@ -29,6 +29,7 @@
 #include "Page.h"
 #include "Rect.h"
 #include "StreamDocument.h"
+#include <spdlog/spdlog.h>
 
 using namespace Napi;
 using namespace PoDoFo;
@@ -45,6 +46,7 @@ FunctionReference Painter::constructor; // NOLINT
 Painter::Painter(const Napi::CallbackInfo& info)
   : ObjectWrap(info)
 {
+  dbglog = spdlog::get("dbglog");
   auto o = info[0].As<Object>();
   if (o.InstanceOf(Document::constructor.Value())) {
     isMemDoc = true;
@@ -62,6 +64,7 @@ Painter::Painter(const Napi::CallbackInfo& info)
 
 Painter::~Painter()
 {
+  dbglog->debug("Painter Cleanup");
   HandleScope scope(Env());
   document = nullptr;
 }

@@ -24,6 +24,7 @@
 #include <podofo/podofo.h>
 
 #include <iostream>
+#include <spdlog/logger.h>
 using std::cout;
 using std::endl;
 
@@ -32,6 +33,7 @@ class Encrypt : public Napi::ObjectWrap<Encrypt>
 {
 public:
   explicit Encrypt(const Napi::CallbackInfo&);
+  ~Encrypt();
   static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
   static Napi::Value CreateEncrypt(const Napi::CallbackInfo&);
@@ -43,6 +45,8 @@ public:
   Napi::Value GetKeyLength(const Napi::CallbackInfo&);
 
   const PoDoFo::PdfEncrypt* encrypt;
+private:
+  std::shared_ptr<spdlog::logger> dbglog;
 };
 }
 #endif

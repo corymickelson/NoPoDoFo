@@ -37,6 +37,7 @@ class CheckBox
 {
 public:
   explicit CheckBox(const CallbackInfo& callbackInfo);
+  ~CheckBox();
   static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
   Napi::Value IsChecked(const CallbackInfo&);
@@ -44,6 +45,9 @@ public:
 
   PoDoFo::PdfCheckBox GetCheckBox() { return PoDoFo::PdfCheckBox(field); }
   PoDoFo::PdfField& field;
+
+private:
+  std::shared_ptr<spdlog::logger> dbglog;
 };
 }
 #endif // NPDF_CHECKBOX_H

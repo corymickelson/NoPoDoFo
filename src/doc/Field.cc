@@ -27,6 +27,7 @@
 #include "Document.h"
 #include "Form.h"
 #include "Page.h"
+#include <spdlog/spdlog.h>
 
 using namespace Napi;
 using namespace PoDoFo;
@@ -48,6 +49,7 @@ namespace NoPoDoFo {
  */
 Field::Field(EPdfField type, const CallbackInfo& info)
 {
+  dbglog = spdlog::get("dbglog");
   if (info[0].IsExternal()) {
     auto arg = info[0].As<External<PdfField>>().Data();
     field = new PdfField(*arg);
@@ -101,6 +103,7 @@ Field::Field(EPdfField type, const CallbackInfo& info)
 
 Field::~Field()
 {
+  dbglog->debug("Field Cleanup");
   delete field;
   for (auto c : children) {
     delete c;

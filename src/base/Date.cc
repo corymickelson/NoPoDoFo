@@ -20,6 +20,7 @@
 #include "Date.h"
 #include "../ValidateArguments.h"
 #include <iostream>
+#include <spdlog/spdlog.h>
 
 using namespace Napi;
 using namespace PoDoFo;
@@ -44,7 +45,7 @@ Date::Date(const Napi::CallbackInfo& info)
 {
   vector<int> argIndex = AssertCallbackInfo(
     info, { { 0, { option(napi_string), nullopt, option(napi_external) } } });
-  cout << argIndex[0] << endl;
+  dgblog = spdlog::get("dbglog");
   if (argIndex[0] == 0) {
     timestamp = new PdfDate(info[0].As<String>().Utf8Value());
     if (!timestamp->IsValid()) {
@@ -61,6 +62,7 @@ Date::Date(const Napi::CallbackInfo& info)
 }
 Date::~Date()
 {
+  dgblog->debug("Date Cleanup");
   HandleScope scope(Env());
   delete timestamp;
 }

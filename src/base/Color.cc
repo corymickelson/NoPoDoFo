@@ -18,9 +18,10 @@
  */
 
 #include "Color.h"
-#include "../ValidateArguments.h"
 #include "../Defines.h"
+#include "../ValidateArguments.h"
 #include <optional/optional.hpp>
+#include <spdlog/spdlog.h>
 
 using namespace PoDoFo;
 using namespace Napi;
@@ -53,7 +54,7 @@ Color::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceMethod("getMagenta", &Color::GetMagenta),
       InstanceMethod("getBlack", &Color::GetBlack),
       InstanceMethod("getGrey", &Color::GetGrey),
-      InstanceMethod("getColorStreamString", &Color::GetColorStreamString)});
+      InstanceMethod("getColorStreamString", &Color::GetColorStreamString) });
   constructor = Persistent(ctor);
   constructor.SuppressDestruct();
   target.Set("Color", ctor);
@@ -72,6 +73,7 @@ Color::Color(const CallbackInfo& info)
                          { 1, { nullopt, option(napi_number) } },
                          { 2, { nullopt, option(napi_number) } },
                          { 3, { nullopt, option(napi_number) } } });
+  dbglog = spdlog::get("dbglog");
   if (opts[0] == 3) {
     const char* cs = info[0].As<String>().Utf8Value().c_str();
     color = new PdfColor(PdfColor::FromString(cs));
@@ -100,6 +102,7 @@ Color::Color(const CallbackInfo& info)
 
 Color::~Color()
 {
+  dbglog->debug("Color Cleanup");
   HandleScope scope(Env());
   delete color;
 }
@@ -195,18 +198,22 @@ Color::GetGreen(const CallbackInfo& info)
   return Number::New(info.Env(), color->GetGreen());
 }
 value
-Color::GetColorStreamString(const CallbackInfo &info)
+Color::GetColorStreamString(const CallbackInfo& info)
 {
   stringstream ss;
   PdfLocaleImbue(ss);
   if (color->IsCMYK()) {
-    ss << color->GetCyan() << " " << color->GetMagenta() << " " << color->GetYellow() << " " << color->GetBlack() << " " << CMYKOp;
+    ss << color->GetCyan() << " " << color->GetMagenta() << " "
+       << color->GetYellow() << " " << color->GetBlack() << " " << CMYKOp;
   } else if (color->IsGrayScale()) {
     ss << color->GetGrayScale() << " " << GreyOp;
   } else if (color->IsRGB()) {
-    ss << color->GetRed() << " " << color->GetGreen() << " " << color->GetBlue() << " " << RGBOp;
+    ss << color->GetRed() << " " << color->GetGreen() << " " << color->GetBlue()
+       << " " << RGBOp;
   } else {
-    Error::New(info.Env(), "Color StringStream currently supports CMYK, RGB, and GreyScale").ThrowAsJavaScriptException();
+    Error::New(info.Env(),
+               "Color StringStream currently supports CMYK, RGB, and GreyScale")
+      .ThrowAsJavaScriptException();
     return {};
   }
   return String::New(info.Env(), ss.str());

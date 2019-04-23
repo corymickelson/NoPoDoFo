@@ -20,6 +20,7 @@
 #include "ComboBox.h"
 #include "Field.h"
 #include <iostream>
+#include <spdlog/spdlog.h>
 
 using namespace Napi;
 using namespace PoDoFo;
@@ -36,8 +37,13 @@ ComboBox::ComboBox(const Napi::CallbackInfo& info)
   , Field(ePdfField_ComboBox, info)
   , ListField(Field::GetField())
   , field(Field::GetField())
-{}
-
+{
+  dbglog = spdlog::get("dbglog");
+}
+ComboBox::~ComboBox()
+{
+  dbglog->debug("ComboBox Cleanup");
+}
 void
 ComboBox::Initialize(Napi::Env& env, Napi::Object& target)
 {

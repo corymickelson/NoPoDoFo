@@ -19,6 +19,7 @@
 
 #include "ListBox.h"
 #include "Field.h"
+#include <spdlog/spdlog.h>
 
 using namespace Napi;
 using namespace PoDoFo;
@@ -32,7 +33,14 @@ ListBox::ListBox(const Napi::CallbackInfo& info)
   , Field(ePdfField_ListBox, info)
   , ListField(Field::GetField())
   , field(Field::GetField())
-{}
+{
+  dbglog = spdlog::get("dbglog");
+}
+
+ListBox::~ListBox()
+{
+  dbglog->debug("ListBox Cleanup");
+}
 
 void
 ListBox::Initialize(Napi::Env& env, Napi::Object& target)

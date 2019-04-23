@@ -24,6 +24,7 @@
 #include <podofo/podofo.h>
 
 #include <iostream>
+#include <spdlog/logger.h>
 #include <utility>
 
 using std::cout;
@@ -63,6 +64,7 @@ public:
 private:
   PoDoFo::PdfObject& obj;
   PoDoFo::PdfObject* init = nullptr;
+  std::shared_ptr<spdlog::logger> dbglog;
 };
 }
 #endif

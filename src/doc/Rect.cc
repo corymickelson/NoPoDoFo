@@ -20,6 +20,7 @@
 #include "Rect.h"
 #include "../ValidateArguments.h"
 #include <iostream>
+#include <spdlog/spdlog.h>
 
 using namespace Napi;
 using namespace PoDoFo;
@@ -35,6 +36,7 @@ FunctionReference Rect::constructor; // NOLINT
 Rect::Rect(const CallbackInfo& info)
   : ObjectWrap(info)
 {
+  dbglog = spdlog::get("dbglog");
   vector<int> opts = AssertCallbackInfo(
     info,
     {
@@ -73,6 +75,7 @@ Rect::Rect(const CallbackInfo& info)
 
 Rect::~Rect()
 {
+  dbglog->debug("Rect Cleanup");
   HandleScope scope(Env());
   delete rect;
 }

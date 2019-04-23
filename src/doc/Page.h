@@ -25,6 +25,7 @@
 #include <iostream>
 #include <napi.h>
 #include <podofo/podofo.h>
+#include <spdlog/logger.h>
 
 using std::cout;
 using std::endl;
@@ -35,6 +36,7 @@ class Page : public Napi::ObjectWrap<Page>
 {
 public:
   explicit Page(const Napi::CallbackInfo& callbackInfo);
+  ~Page();
   static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
   Napi::Value GetRotation(const Napi::CallbackInfo&);
@@ -71,6 +73,9 @@ public:
   PoDoFo::PdfPage& page;
   Napi::Object ExtractAndApplyRectValues(const Napi::CallbackInfo&,
                                          PoDoFo::PdfRect&);
+
+private:
+  std::shared_ptr<spdlog::logger> dbglog;
 };
 }
 #endif // NPDF_PDFPAGE_HPP

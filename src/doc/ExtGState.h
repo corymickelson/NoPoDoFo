@@ -22,13 +22,14 @@
 
 #include <napi.h>
 #include <podofo/podofo.h>
+#include <spdlog/logger.h>
 
 namespace NoPoDoFo {
 class ExtGState : public Napi::ObjectWrap<ExtGState>
 {
 public:
   explicit ExtGState(const Napi::CallbackInfo& info);
-
+  ~ExtGState();
   static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
   void SetFillOpacity(const Napi::CallbackInfo& info);
@@ -45,6 +46,7 @@ public:
 
 private:
   std::unique_ptr<PoDoFo::PdfExtGState> self;
+  std::shared_ptr<spdlog::logger> dbglog;
 };
 }
 #endif

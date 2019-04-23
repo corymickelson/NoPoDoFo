@@ -49,3 +49,4 @@ coverage
 releases/
 yarn*
 node_modules*
+dbglog.txt

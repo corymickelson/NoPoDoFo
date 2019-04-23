@@ -23,6 +23,7 @@
 #include <iostream>
 #include <napi.h>
 #include <podofo/podofo.h>
+#include <spdlog/logger.h>
 
 using std::cout;
 using std::endl;
@@ -32,6 +33,7 @@ class Form : public Napi::ObjectWrap<Form>
 {
 public:
   explicit Form(const Napi::CallbackInfo&);
+  ~Form();
   static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
   void SetNeedAppearances(const Napi::CallbackInfo&, const Napi::Value&);
@@ -56,6 +58,7 @@ public:
 private:
   bool create = true;
   PoDoFo::PdfDocument& doc;
+  std::shared_ptr<spdlog::logger> dbglog;
 };
 }
 #endif

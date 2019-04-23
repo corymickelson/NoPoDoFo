@@ -18,6 +18,7 @@
  */
 
 #include "Page.h"
+#include <spdlog/spdlog.h>
 #if NOPODOFO_SDK
 #include "../../sdk/FlattenFields.h"
 #endif // NOPODOFO_SDK
@@ -50,7 +51,14 @@ FunctionReference Page::constructor; // NOLINT
 Page::Page(const CallbackInfo& info)
   : ObjectWrap(info)
   , page(*info[0].As<External<PdfPage>>().Data())
-{}
+{
+  dbglog = spdlog::get("dbglog");
+}
+
+Page::~Page()
+{
+  dbglog->debug("Page Cleanup");
+}
 
 void
 Page::Initialize(Napi::Env& env, Napi::Object& target)

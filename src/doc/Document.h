@@ -47,6 +47,7 @@ public:
   static Napi::Value GC(const Napi::CallbackInfo&);
 
   explicit Document(const Napi::CallbackInfo&);
+  ~Document();
   Napi::Value Load(const Napi::CallbackInfo&);
   Napi::Value CreatePage(const Napi::CallbackInfo&) override;
   void DeletePages(const Napi::CallbackInfo&);
@@ -70,6 +71,7 @@ public:
 private:
   bool loadForIncrementalUpdates = false;
   vector<PoDoFo::PdfFont*> fonts;
+  std::shared_ptr<spdlog::logger> dbglog;
 };
 }
 #endif // NPDF_PDFMEMDOCUMENT_H

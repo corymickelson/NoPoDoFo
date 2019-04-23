@@ -28,6 +28,7 @@
 #include "../doc/Annotation.h"
 #include "../doc/Document.h"
 #include "StreamDocument.h"
+#include <spdlog/spdlog.h>
 
 using namespace Napi;
 using namespace PoDoFo;
@@ -44,6 +45,7 @@ FunctionReference SignatureField::constructor; // NOLINT
 SignatureField::SignatureField(const CallbackInfo& info)
   : ObjectWrap<SignatureField>(info)
 {
+  dbglog = spdlog::get("dbglog");
   try {
     // Create a new Signature Field
     if (info.Length() == 2) {
@@ -104,6 +106,12 @@ SignatureField::SignatureField(const CallbackInfo& info)
     cout << "Signature Object has not been set on this field" << endl;
   }
 }
+
+SignatureField::~SignatureField()
+{
+  dbglog->debug("SignatureField Cleanup");
+}
+
 
 void
 SignatureField::Initialize(Napi::Env& env, Napi::Object& target)

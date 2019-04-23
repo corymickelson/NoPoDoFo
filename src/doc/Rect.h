@@ -22,6 +22,7 @@
 
 #include <napi.h>
 #include <podofo/podofo.h>
+#include <spdlog/logger.h>
 
 namespace NoPoDoFo {
 class Rect : public Napi::ObjectWrap<Rect>
@@ -45,6 +46,7 @@ public:
 
 private:
   PoDoFo::PdfRect* rect;
+  std::shared_ptr<spdlog::logger> dbglog;
 };
 }
 #endif // NPDF_RECT_H

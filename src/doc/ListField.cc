@@ -20,6 +20,7 @@
 #include "ListField.h"
 #include "Field.h"
 #include <iostream>
+#include <spdlog/spdlog.h>
 
 using namespace PoDoFo;
 using namespace Napi;
@@ -28,7 +29,14 @@ namespace NoPoDoFo {
 
 ListField::ListField(PdfField& field)
   : field(field)
-{}
+{
+  dbglog = spdlog::get("dbglog");
+}
+
+ListField::~ListField()
+{
+  dbglog->debug("ListField Cleanup");
+}
 
 void
 ListField::InsertItem(const CallbackInfo& info)

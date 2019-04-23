@@ -26,6 +26,7 @@
 #include "Document.h"
 #include "StreamDocument.h"
 #include <algorithm>
+#include <spdlog/spdlog.h>
 
 using namespace Napi;
 using namespace PoDoFo;
@@ -39,12 +40,12 @@ FunctionReference Outline::constructor; // NOLINT
 Outline::Outline(const CallbackInfo& info)
   : ObjectWrap(info)
   , outline(*info[0].As<External<PdfOutlineItem>>().Data())
-{}
+{
+  dbglog = spdlog::get("dbglog");
+}
 Outline::~Outline()
 {
-#ifdef NOPODOFO_DEBUG
-  cout << "Outline Destructor" << endl;
-#endif
+  dbglog->debug("Outline Cleanup");
 }
 void
 Outline::Initialize(Napi::Env& env, Napi::Object& target)

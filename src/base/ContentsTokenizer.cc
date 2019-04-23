@@ -23,6 +23,7 @@
 #include "../doc/StreamDocument.h"
 
 #include <iostream>
+#include <spdlog/spdlog.h>
 #include <sstream>
 #include <stack>
 
@@ -45,8 +46,13 @@ ContentsTokenizer::ContentsTokenizer(const Napi::CallbackInfo& info)
   , pIndex(info[1].As<Number>().Int32Value())
 {
   self = make_unique<PdfContentsTokenizer>(doc.GetDocument().GetPage(pIndex));
+  dbglog = spdlog::get("dbglog");
 }
 
+ContentsTokenizer::~ContentsTokenizer()
+{
+  dbglog->debug("ContentsTokenizer Cleanup");
+}
 void
 ContentsTokenizer::Initialize(Napi::Env& env, Napi::Object& target)
 {

@@ -22,6 +22,7 @@
 
 #include <napi.h>
 #include <podofo/podofo.h>
+#include <spdlog/logger.h>
 #include <vector>
 
 using namespace PoDoFo;
@@ -33,6 +34,7 @@ class Annotation : public ObjectWrap<Annotation>
 {
 public:
   explicit Annotation(const CallbackInfo& callbackInfo);
+  ~Annotation();
   static FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
   Napi::Value HasAppearanceStream(const CallbackInfo&);
@@ -64,6 +66,7 @@ public:
 
 private:
   PoDoFo::PdfAnnotation& annot;
+  std::shared_ptr<spdlog::logger> dbglog;
 };
 }
 #endif // NPDF_ANNOTATION_H

@@ -22,6 +22,7 @@
 
 #include <napi.h>
 #include <podofo/podofo.h>
+#include <spdlog/logger.h>
 
 namespace NoPoDoFo {
 
@@ -74,6 +75,7 @@ private:
   PoDoFo::PdfSimpleTableModel* model = nullptr;
   PoDoFo::PdfTable* table = nullptr;
   PoDoFo::PdfDocument* doc = nullptr;
+  std::shared_ptr<spdlog::logger> dbglog;
 };
 }
 #endif // NPDF_SIMPLETABLE_H

@@ -29,6 +29,7 @@
 #include "Page.h"
 #include "Rect.h"
 #include <algorithm>
+#include <spdlog/spdlog.h>
 
 using std::cout;
 using std::endl;
@@ -42,8 +43,13 @@ FunctionReference Annotation::constructor; // NOLINT
 Annotation::Annotation(const CallbackInfo& info)
   : ObjectWrap(info)
   , annot(*info[0].As<External<PdfAnnotation>>().Data())
-{}
+{
+  dbglog = spdlog::get("dbglog");
+}
 
+Annotation::~Annotation() {
+  dbglog->debug("Annotation Cleanup");
+}
 void
 Annotation::Initialize(Napi::Env& env, Napi::Object& target)
 {

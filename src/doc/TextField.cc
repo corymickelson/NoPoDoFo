@@ -18,9 +18,10 @@
  */
 
 #include "TextField.h"
+#include "../ErrorHandler.h"
 #include "Document.h"
 #include "StreamDocument.h"
-#include "../ErrorHandler.h"
+#include <spdlog/spdlog.h>
 
 using namespace Napi;
 using namespace PoDoFo;
@@ -40,6 +41,7 @@ TextField::TextField(const CallbackInfo& info)
   , Field(ePdfField_TextField, info)
   , field(Field::GetField())
 {
+  dbglog = spdlog::get("dbglog");
   if (info[info.Length() - 1].IsObject() &&
       !info[info.Length() - 1].As<Object>().InstanceOf(
         Document::constructor.Value()) &&
@@ -80,7 +82,10 @@ TextField::TextField(const CallbackInfo& info)
     }
   }
 }
-
+TextField::~TextField()
+{
+ dbglog->debug("TextField Cleanup");
+}
 void
 TextField::Initialize(Napi::Env& env, Napi::Object& target)
 {

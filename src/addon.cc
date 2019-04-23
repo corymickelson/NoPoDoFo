@@ -17,6 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "spdlog/spdlog.h"
+#include "spdlog/sinks/basic_file_sink.h"
 #include "base/Array.h"
 #include "base/Color.h"
 #include "base/ContentsTokenizer.h"
@@ -61,10 +63,11 @@ init(Napi::Env env, Napi::Object exports)
     .ThrowAsJavaScriptException();
   return;
 #endif
+  auto dbglog = spdlog::basic_logger_mt("dbglog", "dbglog.txt");
 #ifdef NOPODOFO_DEBUG
-  cout << "/******************************************************/" << endl;
-  cout << "/***** You are running a Debug build of NoPoDoFo ******/" << endl;
-  cout << "/******************************************************/" << endl;
+  dbglog->info("/******************************************************/")
+  dbglog->info( "/***** You are running a Debug build of NoPoDoFo ******/")
+  dbglog->info( "/******************************************************/")
 #endif
   NoPoDoFo::Action::Initialize(env, exports);
   NoPoDoFo::Date::Initialize(env, exports);

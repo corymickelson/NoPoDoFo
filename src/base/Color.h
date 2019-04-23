@@ -22,6 +22,7 @@
 
 #include <napi.h>
 #include <podofo/podofo.h>
+#include "spdlog/logger.h"
 
 using Napi::CallbackInfo;
 using value = Napi::Value;
@@ -59,6 +60,9 @@ public:
   value ConvertToCMYK(const CallbackInfo&);
   value GetColorStreamString(const CallbackInfo &);
   PdfColor* color;
+
+private:
+  std::shared_ptr<spdlog::logger> dbglog;
 };
 }
 

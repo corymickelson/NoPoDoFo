@@ -22,12 +22,14 @@
 
 #include <napi.h>
 #include <podofo/podofo.h>
+#include <spdlog/logger.h>
 
 namespace NoPoDoFo {
 class ListField
 {
 public:
   explicit ListField(PoDoFo::PdfField&);
+  ~ListField();
   void InsertItem(const Napi::CallbackInfo&);
   void RemoveItem(const Napi::CallbackInfo&);
   Napi::Value GetItem(const Napi::CallbackInfo&);
@@ -45,6 +47,7 @@ public:
 
 private:
   PoDoFo::PdfField& field;
+  std::shared_ptr<spdlog::logger> dbglog;
 };
 }
 #endif

@@ -7,6 +7,7 @@
 
 #include <napi.h>
 #include <podofo/podofo.h>
+#include <spdlog/logger.h>
 
 namespace NoPoDoFo {
 
@@ -28,6 +29,7 @@ public:
 
 private:
   PoDoFo::PdfAction* action;
+  std::shared_ptr<spdlog::logger> dbglog;
 };
 }
 #endif // NPDF_ACTION_H

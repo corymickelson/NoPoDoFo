@@ -34,6 +34,7 @@ class TextField
 public:
   static Napi::FunctionReference constructor;
   explicit TextField(const Napi::CallbackInfo&);
+  ~TextField();
   static void Initialize(Napi::Env& env, Napi::Object& target);
   void SetText(const Napi::CallbackInfo&, const Napi::Value&);
   Napi::Value Text(const Napi::CallbackInfo&);
@@ -56,6 +57,8 @@ public:
   void RefreshAppearanceStream(const Napi::CallbackInfo&);
   PoDoFo::PdfTextField GetText() { return PoDoFo::PdfTextField(field); }
   PoDoFo::PdfField& field;
+private:
+  std::shared_ptr<spdlog::logger> dbglog;
 };
 }
 #endif // NPDF_TEXTFIELD_H

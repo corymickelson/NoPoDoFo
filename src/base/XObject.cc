@@ -21,6 +21,7 @@
 #include "../doc/Rect.h"
 #include "Obj.h"
 #include "Ref.h"
+#include <spdlog/spdlog.h>
 
 using namespace Napi;
 using namespace PoDoFo;
@@ -32,8 +33,10 @@ FunctionReference XObject::constructor; // NOLINT
 XObject::XObject(const CallbackInfo& info)
   : ObjectWrap(info)
 {
+  dbglog = spdlog::get("dbglog");
   // create an xobject from an existing object (must be an xobject)
   if (info[0].IsExternal()) {
+    dbglog->debug("XObject copy");
     auto copy = info[0].As<External<PdfXObject>>().Data();
     xobj = new PdfXObject(*copy);
   }
@@ -42,12 +45,14 @@ XObject::XObject(const CallbackInfo& info)
            info[0].As<Object>().InstanceOf(Rect::constructor.Value()) &&
            info[1].IsExternal()) {
     auto rect = Rect::Unwrap(info[0].As<Object>());
+    dbglog->debug("New XObject");
     PdfDocument* doc = info[1].As<External<PdfDocument>>().Data();
     xobj = new PdfXObject(rect->GetRect(), doc);
   }
 }
 XObject::~XObject()
 {
+  dbglog->debug("XObject Cleanup");
   HandleScope scope(Env());
   delete xobj;
 }

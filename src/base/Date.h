@@ -22,6 +22,7 @@
 
 #include <napi.h>
 #include <podofo/podofo.h>
+#include <spdlog/logger.h>
 
 namespace NoPoDoFo {
 
@@ -39,6 +40,7 @@ public:
 
 private:
   PoDoFo::PdfDate* timestamp;
+  std::shared_ptr<spdlog::logger> dgblog;
 };
 }
 #endif // NOPODOFO_DATE_H

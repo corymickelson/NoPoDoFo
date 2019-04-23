@@ -23,6 +23,7 @@
 #include <napi.h>
 #include <openssl/evp.h>
 #include <podofo/podofo.h>
+#include <spdlog/logger.h>
 
 using std::string;
 using std::vector;
@@ -40,6 +41,7 @@ class SignatureField : public Napi::ObjectWrap<SignatureField>
 {
 public:
   explicit SignatureField(const Napi::CallbackInfo&);
+  ~SignatureField();
   static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
   void SetAppearanceStream(const Napi::CallbackInfo&);
@@ -61,6 +63,7 @@ private:
   std::shared_ptr<PoDoFo::PdfSignatureField> field;
   std::unique_ptr<PoDoFo::PdfData> signatureBuffer;
   SignatureInfo signatureInfo;
+  std::shared_ptr<spdlog::logger> dbglog;
 };
 }
 #endif

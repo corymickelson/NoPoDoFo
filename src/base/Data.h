@@ -22,13 +22,14 @@
 
 #include <napi.h>
 #include <podofo/podofo.h>
+#include <spdlog/logger.h>
 
 namespace NoPoDoFo {
 class Data : public Napi::ObjectWrap<Data>
 {
 public:
   explicit Data(const Napi::CallbackInfo&);
-  //  ~Data();
+  ~Data();
   static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
   void Write(const Napi::CallbackInfo&);
@@ -38,6 +39,7 @@ public:
 
 private:
   std::unique_ptr<PoDoFo::PdfData> self;
+  std::shared_ptr<spdlog::logger> dbglog;
 };
 }
 #endif

@@ -33,6 +33,7 @@ class ComboBox
 {
 public:
   explicit ComboBox(const Napi::CallbackInfo&);
+  ~ComboBox();
   static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env&, Napi::Object&);
   void SetEditable(const Napi::CallbackInfo&, const Napi::Value&);
@@ -40,6 +41,8 @@ public:
 
   PoDoFo::PdfComboBox GetComboBox() { return PoDoFo::PdfComboBox(field); }
   PoDoFo::PdfField& field;
+private:
+  std::shared_ptr<spdlog::logger> dbglog;
 };
 }
 

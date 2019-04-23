@@ -21,6 +21,7 @@
 #include "../ErrorHandler.h"
 #include "Document.h"
 #include <algorithm>
+#include <spdlog/spdlog.h>
 #include <sstream>
 
 using namespace Napi;
@@ -64,6 +65,12 @@ Encrypt::Encrypt(const Napi::CallbackInfo& info)
   Error::New(info.Env(), "This build does not include OpenSSL")
     .ThrowAsJavaScriptException();
 #endif
+  dbglog = spdlog::get("dbglog");
+}
+
+Encrypt::~Encrypt()
+{
+  dbglog->debug("Encrypt Cleanup");
 }
 
 void

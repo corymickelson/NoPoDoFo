@@ -25,6 +25,7 @@
 #include "./Page.h"
 #include "./Rect.h"
 #include <iostream>
+#include <spdlog/spdlog.h>
 
 using namespace PoDoFo;
 using namespace Napi;
@@ -42,6 +43,7 @@ FunctionReference Destination::constructor; // NOLINT
 Destination::Destination(const CallbackInfo& info)
   : ObjectWrap(info)
 {
+  dbglog = spdlog::get("dbglog");
   vector<int> opts = AssertCallbackInfo(
     info,
     { { 0, { option(napi_external), option(napi_object) } },
@@ -84,6 +86,7 @@ Destination::Destination(const CallbackInfo& info)
 }
 Destination::~Destination()
 {
+  dbglog->debug("Destination Cleanup");
   HandleScope scope(Env());
   delete destination;
   destination = nullptr;

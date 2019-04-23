@@ -3,7 +3,9 @@
 //
 
 #include "Ref.h"
+#include <iosfwd>
 #include <iostream>
+#include <spdlog/spdlog.h>
 
 using namespace Napi;
 using std::cout;
@@ -28,11 +30,14 @@ Ref::Ref(const CallbackInfo& info)
                "References can only be created from already existing objects")
       .ThrowAsJavaScriptException();
   }
+  dbglog = spdlog::get("dbglog");
 }
 Ref::~Ref()
 {
-  cout << "Cleaning up Ref " << self->ObjectNumber() << " : "
+  std::stringstream dbgMsg;
+  dbgMsg << "Cleaning up Ref " << self->ObjectNumber() << " : "
        << self->GenerationNumber() << endl;
+  dbglog->debug(dbgMsg.str());
   delete self;
 }
 void

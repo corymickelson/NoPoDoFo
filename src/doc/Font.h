@@ -23,6 +23,7 @@
 #include <iostream>
 #include <napi.h>
 #include <podofo/podofo.h>
+#include <spdlog/logger.h>
 
 using std::cout;
 using std::endl;
@@ -32,6 +33,7 @@ class Font : public Napi::ObjectWrap<Font>
 {
 public:
   explicit Font(const Napi::CallbackInfo& callbackInfo);
+  ~Font();
   static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
   Napi::Value GetFontSize(const Napi::CallbackInfo&);
@@ -62,6 +64,7 @@ public:
 
 private:
   PoDoFo::PdfFont& font; // owned by the document
+  std::shared_ptr<spdlog::logger> dbglog;
 };
 }
 #endif // NPDF_FONT_H

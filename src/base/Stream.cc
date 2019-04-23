@@ -22,6 +22,7 @@
 #include "../ValidateArguments.h"
 #include "Array.h"
 #include "Obj.h"
+#include <spdlog/spdlog.h>
 
 using namespace Napi;
 using namespace PoDoFo;
@@ -38,22 +39,27 @@ Stream::Stream(const CallbackInfo& info)
   , stream(info.Length() == 1 && info[0].IsExternal()
              ? *info[0].As<External<PdfStream>>().Data()
              : *Obj::Unwrap(info[0].As<Object>())->GetObject().GetStream())
-{}
-
+{
+  dbglog = spdlog::get("dbglog");
+}
+Stream::~Stream()
+{
+  dbglog->debug("Stream Cleanup");
+}
 void
 Stream::Initialize(Napi::Env& env, Napi::Object& target)
 {
   HandleScope scope(env);
-  Function ctor = DefineClass(
-    env,
-    "Stream",
-    { InstanceMethod("write", &Stream::Write),
-      InstanceMethod("beginAppend", &Stream::BeginAppend),
-      InstanceMethod("append", &Stream::Append),
-      InstanceMethod("endAppend", &Stream::EndAppend),
-      InstanceMethod("inAppendMode", &Stream::IsAppending),
-      InstanceMethod("set", &Stream::Set),
-      InstanceMethod("copy", &Stream::GetCopy) });
+  Function ctor =
+    DefineClass(env,
+                "Stream",
+                { InstanceMethod("write", &Stream::Write),
+                  InstanceMethod("beginAppend", &Stream::BeginAppend),
+                  InstanceMethod("append", &Stream::Append),
+                  InstanceMethod("endAppend", &Stream::EndAppend),
+                  InstanceMethod("inAppendMode", &Stream::IsAppending),
+                  InstanceMethod("set", &Stream::Set),
+                  InstanceMethod("copy", &Stream::GetCopy) });
   constructor = Napi::Persistent(ctor);
   constructor.SuppressDestruct();
   target.Set("Stream", ctor);
@@ -107,15 +113,17 @@ Stream::Write(const CallbackInfo& info)
 {
   string output;
   Function cb;
-  vector<int> opts = AssertCallbackInfo(info, {{0, {option(napi_function), option(napi_string)}},
-                            {1, {nullopt, option(napi_function)}}});
-  if(opts[0] == 0) {
+  vector<int> opts =
+    AssertCallbackInfo(info,
+                       { { 0, { option(napi_function), option(napi_string) } },
+                         { 1, { nullopt, option(napi_function) } } });
+  if (opts[0] == 0) {
     cb = info[0].As<Function>();
   }
-  if(opts[0] == 1) {
+  if (opts[0] == 1) {
     output = info[0].As<String>();
   }
-  if(opts[1] == 1) {
+  if (opts[1] == 1) {
     cb = info[1].As<Function>();
   }
   StreamWriteAsync* worker = new StreamWriteAsync(cb, this, output);
@@ -126,11 +134,11 @@ Stream::Write(const CallbackInfo& info)
 void
 Stream::BeginAppend(const Napi::CallbackInfo& info)
 {
-  std::vector<int> opt =
-    AssertCallbackInfo(info,
-                       { { 0, { nullopt, option(napi_boolean), option(napi_external) } },
-                         { 1, { nullopt, option(napi_boolean) } },
-                         { 2, { nullopt, option(napi_boolean) } } });
+  std::vector<int> opt = AssertCallbackInfo(
+    info,
+    { { 0, { nullopt, option(napi_boolean), option(napi_external) } },
+      { 1, { nullopt, option(napi_boolean) } },
+      { 2, { nullopt, option(napi_boolean) } } });
   bool clearExisting = true;
   bool deleteFilter = true;
   std::vector<EPdfFilter>* filters = nullptr;
@@ -209,10 +217,10 @@ Stream::GetCopy(const Napi::CallbackInfo& info)
   bool filtered = false;
   auto l = GetStream().GetLength();
   char* internalBuffer = static_cast<char*>(podofo_malloc(sizeof(char) * l));
-  if(info.Length() == 1 && info[0].IsBoolean()){
+  if (info.Length() == 1 && info[0].IsBoolean()) {
     filtered = info[0].As<Boolean>();
   }
-  if(filtered) {
+  if (filtered) {
     GetStream().GetFilteredCopy(&internalBuffer, &l);
   } else {
     GetStream().GetCopy(&internalBuffer, &l);

@@ -22,6 +22,7 @@
 #include "../base/Obj.h"
 #include "Document.h"
 #include "StreamDocument.h"
+#include <spdlog/spdlog.h>
 
 using namespace Napi;
 using namespace PoDoFo;
@@ -50,6 +51,7 @@ FileSpec::Initialize(Napi::Env& env, Napi::Object& target)
 FileSpec::FileSpec(const CallbackInfo& info)
   : ObjectWrap<FileSpec>(info)
 {
+  dbglog = spdlog::get("dbglog");
   if (info.Length() == 1 && info[0].IsObject() &&
       info[0].As<Object>().InstanceOf(Obj::constructor.Value())) {
     spec =
@@ -82,6 +84,11 @@ FileSpec::FileSpec(const CallbackInfo& info)
                    "[string, BaseDocument] ]")
       .ThrowAsJavaScriptException();
   }
+}
+
+FileSpec::~FileSpec()
+{
+  dbglog->debug("FileSpec Cleanup");
 }
 
 Napi::Value

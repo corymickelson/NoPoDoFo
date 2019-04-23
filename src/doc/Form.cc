@@ -29,6 +29,7 @@
 #include "Document.h"
 #include "StreamDocument.h"
 #include <iostream>
+#include <spdlog/spdlog.h>
 
 using namespace Napi;
 using namespace PoDoFo;
@@ -50,7 +51,14 @@ Form::Form(const Napi::CallbackInfo& info)
           : *(info[0].As<Object>().InstanceOf(Document::constructor.Value())
                 ? Document::Unwrap(info[0].As<Object>())->base
                 : StreamDocument::Unwrap(info[0].As<Object>())->base))
-{}
+{
+  dbglog = spdlog::get("dbglog");
+}
+
+Form::~Form()
+{
+  dbglog->debug("Form Cleanup");
+}
 
 void
 Form::Initialize(Napi::Env& env, Napi::Object& target)

@@ -19,6 +19,7 @@
 
 #include "Data.h"
 #include "../ErrorHandler.h"
+#include <spdlog/spdlog.h>
 
 using namespace PoDoFo;
 using namespace Napi;
@@ -42,6 +43,7 @@ Data::Data(const Napi::CallbackInfo& info)
       .ThrowAsJavaScriptException();
     return;
   }
+  dbglog = spdlog::get("dbglog");
   if (info[0].IsString()) {
     string strData = info[0].As<String>().Utf8Value();
     self = make_unique<PdfData>(strData.c_str());
@@ -55,13 +57,10 @@ Data::Data(const Napi::CallbackInfo& info)
   }
 }
 
-// Data::~Data()
-//{
-//  if (self != nullptr) {
-//    HandleScope scope(Env());
-//    delete self;
-//  }
-//}
+ Data::~Data()
+{
+  dbglog->debug("Data Cleanup");
+}
 
 void
 Data::Initialize(Napi::Env& env, Napi::Object& target)

@@ -7,6 +7,7 @@
 
 #include <napi.h>
 #include <podofo/podofo.h>
+#include <spdlog/logger.h>
 
 using namespace Napi;
 
@@ -24,6 +25,8 @@ public:
   ~Ref();
   value GetObjectNumber(const CallbackInfo&);
   value GetGenerationNumber(const CallbackInfo&);
+private:
+  std::shared_ptr<spdlog::logger> dbglog;
 };
 
 }

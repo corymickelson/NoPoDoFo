@@ -27,6 +27,7 @@
 #include "Painter.h"
 #include "StreamDocument.h"
 #include <optional/optional.hpp>
+#include <spdlog/spdlog.h>
 
 using namespace PoDoFo;
 using namespace Napi;
@@ -39,6 +40,7 @@ FunctionReference SimpleTable::constructor; // NOLINT
 SimpleTable::SimpleTable(const CallbackInfo& info)
   : ObjectWrap(info)
 {
+  dbglog = spdlog::get("dbglog");
   if (info[0].As<Object>().InstanceOf(Document::constructor.Value())) {
     doc = Document::Unwrap(info[0].As<Object>())->base;
   } else if (info[0].As<Object>().InstanceOf(
@@ -53,6 +55,7 @@ SimpleTable::SimpleTable(const CallbackInfo& info)
 
 SimpleTable::~SimpleTable()
 {
+  dbglog->debug("SimpleTable Cleanup");
   HandleScope scope(Env());
   delete model;
   delete table;

@@ -22,6 +22,7 @@
 
 #include <napi.h>
 #include <podofo/podofo.h>
+#include <spdlog/logger.h>
 
 using std::vector;
 
@@ -62,6 +63,7 @@ public:
 
 private:
   PoDoFo::PdfOutlineItem& outline; // owned by the document
+  std::shared_ptr<spdlog::logger> dbglog;
 };
 }
 #endif // NPDF_OUTLINE_H

@@ -8,6 +8,7 @@
 #include "../base/Obj.h"
 #include "Document.h"
 #include "StreamDocument.h"
+#include <spdlog/spdlog.h>
 
 using namespace PoDoFo;
 using namespace Napi;
@@ -52,9 +53,11 @@ Action::Action(const Napi::CallbackInfo& info)
       "Invalid Action constructor args. Please see the docs for more info.")
       .ThrowAsJavaScriptException();
   }
+  dbglog = spdlog::get("dbglog");
 }
 Action::~Action()
 {
+  dbglog->debug("Action Cleanup");
   delete action;
 }
 void

@@ -27,13 +27,14 @@
 
 namespace NoPoDoFo {
 
-class ListBox
+class ListBox final
   : public Napi::ObjectWrap<ListBox>
   , public Field
   , public ListField
 {
 public:
   explicit ListBox(const Napi::CallbackInfo&);
+  ~ListBox();
   static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env&, Napi::Object&);
 
@@ -41,6 +42,7 @@ public:
 
 private:
   PoDoFo::PdfField& field;
+  std::shared_ptr<spdlog::logger> dbglog;
 };
 }
 

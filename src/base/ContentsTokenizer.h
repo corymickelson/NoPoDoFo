@@ -20,6 +20,7 @@
 #define NPDF_CONTENTSTOKENIZER_H
 
 #include "../doc/Document.h"
+#include "spdlog/logger.h"
 #include <napi.h>
 #include <podofo/podofo.h>
 
@@ -27,10 +28,11 @@ using Napi::CallbackInfo;
 using std::vector;
 
 namespace NoPoDoFo {
-class ContentsTokenizer : public Napi::ObjectWrap<ContentsTokenizer>
+class ContentsTokenizer final : public Napi::ObjectWrap<ContentsTokenizer>
 {
 public:
   explicit ContentsTokenizer(const Napi::CallbackInfo&);
+  ~ContentsTokenizer();
   static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
   Napi::Value ReadSync(const Napi::CallbackInfo&);
@@ -42,6 +44,7 @@ public:
 private:
   std::unique_ptr<PoDoFo::PdfContentsTokenizer> self;
   Document& doc;
+  std::shared_ptr<spdlog::logger> dbglog;
 
   int pIndex;
   void AddText(PoDoFo::PdfFont*, const PoDoFo::PdfString&);

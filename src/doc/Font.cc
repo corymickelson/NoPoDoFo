@@ -23,6 +23,7 @@
 #include "../base/Stream.h"
 #include "Encoding.h"
 #include <iostream>
+#include <spdlog/spdlog.h>
 
 using namespace PoDoFo;
 using namespace Napi;
@@ -38,7 +39,14 @@ FunctionReference Font::constructor; // NOLINT
 Font::Font(const Napi::CallbackInfo& info)
   : ObjectWrap(info)
   , font(*info[0].As<External<PdfFont>>().Data())
-{}
+{
+  dbglog = spdlog::get("dbglog");
+}
+
+Font::~Font()
+{
+  dbglog->debug("Font Cleanup");
+}
 
 void
 Font::Initialize(Napi::Env& env, Napi::Object& target)

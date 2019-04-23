@@ -22,6 +22,7 @@
 
 #include <napi.h>
 #include <podofo/podofo.h>
+#include <spdlog/logger.h>
 #include <string>
 
 using std::vector;
@@ -57,6 +58,7 @@ private:
   PoDoFo::PdfDictionary& self;
   PoDoFo::PdfDictionary* init = nullptr;
   PoDoFo::PdfObject* parent = nullptr;
+  std::shared_ptr<spdlog::logger> dbglog;
 };
 }
 #endif

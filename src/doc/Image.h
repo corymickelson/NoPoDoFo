@@ -22,6 +22,7 @@
 
 #include <napi.h>
 #include <podofo/podofo.h>
+#include <spdlog/logger.h>
 
 namespace NoPoDoFo {
 class Image : public Napi::ObjectWrap<Image>
@@ -39,6 +40,7 @@ public:
 private:
   std::unique_ptr<PoDoFo::PdfImage> img;
   PoDoFo::PdfDocument* doc;
+  std::shared_ptr<spdlog::logger> dbglog;
 };
 }
 #endif // NPDF_IMAGE_H

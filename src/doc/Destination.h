@@ -22,6 +22,7 @@
 
 #include <napi.h>
 #include <podofo/podofo.h>
+#include <spdlog/logger.h>
 
 namespace NoPoDoFo {
 
@@ -42,6 +43,8 @@ public:
   void AddToDictionary(const Napi::CallbackInfo&);
   PoDoFo::PdfDestination& GetDestination() { return *destination; }
   PoDoFo::PdfDestination* destination;
+private:
+  std::shared_ptr<spdlog::logger> dbglog;
 };
 
 }

@@ -22,6 +22,7 @@
 
 #include <napi.h>
 #include <podofo/podofo.h>
+#include <spdlog/logger.h>
 
 namespace NoPoDoFo {
 class XObject : public Napi::ObjectWrap<XObject>
@@ -40,6 +41,7 @@ public:
 
 private:
   PoDoFo::PdfXObject* xobj;
+  std::shared_ptr<spdlog::logger> dbglog;
 };
 }
 #endif // NPDF_XOBJECT_H

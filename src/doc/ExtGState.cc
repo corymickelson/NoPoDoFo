@@ -22,6 +22,7 @@
 #include "Document.h"
 #include "StreamDocument.h"
 #include <algorithm>
+#include <spdlog/spdlog.h>
 
 namespace NoPoDoFo {
 
@@ -38,6 +39,7 @@ FunctionReference ExtGState::constructor; // NOLINT
 ExtGState::ExtGState(const Napi::CallbackInfo& info)
   : ObjectWrap(info)
 {
+  dbglog = spdlog::get("dbglog");
   auto o = info[0].As<Object>();
   if (o.InstanceOf(Document::constructor.Value())) {
     auto d = Document::Unwrap(o);
@@ -51,6 +53,11 @@ ExtGState::ExtGState(const Napi::CallbackInfo& info)
       "Requires an instance of StreamDocument or Document for construction")
       .ThrowAsJavaScriptException();
   }
+}
+
+ExtGState::~ExtGState()
+{
+  dbglog->debug("ExtGState Cleanup");
 }
 
 void

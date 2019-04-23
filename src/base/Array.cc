@@ -17,6 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "spdlog/spdlog.h"
 #include "Array.h"
 #include "../ErrorHandler.h"
 #include "../ValidateArguments.h"
@@ -49,10 +50,13 @@ Array::Array(const CallbackInfo& info)
              ? (parent = info[0].As<External<PdfObject>>().Data())->GetArray()
              : *info[0].As<External<PdfArray>>().Data())
         : *(init = new PdfArray()))
-{}
+{
+  dbglog = spdlog::get("dbglog");
+}
 
 Array::~Array()
 {
+  dbglog->debug("Array cleanup");
   HandleScope scope(Env());
   for (auto child : children) {
     delete child;

@@ -3,6 +3,7 @@
 //
 
 #include "PushButton.h"
+#include <spdlog/spdlog.h>
 
 using namespace Napi;
 using namespace PoDoFo;
@@ -16,7 +17,15 @@ PushButton::PushButton(const Napi::CallbackInfo& info)
   , Field(ePdfField_PushButton, info)
   , Button(Field::GetField())
   , field(Field::GetField())
-{}
+{
+  dbglog = spdlog::get("dbglog");
+}
+
+PushButton::~PushButton()
+{
+  dbglog->debug("PushButton Cleanup");
+}
+
 void
 PushButton::Initialize(Napi::Env& env, Napi::Object& target)
 {

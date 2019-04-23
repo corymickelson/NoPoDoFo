@@ -34,6 +34,7 @@
 #include "Outline.h"
 #include "Page.h"
 #include "StreamDocument.h"
+#include <spdlog/spdlog.h>
 
 using namespace Napi;
 using namespace PoDoFo;
@@ -55,8 +56,11 @@ namespace NoPoDoFo {
  */
 BaseDocument::BaseDocument(const Napi::CallbackInfo& info, bool inMem)
 {
+
+  dbglog = spdlog::get("dbglog");
   if (inMem) {
     base = new PdfMemDocument();
+    dbglog->debug("New PdfMemDocument");
   } else {
     EPdfVersion version = ePdfVersion_1_7;
     EPdfWriteMode writeMode = ePdfWriteMode_Default;
@@ -81,20 +85,22 @@ BaseDocument::BaseDocument(const Napi::CallbackInfo& info, bool inMem)
       output = info[0].As<String>().Utf8Value();
       base =
         new PdfStreamedDocument(output.c_str(), version, encrypt, writeMode);
+      std::stringstream dbgMsg;
+      dbgMsg << "New PdfStreamedDocument to " << output.c_str() << endl;
+      dbglog->debug(dbgMsg.str());
     } else {
       streamDocRefCountedBuffer = new PdfRefCountedBuffer(2048);
       streamDocOutputDevice = new PdfOutputDevice(streamDocRefCountedBuffer);
       base = new PdfStreamedDocument(
         streamDocOutputDevice, version, encrypt, writeMode);
+      dbglog->debug("New PdfStreamedDocument to Buffer");
     }
   }
 }
 
 BaseDocument::~BaseDocument()
 {
-#ifdef NOPODOFO_DEBUG
-  cout << "Base document cleanup" << endl;
-#endif
+  dbglog->debug("BaseDocument Cleanup");
   for (auto c : copies) {
     delete c; 
   }

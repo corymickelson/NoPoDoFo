@@ -29,6 +29,7 @@
 #include <openssl/ssl.h>
 #include <openssl/x509.h>
 #include <podofo/podofo.h>
+#include <spdlog/spdlog.h>
 
 namespace NoPoDoFo {
 class Signer : public Napi::ObjectWrap<Signer>
@@ -49,6 +50,9 @@ public:
 
   EVP_PKEY* pkey = nullptr;
   X509* cert = nullptr;
+
+private:
+  std::shared_ptr<spdlog::logger> dbglog;
 };
 }
 #endif

@@ -57,6 +57,7 @@ Signer::Signer(const Napi::CallbackInfo& info)
   : ObjectWrap(info)
   , doc(Document::Unwrap(info[0].As<Object>())->GetDocument())
 {
+  dbglog = spdlog::get("dbglog");
   if (info.Length() < 1) {
     Error::New(info.Env(), "Document required to construct Signer")
       .ThrowAsJavaScriptException();
@@ -74,6 +75,7 @@ Signer::Signer(const Napi::CallbackInfo& info)
 
 Signer::~Signer()
 {
+  dbglog->debug("Signer Cleanup");
   HandleScope scope(Env());
   if (cert != nullptr) {
     X509_free(cert);

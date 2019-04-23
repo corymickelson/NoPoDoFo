@@ -22,6 +22,7 @@
 
 #include <napi.h>
 #include <podofo/podofo.h>
+#include <spdlog/logger.h>
 
 namespace NoPoDoFo {
 class Encoding : public Napi::ObjectWrap<Encoding>
@@ -38,6 +39,7 @@ public:
 
 private:
   const PoDoFo::PdfEncoding* encoding;
+  std::shared_ptr<spdlog::logger> dbglog;
 };
 }
 #endif // NPDF_ENCODING_H

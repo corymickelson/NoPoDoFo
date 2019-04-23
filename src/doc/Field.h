@@ -92,6 +92,7 @@ protected:
 private:
   PoDoFo::PdfField* field;
   vector<PoDoFo::PdfObject*> children;
+  std::shared_ptr<spdlog::logger> dbglog;
 };
 }
 #endif // NPDF_PDFFIELD_H

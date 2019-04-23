@@ -22,6 +22,7 @@
 #include "Array.h"
 #include "Dictionary.h"
 #include "Ref.h"
+#include <spdlog/spdlog.h>
 
 using namespace Napi;
 using namespace PoDoFo;
@@ -124,9 +125,15 @@ Obj::Obj(const Napi::CallbackInfo& info)
   , obj(info.Length() == 1 && info[0].IsExternal()
           ? *info[0].As<External<PdfObject>>().Data()
           : *(init = InitObject(info)))
-{}
+{
+  dbglog = spdlog::get("dbglog");
+  if(init != nullptr) {
+    dbglog->debug("New Object Created");
+  }
+}
 Obj::~Obj()
 {
+  dbglog->debug("Object Cleanup");
   HandleScope scope(Env());
   delete init;
 }
