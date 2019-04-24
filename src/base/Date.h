@@ -24,23 +24,27 @@
 #include <podofo/podofo.h>
 #include <spdlog/logger.h>
 
+using JsValue = Napi::Value;
+
 namespace NoPoDoFo {
 
 class Date : public Napi::ObjectWrap<Date>
 {
 public:
   explicit Date(const Napi::CallbackInfo&);
+  explicit Date(const Date&) = delete;
+  const Date& operator=(const Date&) = delete;
   ~Date();
-  static Napi::FunctionReference constructor;
+  static Napi::FunctionReference Constructor;
   static void Initialize(Napi::Env&, Napi::Object&);
-  Napi::Value ToString(const Napi::CallbackInfo&);
-  Napi::Value IsValid(const Napi::CallbackInfo&);
+  JsValue ToString(const Napi::CallbackInfo&);
+  JsValue IsValid(const Napi::CallbackInfo&);
 
-  PoDoFo::PdfDate GetDate() { return *timestamp; }
+  PoDoFo::PdfDate GetDate() const { return *Ts; }
 
 private:
-  PoDoFo::PdfDate* timestamp;
-  std::shared_ptr<spdlog::logger> dgblog;
+  PoDoFo::PdfDate* Ts;
+  std::shared_ptr<spdlog::logger> DbgLog;
 };
 }
 #endif // NOPODOFO_DATE_H

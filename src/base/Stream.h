@@ -23,7 +23,6 @@
 #include <napi.h>
 #include <podofo/podofo.h>
 #include <spdlog/logger.h>
-#include <string>
 
 namespace NoPoDoFo {
 class Stream : public Napi::ObjectWrap<Stream>

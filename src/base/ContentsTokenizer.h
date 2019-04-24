@@ -25,28 +25,31 @@
 #include <podofo/podofo.h>
 
 using Napi::CallbackInfo;
+using JsValue = Napi::Value;
 using std::vector;
 
 namespace NoPoDoFo {
-class ContentsTokenizer final : public Napi::ObjectWrap<ContentsTokenizer>
+class ContentsTokenizer final : public ObjectWrap<ContentsTokenizer>
 {
 public:
   explicit ContentsTokenizer(const Napi::CallbackInfo&);
+  explicit ContentsTokenizer(const ContentsTokenizer&) = delete;
+  const ContentsTokenizer& operator=(const ContentsTokenizer&) = delete;
   ~ContentsTokenizer();
-  static Napi::FunctionReference constructor;
+  static Napi::FunctionReference Constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
-  Napi::Value ReadSync(const Napi::CallbackInfo&);
+  JsValue ReadSync(const Napi::CallbackInfo&);
   void Read(const CallbackInfo&);
   void ReadIntoData();
-  vector<string> data;
-  string contentsString;
+  vector<string> Data;
+  string ContentsString;
 
 private:
-  std::unique_ptr<PoDoFo::PdfContentsTokenizer> self;
-  Document& doc;
-  std::shared_ptr<spdlog::logger> dbglog;
+  std::unique_ptr<PoDoFo::PdfContentsTokenizer> Self;
+  Document& Doc;
+  std::shared_ptr<spdlog::logger> DbgLog;
 
-  int pIndex;
+  int PageIndex;
   void AddText(PoDoFo::PdfFont*, const PoDoFo::PdfString&);
 };
 }

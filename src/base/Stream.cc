@@ -20,7 +20,6 @@
 #include "Stream.h"
 #include "../ErrorHandler.h"
 #include "../ValidateArguments.h"
-#include "Array.h"
 #include "Obj.h"
 #include <spdlog/spdlog.h>
 
@@ -40,7 +39,7 @@ Stream::Stream(const CallbackInfo& info)
              ? *info[0].As<External<PdfStream>>().Data()
              : *Obj::Unwrap(info[0].As<Object>())->GetObject().GetStream())
 {
-  dbglog = spdlog::get("dbglog");
+  dbglog = spdlog::get("DbgLog");
 }
 Stream::~Stream()
 {

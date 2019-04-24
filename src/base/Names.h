@@ -1,3 +1,5 @@
+#ifndef NAMES_H
+#define NAMES_H
 #include "../../deps/include/gsl/gsl"
 
 namespace NoPoDoFo {
@@ -72,7 +74,7 @@ const std::string CATALOG = "Catalog";
 const std::string CCITTFAX_DECODE = "CCITTFaxDecode";
 const std::string CCITTFAX_DECODE_ABBREVIATION = "CCF";
 const std::string CENTER_WINDOW = "CenterWindow";
-const std::string CERT = "Cert";
+//const std::string CERT = "Cert";
 const std::string CF = "CF";
 const std::string CFM = "CFM";
 const std::string CH = "Ch";
@@ -498,3 +500,4 @@ const std::string Y_STEP = "YStep";
 const std::string YES = "Yes";
 }
 }
+#endif // NAMES_H

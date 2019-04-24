@@ -33,7 +33,7 @@ FunctionReference XObject::constructor; // NOLINT
 XObject::XObject(const CallbackInfo& info)
   : ObjectWrap(info)
 {
-  dbglog = spdlog::get("dbglog");
+  dbglog = spdlog::get("DbgLog");
   // create an xobject from an existing object (must be an xobject)
   if (info[0].IsExternal()) {
     dbglog->debug("XObject copy");
@@ -78,21 +78,21 @@ XObject::Initialize(Napi::Env& env, Object& target)
 Value
 XObject::GetContents(const CallbackInfo& info)
 {
-  return Obj::constructor.New(
+  return Obj::Constructor.New(
     { External<PdfObject>::New(info.Env(), xobj->GetContents()) });
 }
 
 Value
 XObject::GetContentsForAppending(const CallbackInfo& info)
 {
-  return Obj::constructor.New(
+  return Obj::Constructor.New(
     { External<PdfObject>::New(info.Env(), xobj->GetContentsForAppending()) });
 }
 
 Value
 XObject::GetResources(const CallbackInfo& info)
 {
-  return Obj::constructor.New(
+  return Obj::Constructor.New(
     { External<PdfObject>::New(info.Env(), xobj->GetResources()) });
 }
 

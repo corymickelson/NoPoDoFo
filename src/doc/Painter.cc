@@ -46,14 +46,14 @@ FunctionReference Painter::constructor; // NOLINT
 Painter::Painter(const Napi::CallbackInfo& info)
   : ObjectWrap(info)
 {
-  dbglog = spdlog::get("dbglog");
+  dbglog = spdlog::get("DbgLog");
   auto o = info[0].As<Object>();
   if (o.InstanceOf(Document::constructor.Value())) {
     isMemDoc = true;
-    document = Document::Unwrap(o)->base;
+    document = Document::Unwrap(o)->Base;
   } else if (o.InstanceOf(StreamDocument::constructor.Value())) {
     isMemDoc = false;
-    document = StreamDocument::Unwrap(o)->base;
+    document = StreamDocument::Unwrap(o)->Base;
   } else {
     TypeError::New(info.Env(), "requires an instance of BaseDocument")
       .ThrowAsJavaScriptException();
@@ -155,7 +155,7 @@ Painter::SetPage(const Napi::CallbackInfo& info)
 void
 Painter::SetColor(const CallbackInfo& info)
 {
-  painter->SetColor(*Color::Unwrap(info[0].As<Object>())->color);
+  painter->SetColor(*Color::Unwrap(info[0].As<Object>())->Clr);
 }
 
 void

@@ -30,3 +30,12 @@ values of the containter. When iterating the keys of an array, or the key(s)/val
 that the return value has been resolved, if the value has not been resolved a [Ref](./ref.md) will be returned. The caller then
 can take this ref and pass it to [document.getObject](./document.md#getobject) to get the actual object value. Examples of this can be
 seen in unit tests Image, and FileAttachment.
+
+## Where NoPoDoFo breaks from Javascript
+
+NoPoDoFo is a C++ library, and as such it is responsible for the management of it's own memory. NoPoDoFo follows the
+Aggregation pattern, this pattern if you are unfamiliar states that an object ...
+The effect that this pattern has on NoPoDoFo is that a child class of a Document/StreamDocument, ex a Page, is bound to 
+the lifetime of the parent, the child is not responsible for it's resource allocation(s) or destruction,
+when the parent goes out of scope(allowing the instance to be gc'd) the child will be destroyed along with the parent,
+trying to access the instance of Page after the Document has gone out of scope(and been collected) will result in an Error. 

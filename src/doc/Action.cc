@@ -36,10 +36,10 @@ Action::Action(const Napi::CallbackInfo& info)
   else if (opts[0] == 1 && opts[1] == 1) {
     PdfDocument* doc;
     if (info[0].As<Object>().InstanceOf(Document::constructor.Value())) {
-      doc = Document::Unwrap(info[0].As<Object>())->base;
+      doc = Document::Unwrap(info[0].As<Object>())->Base;
     } else if (info[0].As<Object>().InstanceOf(
                  StreamDocument::constructor.Value())) {
-      doc = StreamDocument::Unwrap(info[0].As<Object>())->base;
+      doc = StreamDocument::Unwrap(info[0].As<Object>())->Base;
     } else {
       Error::New(info.Env(), "Instance of Base is required")
         .ThrowAsJavaScriptException();
@@ -53,7 +53,7 @@ Action::Action(const Napi::CallbackInfo& info)
       "Invalid Action constructor args. Please see the docs for more info.")
       .ThrowAsJavaScriptException();
   }
-  dbglog = spdlog::get("dbglog");
+  dbglog = spdlog::get("DbgLog");
 }
 Action::~Action()
 {
@@ -111,7 +111,7 @@ Napi::Value
 Action::GetObject(const Napi::CallbackInfo& info)
 {
   PdfObject* o = GetAction().GetObject();
-  return Obj::constructor.New({ External<PdfObject>::New(info.Env(), o) });
+  return Obj::Constructor.New({ External<PdfObject>::New(info.Env(), o) });
 }
 void
 Action::AddToDictionary(const Napi::CallbackInfo& info)

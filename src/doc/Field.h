@@ -29,7 +29,7 @@ using std::cout;
 using std::endl;
 using std::string;
 using std::vector;
-using value = Napi::Value;
+using JsValue = Napi::Value;
 
 namespace NoPoDoFo {
 
@@ -45,32 +45,32 @@ class Field
 public:
   explicit Field(PoDoFo::EPdfField type, const Napi::CallbackInfo& info);
   ~Field();
-  value GetType(const Napi::CallbackInfo&);
-  value GetFieldName(const Napi::CallbackInfo&);
+  JsValue GetType(const Napi::CallbackInfo&);
+  JsValue GetFieldName(const Napi::CallbackInfo&);
   void SetFieldName(const Napi::CallbackInfo&, const Napi::Value&);
-  value GetAlternateName(const Napi::CallbackInfo&);
-  value GetMappingName(const Napi::CallbackInfo&);
+  JsValue GetAlternateName(const Napi::CallbackInfo&);
+  JsValue GetMappingName(const Napi::CallbackInfo&);
   void SetAlternateName(const Napi::CallbackInfo&, const Napi::Value&);
   void SetMappingName(const Napi::CallbackInfo&, const Napi::Value&);
   void SetRequired(const Napi::CallbackInfo&, const Napi::Value&);
-  value IsRequired(const Napi::CallbackInfo&);
+  JsValue IsRequired(const Napi::CallbackInfo&);
   void SetReadOnly(const Napi::CallbackInfo&, const Napi::Value&);
-  value IsReadOnly(const Napi::CallbackInfo&);
+  JsValue IsReadOnly(const Napi::CallbackInfo&);
   void SetExport(const Napi::CallbackInfo&, const Napi::Value&);
-  value IsExport(const Napi::CallbackInfo&);
+  JsValue IsExport(const Napi::CallbackInfo&);
   void SetBackground(const Napi::CallbackInfo&);
   void SetBorder(const Napi::CallbackInfo&);
   void SetHighlightingMode(const Napi::CallbackInfo&);
   void SetMouseAction(const Napi::CallbackInfo&);
   void SetPageAction(const Napi::CallbackInfo&);
-  value GetAnnotation(const Napi::CallbackInfo&);
-  value GetAppearanceStream(const Napi::CallbackInfo&);
+  JsValue GetAnnotation(const Napi::CallbackInfo&);
+  JsValue GetAppearanceStream(const Napi::CallbackInfo&);
   void SetAppearanceStream(const Napi::CallbackInfo&, const Napi::Value&);
-  value GetDefaultAppearance(const Napi::CallbackInfo&);
+  JsValue GetDefaultAppearance(const Napi::CallbackInfo&);
   void SetDefaultAppearance(const Napi::CallbackInfo&, const Napi::Value&);
-  value GetJustification(const Napi::CallbackInfo&);
+  JsValue GetJustification(const Napi::CallbackInfo&);
   void SetJustification(const Napi::CallbackInfo&, const Napi::Value&);
-  value GetFieldObject(const Napi::CallbackInfo&);
+  JsValue GetFieldObject(const Napi::CallbackInfo&);
   virtual void RefreshAppearanceStream();
   PoDoFo::PdfField& GetField() { return *field; }
   PoDoFo::PdfDictionary& GetFieldDictionary()
@@ -85,10 +85,6 @@ public:
 
 protected:
   string TypeString();
-
-  // void SetColor(const Napi::CallbackInfo&, std::function<void (double,
-  // double, double, double)>);
-
 private:
   PoDoFo::PdfField* field;
   vector<PoDoFo::PdfObject*> children;

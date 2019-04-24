@@ -25,44 +25,46 @@
 #include "spdlog/logger.h"
 
 using Napi::CallbackInfo;
-using value = Napi::Value;
+using JsValue = Napi::Value;
 using PoDoFo::PdfColor;
 
 namespace NoPoDoFo {
 class Color : public Napi::ObjectWrap<Color>
 {
 public:
-  static Napi::FunctionReference constructor;
+  static Napi::FunctionReference Constructor;
 
   static void Initialize(Napi::Env& env, Napi::Object& target);
 
   explicit Color(const CallbackInfo&);
+  explicit Color(const Color&) = delete;
+  const Color& operator=(const Color&) = delete;
   ~Color();
 
-  value GetGrey(const CallbackInfo&);
+  JsValue GetGrey(const CallbackInfo&);
 
-  value GetCyan(const CallbackInfo&);
-  value GetMagenta(const CallbackInfo&);
-  value GetYellow(const CallbackInfo&);
-  value GetBlack(const CallbackInfo&);
+  JsValue GetCyan(const CallbackInfo&);
+  JsValue GetMagenta(const CallbackInfo&);
+  JsValue GetYellow(const CallbackInfo&);
+  JsValue GetBlack(const CallbackInfo&);
 
-  value GetBlue(const CallbackInfo&);
-  value GetRed(const CallbackInfo&);
-  value GetGreen(const CallbackInfo&);
+  JsValue GetBlue(const CallbackInfo&);
+  JsValue GetRed(const CallbackInfo&);
+  JsValue GetGreen(const CallbackInfo&);
 
-  value IsRGB(const CallbackInfo&);
-  value IsCMYK(const CallbackInfo&);
-  value IsGreyScale(const CallbackInfo&);
-  value GetName(const CallbackInfo&);
-  value GetDensity(const CallbackInfo&);
-  value ConvertToGreyScale(const CallbackInfo&);
-  value ConvertToRGB(const CallbackInfo&);
-  value ConvertToCMYK(const CallbackInfo&);
-  value GetColorStreamString(const CallbackInfo &);
-  PdfColor* color;
+  JsValue IsRGB(const CallbackInfo&);
+  JsValue IsCMYK(const CallbackInfo&);
+  JsValue IsGreyScale(const CallbackInfo&);
+  JsValue GetName(const CallbackInfo&);
+  JsValue GetDensity(const CallbackInfo&);
+  JsValue ConvertToGreyScale(const CallbackInfo&);
+  JsValue ConvertToRGB(const CallbackInfo&);
+  JsValue ConvertToCMYK(const CallbackInfo&);
+  JsValue GetColorStreamString(const CallbackInfo &);
+  PdfColor* Clr;
 
 private:
-  std::shared_ptr<spdlog::logger> dbglog;
+  std::shared_ptr<spdlog::logger> DbgLog;
 };
 }
 

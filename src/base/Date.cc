@@ -19,21 +19,17 @@
 
 #include "Date.h"
 #include "../ValidateArguments.h"
-#include <iostream>
 #include <spdlog/spdlog.h>
 
 using namespace Napi;
 using namespace PoDoFo;
 
-using option = tl::optional<napi_valuetype>;
-using std::cout;
-using std::endl;
-using std::vector;
+using Option = tl::optional<napi_valuetype>;
 using tl::nullopt;
 
 namespace NoPoDoFo {
 
-FunctionReference Date::constructor; // NOLINT
+FunctionReference Date::Constructor; // NOLINT
 
 /**
  * PdfDate, to construct a new date from JS value the value
@@ -43,51 +39,51 @@ FunctionReference Date::constructor; // NOLINT
 Date::Date(const Napi::CallbackInfo& info)
   : ObjectWrap(info)
 {
-  vector<int> argIndex = AssertCallbackInfo(
+  auto argIndex = AssertCallbackInfo(
     info, { { 0, { option(napi_string), nullopt, option(napi_external) } } });
-  dgblog = spdlog::get("dbglog");
+  DbgLog = spdlog::get("DbgLog");
   if (argIndex[0] == 0) {
-    timestamp = new PdfDate(info[0].As<String>().Utf8Value());
-    if (!timestamp->IsValid()) {
+    Ts = new PdfDate(info[0].As<String>().Utf8Value());
+    if (!Ts->IsValid()) {
       Error::New(info.Env(),
                  "Invalid Date format. See NoPoDoFo Date docs for details.")
         .ThrowAsJavaScriptException();
     }
   } else if (argIndex[0] == 1) {
-    timestamp = new PdfDate();
+    Ts = new PdfDate();
   } else if (argIndex[0] == 2) {
-    PdfDate* copy = info[0].As<External<PdfDate>>().Data();
-    timestamp = new PdfDate(*copy);
+    const auto copy = info[0].As<External<PdfDate>>().Data();
+    Ts = new PdfDate(*copy);
   }
 }
 Date::~Date()
 {
-  dgblog->debug("Date Cleanup");
+  DbgLog->debug("Date Cleanup");
   HandleScope scope(Env());
-  delete timestamp;
+  delete Ts;
 }
 void
 Date::Initialize(Napi::Env& env, Napi::Object& target)
 {
   HandleScope scope(env);
-  Function ctor = DefineClass(env,
+  auto ctor = DefineClass(env,
                               "Date",
                               { InstanceMethod("toString", &Date::ToString),
                                 InstanceMethod("isValid", &Date::IsValid) });
-  constructor = Napi::Persistent(ctor);
-  constructor.SuppressDestruct();
+  Constructor = Napi::Persistent(ctor);
+  Constructor.SuppressDestruct();
   target.Set("Date", ctor);
 }
-Napi::Value
+JsValue
 Date::ToString(const CallbackInfo& info)
 {
   PdfString value;
-  timestamp->ToString(value);
+  Ts->ToString(value);
   return String::New(info.Env(), value.GetStringUtf8());
 }
-Napi::Value
+JsValue
 Date::IsValid(const CallbackInfo& info)
 {
-  return Boolean::New(info.Env(), timestamp->IsValid());
+  return Boolean::New(info.Env(), Ts->IsValid());
 }
 }

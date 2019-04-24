@@ -52,7 +52,7 @@ Page::Page(const CallbackInfo& info)
   : ObjectWrap(info)
   , page(*info[0].As<External<PdfPage>>().Data())
 {
-  dbglog = spdlog::get("dbglog");
+  dbglog = spdlog::get("DbgLog");
 }
 
 Page::~Page()
@@ -133,7 +133,7 @@ Page::GetField(const Napi::Env& env, int index)
         .ThrowAsJavaScriptException();
       return env.Undefined();
     case ePdfField_TextField:
-      return TextField::constructor.New(
+      return TextField::Constructor.New(
         { External<PdfField>::New(env, &field) });
     case ePdfField_ComboBox:
       return ComboBox::constructor.New(
@@ -278,7 +278,7 @@ Page::GetContents(const CallbackInfo& info)
 {
   PdfObject* contentsObj = page.GetContents();
   auto objPtr = External<PdfObject>::New(info.Env(), contentsObj);
-  auto instance = Obj::constructor.New({ objPtr });
+  auto instance = Obj::Constructor.New({ objPtr });
   return instance;
 }
 
@@ -288,7 +288,7 @@ Page::GetResources(const CallbackInfo& info)
   EscapableHandleScope scope(info.Env());
   PdfObject* resources = page.GetResources();
   auto objPtr = External<PdfObject>::New(info.Env(), resources);
-  auto instance = Obj::constructor.New({ objPtr });
+  auto instance = Obj::Constructor.New({ objPtr });
   return scope.Escape(instance);
 }
 
@@ -382,7 +382,7 @@ Page::CreateField(const CallbackInfo& info)
     case ePdfField_RadioButton:
       break;
     case ePdfField_TextField:
-      return TextField::constructor.New(
+      return TextField::Constructor.New(
         { widget->Value(), form->Value(), opts });
     case ePdfField_ComboBox:
       return ComboBox::constructor.New({ widget->Value(), form->Value() });

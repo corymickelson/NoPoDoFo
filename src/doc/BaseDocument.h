@@ -36,6 +36,8 @@ class BaseDocument
 {
 public:
   explicit BaseDocument(const Napi::CallbackInfo&, bool);
+  explicit BaseDocument(const BaseDocument&) = delete;
+  const BaseDocument& operator=(const BaseDocument&) = delete;
   virtual ~BaseDocument();
   Napi::Value GetPageCount(const Napi::CallbackInfo&);
   virtual Napi::Value GetPage(const Napi::CallbackInfo&);
@@ -73,18 +75,18 @@ public:
   void AddNamedDestination(const Napi::CallbackInfo&);
   Napi::Value CreateXObject(const Napi::CallbackInfo&);
 
-  PoDoFo::PdfDocument* base;
-  PoDoFo::PdfRefCountedBuffer* streamDocRefCountedBuffer = nullptr;
-  PoDoFo::PdfOutputDevice* streamDocOutputDevice = nullptr;
-  string output;
+  PoDoFo::PdfDocument* Base;
+  PoDoFo::PdfRefCountedBuffer* StreamDocRefCountedBuffer = nullptr;
+  PoDoFo::PdfOutputDevice* StreamDocOutputDevice = nullptr;
+  string Output;
 
 protected:
   PoDoFo::PdfFont* CreateFontObject(napi_env, Napi::Object, bool subset);
-  std::string pwd;
-  vector<PoDoFo::PdfObject*> copies;
+  std::string Pwd;
+  vector<PoDoFo::PdfObject*> Copies;
 
 private:
-  std::shared_ptr<spdlog::logger> dbglog;
+  std::shared_ptr<spdlog::logger> DbgLog;
 };
 }
 #endif

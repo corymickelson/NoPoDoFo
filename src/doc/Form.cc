@@ -47,12 +47,12 @@ Form::Form(const Napi::CallbackInfo& info)
   : ObjectWrap(info)
   , create(info[1].As<Boolean>())
   , doc(info[0].IsExternal()
-          ? *info[0].As<External<BaseDocument>>().Data()->base
+          ? *info[0].As<External<BaseDocument>>().Data()->Base
           : *(info[0].As<Object>().InstanceOf(Document::constructor.Value())
-                ? Document::Unwrap(info[0].As<Object>())->base
-                : StreamDocument::Unwrap(info[0].As<Object>())->base))
+                ? Document::Unwrap(info[0].As<Object>())->Base
+                : StreamDocument::Unwrap(info[0].As<Object>())->Base))
 {
-  dbglog = spdlog::get("dbglog");
+  dbglog = spdlog::get("DbgLog");
 }
 
 Form::~Form()
@@ -103,7 +103,7 @@ Napi::Value
 Form::GetFormDictionary(const CallbackInfo& info)
 {
   PdfDictionary& obj = GetForm()->GetObject()->GetDictionary();
-  auto ptr = Dictionary::constructor.New(
+  auto ptr = Dictionary::Constructor.New(
     { External<PdfDictionary>::New(info.Env(), &obj),
       Number::New(info.Env(), 1) });
   return ptr;
@@ -187,7 +187,7 @@ Form::GetResource(const CallbackInfo& info)
     if (drObj->IsReference()) {
       drObj = doc.GetObjects()->GetObject(drObj->GetReference());
     }
-    return Dictionary::constructor.New(
+    return Dictionary::Constructor.New(
       { External<PdfObject>::New(info.Env(), drObj),
         Number::New(info.Env(), 0) });
   }
@@ -197,7 +197,7 @@ Form::GetResource(const CallbackInfo& info)
 void
 Form::SetResource(const CallbackInfo& info, const Napi::Value& value)
 {
-  if (!value.As<Object>().InstanceOf(Dictionary::constructor.Value())) {
+  if (!value.As<Object>().InstanceOf(Dictionary::Constructor.Value())) {
     TypeError::New(
       info.Env(),
       "Default resource must be an instance of NoPoDoFo::Dictionary")
@@ -235,14 +235,14 @@ Form::GetCalculationOrder(const CallbackInfo& info)
       for (const auto& item : arr) {
         if (item.IsReference()) {
           auto value = doc.GetObjects()->GetObject(item.GetReference());
-          auto nObj = Obj::constructor.New(
+          auto nObj = Obj::Constructor.New(
             { External<PdfObject>::New(info.Env(), value) });
           if (!value->IsDictionary()) {
             js.Set(n, nObj);
             n++;
           } else {
             js.Set(n,
-                   Dictionary::constructor.New(
+                   Dictionary::Constructor.New(
                      { External<PdfObject>::New(info.Env(), value),
                        Number::New(info.Env(), 0) }));
             n++;

@@ -44,7 +44,7 @@ Annotation::Annotation(const CallbackInfo& info)
   : ObjectWrap(info)
   , annot(*info[0].As<External<PdfAnnotation>>().Data())
 {
-  dbglog = spdlog::get("dbglog");
+  dbglog = spdlog::get("DbgLog");
 }
 
 Annotation::~Annotation() {
@@ -200,7 +200,7 @@ Annotation::GetDestination(const CallbackInfo& info)
 {
   if (!GetAnnotation().HasDestination())
     return info.Env().Null();
-  auto doc = Document::Unwrap(info[0].As<Object>())->base;
+  auto doc = Document::Unwrap(info[0].As<Object>())->Base;
   PdfDestination d = GetAnnotation().GetDestination(doc);
   return Destination::constructor.New(
     { External<PdfDestination>::New(info.Env(), &d) });
@@ -256,8 +256,8 @@ Annotation::SetColor(const CallbackInfo& info, const Napi::Value& value)
   vector<NPDFColorFormat> types = { NPDFColorFormat::RGB,
                                     NPDFColorFormat::GreyScale,
                                     NPDFColorFormat::CMYK };
-  NPDFColorAccessor(
-    Color::Unwrap(value.As<Object>())->color, types, GetAnnotation().SetColor)
+  NPDF_COLOR_ACCESSOR(
+    Color::Unwrap(value.As<Object>())->Clr, types, GetAnnotation().SetColor)
 }
 
 Napi::Value
@@ -268,17 +268,17 @@ Annotation::GetColor(const CallbackInfo& info)
     return info.Env().Null();
   switch (color.size()) {
     case 1: { // greyscale
-      return Color::constructor.New(
+      return Color::Constructor.New(
         { Number::New(info.Env(), color[0].GetNumber()) });
     }
     case 3: { // rgb
-      return Color::constructor.New(
+      return Color::Constructor.New(
         { Number::New(info.Env(), color[0].GetNumber()),
           Number::New(info.Env(), color[1].GetNumber()),
           Number::New(info.Env(), color[2].GetNumber()) });
     }
     case 4: { // cmyk
-      return Color::constructor.New(
+      return Color::Constructor.New(
         { Number::New(info.Env(), color[0].GetNumber()),
           Number::New(info.Env(), color[1].GetNumber()),
           Number::New(info.Env(), color[2].GetNumber()),

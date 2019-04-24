@@ -20,15 +20,16 @@
 #ifndef NPDF_ERRORHANDLER_H
 #define NPDF_ERRORHANDLER_H
 
-#include <iostream>
 #include <napi.h>
 #include <podofo/podofo.h>
-#include <sstream>
+#include "spdlog/logger.h"
 
 class ErrorHandler
 {
 public:
   ErrorHandler() = default;
+  ErrorHandler(const ErrorHandler&) = delete;
+  const ErrorHandler& operator=(const ErrorHandler&) = delete;
   ErrorHandler(PoDoFo::PdfError&, const Napi::CallbackInfo&);
   ErrorHandler(Napi::Error&, const Napi::CallbackInfo&);
   ~ErrorHandler() = default;
@@ -37,5 +38,6 @@ public:
 
 private:
   static std::string ParseMsgFromPdfError(PoDoFo::PdfError&);
+  std::shared_ptr<spdlog::logger> DbgLog;
 };
 #endif // NPDF_ERRORHANDLER_H

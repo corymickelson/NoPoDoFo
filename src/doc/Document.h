@@ -65,7 +65,7 @@ public:
   bool LoadedForIncrementalUpdates() { return loadForIncrementalUpdates; }
   inline PoDoFo::PdfMemDocument& GetDocument()
   {
-    return *dynamic_cast<PoDoFo::PdfMemDocument*>(base);
+    return *dynamic_cast<PoDoFo::PdfMemDocument*>(Base);
   }
 
 private:

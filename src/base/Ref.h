@@ -11,7 +11,7 @@
 
 using namespace Napi;
 
-using value = Napi::Value;
+using JsValue = Napi::Value;
 using PoDoFo::PdfReference;
 
 namespace NoPoDoFo {
@@ -23,8 +23,8 @@ public:
   static void Initialize(Napi::Env& env, Napi::Object& target);
   explicit Ref(const CallbackInfo& info);
   ~Ref();
-  value GetObjectNumber(const CallbackInfo&);
-  value GetGenerationNumber(const CallbackInfo&);
+  JsValue GetObjectNumber(const CallbackInfo&);
+  JsValue GetGenerationNumber(const CallbackInfo&);
 private:
   std::shared_ptr<spdlog::logger> dbglog;
 };

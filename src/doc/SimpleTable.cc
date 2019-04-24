@@ -40,12 +40,12 @@ FunctionReference SimpleTable::constructor; // NOLINT
 SimpleTable::SimpleTable(const CallbackInfo& info)
   : ObjectWrap(info)
 {
-  dbglog = spdlog::get("dbglog");
+  dbglog = spdlog::get("DbgLog");
   if (info[0].As<Object>().InstanceOf(Document::constructor.Value())) {
-    doc = Document::Unwrap(info[0].As<Object>())->base;
+    doc = Document::Unwrap(info[0].As<Object>())->Base;
   } else if (info[0].As<Object>().InstanceOf(
                StreamDocument::constructor.Value())) {
-    doc = StreamDocument::Unwrap(info[0].As<Object>())->base;
+    doc = StreamDocument::Unwrap(info[0].As<Object>())->Base;
   }
   const int cols = info[1].As<Number>();
   const int rows = info[2].As<Number>();
@@ -170,7 +170,7 @@ SimpleTable::GetBorderColor(const CallbackInfo& info)
   const int col = info[0].As<Number>();
   const int row = info[1].As<Number>();
   auto color = model->GetBorderColor(col, row);
-  return Color::constructor.New(
+  return Color::Constructor.New(
     { External<PdfColor>::New(info.Env(), &color) });
 }
 
@@ -212,7 +212,7 @@ SimpleTable::GetForegroundColor(const CallbackInfo& info)
   const int col = info[0].As<Number>();
   const int row = info[1].As<Number>();
   auto color = model->GetForegroundColor(col, row);
-  return Color::constructor.New(
+  return Color::Constructor.New(
     { External<PdfColor>::New(info.Env(), &color) });
 }
 void
@@ -220,7 +220,7 @@ SimpleTable::SetForegroundColor(const CallbackInfo& info,
                                 const Napi::Value& value)
 {
 
-  model->SetForegroundColor(*Color::Unwrap(info[0].As<Object>())->color);
+  model->SetForegroundColor(*Color::Unwrap(info[0].As<Object>())->Clr);
 }
 
 Value
@@ -229,7 +229,7 @@ SimpleTable::GetBackgroundColor(const CallbackInfo& info)
   const int col = info[0].As<Number>();
   const int row = info[1].As<Number>();
   auto color = model->GetForegroundColor(col, row);
-  return Color::constructor.New(
+  return Color::Constructor.New(
     { External<PdfColor>::New(info.Env(), &color) });
 }
 
@@ -237,7 +237,7 @@ void
 SimpleTable::SetBackgroundColor(const CallbackInfo& info,
                                 const Napi::Value& value)
 {
-  model->SetBackgroundColor(*Color::Unwrap(info[0].As<Object>())->color);
+  model->SetBackgroundColor(*Color::Unwrap(info[0].As<Object>())->Clr);
 }
 
 Value

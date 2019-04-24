@@ -40,7 +40,7 @@ public:
   Napi::Value InsertExistingPage(const Napi::CallbackInfo&) override;
   PoDoFo::PdfStreamedDocument& GetStreamedDocument()
   {
-    return *dynamic_cast<PoDoFo::PdfStreamedDocument*>(BaseDocument::base);
+    return *dynamic_cast<PoDoFo::PdfStreamedDocument*>(BaseDocument::Base);
   }
 
 private:

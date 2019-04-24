@@ -1,0 +1,314 @@
+{
+  "document": [
+    [
+      {
+        "x": 101,
+        "y": 719,
+        "width": 135,
+        "height": 15,
+        "value": "applicant_fullname",
+        "alignment": "Left"
+      },
+      {
+        "x": 101,
+        "y": 707,
+        "width": 135,
+        "height": 15,
+        "value": "coapplicant_fullname",
+        "alignment": "Left"
+      },
+      {
+        "x": 101,
+        "y": 696,
+        "width": 135,
+        "height": 15,
+        "value": "applicant_email",
+        "alignment": "Left"
+      },
+      {
+        "x": 101,
+        "y": 682,
+        "width": 135,
+        "height": 15,
+        "value": "applicant_phone",
+        "alignment": "Left"
+      },
+      {
+        "x": 147,
+        "y": 670,
+        "width": 135,
+        "height": 15,
+        "value": "account_id",
+        "alignment": "Left"
+      },
+      {
+        "x": 410,
+        "y": 700,
+        "width": 135,
+        "height": 30,
+        "value": "full_address",
+        "multiline": true
+      },
+      {
+        "x": 91.84,
+        "y": 587,
+        "width": 79,
+        "height": 25,
+        "value": "loan_start_date"
+      },
+      {
+        "x": 170.5,
+        "y": 587,
+        "width": 93,
+        "height": 25,
+        "value": "initial_payment_date"
+      },
+      {
+        "x": 240,
+        "y": 587,
+        "width": 132,
+        "height": 25,
+        "value": "recurring_payment_day"
+      },
+      {
+        "x": 355,
+        "y": 587,
+        "width": 73.75,
+        "height": 25,
+        "value": "maturity_date"
+      },
+      {
+        "x": 444.75,
+        "y": 587,
+        "width": 69.3,
+        "height": 25,
+        "value": "total_loan_amount"
+      },
+      {
+        "x": 80,
+        "y": 490,
+        "width": 38.75,
+        "height": 25,
+        "value": "term"
+      },
+      {
+        "x": 205.25,
+        "y": 490,
+        "width": 70,
+        "height": 25,
+        "value": "total_loan_amount"
+      },
+      {
+        "x": 338.75,
+        "y": 490,
+        "width": 70,
+        "height": 25,
+        "value": "initial_payment"
+      },
+      {
+        "x": 480,
+        "y": 490,
+        "width": 44.75,
+        "height": 25,
+        "value": "rate"
+      },
+      {
+        "x": 146.5,
+        "y": 375,
+        "width": 121,
+        "height": 19,
+        "value": "solar_installer",
+        "alignment": "Left"
+      },
+      {
+        "x": 497,
+        "y": 375,
+        "width": 76.75,
+        "height": 19,
+        "value": "reference_number",
+        "alignment": "Left"
+      },
+      {
+        "x": 167,
+        "y": 302,
+        "width": 129,
+        "height": 15,
+        "value": "term_months",
+        "alignment": "Left"
+      },
+      {
+        "x": 167,
+        "y": 287.5,
+        "width": 129,
+        "height": 15,
+        "value": "rate",
+        "alignment": "Left"
+      },
+      {
+        "x": 167,
+        "y": 272,
+        "width": 129,
+        "height": 15,
+        "value": "initial_payment",
+        "alignment": "Left"
+      },
+      {
+        "x": 147,
+        "y": 214,
+        "width": 129,
+        "height": 15,
+        "value": "loan_start_date",
+        "alignment": "Left"
+      },
+      {
+        "x": 397,
+        "y": 214,
+        "width": 129,
+        "height": 15,
+        "value": "maturity_date",
+        "alignment": "Left"
+      },
+      {
+        "x": 147,
+        "y": 199,
+        "width": 129,
+        "height": 15,
+        "value": "initial_payment_date",
+        "alignment": "Left"
+      },
+      {
+        "x": 397,
+        "y": 199,
+        "width": 129,
+        "height": 15,
+        "value": "total_loan_amount",
+        "alignment": "Left"
+      },
+      {
+        "x": 147,
+        "y": 183,
+        "width": 129,
+        "height": 15,
+        "value": "recurring_payment_day",
+        "alignment": "Left"
+      }
+    ],
+    [
+      {
+        "x": 41.76,
+        "y": 650,
+        "width": 131.5,
+        "height": 25,
+        "value": "rate"
+      },
+      {
+        "x": 174.72,
+        "y": 650,
+        "width": 128.1,
+        "height": 25,
+        "value": "finance_charge"
+      },
+      {
+        "x": 305,
+        "y": 650,
+        "width": 146,
+        "height": 25,
+        "value": "total_loan_amount"
+      },
+      {
+        "x": 454.56,
+        "y": 650,
+        "width": 113.76,
+        "height": 25,
+        "value": "total_of_payments"
+      },
+      {
+        "x": 43.45,
+        "y": 595,
+        "width": 129.7,
+        "height": 15,
+        "value": "initial_payment_count"
+      },
+      {
+        "x": 176.9,
+        "y": 595,
+        "width": 126.76,
+        "height": 17,
+        "value": "initial_payment"
+      },
+      {
+        "x": 305,
+        "y": 595,
+        "width": 265,
+        "height": 17,
+        "value": "monthly_beginning_initial_payment_date"
+      },
+      {
+        "x": 43.45,
+        "y": 578,
+        "width": 129.7,
+        "height": 15,
+        "value": "adjusted_payment_count"
+      },
+      {
+        "x": 176.9,
+        "y": 578,
+        "width": 126.7,
+        "height": 17,
+        "value": "second_payment"
+      },
+      {
+        "x": 305,
+        "y": 578,
+        "width": 265,
+        "height": 17,
+        "value": "monthly_beginning_second_payment_date"
+      },
+      {
+        "x": 43.45,
+        "y": 560,
+        "width": 129.7,
+        "height": 15,
+        "value": "final_payment_count"
+      },
+      {
+        "x": 176.9,
+        "y": 560,
+        "width": 126.7,
+        "height": 17,
+        "value": "final_payment"
+      },
+      {
+        "x": 305,
+        "y": 560,
+        "width": 265,
+        "height": 18,
+        "value": "maturity_date"
+      },
+      {
+        "x": 360.5,
+        "y": 416,
+        "width": 180.4,
+        "height": 15,
+        "value": "total_loan_amount",
+        "alignment": "Left"
+      },
+      {
+        "x": 360.5,
+        "y": 401,
+        "width": 180.4,
+        "height": 15,
+        "value": "amount_given_direct",
+        "alignment": "Left"
+      },
+      {
+        "x": 360.5,
+        "y": 387,
+        "width": 180.4,
+        "height": 15,
+        "value": "amount_to_installer",
+        "alignment": "Left"
+      }
+    ]
+  ]
+}

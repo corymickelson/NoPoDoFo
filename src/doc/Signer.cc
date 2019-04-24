@@ -57,7 +57,7 @@ Signer::Signer(const Napi::CallbackInfo& info)
   : ObjectWrap(info)
   , doc(Document::Unwrap(info[0].As<Object>())->GetDocument())
 {
-  dbglog = spdlog::get("dbglog");
+  dbglog = spdlog::get("DbgLog");
   if (info.Length() < 1) {
     Error::New(info.Env(), "Document required to construct Signer")
       .ThrowAsJavaScriptException();

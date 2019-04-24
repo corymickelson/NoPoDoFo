@@ -43,7 +43,7 @@ FunctionReference Destination::constructor; // NOLINT
 Destination::Destination(const CallbackInfo& info)
   : ObjectWrap(info)
 {
-  dbglog = spdlog::get("dbglog");
+  dbglog = spdlog::get("DbgLog");
   vector<int> opts = AssertCallbackInfo(
     info,
     { { 0, { option(napi_external), option(napi_object) } },
@@ -179,14 +179,14 @@ Destination::GetDValue(const Napi::CallbackInfo& info)
 Napi::Value
 Destination::GetObject(const Napi::CallbackInfo& info)
 {
-  return Obj::constructor.New(
+  return Obj::Constructor.New(
     { External<PdfObject>::New(info.Env(), GetDestination().GetObject()) });
 }
 
 void
 Destination::AddToDictionary(const Napi::CallbackInfo& info)
 {
-  if (info[0].As<Object>().InstanceOf(Dictionary::constructor.Value())) {
+  if (info[0].As<Object>().InstanceOf(Dictionary::Constructor.Value())) {
     PdfDictionary d = Dictionary::Unwrap(info[0].As<Object>())->GetDictionary();
     GetDestination().AddToDictionary(d);
   }

@@ -18,11 +18,9 @@
  */
 
 #include "ValidateArguments.h"
-
-#include <iostream>
 #include <sstream>
+#include "spdlog/spdlog.h"
 
-using std::cout;
 using std::endl;
 using std::map;
 using std::stringstream;
@@ -32,11 +30,12 @@ namespace NoPoDoFo {
 
 std::vector<int>
 AssertCallbackInfo(const Napi::CallbackInfo& info,
-                   std::map<int, std::vector<option>> vars)
+                   const std::map<int, std::vector<option>>& vars)
 {
   vector<int> argIndex;
+  auto dbglog = spdlog::get("DbgLog");
   for (auto item : vars) {
-    bool valid = false;
+    auto valid = false;
     if (static_cast<int>(info.Length()) - 1 < item.first) {
       for (size_t i = 0; i < item.second.size(); i++) {
         if (!item.second[i].has_value()) {
@@ -49,11 +48,12 @@ AssertCallbackInfo(const Napi::CallbackInfo& info,
         stringstream eMsg;
         eMsg << "Expected " << vars.size()
              << " argument parameters but received " << info.Length() << endl;
+        dbglog->debug(eMsg.str());
         Napi::Error::New(info.Env(), eMsg.str()).ThrowAsJavaScriptException();
         return {};
       }
     } else {
-      napi_valuetype t = info[static_cast<size_t>(item.first)].Type();
+      const auto t = info[static_cast<size_t>(item.first)].Type();
       for (size_t i = 0; i < static_cast<size_t>(item.second.size()); i++) {
         auto opt = item.second[i];
         if (opt.has_value() && opt.value() == t) {

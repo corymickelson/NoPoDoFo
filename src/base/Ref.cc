@@ -30,7 +30,7 @@ Ref::Ref(const CallbackInfo& info)
                "References can only be created from already existing objects")
       .ThrowAsJavaScriptException();
   }
-  dbglog = spdlog::get("dbglog");
+  dbglog = spdlog::get("DbgLog");
 }
 Ref::~Ref()
 {
@@ -54,12 +54,12 @@ Ref::Initialize(Napi::Env& env, Napi::Object& target)
 
   target.Set("Ref", ctor);
 }
-value
+JsValue
 Ref::GetObjectNumber(const CallbackInfo& info)
 {
   return Number::New(info.Env(), self->ObjectNumber());
 }
-value
+JsValue
 Ref::GetGenerationNumber(const CallbackInfo& info)
 {
   return Number::New(info.Env(), self->GenerationNumber());

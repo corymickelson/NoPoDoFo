@@ -22,49 +22,50 @@
 
 #include <napi.h>
 #include <podofo/podofo.h>
-
 #include <iostream>
 #include <spdlog/logger.h>
-#include <utility>
 
 using std::cout;
 using std::endl;
+using JsValue = Napi::Value;
 
 namespace NoPoDoFo {
 class Obj : public Napi::ObjectWrap<Obj>
 {
 public:
   explicit Obj(const Napi::CallbackInfo&);
+  explicit Obj(const Obj&) = delete;
+  const Obj& operator=(const Obj&) = delete;
   ~Obj();
-  static Napi::FunctionReference constructor;
+  static Napi::FunctionReference Constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
-  Napi::Value GetStream(const Napi::CallbackInfo&);
-  Napi::Value HasStream(const Napi::CallbackInfo&);
-  Napi::Value GetObjectLength(const Napi::CallbackInfo&);
-  Napi::Value GetDataType(const Napi::CallbackInfo&);
-  Napi::Value GetByteOffset(const Napi::CallbackInfo&);
-  Napi::Value Write(const Napi::CallbackInfo&);
-  Napi::Value Reference(const Napi::CallbackInfo&);
+  JsValue GetStream(const Napi::CallbackInfo&);
+  JsValue HasStream(const Napi::CallbackInfo&);
+  JsValue GetObjectLength(const Napi::CallbackInfo&);
+  JsValue GetDataType(const Napi::CallbackInfo&);
+  JsValue GetByteOffset(const Napi::CallbackInfo&);
+  JsValue Write(const Napi::CallbackInfo&);
+  JsValue Reference(const Napi::CallbackInfo&);
   void FlateCompressStream(const Napi::CallbackInfo&);
   void DelayedStreamLoad(const Napi::CallbackInfo&);
-  Napi::Value GetNumber(const Napi::CallbackInfo&);
-  Napi::Value GetReal(const Napi::CallbackInfo&);
-  Napi::Value GetString(const Napi::CallbackInfo&);
-  Napi::Value GetName(const Napi::CallbackInfo&);
-  Napi::Value GetArray(const Napi::CallbackInfo&);
-  Napi::Value GetBool(const Napi::CallbackInfo&);
-  Napi::Value GetDictionary(const Napi::CallbackInfo&);
-  Napi::Value GetRawData(const Napi::CallbackInfo&);
-  Napi::Value GetImmutable(const Napi::CallbackInfo&);
-  void SetImmutable(const Napi::CallbackInfo&, const Napi::Value&);
+  JsValue GetNumber(const Napi::CallbackInfo&);
+  JsValue GetReal(const Napi::CallbackInfo&);
+  JsValue GetString(const Napi::CallbackInfo&);
+  JsValue GetName(const Napi::CallbackInfo&);
+  JsValue GetArray(const Napi::CallbackInfo&);
+  JsValue GetBool(const Napi::CallbackInfo&);
+  JsValue GetDictionary(const Napi::CallbackInfo&);
+  JsValue GetRawData(const Napi::CallbackInfo&);
+  JsValue GetImmutable(const Napi::CallbackInfo&);
+  void SetImmutable(const Napi::CallbackInfo&, const JsValue&);
   void Clear(const Napi::CallbackInfo&);
-  Napi::Value MustGetIndirect(const Napi::CallbackInfo&);
-  PoDoFo::PdfObject& GetObject() { return init == nullptr ? obj : *init; }
+  JsValue MustGetIndirect(const Napi::CallbackInfo&);
+  PoDoFo::PdfObject& GetObject() const { return Init == nullptr ? NObj : *Init; }
 
 private:
-  PoDoFo::PdfObject& obj;
-  PoDoFo::PdfObject* init = nullptr;
-  std::shared_ptr<spdlog::logger> dbglog;
+  PoDoFo::PdfObject& NObj;
+  PoDoFo::PdfObject* Init = nullptr;
+  std::shared_ptr<spdlog::logger> DbgLog;
 };
 }
 #endif

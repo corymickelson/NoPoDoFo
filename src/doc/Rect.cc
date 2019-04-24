@@ -36,7 +36,7 @@ FunctionReference Rect::constructor; // NOLINT
 Rect::Rect(const CallbackInfo& info)
   : ObjectWrap(info)
 {
-  dbglog = spdlog::get("dbglog");
+  dbglog = spdlog::get("DbgLog");
   vector<int> opts = AssertCallbackInfo(
     info,
     {

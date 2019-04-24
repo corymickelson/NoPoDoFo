@@ -31,7 +31,7 @@ using std::string;
 
 namespace NoPoDoFo {
 
-FunctionReference Array::constructor; // NOLINT
+FunctionReference Array::Constructor; // NOLINT
 
 /**
  * The NoPoDoFo::Array constructor excepts the following arguments:
@@ -43,34 +43,37 @@ FunctionReference Array::constructor; // NOLINT
  */
 Array::Array(const CallbackInfo& info)
   : ObjectWrap<Array>(info)
-  , self(
+  , Self(
       info.Length() == 2
         ? (info[0].IsExternal() && info[1].IsNumber() &&
                info[1].As<Number>().Int32Value() == 0
-             ? (parent = info[0].As<External<PdfObject>>().Data())->GetArray()
+             ? (Parent = info[0].As<External<PdfObject>>().Data())->GetArray()
              : *info[0].As<External<PdfArray>>().Data())
-        : *(init = new PdfArray()))
+        : *(Init = new PdfArray()))
 {
-  dbglog = spdlog::get("dbglog");
+  DbgLog = spdlog::get("DbgLog");
+  if (Init != nullptr) {
+    DbgLog->debug("Initialized New Array");
+  }
 }
 
 Array::~Array()
 {
-  dbglog->debug("Array cleanup");
+  DbgLog->debug("Array cleanup");
   HandleScope scope(Env());
-  for (auto child : children) {
+  for (auto child : Children) {
     delete child;
   }
-  delete init;
-  if (parent) {
-    parent = nullptr;
+  delete Init;
+  if (Parent) {
+    Parent = nullptr;
   }
 }
 void
 Array::Initialize(Napi::Env& env, Napi::Object& target)
 {
   HandleScope scope(env);
-  Function ctor = DefineClass(
+  auto ctor = DefineClass(
     env,
     "Array",
     { InstanceAccessor("dirty", &Array::IsDirty, &Array::SetDirty),
@@ -83,12 +86,12 @@ Array::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceMethod("push", &Array::Push),
       InstanceMethod("pop", &Array::Pop),
       InstanceMethod("clear", &Array::Clear) });
-  constructor = Persistent(ctor);
-  constructor.SuppressDestruct();
+  Constructor = Persistent(ctor);
+  Constructor.SuppressDestruct();
   target.Set("Array", ctor);
 }
 
-Napi::Value
+JsValue
 Array::GetImmutable(const CallbackInfo& info)
 {
   return Boolean::New(info.Env(), GetArray().GetImmutable());
@@ -103,7 +106,7 @@ Array::SetImmutable(const CallbackInfo& info, const Napi::Value& value)
     ErrorHandler(err, info);
   }
 }
-Napi::Value
+JsValue
 Array::Length(const Napi::CallbackInfo& info)
 {
   return Number::New(info.Env(), GetArray().size());
@@ -111,31 +114,31 @@ Array::Length(const Napi::CallbackInfo& info)
 void
 Array::Write(const CallbackInfo& info)
 {
-  string output = info[0].As<String>().Utf8Value();
+  const auto output = info[0].As<String>().Utf8Value();
   PdfOutputDevice device(output.c_str());
   GetArray().Write(&device, ePdfWriteMode_Default);
 }
-Napi::Value
+JsValue
 Array::ContainsString(const CallbackInfo& info)
 {
-  string searchString = info[0].As<String>().Utf8Value();
-  bool match = GetArray().ContainsString(searchString);
+  const auto searchString = info[0].As<String>().Utf8Value();
+  const auto match = GetArray().ContainsString(searchString);
   return Napi::Boolean::New(info.Env(), match);
 }
-Napi::Value
+JsValue
 Array::GetStringIndex(const CallbackInfo& info)
 {
-  string str = info[0].As<String>().Utf8Value();
+  const auto str = info[0].As<String>().Utf8Value();
   return Napi::Number::New(info.Env(), GetArray().GetStringIndex(str));
 }
 
-Napi::Value
+JsValue
 Array::IsDirty(const CallbackInfo& info)
 {
   return Napi::Boolean::New(info.Env(), GetArray().IsDirty());
 }
 
-Napi::Value
+JsValue
 Array::At(const CallbackInfo& info)
 {
   return GetObjAtIndex(info);
@@ -153,8 +156,8 @@ Array::SetDirty(const CallbackInfo& info, const Napi::Value& value)
 void
 Array::Push(const CallbackInfo& info)
 {
-  auto wrapper = info[0].As<Object>();
-  if (!wrapper.InstanceOf(Obj::constructor.Value())) {
+  const auto wrapper = info[0].As<Object>();
+  if (!wrapper.InstanceOf(Obj::Constructor.Value())) {
     throw Error::New(info.Env(), "must be an instance of Obj");
   }
   try {
@@ -168,35 +171,38 @@ Array::Push(const CallbackInfo& info)
   }
 }
 
-Value
+JsValue
 Array::Pop(const CallbackInfo& info)
 {
-  Napi::Value copy = GetObjAtIndex(info);
-  size_t index = info[0].As<Number>().Uint32Value();
+  const auto copy = GetObjAtIndex(info);
+  const size_t index = info[0].As<Number>().Uint32Value();
   GetArray().erase(GetArray().begin() + index);
   return copy;
 }
 
-Value
+JsValue
 Array::GetObjAtIndex(const CallbackInfo& info)
 {
-  size_t index = info[0].As<Number>().Uint32Value();
+  const size_t index = info[0].As<Number>().Uint32Value();
   if (index > GetArray().size()) {
     throw Napi::RangeError();
   }
   PdfObject* item;
   if (GetArray()[index].IsReference()) {
-    PdfReference indirect = GetArray()[index].GetReference();
+    auto indirect = GetArray()[index].GetReference();
     return Ref::constructor.New(
       { External<PdfReference>::New(info.Env(), &indirect) });
   } else {
     item = &(GetArray()[index]);
   }
   // Create copy for shift and pop operations
-  auto child = new PdfObject(*item);
-  children.push_back(child);
-  auto initPtr = Napi::External<PdfObject>::New(info.Env(), child);
-  auto instance = Obj::constructor.New({ initPtr });
+  const auto child = new PdfObject(*item);
+  std::stringstream msg;
+  msg << "Array[" << index << "] = " << child->GetDataTypeString();
+  DbgLog->debug(msg.str());
+  Children.push_back(child);
+  const auto initPtr = Napi::External<PdfObject>::New(info.Env(), child);
+  const auto instance = Obj::Constructor.New({ initPtr });
   return instance;
 }
 

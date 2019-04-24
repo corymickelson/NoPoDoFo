@@ -4,14 +4,14 @@ namespace NoPoDoFo {
 int
 FileAccess(std::string& file)
 {
-  int found = 0;
+  auto found = 0;
 #ifdef __APPLE__
   if (access(file.c_str(), F_OK) == -1) {
     found = 0;
   }
   found = 1;
 #elif defined _WIN32 || defined _WIN64 || defined __linux__
-  fs::path p(file.c_str());
+  const fs::path p(file.c_str());
   if (fs::exists(p)) {
     found = 1;
   }
