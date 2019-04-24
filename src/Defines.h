@@ -25,7 +25,6 @@
 #define DEFER(fn) ScopeGuard CONCAT(__defer__, __LINE__) = [&]() { fn; }
 
 #include "base/Color.h"
-#include <napi.h>
 #include <podofo/podofo.h>
 
 #if defined(_WIN32) || defined(_WIN64)
@@ -35,8 +34,6 @@
  */
 
 #include <direct.h> /* for _getcwd() and _chdir() */
-#include <io.h>
-#include <process.h> /* for getpid() and the exec..() family */
 #include <stdlib.h>
 #include <string>
 
@@ -76,7 +73,7 @@ enum DocumentInputDevice
 int
 FileAccess(std::string& file);
 
-#define TryLoad(doc, file, buffer, pwd, forUpdate, typeE)                      \
+#define TRY_LOAD(doc, file, buffer, pwd, forUpdate, typeE)                      \
   {                                                                            \
     try {                                                                      \
       switch (typeE) {                                                         \
@@ -110,7 +107,7 @@ enum NPDFColorFormat
   CMYK
 };
 
-#define NPDFColorAccessor(color, types, cb)                                    \
+#define NPDF_COLOR_ACCESSOR(color, types, cb)                                    \
   /* Color is the PdfColor object, types an array of NPDFColorFormat's in*/    \
   /* order of precedence, and the function to call as the cb*/                 \
   {                                                                            \
@@ -159,36 +156,36 @@ enum NPDFColorFormat
   }
 }
 
-const char RectOp[] = "re";
-const char ConcatMatrixOp[] = "cm";
-const char CurveToOp[] = "c";
-const char EndPathNoFillOrStrokeOp[] = "n";
-const char FillOp[] = "f";
-const char FillEvenOddOp[] = "f*";
-const char InvokeXObjectOp[] = "Do";
-const char LineToOp[] = "l";
-const char BeginMarkedContentOp[] = "BMC";
-const char EndMarkedContentOp[] = "EMC";
-const char TextPosOp[] = "Td";
-const char MoveToOp[] = "m";
-const char CharSpacingOp[] = "Tc";
-const char CMYKOp[] = "k";
-const char CMYKStrokeOp[] = "K";
-const char DashOp[] = "d";
-const char GreyOp[] = "g";
-const char GreyStrokeOp[] = "G";
-const char LineCapOp[] = "J";
-const char LineJoinOp[] = "j";
-const char LineWidthOp[] = "w";
-const char NonZeroWindingClipOp[] = "W";
-const char RGBOp[] = "rg";
-const char RGBStrokeOp[] = "RG";
-const char FontAndSizeOp[] = "Tf";
-const char ShowTextOp[] = "Tj";
-const char RestoreOp[] = "Q";
-const char SaveOp[] = "q";
-const char StrokeOp[] = "S";
-const char BeginTextOp[] = "BT";
-const char EndTextOp[] = "ET";
+const char RECT_OP[] = "re";
+const char CONCAT_MATRIX_OP[] = "cm";
+const char CURVE_TO_OP[] = "c";
+const char END_PATH_NO_FILL_OR_STROKE_OP[] = "n";
+const char FILL_OP[] = "f";
+const char FILL_EVEN_ODD_OP[] = "f*";
+const char INVOKE_X_OBJECT_OP[] = "Do";
+const char LINE_TO_OP[] = "l";
+const char BEGIN_MARKED_CONTENT_OP[] = "BMC";
+const char END_MARKED_CONTENT_OP[] = "EMC";
+const char TEXT_POS_OP[] = "Td";
+const char MOVE_TO_OP[] = "m";
+const char CHAR_SPACING_OP[] = "Tc";
+const char CMYK_OP[] = "k";
+const char CMYK_STROKE_OP[] = "K";
+const char DASH_OP[] = "d";
+const char GREY_OP[] = "g";
+const char GREY_STROKE_OP[] = "G";
+const char LINE_CAP_OP[] = "J";
+const char LINE_JOIN_OP[] = "j";
+const char LINE_WIDTH_OP[] = "w";
+const char NON_ZERO_WINDING_CLIP_OP[] = "W";
+const char RGB_OP[] = "rg";
+const char RGB_STROKE_OP[] = "RG";
+const char FONT_AND_SIZE_OP[] = "Tf";
+const char SHOW_TEXT_OP[] = "Tj";
+const char RESTORE_OP[] = "Q";
+const char SAVE_OP[] = "q";
+const char STROKE_OP[] = "S";
+const char BEGIN_TEXT_OP[] = "BT";
+const char END_TEXT_OP[] = "ET";
 
 #endif // NOPODOFO_DEFINES_H

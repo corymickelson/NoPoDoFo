@@ -23,8 +23,8 @@
 #include <napi.h>
 #include <podofo/podofo.h>
 #include <spdlog/logger.h>
-#include <string>
 
+using JsValue = Napi::Value;
 using std::vector;
 
 namespace NoPoDoFo {
@@ -32,33 +32,36 @@ class Dictionary : public Napi::ObjectWrap<Dictionary>
 {
 public:
   explicit Dictionary(const Napi::CallbackInfo&);
+  explicit Dictionary(const Dictionary&) = delete;
+  const Dictionary& operator=(const Dictionary&) = delete;
+
   ~Dictionary();
-  static Napi::FunctionReference constructor;
+  static Napi::FunctionReference Constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
   void AddKey(const Napi::CallbackInfo&);
-  Napi::Value GetKey(const Napi::CallbackInfo&);
-  Napi::Value GetKeyType(const Napi::CallbackInfo&);
-  Napi::Value GetKeys(const Napi::CallbackInfo&);
-  Napi::Value RemoveKey(const Napi::CallbackInfo&);
-  Napi::Value HasKey(const Napi::CallbackInfo&);
-  Napi::Value Clear(const Napi::CallbackInfo&);
-  void SetImmutable(const Napi::CallbackInfo&, const Napi::Value&);
-  Napi::Value GetImmutable(const Napi::CallbackInfo&);
-  void SetDirty(const Napi::CallbackInfo&, const Napi::Value&);
-  Napi::Value GetDirty(const Napi::CallbackInfo&);
-  Napi::Value GetKeyAs(const Napi::CallbackInfo&);
-  Napi::Value Write(const Napi::CallbackInfo&);
+  JsValue GetKey(const Napi::CallbackInfo&);
+  JsValue GetKeyType(const Napi::CallbackInfo&);
+  JsValue GetKeys(const Napi::CallbackInfo&);
+  JsValue RemoveKey(const Napi::CallbackInfo&);
+  JsValue HasKey(const Napi::CallbackInfo&);
+  JsValue Clear(const Napi::CallbackInfo&);
+  void SetImmutable(const Napi::CallbackInfo&, const JsValue&);
+  JsValue GetImmutable(const Napi::CallbackInfo&);
+  void SetDirty(const Napi::CallbackInfo&, const JsValue&);
+  JsValue GetDirty(const Napi::CallbackInfo&);
+  JsValue GetKeyAs(const Napi::CallbackInfo&);
+  JsValue Write(const Napi::CallbackInfo&);
   void WriteSync(const Napi::CallbackInfo&);
-  Napi::Value Eq(const Napi::CallbackInfo&);
-  PoDoFo::PdfDictionary& GetDictionary() { return init ? *init : self; }
+  JsValue Eq(const Napi::CallbackInfo&);
+  PoDoFo::PdfDictionary& GetDictionary() const { return Init ? *Init : Self; }
 
 private:
-  vector<PoDoFo::PdfObject*> children;
-  vector<PoDoFo::PdfArray*> childArrays;
-  PoDoFo::PdfDictionary& self;
-  PoDoFo::PdfDictionary* init = nullptr;
-  PoDoFo::PdfObject* parent = nullptr;
-  std::shared_ptr<spdlog::logger> dbglog;
+  vector<PoDoFo::PdfObject*> Children;
+  vector<PoDoFo::PdfArray*> ChildArrays;
+  PoDoFo::PdfDictionary& Self;
+  PoDoFo::PdfDictionary* Init = nullptr;
+  PoDoFo::PdfObject* Parent = nullptr;
+  std::shared_ptr<spdlog::logger> DbgLog;
 };
 }
 #endif

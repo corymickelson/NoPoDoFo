@@ -38,7 +38,7 @@ ComboBox::ComboBox(const Napi::CallbackInfo& info)
   , ListField(Field::GetField())
   , field(Field::GetField())
 {
-  dbglog = spdlog::get("dbglog");
+  dbglog = spdlog::get("DbgLog");
 }
 ComboBox::~ComboBox()
 {

@@ -105,7 +105,7 @@ Document::Document(const CallbackInfo& info)
   : ObjectWrap(info)
   , BaseDocument(info, true)
 {
-  dbglog = spdlog::get("dbglog");
+  dbglog = spdlog::get("DbgLog");
 }
 
 Document::~Document()
@@ -275,9 +275,9 @@ Document::GetTrailer(const CallbackInfo& info)
 {
   const PdfObject* trailerPdObject = GetDocument().GetTrailer();
   auto trailerCopy = new PdfObject(*trailerPdObject);
-  copies.emplace_back(trailerCopy);
+  Copies.emplace_back(trailerCopy);
   auto initPtr = Napi::External<PdfObject>::New(info.Env(), trailerCopy);
-  auto instance = Obj::constructor.New({ initPtr });
+  auto instance = Obj::Constructor.New({ initPtr });
   return instance;
 }
 
@@ -288,7 +288,7 @@ Document::GetCatalog(const CallbackInfo& info)
   if (catalog == nullptr) {
     return info.Env().Null();
   }
-  return Obj::constructor.New(
+  return Obj::Constructor.New(
     { External<PdfObject>::New(info.Env(), catalog) });
 }
 
@@ -349,7 +349,7 @@ private:
 protected:
   void Execute() override
   {
-    TryLoad(doc.GetDocument(),
+    TRY_LOAD(doc.GetDocument(),
             string(""),
             *data,
             pwd,
@@ -388,7 +388,7 @@ private:
 protected:
   void Execute() override
   {
-    TryLoad(doc.GetDocument(),
+    TRY_LOAD(doc.GetDocument(),
             arg,
             nullptr,
             pwd,
@@ -428,7 +428,7 @@ Document::Load(const CallbackInfo& info)
     }
     if (opts.Has("password")) {
       pwd = opts.Get("password").As<String>().Utf8Value();
-      this->pwd = pwd;
+      this->Pwd = pwd;
     }
   }
   if (!info[info.Length() - 1].IsFunction()) {
@@ -457,7 +457,7 @@ Document::Load(const CallbackInfo& info)
   return info.Env().Undefined();
 }
 
-class DocumentWriteBufferAsync : public AsyncWorker
+class DocumentWriteBufferAsync final : public AsyncWorker
 {
 public:
   DocumentWriteBufferAsync(Function& cb, Document& doc)
@@ -477,14 +477,12 @@ protected:
   }
   void OnOK() override
   {
-    auto env = Env();
-    HandleScope scope(env);
     if (output.GetSize() == 0) {
       SetError("Error, failed to write to buffer");
     }
     Callback().Call({ Env().Null(),
                       Buffer<char>::Copy(
-                        scope.Env(), output.GetBuffer(), output.GetSize()) });
+                        Env(), output.GetBuffer(), output.GetSize()) });
   }
 };
 
@@ -649,8 +647,8 @@ Document::InsertPages(const Napi::CallbackInfo& info)
 Napi::Value
 Document::HasSignature(const CallbackInfo& info)
 {
-  for (int i = 0; i < base->GetPageCount(); i++) {
-    auto page = base->GetPage(i);
+  for (int i = 0; i < Base->GetPageCount(); i++) {
+    auto page = Base->GetPage(i);
     for (int j = 0; j < page->GetNumFields(); j++) {
       auto field = page->GetField(j);
       if (field.GetType() == ePdfField_Signature) {
@@ -665,8 +663,8 @@ Document::GetSignatures(const CallbackInfo& info)
 {
   auto js = Array::New(info.Env());
   uint32_t jsIndex = 0;
-  for (int i = 0; i < base->GetPageCount(); i++) {
-    auto page = base->GetPage(i);
+  for (int i = 0; i < Base->GetPageCount(); i++) {
+    auto page = Base->GetPage(i);
     for (int j = 0; j < page->GetNumFields(); j++) {
       auto field = page->GetField(j);
       if (field.GetType() == ePdfField_Signature) {

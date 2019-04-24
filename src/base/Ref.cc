@@ -13,55 +13,55 @@ using std::endl;
 
 namespace NoPoDoFo {
 
-FunctionReference Ref::constructor; // NOLINT
+FunctionReference Ref::Constructor; // NOLINT
 
 Ref::Ref(const CallbackInfo& info)
   : ObjectWrap(info)
 {
+  DbgLog = spdlog::get("DbgLog");
   if (info.Length() == 2 && info[0].IsNumber() && info[1].IsNumber()) {
-    self = new PdfReference(info[0].As<Number>(),
+    Self = new PdfReference(info[0].As<Number>(),
                             static_cast<const PoDoFo::pdf_gennum>(
                               info[1].As<Number>().Uint32Value()));
   } else if (info.Length() == 1 && info[0].IsExternal()) {
-    cout << "Creating a new PdfReference Copy" << endl;
-    self = new PdfReference(*info[0].As<External<PdfReference>>().Data());
+    DbgLog->debug("Creating a new PdfReference Copy");
+    Self = new PdfReference(*info[0].As<External<PdfReference>>().Data());
   } else {
     Error::New(info.Env(),
                "References can only be created from already existing objects")
       .ThrowAsJavaScriptException();
   }
-  dbglog = spdlog::get("dbglog");
 }
 Ref::~Ref()
 {
   std::stringstream dbgMsg;
-  dbgMsg << "Cleaning up Ref " << self->ObjectNumber() << " : "
-       << self->GenerationNumber() << endl;
-  dbglog->debug(dbgMsg.str());
-  delete self;
+  dbgMsg << "Cleaning up Ref " << Self->ObjectNumber() << " : "
+       << Self->GenerationNumber() << endl;
+  DbgLog->debug(dbgMsg.str());
+  delete Self;
 }
 void
 Ref::Initialize(Napi::Env& env, Napi::Object& target)
 {
   HandleScope scope(env);
-  Function ctor = DefineClass(
+  auto ctor = DefineClass(
     env,
     "Ref",
     { InstanceAccessor("gennum", &Ref::GetGenerationNumber, nullptr),
       InstanceAccessor("objnum", &Ref::GetObjectNumber, nullptr) });
-  constructor = Persistent(ctor);
-  constructor.SuppressDestruct();
+  Constructor = Persistent(ctor);
+  Constructor.SuppressDestruct();
 
   target.Set("Ref", ctor);
 }
-value
+JsValue
 Ref::GetObjectNumber(const CallbackInfo& info)
 {
-  return Number::New(info.Env(), self->ObjectNumber());
+  return Number::New(info.Env(), Self->ObjectNumber());
 }
-value
+JsValue
 Ref::GetGenerationNumber(const CallbackInfo& info)
 {
-  return Number::New(info.Env(), self->GenerationNumber());
+  return Number::New(info.Env(), Self->GenerationNumber());
 }
 }

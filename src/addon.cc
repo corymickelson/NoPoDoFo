@@ -63,11 +63,12 @@ init(Napi::Env env, Napi::Object exports)
     .ThrowAsJavaScriptException();
   return;
 #endif
-  auto dbglog = spdlog::basic_logger_mt("dbglog", "dbglog.txt");
+  auto debugLog = spdlog::basic_logger_mt("DbgLog", "DbgLog.txt");
+  debugLog->flush_on(spdlog::level::debug);
 #ifdef NOPODOFO_DEBUG
-  dbglog->info("/******************************************************/")
-  dbglog->info( "/***** You are running a Debug build of NoPoDoFo ******/")
-  dbglog->info( "/******************************************************/")
+  DbgLog->info("/******************************************************/")
+  DbgLog->info( "/***** You are running a Debug build of NoPoDoFo ******/")
+  DbgLog->info( "/******************************************************/")
 #endif
   NoPoDoFo::Action::Initialize(env, exports);
   NoPoDoFo::Date::Initialize(env, exports);

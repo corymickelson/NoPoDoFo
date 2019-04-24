@@ -29,7 +29,7 @@ using std::string;
 
 namespace NoPoDoFo {
 
-FunctionReference Data::constructor; // NOLINT
+FunctionReference Data::Constructor; // NOLINT
 
 /**
  * @note JS new Data(data:string|Buffer)
@@ -43,13 +43,13 @@ Data::Data(const Napi::CallbackInfo& info)
       .ThrowAsJavaScriptException();
     return;
   }
-  dbglog = spdlog::get("dbglog");
+  DbgLog = spdlog::get("DbgLog");
   if (info[0].IsString()) {
-    string strData = info[0].As<String>().Utf8Value();
-    self = make_unique<PdfData>(strData.c_str());
+    const auto strData = info[0].As<String>().Utf8Value();
+    Self = make_unique<PdfData>(strData.c_str());
   } else if (info[0].IsBuffer()) {
     auto bData = info[0].As<Buffer<char>>().Data();
-    self = make_unique<PdfData>(bData);
+    Self = make_unique<PdfData>(bData);
   } else {
     TypeError::New(info.Env(), "Requires a string or Buffer")
       .ThrowAsJavaScriptException();
@@ -59,41 +59,41 @@ Data::Data(const Napi::CallbackInfo& info)
 
  Data::~Data()
 {
-  dbglog->debug("Data Cleanup");
+  DbgLog->debug("Data Cleanup");
 }
 
 void
 Data::Initialize(Napi::Env& env, Napi::Object& target)
 {
   HandleScope scope(env);
-  Function ctor =
+  auto ctor =
     DefineClass(env,
                 "Data",
                 { InstanceAccessor("value", &Data::Value, nullptr),
                   InstanceMethod("write", &Data::Write) });
-  constructor = Persistent(ctor);
-  constructor.SuppressDestruct();
+  Constructor = Persistent(ctor);
+  Constructor.SuppressDestruct();
   target.Set("Data", ctor);
 }
 
 void
 Data::Write(const CallbackInfo& info)
 {
-  string output = info[0].As<String>().Utf8Value();
-  if (output.empty() || output.empty()) {
+  const auto output = info[0].As<String>().Utf8Value();
+  if (output.empty()) {
     throw Error::New(info.Env(), "output must be valid path");
   }
   try {
     PdfOutputDevice device(output.c_str());
-    self->Write(&device, ePdfWriteMode_Default);
+    Self->Write(&device, ePdfWriteMode_Default);
   } catch (PdfError& err) {
     ErrorHandler(err, info);
   }
 }
 
-Value
+JsValue
 Data::Value(const CallbackInfo& info)
 {
-  return String::New(info.Env(), self->data());
+  return String::New(info.Env(), Self->data());
 }
 }

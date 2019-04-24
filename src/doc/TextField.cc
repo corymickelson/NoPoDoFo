@@ -25,12 +25,10 @@
 
 using namespace Napi;
 using namespace PoDoFo;
-using std::cout;
-using std::endl;
 
 namespace NoPoDoFo {
 
-FunctionReference TextField::constructor; // NOLINT
+FunctionReference TextField::Constructor; // NOLINT
 
 /**
  * @brief TextField::TextField
@@ -41,7 +39,7 @@ TextField::TextField(const CallbackInfo& info)
   , Field(ePdfField_TextField, info)
   , field(Field::GetField())
 {
-  dbglog = spdlog::get("dbglog");
+  dbglog = spdlog::get("DbgLog");
   if (info[info.Length() - 1].IsObject() &&
       !info[info.Length() - 1].As<Object>().InstanceOf(
         Document::constructor.Value()) &&
@@ -140,8 +138,8 @@ TextField::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceMethod("setPageAction", &TextField::SetPageAction),
       InstanceMethod("setHighlightingMode", &TextField::SetHighlightingMode),
       InstanceMethod("refreshAppearanceStream", &TextField::RefreshAppearanceStream)});
-  constructor = Napi::Persistent(ctor);
-  constructor.SuppressDestruct();
+  Constructor = Napi::Persistent(ctor);
+  Constructor.SuppressDestruct();
 
   target.Set("TextField", ctor);
 }

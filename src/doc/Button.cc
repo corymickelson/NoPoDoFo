@@ -32,7 +32,7 @@ namespace NoPoDoFo {
 Button::Button(PdfField& field)
 {
   button = new PdfButton(field);
-  dbglog = spdlog::get("dbglog");
+  dbglog = spdlog::get("DbgLog");
 }
 
 Button::~Button()

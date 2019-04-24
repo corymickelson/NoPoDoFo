@@ -52,7 +52,7 @@ Page::Page(const CallbackInfo& info)
   : ObjectWrap(info)
   , page(*info[0].As<External<PdfPage>>().Data())
 {
-  dbglog = spdlog::get("dbglog");
+  dbglog = spdlog::get("DbgLog");
 }
 
 Page::~Page()
@@ -133,7 +133,7 @@ Page::GetField(const Napi::Env& env, int index)
         .ThrowAsJavaScriptException();
       return env.Undefined();
     case ePdfField_TextField:
-      return TextField::constructor.New(
+      return TextField::Constructor.New(
         { External<PdfField>::New(env, &field) });
     case ePdfField_ComboBox:
       return ComboBox::constructor.New(
@@ -278,7 +278,7 @@ Page::GetContents(const CallbackInfo& info)
 {
   PdfObject* contentsObj = page.GetContents();
   auto objPtr = External<PdfObject>::New(info.Env(), contentsObj);
-  auto instance = Obj::constructor.New({ objPtr });
+  auto instance = Obj::Constructor.New({ objPtr });
   return instance;
 }
 
@@ -288,7 +288,7 @@ Page::GetResources(const CallbackInfo& info)
   EscapableHandleScope scope(info.Env());
   PdfObject* resources = page.GetResources();
   auto objPtr = External<PdfObject>::New(info.Env(), resources);
-  auto instance = Obj::constructor.New({ objPtr });
+  auto instance = Obj::Constructor.New({ objPtr });
   return scope.Escape(instance);
 }
 
@@ -335,7 +335,7 @@ Page::GetAnnotation(const CallbackInfo& info)
   int index = info[0].As<Number>();
   auto ptr = page.GetAnnotation(index);
   auto instance = External<PdfAnnotation>::New(info.Env(), ptr);
-  return Annotation::constructor.New({ instance });
+  return Annotation::Constructor.New({ instance });
 }
 Napi::Value
 Page::CreateAnnotation(const CallbackInfo& info)
@@ -345,7 +345,7 @@ Page::CreateAnnotation(const CallbackInfo& info)
   auto obj = info[1].As<Object>();
   Rect* rect = Rect::Unwrap(obj);
   PdfAnnotation* annot = page.CreateAnnotation(type, rect->GetRect());
-  auto instance = Annotation::constructor.New(
+  auto instance = Annotation::Constructor.New(
     { External<PdfAnnotation>::New(info.Env(), annot) });
   return instance;
 }
@@ -357,7 +357,7 @@ Page::CreateAnnotation(const CallbackInfo& info)
 Value
 Page::CreateField(const CallbackInfo& info)
 {
-  if (!info[1].As<Object>().InstanceOf(Annotation::constructor.Value())) {
+  if (!info[1].As<Object>().InstanceOf(Annotation::Constructor.Value())) {
     TypeError::New(info.Env(), "Requires in instance of Annotation")
       .ThrowAsJavaScriptException();
     return info.Env().Undefined();
@@ -382,7 +382,7 @@ Page::CreateField(const CallbackInfo& info)
     case ePdfField_RadioButton:
       break;
     case ePdfField_TextField:
-      return TextField::constructor.New(
+      return TextField::Constructor.New(
         { widget->Value(), form->Value(), opts });
     case ePdfField_ComboBox:
       return ComboBox::constructor.New({ widget->Value(), form->Value() });

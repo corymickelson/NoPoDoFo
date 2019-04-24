@@ -27,14 +27,13 @@
 using namespace Napi;
 using namespace PoDoFo;
 
-using std::cout;
 using std::endl;
 using std::string;
 using std::stringstream;
 
 namespace NoPoDoFo {
 
-FunctionReference Obj::constructor; // NOLINT
+FunctionReference Obj::Constructor; // NOLINT
 
 /**
  * Creates a new instance of PdfObject, this object is assigned in the
@@ -52,19 +51,19 @@ InitObject(const CallbackInfo& info)
   }
   if (info.Length() == 1) {
     if (info[0].IsArray()) {
-      auto array = info[0].As<Napi::Array>();
+      const auto array = info[0].As<Napi::Array>();
       PdfArray pdfArray;
       for (uint32_t i = 0; i < array.Length(); i++) {
         auto ii = array.Get(i);
         if (ii.IsBoolean()) {
-          bool x = ii.As<Boolean>();
+          const bool x = ii.As<Boolean>();
           pdfArray[i] = x;
         }
         if (ii.IsNumber()) {
           pdfArray[i] = ii.As<Number>().DoubleValue();
         }
         if (ii.IsString()) {
-          string x = ii.As<String>().Utf8Value();
+          auto x = ii.As<String>().Utf8Value();
           pdfArray[i] = PdfString(x);
         } else {
           Error::New(
@@ -76,7 +75,7 @@ InitObject(const CallbackInfo& info)
       return new PdfObject(pdfArray);
     }
     if (info[0].IsString()) {
-      PdfString s(info[0].As<String>());
+      const PdfString s(info[0].As<String>());
       return new PdfObject(s);
     }
     if (info[0].IsNumber()) {
@@ -92,7 +91,7 @@ void
 Obj::Initialize(Napi::Env& env, Napi::Object& target)
 {
   HandleScope scope(env);
-  Function ctor = DefineClass(
+  auto ctor = DefineClass(
     env,
     "Object",
     { InstanceAccessor("stream", &Obj::GetStream, nullptr),
@@ -115,33 +114,33 @@ Obj::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceMethod("getRawData", &Obj::GetRawData),
       InstanceMethod("clear", &Obj::Clear),
       InstanceMethod("resolveIndirectKey", &Obj::MustGetIndirect) });
-  constructor = Persistent(ctor);
-  constructor.SuppressDestruct();
+  Constructor = Persistent(ctor);
+  Constructor.SuppressDestruct();
   target.Set("Object", ctor);
 }
 
 Obj::Obj(const Napi::CallbackInfo& info)
   : ObjectWrap<Obj>(info)
-  , obj(info.Length() == 1 && info[0].IsExternal()
+  , NObj(info.Length() == 1 && info[0].IsExternal()
           ? *info[0].As<External<PdfObject>>().Data()
-          : *(init = InitObject(info)))
+          : *(Init = InitObject(info)))
 {
-  dbglog = spdlog::get("dbglog");
-  if(init != nullptr) {
-    dbglog->debug("New Object Created");
+  DbgLog = spdlog::get("DbgLog");
+  if(Init != nullptr) {
+    DbgLog->debug("New Object Created");
   }
 }
 Obj::~Obj()
 {
-  dbglog->debug("Object Cleanup");
+  DbgLog->debug("Object Cleanup");
   HandleScope scope(Env());
-  delete init;
+  delete Init;
 }
 void
 Obj::Clear(const Napi::CallbackInfo& info)
 {
   try {
-    obj.Clear();
+    NObj.Clear();
   } catch (PdfError& err) {
     ErrorHandler(err, info);
   }
@@ -150,25 +149,25 @@ Napi::Value
 Obj::GetStream(const CallbackInfo& info)
 {
   try {
-    if (!obj.HasStream()) {
+    if (!NObj.HasStream()) {
       stringstream output;
-      output << "/tmp/" << obj.Reference().GenerationNumber() << "."
-             << obj.Reference().ObjectNumber() << ".txt" << endl;
-      const char* outfile = output.str().c_str();
-#ifdef NOPODOFO_DEBUG
-      cout << "This Object does not have a stream associated with it" << endl;
+      output << "/tmp/" << NObj.Reference().GenerationNumber() << "."
+             << NObj.Reference().ObjectNumber() << ".txt" << endl;
+      const auto outfile = output.str().c_str();
+      stringstream msg;
+      msg << "This Object does not have a stream associated with it" << endl;
       cout << "Writing Object to: " << outfile << endl;
-#endif
+      DbgLog->debug(msg.str());
       PdfOutputDevice outDevice(outfile);
-      obj.WriteObject(&outDevice, ePdfWriteMode_Clean, nullptr);
+      NObj.WriteObject(&outDevice, ePdfWriteMode_Clean, nullptr);
       return info.Env().Undefined();
     }
-    auto pStream = dynamic_cast<PdfMemStream*>(obj.GetStream());
-    auto stream = pStream->Get();
-    auto length = pStream->GetLength();
-    auto value =
+    const auto pStream = dynamic_cast<PdfMemStream*>(NObj.GetStream());
+    const auto stream = pStream->Get();
+    const auto length = pStream->GetLength();
+    const auto value =
       Buffer<char>::Copy(info.Env(), stream, static_cast<size_t>(length));
-    return value;
+    return Napi::Value(value);
   } catch (PdfError& err) {
     ErrorHandler(err, info);
   } catch (Napi::Error& err) {
@@ -177,63 +176,63 @@ Obj::GetStream(const CallbackInfo& info)
   return info.Env().Undefined();
 }
 
-Napi::Value
+JsValue
 Obj::HasStream(const CallbackInfo& info)
 {
-  return Napi::Boolean::New(info.Env(), obj.HasStream());
+  return Napi::Boolean::New(info.Env(), NObj.HasStream());
 }
 
-Napi::Value
+JsValue
 Obj::GetObjectLength(const CallbackInfo& info)
 {
   return Napi::Number::New(info.Env(),
-                           obj.GetObjectLength(ePdfWriteMode_Default));
+                           NObj.GetObjectLength(ePdfWriteMode_Default));
 }
 
-Napi::Value
+JsValue
 Obj::GetImmutable(const CallbackInfo& info)
 {
-  return Boolean::New(info.Env(), obj.GetImmutable());
+  return Boolean::New(info.Env(), NObj.GetImmutable());
 }
 void
 Obj::SetImmutable(const CallbackInfo& info, const Napi::Value& value)
 {
   if (value.IsBoolean()) {
     try {
-      obj.SetImmutable(value.As<Boolean>());
+      NObj.SetImmutable(value.As<Boolean>());
     } catch (PdfError& err) {
       ErrorHandler(err, info);
     }
   }
 }
 
-Napi::Value
+JsValue
 Obj::GetDataType(const CallbackInfo& info)
 {
   string js;
-  if (obj.IsArray()) {
+  if (NObj.IsArray()) {
     js = "Array";
-  } else if (obj.IsBool()) {
+  } else if (NObj.IsBool()) {
     js = "Boolean";
-  } else if (obj.IsDictionary()) {
+  } else if (NObj.IsDictionary()) {
     js = "Dictionary";
-  } else if (obj.IsEmpty()) {
+  } else if (NObj.IsEmpty()) {
     js = "Empty";
-  } else if (obj.IsHexString()) {
+  } else if (NObj.IsHexString()) {
     js = "HexString";
-  } else if (obj.IsNull()) {
+  } else if (NObj.IsNull()) {
     js = "Null";
-  } else if (obj.IsNumber()) {
+  } else if (NObj.IsNumber()) {
     js = "Number";
-  } else if (obj.IsName()) {
+  } else if (NObj.IsName()) {
     js = "Name";
-  } else if (obj.IsRawData()) {
+  } else if (NObj.IsRawData()) {
     js = "RawData";
-  } else if (obj.IsReal()) {
+  } else if (NObj.IsReal()) {
     js = "Real";
-  } else if (obj.IsReference()) {
+  } else if (NObj.IsReference()) {
     js = "Reference";
-  } else if (obj.IsString()) {
+  } else if (NObj.IsString()) {
     js = "String";
   } else {
     js = "Unknown";
@@ -241,18 +240,18 @@ Obj::GetDataType(const CallbackInfo& info)
   return Napi::String::New(info.Env(), js);
 }
 
-Napi::Value
+JsValue
 Obj::Reference(const CallbackInfo& info)
 {
   auto r = GetObject().Reference();
-  return Ref::constructor.New({ External<PdfReference>::New(info.Env(), &r) });
+  return Ref::Constructor.New({ External<PdfReference>::New(info.Env(), &r) });
 }
 
 void
 Obj::FlateCompressStream(const CallbackInfo& info)
 {
   try {
-    obj.FlateCompressStream();
+    NObj.FlateCompressStream();
   } catch (PdfError& err) {
     ErrorHandler(err, info);
   }
@@ -262,48 +261,48 @@ void
 Obj::DelayedStreamLoad(const CallbackInfo& info)
 {
   try {
-    obj.DelayedStreamLoad();
+    NObj.DelayedStreamLoad();
   } catch (PdfError& err) {
     ErrorHandler(err, info);
   }
 }
 
-Napi::Value
+JsValue
 Obj::GetNumber(const CallbackInfo& info)
 {
-  if (!obj.IsNumber()) {
+  if (!NObj.IsNumber()) {
     throw Napi::Error::New(info.Env(), "Obj only accessible as a number");
   }
-  return Number::New(info.Env(), obj.GetNumber());
+  return Number::New(info.Env(), NObj.GetNumber());
 }
 
-Napi::Value
+JsValue
 Obj::GetReal(const CallbackInfo& info)
 {
-  if (!obj.IsReal()) {
+  if (!NObj.IsReal()) {
     throw Napi::Error::New(info.Env(), "Obj only accessible as a number");
   }
 
-  return Number::New(info.Env(), obj.GetReal());
+  return Number::New(info.Env(), NObj.GetReal());
 }
 
-Napi::Value
+JsValue
 Obj::GetString(const CallbackInfo& info)
 {
-  if (!obj.IsString() && !obj.IsHexString()) {
+  if (!NObj.IsString() && !NObj.IsHexString()) {
     throw Napi::Error::New(info.Env(), "Obj only accessible as a String");
   }
-  return String::New(info.Env(), obj.GetString().GetStringUtf8());
+  return String::New(info.Env(), NObj.GetString().GetStringUtf8());
 }
 
-Napi::Value
+JsValue
 Obj::GetName(const CallbackInfo& info)
 {
-  if (!obj.IsName()) {
+  if (!NObj.IsName()) {
     throw Napi::Error::New(info.Env(), "Obj only accessible as a string");
   }
   try {
-    string name = obj.GetName().GetName();
+    const auto name = NObj.GetName().GetName();
     return String::New(info.Env(), name);
   } catch (PdfError& err) {
     ErrorHandler(err, info);
@@ -313,62 +312,62 @@ Obj::GetName(const CallbackInfo& info)
   return info.Env().Undefined();
 }
 
-Napi::Value
+JsValue
 Obj::GetArray(const CallbackInfo& info)
 {
-  if (!obj.IsArray()) {
+  if (!NObj.IsArray()) {
     throw Napi::Error::New(info.Env(), "Obj only accessible as array");
   }
-  auto instance = Array::constructor.New(
-    { External<PdfArray>::New(info.Env(), &obj.GetArray()),
+  const auto instance = Array::Constructor.New(
+    { External<PdfArray>::New(info.Env(), &NObj.GetArray()),
       Number::New(info.Env(), 1) });
   return instance;
 }
 
-Napi::Value
+JsValue
 Obj::GetBool(const CallbackInfo& info)
 {
-  if (!obj.IsNumber()) {
+  if (!NObj.IsNumber()) {
     throw Napi::Error::New(info.Env(), "Obj not accessible as a boolean");
   }
-  return Boolean::New(info.Env(), obj.GetBool());
+  return Boolean::New(info.Env(), NObj.GetBool());
 }
 
-Napi::Value
+JsValue
 Obj::GetDictionary(const CallbackInfo& info)
 {
-  if (!obj.IsDictionary()) {
+  if (!NObj.IsDictionary()) {
     throw Napi::Error::New(info.Env(), "Obj only accessible as Dictionary");
   }
-  return Dictionary::constructor.New(
-    { External<PdfObject>::New(info.Env(), &obj), Number::New(info.Env(), 0) });
+  return Dictionary::Constructor.New(
+    { External<PdfObject>::New(info.Env(), &NObj), Number::New(info.Env(), 0) });
 }
 
-Napi::Value
+JsValue
 Obj::GetRawData(const CallbackInfo& info)
 {
-  if (!obj.IsRawData()) {
+  if (!NObj.IsRawData()) {
     throw Napi::Error::New(info.Env(), "Obj not accessible as a buffer");
   }
-  string data = obj.GetRawData().data();
-  return Buffer<char>::Copy(info.Env(), data.c_str(), data.length());
+  const auto data = NObj.GetRawData().data();
+  return Napi::Value(Buffer<char>::Copy(info.Env(), data.c_str(), data.length()));
 }
 
-class ObjOffsetAsync : public Napi::AsyncWorker
+class ObjOffsetAsync final : public Napi::AsyncWorker
 {
 public:
   ObjOffsetAsync(Napi::Function& cb, Obj* obj, string arg)
     : Napi::AsyncWorker(cb)
-    , obj(obj)
-    , arg(std::move(arg))
+    , NpdfObj(obj)
+    , Arg(std::move(arg))
   {}
 
 protected:
   void Execute() override
   {
     try {
-      auto o = obj->GetObject();
-      value = o.GetByteOffset(arg.c_str(), ePdfWriteMode_Default);
+      auto o = NpdfObj->GetObject();
+      Value = o.GetByteOffset(Arg.c_str(), ePdfWriteMode_Default);
     } catch (PdfError& err) {
       SetError(ErrorHandler::WriteMsg(err));
     } catch (Napi::Error& err) {
@@ -378,40 +377,40 @@ protected:
   void OnOK() override
   {
     HandleScope scope(Env());
-    Callback().Call({ Env().Null(), Number::New(Env(), value) });
+    Callback().Call({ Env().Null(), Number::New(Env(), Value) });
   }
 
 private:
-  Obj* obj;
-  string arg;
-  long value = -1;
+  Obj* NpdfObj;
+  string Arg;
+  long Value = -1;
 };
 
-Napi::Value
+JsValue
 Obj::GetByteOffset(const CallbackInfo& info)
 {
-  string arg = info[0].As<String>().Utf8Value();
+  const auto arg = info[0].As<String>().Utf8Value();
   auto cb = info[1].As<Function>();
-  ObjOffsetAsync* worker = new ObjOffsetAsync(cb, this, arg);
+  auto worker = new ObjOffsetAsync(cb, this, arg);
   worker->Queue();
   return info.Env().Undefined();
 }
 
-class ObjWriteAsync : public Napi::AsyncWorker
+class ObjWriteAsync final : public Napi::AsyncWorker
 {
 public:
   ObjWriteAsync(Napi::Function& cb, Obj* obj, string dest)
     : AsyncWorker(cb)
-    , obj(obj)
-    , arg(std::move(dest))
+    , NpdfObj(obj)
+    , Arg(std::move(dest))
   {}
 
 protected:
   void Execute() override
   {
     try {
-      PdfOutputDevice device(arg.c_str());
-      obj->GetObject().WriteObject(&device, ePdfWriteMode_Default, nullptr);
+      PdfOutputDevice device(Arg.c_str());
+      NpdfObj->GetObject().WriteObject(&device, ePdfWriteMode_Default, nullptr);
     } catch (PdfError& err) {
       SetError(ErrorHandler::WriteMsg(err));
     } catch (Napi::Error& err) {
@@ -421,24 +420,24 @@ protected:
   void OnOK() override
   {
     HandleScope scope(Env());
-    Callback().Call({ Env().Null(), String::New(Env(), arg) });
+    Callback().Call({ Env().Null(), String::New(Env(), Arg) });
   }
 
 private:
-  Obj* obj;
-  string arg;
+  Obj* NpdfObj;
+  string Arg;
 };
 
-Napi::Value
+JsValue
 Obj::Write(const CallbackInfo& info)
 {
   auto cb = info[1].As<Function>();
-  ObjWriteAsync* worker =
+  auto worker =
     new ObjWriteAsync(cb, this, info[0].As<String>().Utf8Value());
   worker->Queue();
   return info.Env().Undefined();
 }
-Napi::Value
+JsValue
 Obj::MustGetIndirect(const CallbackInfo& info)
 {
   if (info.Length() != 1 && !info[0].IsString()) {
@@ -448,9 +447,9 @@ Obj::MustGetIndirect(const CallbackInfo& info)
                    "any Indirects to their Object value")
       .ThrowAsJavaScriptException();
   }
-  PdfName name = PdfName(info[0].As<String>());
-  PdfObject* target = obj.MustGetIndirectKey(name);
-  return Obj::constructor.New({ External<PdfObject>::New(info.Env(), target) });
+  const auto name = PdfName(info[0].As<String>());
+  const auto target = NObj.MustGetIndirectKey(name);
+  return Constructor.New({ External<PdfObject>::New(info.Env(), target) });
 }
 
 }

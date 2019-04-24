@@ -42,7 +42,7 @@ StreamDocument::StreamDocument(const CallbackInfo& info)
   : ObjectWrap(info)
   , BaseDocument(info, false)
 {
-  dbglog = spdlog::get("dbglog");
+  dbglog = spdlog::get("DbgLog");
   cout << "Stream Document" << endl;
 }
 StreamDocument::~StreamDocument()
@@ -107,13 +107,13 @@ Napi::Value
 StreamDocument::Close(const CallbackInfo& info)
 {
   GetStreamedDocument().Close();
-  if (output.empty()) {
+  if (Output.empty()) {
     cout << "Streaming to nodejs buffer" << endl;
     return Buffer<char>::Copy(info.Env(),
-                              streamDocRefCountedBuffer->GetBuffer(),
-                              streamDocRefCountedBuffer->GetSize());
+                              StreamDocRefCountedBuffer->GetBuffer(),
+                              StreamDocRefCountedBuffer->GetSize());
   }
-  return String::New(info.Env(), output);
+  return String::New(info.Env(), Output);
 }
 void
 StreamDocument::Append(const Napi::CallbackInfo& info)

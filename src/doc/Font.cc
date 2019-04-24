@@ -40,7 +40,7 @@ Font::Font(const Napi::CallbackInfo& info)
   : ObjectWrap(info)
   , font(*info[0].As<External<PdfFont>>().Data())
 {
-  dbglog = spdlog::get("dbglog");
+  dbglog = spdlog::get("DbgLog");
 }
 
 Font::~Font()
@@ -222,7 +222,7 @@ Font::StringWidth(const CallbackInfo& info)
 Napi::Value
 Font::GetObject(const CallbackInfo& info)
 {
-  return Obj::constructor.New(
+  return Obj::Constructor.New(
     { External<PdfObject>::New(info.Env(), GetFont().GetObject()) });
 }
 void

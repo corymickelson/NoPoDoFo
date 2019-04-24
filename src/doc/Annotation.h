@@ -23,10 +23,10 @@
 #include <napi.h>
 #include <podofo/podofo.h>
 #include <spdlog/logger.h>
-#include <vector>
 
-using namespace PoDoFo;
 using namespace Napi;
+
+using JsValue = Napi::Value;
 
 namespace NoPoDoFo {
 
@@ -34,39 +34,41 @@ class Annotation : public ObjectWrap<Annotation>
 {
 public:
   explicit Annotation(const CallbackInfo& callbackInfo);
+  explicit Annotation(const Annotation&) = delete;
+  const Annotation& operator=(const Annotation&) = delete;
   ~Annotation();
-  static FunctionReference constructor;
+  static FunctionReference Constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
-  Napi::Value HasAppearanceStream(const CallbackInfo&);
+  JsValue HasAppearanceStream(const CallbackInfo&);
   void SetAppearanceStream(const CallbackInfo&);
-  void SetRect(const CallbackInfo&, const Napi::Value&);
-  Napi::Value GetRect(const CallbackInfo&);
-  void SetFlags(const CallbackInfo&, const Napi::Value&);
-  Napi::Value GetFlags(const CallbackInfo&);
+  void SetRect(const CallbackInfo&, const JsValue&);
+  JsValue GetRect(const CallbackInfo&);
+  void SetFlags(const CallbackInfo&, const JsValue&);
+  JsValue GetFlags(const CallbackInfo&);
   void SetBorderStyle(const CallbackInfo&);
-  void SetTitle(const CallbackInfo&, const Napi::Value&);
-  Napi::Value GetTitle(const CallbackInfo&);
-  void SetContent(const CallbackInfo&, const Napi::Value&);
-  Napi::Value GetContent(const CallbackInfo&);
-  void SetDestination(const CallbackInfo&, const Napi::Value&);
-  Napi::Value GetDestination(const CallbackInfo&);
-  void SetAction(const CallbackInfo&, const Napi::Value&);
-  Napi::Value GetAction(const CallbackInfo&);
-  void SetOpen(const CallbackInfo&, const Napi::Value&);
-  Napi::Value GetOpen(const CallbackInfo&);
-  void SetColor(const CallbackInfo&, const Napi::Value&);
-  Napi::Value GetColor(const CallbackInfo&);
-  Napi::Value GetType(const CallbackInfo&);
-  void SetQuadPoints(const CallbackInfo&, const Napi::Value&);
-  Napi::Value GetQuadPoints(const CallbackInfo&);
-  Napi::Value GetAttachment(const CallbackInfo&);
-  void SetAttachment(const CallbackInfo&, const Napi::Value&);
+  void SetTitle(const CallbackInfo&, const JsValue&);
+  JsValue GetTitle(const CallbackInfo&);
+  void SetContent(const CallbackInfo&, const JsValue&);
+  JsValue GetContent(const CallbackInfo&);
+  void SetDestination(const CallbackInfo&, const JsValue&);
+  JsValue GetDestination(const CallbackInfo&);
+  void SetAction(const CallbackInfo&, const JsValue&);
+  JsValue GetAction(const CallbackInfo&);
+  void SetOpen(const CallbackInfo&, const JsValue&);
+  JsValue GetOpen(const CallbackInfo&);
+  void SetColor(const CallbackInfo&, const JsValue&);
+  JsValue GetColor(const CallbackInfo&);
+  JsValue GetType(const CallbackInfo&);
+  void SetQuadPoints(const CallbackInfo&, const JsValue&);
+  JsValue GetQuadPoints(const CallbackInfo&);
+  JsValue GetAttachment(const CallbackInfo&);
+  void SetAttachment(const CallbackInfo&, const JsValue&);
 
-  PoDoFo::PdfAnnotation& GetAnnotation() { return annot; }
+  PoDoFo::PdfAnnotation& GetAnnotation() const { return Annot; }
 
 private:
-  PoDoFo::PdfAnnotation& annot;
-  std::shared_ptr<spdlog::logger> dbglog;
+  PoDoFo::PdfAnnotation& Annot;
+  std::shared_ptr<spdlog::logger> DbgLog;
 };
 }
 #endif // NPDF_ANNOTATION_H

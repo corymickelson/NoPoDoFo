@@ -49,7 +49,7 @@ namespace NoPoDoFo {
  */
 Field::Field(EPdfField type, const CallbackInfo& info)
 {
-  dbglog = spdlog::get("dbglog");
+  dbglog = spdlog::get("DbgLog");
   if (info[0].IsExternal()) {
     auto arg = info[0].As<External<PdfField>>().Data();
     field = new PdfField(*arg);
@@ -61,7 +61,7 @@ Field::Field(EPdfField type, const CallbackInfo& info)
         int index = info[1].As<Number>();
         field = new PdfField(page->page.GetField(index));
       }
-    } else if (arg1.InstanceOf(Annotation::constructor.Value())) {
+    } else if (arg1.InstanceOf(Annotation::Constructor.Value())) {
       PdfAnnotation* annotation = &Annotation::Unwrap(arg1)->GetAnnotation();
       if (info[1].IsObject() &&
           info[1].As<Object>().InstanceOf(Form::constructor.Value())) {
@@ -142,13 +142,13 @@ Field::TypeString()
   return typeStr;
 }
 
-value
+JsValue
 Field::GetType(const Napi::CallbackInfo& info)
 {
   return Number::New(info.Env(), static_cast<int>(field->GetType()));
 }
 
-value
+JsValue
 Field::GetFieldName(const CallbackInfo& info)
 {
   return Napi::String::New(info.Env(),
@@ -162,14 +162,14 @@ Field::SetFieldName(const CallbackInfo&, const Napi::Value& value)
   GetField().SetFieldName(PdfString(name));
 }
 
-value
+JsValue
 Field::GetAlternateName(const CallbackInfo& info)
 {
   return Napi::String::New(info.Env(),
                            field->GetAlternateName().GetStringUtf8());
 }
 
-value
+JsValue
 Field::GetMappingName(const CallbackInfo& info)
 {
   return Napi::String::New(info.Env(), field->GetMappingName().GetStringUtf8());
@@ -193,13 +193,13 @@ Field::SetRequired(const CallbackInfo&, const Napi::Value& value)
   field->SetRequired(value.As<Boolean>());
 }
 
-value
+JsValue
 Field::IsRequired(const CallbackInfo& info)
 {
   return Napi::Boolean::New(info.Env(), field->IsRequired());
 }
 
-value
+JsValue
 Field::IsReadOnly(const Napi::CallbackInfo& info)
 {
   return Boolean::New(info.Env(), field->IsReadOnly());
@@ -215,7 +215,7 @@ Field::SetExport(const Napi::CallbackInfo&, const Napi::Value& value)
 {
   field->SetExport(value.As<Boolean>());
 }
-value
+JsValue
 Field::IsExport(const Napi::CallbackInfo& info)
 {
   return Boolean::New(info.Env(), field->IsExport());
@@ -231,7 +231,7 @@ Field::SetBackground(const Napi::CallbackInfo& info)
   vector<NPDFColorFormat> types = { NPDFColorFormat::GreyScale,
                                     NPDFColorFormat::RGB,
                                     NPDFColorFormat::CMYK };
-  NPDFColorAccessor(Color::Unwrap(info[0].As<Object>())->color,
+  NPDF_COLOR_ACCESSOR(Color::Unwrap(info[0].As<Object>())->Clr,
                     types,
                     field->SetBackgroundColor)
 }
@@ -241,8 +241,8 @@ Field::SetBorder(const Napi::CallbackInfo& info)
   vector<NPDFColorFormat> types = { NPDFColorFormat::GreyScale,
                                     NPDFColorFormat::RGB,
                                     NPDFColorFormat::CMYK };
-  NPDFColorAccessor(
-    Color::Unwrap(info[0].As<Object>())->color, types, field->SetBorderColor)
+  NPDF_COLOR_ACCESSOR(
+    Color::Unwrap(info[0].As<Object>())->Clr, types, field->SetBorderColor)
 }
 
 void
@@ -303,19 +303,19 @@ Field::SetPageAction(const Napi::CallbackInfo& info)
         .ThrowAsJavaScriptException();
   }
 }
-value
+JsValue
 Field::GetAnnotation(const Napi::CallbackInfo& info)
 {
   PdfAnnotation* annot = field->GetWidgetAnnotation();
-  return Annotation::constructor.New(
+  return Annotation::Constructor.New(
     { External<PdfAnnotation>::New(info.Env(), annot) });
 }
-value
+JsValue
 Field::GetAppearanceStream(const Napi::CallbackInfo& info)
 {
   if (GetFieldDictionary().HasKey(Name::AP)) {
     auto ap = field->GetFieldObject()->MustGetIndirectKey(Name::AP);
-    return Dictionary::constructor.New(
+    return Dictionary::Constructor.New(
       { External<PdfObject>::New(info.Env(), ap), Number::New(info.Env(), 0) });
   } else {
     return info.Env().Null();
@@ -334,13 +334,13 @@ Field::SetAppearanceStream(const Napi::CallbackInfo& info,
   }
 
   if (value.IsObject() &&
-      value.As<Object>().InstanceOf(Dictionary::constructor.Value())) {
+      value.As<Object>().InstanceOf(Dictionary::Constructor.Value())) {
     PdfDictionary dict =
       Dictionary::Unwrap(value.As<Object>())->GetDictionary();
     GetFieldDictionary().AddKey(PdfName(Name::AP), dict);
   }
 }
-value
+JsValue
 Field::GetDefaultAppearance(const Napi::CallbackInfo& info)
 {
   if (GetFieldDictionary().HasKey(Name::DA)) {
@@ -368,7 +368,7 @@ Field::SetDefaultAppearance(const Napi::CallbackInfo& info,
                                 PdfString(value.As<String>()));
   }
 }
-value
+JsValue
 Field::GetJustification(const Napi::CallbackInfo& info)
 {
   if (field->GetFieldObject()->GetDictionary().HasKey(Name::Q)) {
@@ -397,10 +397,10 @@ Field::SetJustification(const Napi::CallbackInfo& info,
   }
 }
 
-value
+JsValue
 Field::GetFieldObject(const CallbackInfo& info)
 {
-  return Obj::constructor.New(
+  return Obj::Constructor.New(
     { External<PdfObject>::New(info.Env(), field->GetFieldObject()) });
 }
 
@@ -484,9 +484,9 @@ Field::RefreshAppearanceStream()
   PdfOutputDevice device(&buffer);
   apKeys.find(Name::V)->second->GetString().Write(&device,
                                                   ePdfWriteMode_Compact);
-  ss << "/Tx " << BeginMarkedContentOp << endl;
-  ss << SaveOp << endl;
-  ss << BeginTextOp << endl;
+  ss << "/Tx " << BEGIN_MARKED_CONTENT_OP << endl;
+  ss << SAVE_OP << endl;
+  ss << BEGIN_TEXT_OP << endl;
   if (apKeys.find(Name::DA) != apKeys.end()) {
     ss << apKeys.find(Name::DA)->second->GetString().GetString() << endl;
     if (!xObj.GetResources()->GetDictionary().HasKey(Name::FONT)) {
@@ -504,11 +504,11 @@ Field::RefreshAppearanceStream()
     field->GetWidgetAnnotation()->GetObject()->GetDictionary().AddKey(
       Name::DA, apKeys.find(Name::DA)->second);
   }
-  ss << "2.0 2.0 " << TextPosOp << endl;
-  ss << buffer.GetBuffer() << ShowTextOp << endl;
-  ss << EndTextOp << endl;
-  ss << RestoreOp << endl;
-  ss << EndMarkedContentOp << endl;
+  ss << "2.0 2.0 " << TEXT_POS_OP << endl;
+  ss << buffer.GetBuffer() << SHOW_TEXT_OP << endl;
+  ss << END_TEXT_OP << endl;
+  ss << RESTORE_OP << endl;
+  ss << END_MARKED_CONTENT_OP << endl;
 
   xObj.GetContentsForAppending()->GetStream()->Append(ss.str());
   xObj.GetContentsForAppending()->GetStream()->EndAppend();
@@ -530,7 +530,7 @@ Field::GetDAFont(string_view da)
   // go back 2 /space char
   // read from index of second /space to '/' for PdfFont name
   // use Document.listFonts to find the font
-  long ftIndex = da.find(FontAndSizeOp);
+  long ftIndex = da.find(FONT_AND_SIZE_OP);
   if (ftIndex == -1) {
     throw std::exception();
   }

@@ -13,58 +13,57 @@
 using namespace PoDoFo;
 using namespace Napi;
 
-using std::vector;
 using tl::nullopt;
 
 namespace NoPoDoFo {
 
-FunctionReference Action::constructor; // NOLINT
+FunctionReference Action::Constructor; // NOLINT
 
 Action::Action(const Napi::CallbackInfo& info)
   : ObjectWrap(info)
 {
-  vector<int> opts =
+  const auto opts =
     AssertCallbackInfo(info,
                        { { 0, { option(napi_external), option(napi_object) } },
                          { 1, { nullopt, option(napi_number) } } });
   // Create Copy Constructor Action
   if (opts[0] == 0 && info.Length() == 1) {
-    action =
+    Act =
       new PdfAction(info[0].As<External<PdfAction>>().Data()->GetObject());
   }
   // Create a new Action
   else if (opts[0] == 1 && opts[1] == 1) {
     PdfDocument* doc;
     if (info[0].As<Object>().InstanceOf(Document::constructor.Value())) {
-      doc = Document::Unwrap(info[0].As<Object>())->base;
+      doc = Document::Unwrap(info[0].As<Object>())->Base;
     } else if (info[0].As<Object>().InstanceOf(
                  StreamDocument::constructor.Value())) {
-      doc = StreamDocument::Unwrap(info[0].As<Object>())->base;
+      doc = StreamDocument::Unwrap(info[0].As<Object>())->Base;
     } else {
       Error::New(info.Env(), "Instance of Base is required")
         .ThrowAsJavaScriptException();
       return;
     }
-    EPdfAction t = static_cast<EPdfAction>(info[1].As<Number>().Uint32Value());
-    action = new PdfAction(t, doc);
+    const auto t = static_cast<EPdfAction>(info[1].As<Number>().Uint32Value());
+    Act = new PdfAction(t, doc);
   } else {
     TypeError::New(
       info.Env(),
       "Invalid Action constructor args. Please see the docs for more info.")
       .ThrowAsJavaScriptException();
   }
-  dbglog = spdlog::get("dbglog");
+  DbgLog = spdlog::get("DbgLog");
 }
 Action::~Action()
 {
-  dbglog->debug("Action Cleanup");
-  delete action;
+  DbgLog->debug("Action Cleanup");
+  delete Act;
 }
 void
 Action::Initialize(Napi::Env& env, Napi::Object& target)
 {
   HandleScope scope(env);
-  auto ctor = DefineClass(
+  const auto ctor = DefineClass(
     env,
     "Action",
     { InstanceAccessor("type", &Action::GetType, nullptr),
@@ -72,11 +71,11 @@ Action::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceAccessor("script", &Action::GetScript, &Action::SetScript),
       InstanceMethod("getObject", &Action::GetObject),
       InstanceMethod("addToDictionary", &Action::AddToDictionary) });
-  constructor = Persistent(ctor);
-  constructor.SuppressDestruct();
+  Constructor = Persistent(ctor);
+  Constructor.SuppressDestruct();
   target.Set("Action", ctor);
 }
-Napi::Value
+JsValue
 Action::GetUri(const Napi::CallbackInfo& info)
 {
   if (GetAction().HasURI()) {
@@ -84,7 +83,7 @@ Action::GetUri(const Napi::CallbackInfo& info)
   }
   return info.Env().Null();
 }
-Napi::Value
+JsValue
 Action::GetScript(const Napi::CallbackInfo& info)
 {
   if (GetAction().HasScript()) {
@@ -92,26 +91,26 @@ Action::GetScript(const Napi::CallbackInfo& info)
   }
   return info.Env().Null();
 }
-Napi::Value
+JsValue
 Action::GetType(const Napi::CallbackInfo& info)
 {
   return Number::New(info.Env(), static_cast<int>(GetAction().GetType()));
 }
 void
-Action::SetUri(const Napi::CallbackInfo& info, const Napi::Value& value)
+Action::SetUri(const Napi::CallbackInfo& info, const JsValue& value)
 {
   GetAction().SetURI(PdfString(value.As<String>().Utf8Value()));
 }
 void
-Action::SetScript(const Napi::CallbackInfo& info, const Napi::Value& value)
+Action::SetScript(const Napi::CallbackInfo& info, const JsValue& value)
 {
   GetAction().SetScript(PdfString(value.As<String>().Utf8Value()));
 }
-Napi::Value
+JsValue
 Action::GetObject(const Napi::CallbackInfo& info)
 {
-  PdfObject* o = GetAction().GetObject();
-  return Obj::constructor.New({ External<PdfObject>::New(info.Env(), o) });
+  const auto o = GetAction().GetObject();
+  return Obj::Constructor.New({ External<PdfObject>::New(info.Env(), o) });
 }
 void
 Action::AddToDictionary(const Napi::CallbackInfo& info)

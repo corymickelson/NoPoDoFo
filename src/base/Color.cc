@@ -32,7 +32,7 @@ using tl::nullopt;
 
 namespace NoPoDoFo {
 
-FunctionReference Color::constructor;
+FunctionReference Color::Constructor;
 
 void
 Color::Initialize(Napi::Env& env, Napi::Object& target)
@@ -55,8 +55,8 @@ Color::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceMethod("getBlack", &Color::GetBlack),
       InstanceMethod("getGrey", &Color::GetGrey),
       InstanceMethod("getColorStreamString", &Color::GetColorStreamString) });
-  constructor = Persistent(ctor);
-  constructor.SuppressDestruct();
+  Constructor = Persistent(ctor);
+  Constructor.SuppressDestruct();
   target.Set("Color", ctor);
 }
 
@@ -73,24 +73,24 @@ Color::Color(const CallbackInfo& info)
                          { 1, { nullopt, option(napi_number) } },
                          { 2, { nullopt, option(napi_number) } },
                          { 3, { nullopt, option(napi_number) } } });
-  dbglog = spdlog::get("dbglog");
+  DbgLog = spdlog::get("DbgLog");
   if (opts[0] == 3) {
-    const char* cs = info[0].As<String>().Utf8Value().c_str();
-    color = new PdfColor(PdfColor::FromString(cs));
+    const auto cs = info[0].As<String>().Utf8Value().c_str();
+    Clr = new PdfColor(PdfColor::FromString(cs));
   } else if (opts[0] == 0 && opts[1] == 0) {
-    color = new PdfColor(info[0].As<Number>().FloatValue());
+    Clr = new PdfColor(info[0].As<Number>().FloatValue());
   } else if (opts[0] == 1) {
-    color = new PdfColor(*Color::Unwrap(info[0].As<Object>())->color);
+    Clr = new PdfColor(*Color::Unwrap(info[0].As<Object>())->Clr);
   } else if (opts[0] == 2) {
-    color = new PdfColor(*info[0].As<External<PdfColor>>().Data());
+    Clr = new PdfColor(*info[0].As<External<PdfColor>>().Data());
   } else if (opts[0] == 0 && opts[1] == 1 && opts[2] == 1 && opts[3] == 0) {
-    color = new PdfColor(info[0].As<Number>().FloatValue(),
+    Clr = new PdfColor(info[0].As<Number>().FloatValue(),
                          info[1].As<Number>().FloatValue(),
                          info[2].As<Number>().FloatValue());
   }
 
   else if (opts[0] == 0 && opts[1] == 1 && opts[2] == 1 && opts[3] == 1) {
-    color = new PdfColor(info[0].As<Number>().FloatValue(),
+    Clr = new PdfColor(info[0].As<Number>().FloatValue(),
                          info[1].As<Number>().FloatValue(),
                          info[2].As<Number>().FloatValue(),
                          info[3].As<Number>().FloatValue());
@@ -102,114 +102,114 @@ Color::Color(const CallbackInfo& info)
 
 Color::~Color()
 {
-  dbglog->debug("Color Cleanup");
+  DbgLog->debug("Color Cleanup");
   HandleScope scope(Env());
-  delete color;
+  delete Clr;
 }
 
-value
+JsValue
 Color::IsRGB(const CallbackInfo& info)
 {
-  return Boolean::New(info.Env(), color->IsRGB());
+  return Boolean::New(info.Env(), Clr->IsRGB());
 }
 
-value
+JsValue
 Color::IsCMYK(const CallbackInfo& info)
 {
-  return Boolean::New(info.Env(), color->IsCMYK());
+  return Boolean::New(info.Env(), Clr->IsCMYK());
 }
-value
+JsValue
 Color::IsGreyScale(const CallbackInfo& info)
 {
-  return Boolean::New(info.Env(), color->IsGrayScale());
+  return Boolean::New(info.Env(), Clr->IsGrayScale());
 }
-value
+JsValue
 Color::GetName(const CallbackInfo& info)
 {
-  return String::New(info.Env(), color->GetName());
+  return String::New(info.Env(), Clr->GetName());
 }
-value
+JsValue
 Color::GetDensity(const CallbackInfo& info)
 {
-  return Number::New(info.Env(), color->GetDensity());
+  return Number::New(info.Env(), Clr->GetDensity());
 }
-value
+JsValue
 Color::ConvertToGreyScale(const CallbackInfo& info)
 {
-  PdfColor greyScale = color->ConvertToGrayScale();
-  return Color::constructor.New(
+  PdfColor greyScale = Clr->ConvertToGrayScale();
+  return Color::Constructor.New(
     { Number::New(info.Env(), greyScale.GetGrayScale()) });
 }
-value
+JsValue
 Color::ConvertToRGB(const CallbackInfo& info)
 {
-  PdfColor rgb = color->ConvertToRGB();
-  return Color::constructor.New({ Number::New(info.Env(), rgb.GetRed()),
+  PdfColor rgb = Clr->ConvertToRGB();
+  return Color::Constructor.New({ Number::New(info.Env(), rgb.GetRed()),
                                   Number::New(info.Env(), rgb.GetGreen()),
                                   Number::New(info.Env(), rgb.GetBlue()) });
 }
-value
+JsValue
 Color::ConvertToCMYK(const CallbackInfo& info)
 {
-  PdfColor cmyk = color->ConvertToCMYK();
-  return Color::constructor.New({ Number::New(info.Env(), cmyk.GetCyan()),
+  PdfColor cmyk = Clr->ConvertToCMYK();
+  return Color::Constructor.New({ Number::New(info.Env(), cmyk.GetCyan()),
                                   Number::New(info.Env(), cmyk.GetMagenta()),
                                   Number::New(info.Env(), cmyk.GetYellow()),
                                   Number::New(info.Env(), cmyk.GetBlack()) });
 }
-value
+JsValue
 Color::GetGrey(const CallbackInfo& info)
 {
-  return Number::New(info.Env(), color->GetGrayScale());
+  return Number::New(info.Env(), Clr->GetGrayScale());
 }
-value
+JsValue
 Color::GetCyan(const CallbackInfo& info)
 {
-  return Number::New(info.Env(), color->GetCyan());
+  return Number::New(info.Env(), Clr->GetCyan());
 }
-value
+JsValue
 Color::GetMagenta(const CallbackInfo& info)
 {
-  return Number::New(info.Env(), color->GetMagenta());
+  return Number::New(info.Env(), Clr->GetMagenta());
 }
-value
+JsValue
 Color::GetYellow(const CallbackInfo& info)
 {
-  return Number::New(info.Env(), color->GetYellow());
+  return Number::New(info.Env(), Clr->GetYellow());
 }
-value
+JsValue
 Color::GetBlack(const CallbackInfo& info)
 {
-  return Number::New(info.Env(), color->GetBlack());
+  return Number::New(info.Env(), Clr->GetBlack());
 }
-value
+JsValue
 Color::GetBlue(const CallbackInfo& info)
 {
-  return Number::New(info.Env(), color->GetBlue());
+  return Number::New(info.Env(), Clr->GetBlue());
 }
-value
+JsValue
 Color::GetRed(const CallbackInfo& info)
 {
-  return Number::New(info.Env(), color->GetRed());
+  return Number::New(info.Env(), Clr->GetRed());
 }
-value
+JsValue
 Color::GetGreen(const CallbackInfo& info)
 {
-  return Number::New(info.Env(), color->GetGreen());
+  return Number::New(info.Env(), Clr->GetGreen());
 }
-value
+JsValue
 Color::GetColorStreamString(const CallbackInfo& info)
 {
   stringstream ss;
   PdfLocaleImbue(ss);
-  if (color->IsCMYK()) {
-    ss << color->GetCyan() << " " << color->GetMagenta() << " "
-       << color->GetYellow() << " " << color->GetBlack() << " " << CMYKOp;
-  } else if (color->IsGrayScale()) {
-    ss << color->GetGrayScale() << " " << GreyOp;
-  } else if (color->IsRGB()) {
-    ss << color->GetRed() << " " << color->GetGreen() << " " << color->GetBlue()
-       << " " << RGBOp;
+  if (Clr->IsCMYK()) {
+    ss << Clr->GetCyan() << " " << Clr->GetMagenta() << " "
+       << Clr->GetYellow() << " " << Clr->GetBlack() << " " << CMYK_OP;
+  } else if (Clr->IsGrayScale()) {
+    ss << Clr->GetGrayScale() << " " << GREY_OP;
+  } else if (Clr->IsRGB()) {
+    ss << Clr->GetRed() << " " << Clr->GetGreen() << " " << Clr->GetBlue()
+       << " " << RGB_OP;
   } else {
     Error::New(info.Env(),
                "Color StringStream currently supports CMYK, RGB, and GreyScale")

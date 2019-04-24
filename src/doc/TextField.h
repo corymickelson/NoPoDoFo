@@ -32,7 +32,7 @@ class TextField
   , public Field
 {
 public:
-  static Napi::FunctionReference constructor;
+  static Napi::FunctionReference Constructor;
   explicit TextField(const Napi::CallbackInfo&);
   ~TextField();
   static void Initialize(Napi::Env& env, Napi::Object& target);

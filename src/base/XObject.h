@@ -24,24 +24,28 @@
 #include <podofo/podofo.h>
 #include <spdlog/logger.h>
 
+using JsValue = Napi::Value;
+
 namespace NoPoDoFo {
 class XObject : public Napi::ObjectWrap<XObject>
 {
 public:
   explicit XObject(const Napi::CallbackInfo& info);
+  explicit XObject(const XObject&) = delete;
+  const XObject& operator=(const XObject&) = delete;
   ~XObject();
-  static Napi::FunctionReference constructor;
+  static Napi::FunctionReference Constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
-  Napi::Value GetContents(const Napi::CallbackInfo&);
-  Napi::Value GetContentsForAppending(const Napi::CallbackInfo&);
-  Napi::Value GetResources(const Napi::CallbackInfo&);
-  Napi::Value GetPageSize(const Napi::CallbackInfo&);
-  Napi::Value Reference(const Napi::CallbackInfo&);
-  PoDoFo::PdfXObject& GetXObject() { return *xobj; }
+  JsValue GetContents(const Napi::CallbackInfo&);
+  JsValue GetContentsForAppending(const Napi::CallbackInfo&);
+  JsValue GetResources(const Napi::CallbackInfo&);
+  JsValue GetPageSize(const Napi::CallbackInfo&);
+  JsValue Reference(const Napi::CallbackInfo&);
+  PoDoFo::PdfXObject& GetXObject() const { return *XObj; }
 
 private:
-  PoDoFo::PdfXObject* xobj;
-  std::shared_ptr<spdlog::logger> dbglog;
+  PoDoFo::PdfXObject* XObj;
+  std::shared_ptr<spdlog::logger> DbgLog;
 };
 }
 #endif // NPDF_XOBJECT_H

@@ -29,6 +29,7 @@ using std::cout;
 using std::endl;
 using std::string;
 using std::vector;
+using JsValue = Napi::Value;
 
 namespace NoPoDoFo {
 
@@ -36,18 +37,20 @@ class BaseDocument
 {
 public:
   explicit BaseDocument(const Napi::CallbackInfo&, bool);
+  explicit BaseDocument(const BaseDocument&) = delete;
+  const BaseDocument& operator=(const BaseDocument&) = delete;
   virtual ~BaseDocument();
-  Napi::Value GetPageCount(const Napi::CallbackInfo&);
-  virtual Napi::Value GetPage(const Napi::CallbackInfo&);
-  Napi::Value GetObjects(const Napi::CallbackInfo&);
-  Napi::Value GetObject(const Napi::CallbackInfo&);
-  Napi::Value IsAllowed(const Napi::CallbackInfo&);
-  Napi::Value CreateFont(const Napi::CallbackInfo&);
-  Napi::Value CreateFontSubset(const Napi::CallbackInfo&);
-  Napi::Value GetPageMode(const Napi::CallbackInfo&);
-  Napi::Value GetForm(const Napi::CallbackInfo&);
-  void SetPageMode(const Napi::CallbackInfo&, const Napi::Value&);
-  void SetPageLayout(const Napi::CallbackInfo&, const Napi::Value&);
+  JsValue GetPageCount(const Napi::CallbackInfo&);
+  virtual JsValue GetPage(const Napi::CallbackInfo&);
+  JsValue GetObjects(const Napi::CallbackInfo&);
+  JsValue GetObject(const Napi::CallbackInfo&);
+  JsValue IsAllowed(const Napi::CallbackInfo&);
+  JsValue CreateFont(const Napi::CallbackInfo&);
+  JsValue CreateFontSubset(const Napi::CallbackInfo&);
+  JsValue GetPageMode(const Napi::CallbackInfo&);
+  JsValue GetForm(const Napi::CallbackInfo&);
+  void SetPageMode(const Napi::CallbackInfo&, const JsValue&);
+  void SetPageLayout(const Napi::CallbackInfo&, const JsValue&);
   void SetUseFullScreen(const Napi::CallbackInfo&);
   void SetHideToolbar(const Napi::CallbackInfo&);
   void SetHideMenubar(const Napi::CallbackInfo&);
@@ -55,36 +58,36 @@ public:
   void SetFitWindow(const Napi::CallbackInfo&);
   void SetCenterWindow(const Napi::CallbackInfo&);
   void SetDisplayDocTitle(const Napi::CallbackInfo&);
-  void SetPrintingScale(const Napi::CallbackInfo&, const Napi::Value&);
-  void SetLanguage(const Napi::CallbackInfo&, const Napi::Value&);
+  void SetPrintingScale(const Napi::CallbackInfo&, const JsValue&);
+  void SetLanguage(const Napi::CallbackInfo&, const JsValue&);
   void AttachFile(const Napi::CallbackInfo&);
-  Napi::Value GetVersion(const Napi::CallbackInfo&);
-  Napi::Value IsLinearized(const Napi::CallbackInfo&);
-  Napi::Value GetWriteMode(const Napi::CallbackInfo&);
-  virtual Napi::Value InsertExistingPage(const Napi::CallbackInfo&);
-  Napi::Value GetInfo(const Napi::CallbackInfo&);
-  Napi::Value GetOutlines(const Napi::CallbackInfo&);
-  Napi::Value GetNamesTree(const Napi::CallbackInfo&);
-  virtual Napi::Value CreatePage(const Napi::CallbackInfo&);
-  Napi::Value CreatePages(const Napi::CallbackInfo&);
-  Napi::Value InsertPage(const Napi::CallbackInfo&);
+  JsValue GetVersion(const Napi::CallbackInfo&);
+  JsValue IsLinearized(const Napi::CallbackInfo&);
+  JsValue GetWriteMode(const Napi::CallbackInfo&);
+  virtual JsValue InsertExistingPage(const Napi::CallbackInfo&);
+  JsValue GetInfo(const Napi::CallbackInfo&);
+  JsValue GetOutlines(const Napi::CallbackInfo&);
+  JsValue GetNamesTree(const Napi::CallbackInfo&);
+  virtual JsValue CreatePage(const Napi::CallbackInfo&);
+  JsValue CreatePages(const Napi::CallbackInfo&);
+  JsValue InsertPage(const Napi::CallbackInfo&);
   virtual void Append(const Napi::CallbackInfo&);
-  Napi::Value GetAttachment(const Napi::CallbackInfo&);
+  JsValue GetAttachment(const Napi::CallbackInfo&);
   void AddNamedDestination(const Napi::CallbackInfo&);
-  Napi::Value CreateXObject(const Napi::CallbackInfo&);
+  JsValue CreateXObject(const Napi::CallbackInfo&);
 
-  PoDoFo::PdfDocument* base;
-  PoDoFo::PdfRefCountedBuffer* streamDocRefCountedBuffer = nullptr;
-  PoDoFo::PdfOutputDevice* streamDocOutputDevice = nullptr;
-  string output;
+  PoDoFo::PdfDocument* Base;
+  PoDoFo::PdfRefCountedBuffer* StreamDocRefCountedBuffer = nullptr;
+  PoDoFo::PdfOutputDevice* StreamDocOutputDevice = nullptr;
+  string Output;
 
 protected:
   PoDoFo::PdfFont* CreateFontObject(napi_env, Napi::Object, bool subset);
-  std::string pwd;
-  vector<PoDoFo::PdfObject*> copies;
+  std::string Pwd;
+  vector<PoDoFo::PdfObject*> Copies;
 
 private:
-  std::shared_ptr<spdlog::logger> dbglog;
+  std::shared_ptr<spdlog::logger> DbgLog;
 };
 }
 #endif

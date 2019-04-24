@@ -24,22 +24,24 @@
 #include <podofo/podofo.h>
 #include <spdlog/logger.h>
 
+using JsValue = Napi::Value;
+
 namespace NoPoDoFo {
 class Data : public Napi::ObjectWrap<Data>
 {
 public:
   explicit Data(const Napi::CallbackInfo&);
+  explicit Data(const Data&) = delete;
+  const Data& operator=(const Data&) = delete;
   ~Data();
-  static Napi::FunctionReference constructor;
+  static Napi::FunctionReference Constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
   void Write(const Napi::CallbackInfo&);
-  Napi::Value Value(const Napi::CallbackInfo&);
-
-  //  PoDoFo::PdfData* GetData() { return self; }
+  JsValue Value(const Napi::CallbackInfo&);
 
 private:
-  std::unique_ptr<PoDoFo::PdfData> self;
-  std::shared_ptr<spdlog::logger> dbglog;
+  std::unique_ptr<PoDoFo::PdfData> Self;
+  std::shared_ptr<spdlog::logger> DbgLog;
 };
 }
 #endif

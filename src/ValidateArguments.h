@@ -48,7 +48,7 @@ using option = tl::optional<napi_valuetype>;
  */
 std::vector<int>
 AssertCallbackInfo(const Napi::CallbackInfo& info,
-                   std::map<int, std::vector<option>> vars);
+                   const std::map<int, std::vector<option>>& vars);
 }
 
 #endif // NPDF_VALIDATEARGUMENTS_H

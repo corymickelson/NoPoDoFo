@@ -9,27 +9,31 @@
 #include <podofo/podofo.h>
 #include <spdlog/logger.h>
 
+using JsValue = Napi::Value;
+
 namespace NoPoDoFo {
 
 class Action : public Napi::ObjectWrap<Action>
 {
 public:
   explicit Action(const Napi::CallbackInfo& info);
+  explicit Action(const Action&) = delete;
+  const Action& operator=(const Action&) = delete;
   ~Action();
-  static Napi::FunctionReference constructor;
+  static Napi::FunctionReference Constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
-  Napi::Value GetUri(const Napi::CallbackInfo&);
-  Napi::Value GetScript(const Napi::CallbackInfo&);
-  Napi::Value GetType(const Napi::CallbackInfo&);
-  void SetUri(const Napi::CallbackInfo&, const Napi::Value&);
-  void SetScript(const Napi::CallbackInfo&, const Napi::Value&);
-  Napi::Value GetObject(const Napi::CallbackInfo&);
+  JsValue GetUri(const Napi::CallbackInfo&);
+  JsValue GetScript(const Napi::CallbackInfo&);
+  JsValue GetType(const Napi::CallbackInfo&);
+  void SetUri(const Napi::CallbackInfo&, const JsValue&);
+  void SetScript(const Napi::CallbackInfo&, const JsValue&);
+  JsValue GetObject(const Napi::CallbackInfo&);
   void AddToDictionary(const Napi::CallbackInfo&);
-  PoDoFo::PdfAction& GetAction() { return *action; }
+  PoDoFo::PdfAction& GetAction() const { return *Act; }
 
 private:
-  PoDoFo::PdfAction* action;
-  std::shared_ptr<spdlog::logger> dbglog;
+  PoDoFo::PdfAction* Act;
+  std::shared_ptr<spdlog::logger> DbgLog;
 };
 }
 #endif // NPDF_ACTION_H

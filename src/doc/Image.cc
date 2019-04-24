@@ -37,7 +37,7 @@ FunctionReference Image::constructor; // NOLINT
 Image::Image(const CallbackInfo& info)
   : ObjectWrap(info)
 {
-  dbglog = spdlog::get("dbglog");
+  dbglog = spdlog::get("DbgLog");
 #if defined(PODOFO_HAVE_JPEG_LIB) && defined(PODOFO_HAVE_PNG_LIB) &&           \
   defined(PODOFO_HAVE_TIFF_LIB)
   if (info.Length() < 2 || !info[0].IsObject() ||
@@ -49,9 +49,9 @@ Image::Image(const CallbackInfo& info)
   }
   auto iObj = info[0].As<Object>();
   if (iObj.InstanceOf(Document::constructor.Value())) {
-    doc = Document::Unwrap(iObj)->base;
+    doc = Document::Unwrap(iObj)->Base;
   } else if (iObj.InstanceOf(StreamDocument::constructor.Value())) {
-    doc = StreamDocument::Unwrap(iObj)->base;
+    doc = StreamDocument::Unwrap(iObj)->Base;
   }
   int format = 0;
   if (info.Length() >= 3 && info[2].IsString()) {

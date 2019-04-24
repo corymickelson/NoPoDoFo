@@ -18,7 +18,7 @@ PushButton::PushButton(const Napi::CallbackInfo& info)
   , Button(Field::GetField())
   , field(Field::GetField())
 {
-  dbglog = spdlog::get("dbglog");
+  dbglog = spdlog::get("DbgLog");
 }
 
 PushButton::~PushButton()

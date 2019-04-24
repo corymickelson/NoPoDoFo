@@ -11,22 +11,25 @@
 
 using namespace Napi;
 
-using value = Napi::Value;
+using JsValue = Napi::Value;
 using PoDoFo::PdfReference;
 
 namespace NoPoDoFo {
 class Ref : public Napi::ObjectWrap<Ref>
 {
 public:
-  PdfReference* self;
-  static Napi::FunctionReference constructor;
+  static Napi::FunctionReference Constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
   explicit Ref(const CallbackInfo& info);
+  explicit Ref(const Ref&) = delete;
+  const Ref& operator=(const Ref&) = delete;
   ~Ref();
-  value GetObjectNumber(const CallbackInfo&);
-  value GetGenerationNumber(const CallbackInfo&);
+  JsValue GetObjectNumber(const CallbackInfo&);
+  JsValue GetGenerationNumber(const CallbackInfo&);
+
+  PdfReference* Self;
 private:
-  std::shared_ptr<spdlog::logger> dbglog;
+  std::shared_ptr<spdlog::logger> DbgLog;
 };
 
 }

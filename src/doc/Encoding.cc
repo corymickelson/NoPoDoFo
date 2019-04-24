@@ -36,7 +36,7 @@ Encoding::Encoding(const Napi::CallbackInfo& info)
   : ObjectWrap(info)
   , encoding(info[0].As<External<PdfEncoding>>().Data())
 {
-  dbglog = spdlog::get("dbglog");
+  dbglog = spdlog::get("DbgLog");
 }
 Encoding::~Encoding()
 {

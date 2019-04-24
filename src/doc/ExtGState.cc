@@ -39,14 +39,14 @@ FunctionReference ExtGState::constructor; // NOLINT
 ExtGState::ExtGState(const Napi::CallbackInfo& info)
   : ObjectWrap(info)
 {
-  dbglog = spdlog::get("dbglog");
+  dbglog = spdlog::get("DbgLog");
   auto o = info[0].As<Object>();
   if (o.InstanceOf(Document::constructor.Value())) {
     auto d = Document::Unwrap(o);
     self = make_unique<PdfExtGState>(&d->GetDocument());
   } else if (o.InstanceOf(StreamDocument::constructor.Value())) {
     auto d = StreamDocument::Unwrap(o);
-    self = make_unique<PdfExtGState>(d->base);
+    self = make_unique<PdfExtGState>(d->Base);
   } else {
     Error::New(
       info.Env(),

@@ -18,6 +18,7 @@
  */
 
 #include "ErrorHandler.h"
+#include "spdlog/spdlog.h"
 
 using namespace PoDoFo;
 
@@ -30,25 +31,28 @@ using std::stringstream;
 
 ErrorHandler::ErrorHandler(PoDoFo::PdfError& err, const CallbackInfo& info)
 {
-  string msg = WriteMsg(err);
+  DbgLog = spdlog::get("DbgLog");
+  const auto msg = WriteMsg(err);
   stringstream eMsg;
   eMsg << "PoDoFo error: " << msg << endl;
   err.PrintErrorMsg();
+  DbgLog->debug(eMsg.str());
   Error::New(info.Env(), eMsg.str()).ThrowAsJavaScriptException();
 }
 
 ErrorHandler::ErrorHandler(Error& err, const CallbackInfo& info)
 {
+  DbgLog = spdlog::get("DbgLog");
   stringstream msg;
   msg << "JS error: " << err.Message() << endl;
+  DbgLog->debug(msg.str());
   Error::New(info.Env(), msg.str()).ThrowAsJavaScriptException();
 }
 
 string
 ErrorHandler::WriteMsg(PoDoFo::PdfError& err)
 {
-  string msg = ParseMsgFromPdfError(err);
-  return msg;
+  return ParseMsgFromPdfError(err);
 }
 
 string

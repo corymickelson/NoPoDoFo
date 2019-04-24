@@ -25,37 +25,40 @@
 #include <spdlog/logger.h>
 
 using std::vector;
+using JsValue = Napi::Value;
 
 namespace NoPoDoFo {
 class Array : public Napi::ObjectWrap<Array>
 {
 public:
   explicit Array(const Napi::CallbackInfo&);
+  explicit Array(const Array&) = delete;
+  const Array& operator=(const Array&) = delete;
   ~Array();
-  static Napi::FunctionReference constructor;
+  static Napi::FunctionReference Constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
 
   void Write(const Napi::CallbackInfo&);
-  Napi::Value Length(const Napi::CallbackInfo&);
-  Napi::Value ContainsString(const Napi::CallbackInfo&);
-  Napi::Value GetStringIndex(const Napi::CallbackInfo&);
-  Napi::Value IsDirty(const Napi::CallbackInfo&);
-  Napi::Value At(const Napi::CallbackInfo&);
+  JsValue Length(const Napi::CallbackInfo&);
+  JsValue ContainsString(const Napi::CallbackInfo&);
+  JsValue GetStringIndex(const Napi::CallbackInfo&);
+  JsValue IsDirty(const Napi::CallbackInfo&);
+  JsValue At(const Napi::CallbackInfo&);
   void SetDirty(const Napi::CallbackInfo&, const Napi::Value&);
-  Napi::Value GetImmutable(const Napi::CallbackInfo&);
+  JsValue GetImmutable(const Napi::CallbackInfo&);
   void SetImmutable(const Napi::CallbackInfo&, const Napi::Value&);
   void Push(const Napi::CallbackInfo&);
-  Napi::Value Pop(const Napi::CallbackInfo&);
+  JsValue Pop(const Napi::CallbackInfo&);
   void Clear(const Napi::CallbackInfo&);
-  PoDoFo::PdfArray& GetArray() { return init ? *init : self; }
+  PoDoFo::PdfArray& GetArray() const { return Init ? *Init : Self; }
 
 private:
-  vector<PoDoFo::PdfObject*> children;
+  vector<PoDoFo::PdfObject*> Children;
   Napi::Value GetObjAtIndex(const Napi::CallbackInfo&);
-  PoDoFo::PdfArray& self;
-  PoDoFo::PdfArray* init = nullptr;
-  PoDoFo::PdfObject* parent = nullptr;
-  std::shared_ptr<spdlog::logger> dbglog;
+  PoDoFo::PdfArray& Self;
+  PoDoFo::PdfArray* Init = nullptr;
+  PoDoFo::PdfObject* Parent = nullptr;
+  std::shared_ptr<spdlog::logger> DbgLog;
 };
 }
 #endif

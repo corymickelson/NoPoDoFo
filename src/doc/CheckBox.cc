@@ -35,7 +35,7 @@ CheckBox::CheckBox(const CallbackInfo& info)
   , Button(Field::GetField())
   , field(Field::GetField())
 {
-  dbglog = spdlog::get("dbglog");
+  dbglog = spdlog::get("DbgLog");
 }
 
 CheckBox::~CheckBox()

@@ -36,7 +36,7 @@ using std::vector;
 
 namespace NoPoDoFo {
 
-FunctionReference Dictionary::constructor; // NOLINT
+FunctionReference Dictionary::Constructor; // NOLINT
 
 /**
  * The NoPoDoFo::Dictionary constructor excepts the following arguments:
@@ -48,17 +48,17 @@ FunctionReference Dictionary::constructor; // NOLINT
  */
 Dictionary::Dictionary(const CallbackInfo& info)
   : ObjectWrap(info)
-  , self(info.Length() == 2
+  , Self(info.Length() == 2
            ? (info[0].IsExternal() && info[1].IsNumber() &&
                   info[1].As<Number>().Int32Value() == 0
-                ? (parent = info[0].As<External<PdfObject>>().Data())
+                ? (Parent = info[0].As<External<PdfObject>>().Data())
                     ->GetDictionary()
                 : *info[0].As<External<PdfDictionary>>().Data())
-           : *(init = new PdfDictionary()))
+           : *(Init = new PdfDictionary()))
 {
-  dbglog = spdlog::get("dbglog");
-  if(init != nullptr) {
-    dbglog->debug("New Dictionary Created");
+  DbgLog = spdlog::get("DbgLog");
+  if(Init != nullptr) {
+    DbgLog->debug("New Dictionary Created");
   }
 }
 
@@ -83,24 +83,24 @@ Dictionary::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceMethod("write", &Dictionary::Write),
       InstanceMethod("writeSync", &Dictionary::WriteSync),
       InstanceMethod("eq", &Dictionary::Eq) });
-  constructor = Napi::Persistent(ctor);
-  constructor.SuppressDestruct();
+  Constructor = Napi::Persistent(ctor);
+  Constructor.SuppressDestruct();
 
   target.Set("Dictionary", ctor);
 }
 Dictionary::~Dictionary()
 {
-  dbglog->debug("Dictionary Cleanup");
+  DbgLog->debug("Dictionary Cleanup");
   HandleScope scope(Env());
-  for (auto i : children) {
+  for (auto i : Children) {
     delete i;
   }
-  for (auto i : childArrays) {
+  for (auto i : ChildArrays) {
     delete i;
   }
-  delete init;
-  if (parent) {
-    parent = nullptr;
+  delete Init;
+  if (Parent) {
+    Parent = nullptr;
   }
 }
 
@@ -108,7 +108,7 @@ Napi::Value
 Dictionary::Eq(const CallbackInfo& info)
 {
   auto wrap = info[0].As<Object>();
-  if (!wrap.InstanceOf(Dictionary::constructor.Value())) {
+  if (!wrap.InstanceOf(Dictionary::Constructor.Value())) {
     throw Error::New(info.Env(), "Must be an instance of NoPoDoFo Obj");
   }
   auto value = Dictionary::Unwrap(wrap);
@@ -132,16 +132,16 @@ Dictionary::AddKey(const CallbackInfo& info)
     } else if (v.IsString()) {
       GetDictionary().AddKey(key, PdfString(v.As<String>().Utf8Value()));
     } else if (v.IsObject() &&
-               v.As<Object>().InstanceOf(Dictionary::constructor.Value())) {
+               v.As<Object>().InstanceOf(Dictionary::Constructor.Value())) {
       cout << "Adding inline dictionary" << endl;
       auto dict = Dictionary::Unwrap(v.As<Object>());
       GetDictionary().AddKey(key, dict->GetDictionary());
     } else if (v.IsObject() &&
-               v.As<Object>().InstanceOf(Ref::constructor.Value())) {
+               v.As<Object>().InstanceOf(Ref::Constructor.Value())) {
       auto refValue = Ref::Unwrap(v.As<Object>());
-      GetDictionary().AddKey(key, *refValue->self);
+      GetDictionary().AddKey(key, *refValue->Self);
     } else if (v.IsObject() &&
-               v.As<Object>().InstanceOf(Obj::constructor.Value())) {
+               v.As<Object>().InstanceOf(Obj::Constructor.Value())) {
       auto obj = Obj::Unwrap(v.As<Object>())->GetObject();
       if (obj.IsDictionary()) {
         GetDictionary().AddKey(key, obj.Reference());
@@ -226,7 +226,7 @@ Dictionary::GetKey(const CallbackInfo& info)
     return {};
   }
   if (!resolveType) {
-    return Obj::constructor.New(
+    return Obj::Constructor.New(
       { Napi::External<PdfObject>::New(info.Env(), v) });
   }
   switch (v->GetDataType()) {
@@ -242,11 +242,11 @@ Dictionary::GetKey(const CallbackInfo& info)
     case ePdfDataType_Name:
       return String::New(info.Env(), v->GetName().GetName());
     case ePdfDataType_Array:
-      return NoPoDoFo::Array::constructor.New(
+      return NoPoDoFo::Array::Constructor.New(
         { External<PdfObject>::New(info.Env(), v),
           Number::New(info.Env(), 0) });
     case ePdfDataType_Dictionary:
-      return Dictionary::constructor.New(
+      return Dictionary::Constructor.New(
         { External<PdfObject>::New(info.Env(), v),
           Number::New(info.Env(), 0) });
     case ePdfDataType_Null:
@@ -264,7 +264,7 @@ Dictionary::GetKey(const CallbackInfo& info)
         info.Env(), stream, static_cast<size_t>(length));
     }
     case ePdfDataType_Reference: {
-      return Ref::constructor.New(
+      return Ref::Constructor.New(
         { Number::New(info.Env(), v->GetReference().ObjectNumber()),
           Number::New(info.Env(), v->GetReference().GenerationNumber()) });
     }

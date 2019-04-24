@@ -33,7 +33,6 @@
 #include "Form.h"
 #include "Outline.h"
 #include "Page.h"
-#include "StreamDocument.h"
 #include <spdlog/spdlog.h>
 
 using namespace Napi;
@@ -53,21 +52,22 @@ namespace NoPoDoFo {
  *
  * @brief BaseDocument::BaseDocument
  * @param info
+ * @param inMem
  */
-BaseDocument::BaseDocument(const Napi::CallbackInfo& info, bool inMem)
+BaseDocument::BaseDocument(const Napi::CallbackInfo& info, const bool inMem)
 {
 
-  dbglog = spdlog::get("dbglog");
+  DbgLog = spdlog::get("DbgLog");
   if (inMem) {
-    base = new PdfMemDocument();
-    dbglog->debug("New PdfMemDocument");
+    Base = new PdfMemDocument();
+    DbgLog->debug("New PdfMemDocument");
   } else {
-    EPdfVersion version = ePdfVersion_1_7;
-    EPdfWriteMode writeMode = ePdfWriteMode_Default;
+    auto version = ePdfVersion_1_7;
+    auto writeMode = ePdfWriteMode_Default;
     PdfEncrypt* encrypt = nullptr;
 
     if (info.Length() >= 2 && info[1].IsObject()) {
-      auto nObj = info[1].As<Object>();
+      const auto nObj = info[1].As<Object>();
       if (nObj.Has("version")) {
         version = static_cast<EPdfVersion>(
           nObj.Get("version").As<Number>().Uint32Value());
@@ -77,156 +77,156 @@ BaseDocument::BaseDocument(const Napi::CallbackInfo& info, bool inMem)
           nObj.Get("writeMode").As<Number>().Uint32Value());
       }
       if (nObj.Has("encrypt")) {
-        auto nEncObj = Encrypt::Unwrap(nObj.Get("encrypt").As<Object>());
+        const auto nEncObj = Encrypt::Unwrap(nObj.Get("encrypt").As<Object>());
         encrypt = PdfEncrypt::CreatePdfEncrypt(*nEncObj->encrypt);
       }
     }
     if (info.Length() > 0 && info[0].IsString()) {
-      output = info[0].As<String>().Utf8Value();
-      base =
-        new PdfStreamedDocument(output.c_str(), version, encrypt, writeMode);
+      Output = info[0].As<String>().Utf8Value();
+      Base =
+        new PdfStreamedDocument(Output.c_str(), version, encrypt, writeMode);
       std::stringstream dbgMsg;
-      dbgMsg << "New PdfStreamedDocument to " << output.c_str() << endl;
-      dbglog->debug(dbgMsg.str());
+      dbgMsg << "New PdfStreamedDocument to " << Output.c_str() << endl;
+      DbgLog->debug(dbgMsg.str());
     } else {
-      streamDocRefCountedBuffer = new PdfRefCountedBuffer(2048);
-      streamDocOutputDevice = new PdfOutputDevice(streamDocRefCountedBuffer);
-      base = new PdfStreamedDocument(
-        streamDocOutputDevice, version, encrypt, writeMode);
-      dbglog->debug("New PdfStreamedDocument to Buffer");
+      StreamDocRefCountedBuffer = new PdfRefCountedBuffer(2048);
+      StreamDocOutputDevice = new PdfOutputDevice(StreamDocRefCountedBuffer);
+      Base = new PdfStreamedDocument(
+        StreamDocOutputDevice, version, encrypt, writeMode);
+      DbgLog->debug("New PdfStreamedDocument to Buffer");
     }
   }
 }
 
 BaseDocument::~BaseDocument()
 {
-  dbglog->debug("BaseDocument Cleanup");
-  for (auto c : copies) {
+  DbgLog->debug("BaseDocument Cleanup");
+  for (auto c : Copies) {
     delete c; 
   }
-  delete base;
-  delete streamDocOutputDevice;
-  delete streamDocRefCountedBuffer;
+  delete Base;
+  delete StreamDocOutputDevice;
+  delete StreamDocRefCountedBuffer;
 }
 
 Napi::Value
 BaseDocument::GetPageCount(const CallbackInfo& info)
 {
-  int pages = base->GetPageCount();
+  const auto pages = Base->GetPageCount();
   return Number::New(info.Env(), pages);
 }
 Napi::Value
 BaseDocument::GetPage(const CallbackInfo& info)
 {
-  int n = info[0].As<Number>();
-  if (n < 0 || n > base->GetPageCount()) {
+  const int n = info[0].As<Number>();
+  if (n < 0 || n > Base->GetPageCount()) {
     RangeError::New(info.Env(), "Page index out of range")
       .ThrowAsJavaScriptException();
     return {};
   }
   return Page::constructor.New(
-    { External<PdfPage>::New(info.Env(), base->GetPage(n)) });
+    { External<PdfPage>::New(info.Env(), Base->GetPage(n)) });
 }
 
 void
 BaseDocument::SetHideMenubar(const Napi::CallbackInfo&)
 {
-  base->SetHideMenubar();
+  Base->SetHideMenubar();
 }
 
 Napi::Value
 BaseDocument::GetPageMode(const CallbackInfo& info)
 {
-  return Number::New(info.Env(), static_cast<int>(base->GetPageMode()));
+  return Number::New(info.Env(), static_cast<int>(Base->GetPageMode()));
 }
 
 void
 BaseDocument::SetPageMode(const CallbackInfo&, const Napi::Value& value)
 {
   int flag = value.As<Number>();
-  auto mode = static_cast<EPdfPageMode>(flag);
-  base->SetPageMode(mode);
+  const auto mode = static_cast<EPdfPageMode>(flag);
+  Base->SetPageMode(mode);
 }
 
 void
 BaseDocument::SetPageLayout(const CallbackInfo&, const Napi::Value& value)
 {
   int flag = value.As<Number>();
-  auto mode = static_cast<EPdfPageLayout>(flag);
-  base->SetPageLayout(mode);
+  const auto mode = static_cast<EPdfPageLayout>(flag);
+  Base->SetPageLayout(mode);
 }
 
 void
 BaseDocument::SetUseFullScreen(const CallbackInfo&)
 {
-  base->SetUseFullScreen();
+  Base->SetUseFullScreen();
 }
 
 void
 BaseDocument::SetHideToolbar(const CallbackInfo&)
 {
-  base->SetHideMenubar();
+  Base->SetHideMenubar();
 }
 
 void
 BaseDocument::SetHideWindowUI(const CallbackInfo&)
 {
-  base->SetHideWindowUI();
+  Base->SetHideWindowUI();
 }
 
 void
 BaseDocument::SetFitWindow(const CallbackInfo&)
 {
-  base->SetFitWindow();
+  Base->SetFitWindow();
 }
 
 void
 BaseDocument::SetCenterWindow(const CallbackInfo&)
 {
-  base->SetCenterWindow();
+  Base->SetCenterWindow();
 }
 
 void
 BaseDocument::SetDisplayDocTitle(const CallbackInfo&)
 {
-  base->SetDisplayDocTitle();
+  Base->SetDisplayDocTitle();
 }
 
 void
 BaseDocument::SetPrintingScale(const CallbackInfo&, const Napi::Value& value)
 {
   PdfName scale(value.As<String>().Utf8Value());
-  base->SetPrintScaling(scale);
+  Base->SetPrintScaling(scale);
 }
 
 void
 BaseDocument::SetLanguage(const CallbackInfo&, const Napi::Value& value)
 {
-  base->SetLanguage(value.As<String>().Utf8Value());
+  Base->SetLanguage(value.As<String>().Utf8Value());
 }
 
 void
 BaseDocument::AttachFile(const CallbackInfo& info)
 {
-  string value = info[0].As<String>().Utf8Value();
+  auto value = info[0].As<String>().Utf8Value();
   if (!FileAccess(value)) {
     Error::New(info.Env(), "File: " + value + " not found")
       .ThrowAsJavaScriptException();
     return;
   }
-  bool embed = true;
-  if (!output.empty() || (streamDocOutputDevice && streamDocRefCountedBuffer)) {
+  auto embed = true;
+  if (!Output.empty() || (StreamDocOutputDevice && StreamDocRefCountedBuffer)) {
     embed = false;
   }
-  PdfFileSpec attachment(value.c_str(), embed, base);
-  base->AttachFile(attachment);
+  const PdfFileSpec attachment(value.c_str(), embed, Base);
+  Base->AttachFile(attachment);
 }
 
 Napi::Value
 BaseDocument::GetVersion(const CallbackInfo& info)
 {
-  EPdfVersion versionE = base->GetPdfVersion();
-  double v = 0.0;
+  const auto versionE = Base->GetPdfVersion();
+  auto v = 0.0;
   switch (versionE) {
     case ePdfVersion_1_1:
       v = 1.1;
@@ -263,14 +263,14 @@ BaseDocument::GetVersion(const CallbackInfo& info)
 Napi::Value
 BaseDocument::IsLinearized(const CallbackInfo& info)
 {
-  return Boolean::New(info.Env(), base->IsLinearized());
+  return Boolean::New(info.Env(), Base->IsLinearized());
 }
 
 Napi::Value
 BaseDocument::GetWriteMode(const CallbackInfo& info)
 {
   string writeMode;
-  switch (base->GetWriteMode()) {
+  switch (Base->GetWriteMode()) {
     case ePdfWriteMode_Clean: {
       writeMode = "Clean";
       break;
@@ -289,12 +289,12 @@ BaseDocument::GetObjects(const CallbackInfo& info)
   try {
     auto js = Array::New(info.Env());
     uint32_t count = 0;
-    for (auto item : *base->GetObjects()) {
+    for (auto item : *Base->GetObjects()) {
       if (item->IsReference()) {
         item = item->GetOwner()->GetObject(item->GetReference());
       }
       auto instance = External<PdfObject>::New(info.Env(), item);
-      js[count] = Obj::constructor.New({ instance });
+      js[count] = Obj::Constructor.New({ instance });
       ++count;
     }
     return js;
@@ -316,52 +316,53 @@ BaseDocument::GetObject(const CallbackInfo& info)
                         .Get(static_cast<uint32_t>(0))
                         .As<Number>()
                         .Uint32Value();
-    pdf_objnum o =
+    const pdf_objnum o =
       info[0].As<Array>().Get(static_cast<uint32_t>(1)).As<Number>();
-    auto gen = static_cast<pdf_gennum>(g);
+    const auto gen = static_cast<pdf_gennum>(g);
     PdfReference r(o, gen);
     ref = &r;
   } else if (info[0].IsObject() &&
-             info[0].As<Object>().InstanceOf(Ref::constructor.Value())) {
-    ref = Ref::Unwrap(info[0].As<Object>())->self;
+             info[0].As<Object>().InstanceOf(Ref::Constructor.Value())) {
+    ref = Ref::Unwrap(info[0].As<Object>())->Self;
   }
   if (!ref) {
     Error::New(info.Env(), "NoPoDoFo is unable to resolve null reference")
       .ThrowAsJavaScriptException();
     return {};
   }
-  PdfObject* target = base->GetObjects()->GetObject(*ref);
+  const auto target = Base->GetObjects()->GetObject(*ref);
   if (!target) {
     stringstream oss;
     oss << "NoPoDoFo is unable to resolve reference " << ref->ObjectNumber()
         << " : " << ref->GenerationNumber();
+    DbgLog->debug(oss.str());
     Error::New(info.Env(), oss.str()).ThrowAsJavaScriptException();
     return {};
   }
-  return Obj::constructor.New({ External<PdfObject>::New(info.Env(), target) });
+  return Obj::Constructor.New({ External<PdfObject>::New(info.Env(), target) });
 }
 
 Napi::Value
 BaseDocument::IsAllowed(const CallbackInfo& info)
 {
-  string allowed = info[0].As<String>().Utf8Value();
+  const auto allowed = info[0].As<String>().Utf8Value();
   bool is;
   if (allowed == "Print") {
-    is = base->IsPrintAllowed();
+    is = Base->IsPrintAllowed();
   } else if (allowed == "Edit") {
-    is = base->IsEditAllowed();
+    is = Base->IsEditAllowed();
   } else if (allowed == "Copy") {
-    is = base->IsCopyAllowed();
+    is = Base->IsCopyAllowed();
   } else if (allowed == "EditNotes") {
-    is = base->IsEditNotesAllowed();
+    is = Base->IsEditNotesAllowed();
   } else if (allowed == "FillAndSign") {
-    is = base->IsFillAndSignAllowed();
+    is = Base->IsFillAndSignAllowed();
   } else if (allowed == "Accessible") {
-    is = base->IsAccessibilityAllowed();
+    is = Base->IsAccessibilityAllowed();
   } else if (allowed == "DocAssembly") {
-    is = base->IsDocAssemblyAllowed();
+    is = Base->IsDocAssemblyAllowed();
   } else if (allowed == "HighPrint") {
-    is = base->IsHighPrintAllowed();
+    is = Base->IsHighPrintAllowed();
   } else {
     throw Napi::Error::New(
       info.Env(),
@@ -374,11 +375,11 @@ Napi::Value
 BaseDocument::CreateFont(const CallbackInfo& info)
 {
   if (info.Length() < 1 || !info[0].IsObject()) {
-    Error::New(info.Env(), "Invalid arguement, expected an object")
+    Error::New(info.Env(), "Invalid argument, expected an object")
       .ThrowAsJavaScriptException();
     return info.Env().Undefined();
   }
-  PdfFont* font = CreateFontObject(info.Env(), info[0].As<Object>(), false);
+  const auto font = CreateFontObject(info.Env(), info[0].As<Object>(), false);
   return Font::constructor.New({ External<PdfFont>::New(info.Env(), font) });
 }
 /**
@@ -390,28 +391,28 @@ Napi::Value
 BaseDocument::InsertExistingPage(const CallbackInfo& info)
 {
   auto memDoc = Document::Unwrap(info[0].As<Object>());
-  int memPageN = info[1].As<Number>();
-  int atN = info[2].As<Number>();
+  const int memPageN = info[1].As<Number>();
+  const int atN = info[2].As<Number>();
   if (atN < 0) {
     cout << "Appending page to the beginning of this document" << endl;
   }
-  if (base->GetPageCount() + 1 < atN) {
+  if (Base->GetPageCount() + 1 < atN) {
     RangeError::New(info.Env(), "at index out of range")
       .ThrowAsJavaScriptException();
     return {};
   }
-  if (memPageN < 0 || memPageN > memDoc->base->GetPageCount() - 1) {
+  if (memPageN < 0 || memPageN > memDoc->Base->GetPageCount() - 1) {
     RangeError::New(info.Env(), "parameter document page range exception")
       .ThrowAsJavaScriptException();
     return {};
   }
-  base->InsertExistingPageAt(memDoc->GetDocument(), memPageN, atN);
-  return Number::New(info.Env(), base->GetPageCount());
+  Base->InsertExistingPageAt(memDoc->GetDocument(), memPageN, atN);
+  return Number::New(info.Env(), Base->GetPageCount());
 }
 Napi::Value
 BaseDocument::GetInfo(const CallbackInfo& info)
 {
-  PdfInfo* i = base->GetInfo();
+  auto i = Base->GetInfo();
   auto infoObj = Object::New(info.Env());
   infoObj.Set("author", i->GetAuthor().GetStringUtf8());
   infoObj.Set("createdAt", i->GetCreationDate().GetTime());
@@ -430,7 +431,7 @@ BaseDocument::GetInfo(const CallbackInfo& info)
 Napi::Value
 BaseDocument::GetOutlines(const CallbackInfo& info)
 {
-  vector<int> opts = AssertCallbackInfo(
+  auto opts = AssertCallbackInfo(
     info,
     { { 0, { nullopt, option(napi_boolean), option(napi_string) } },
       { 1, { nullopt, option(napi_string) } } });
@@ -438,11 +439,11 @@ BaseDocument::GetOutlines(const CallbackInfo& info)
   PdfOutlineItem* outlines = nullptr;
   // Create with default options
   if (opts[0] == 0) {
-    outlines = base->GetOutlines();
+    outlines = Base->GetOutlines();
   } // Create with create option provided
   if (opts[0] == 1) {
-    bool create = info[0].As<Boolean>();
-    outlines = base->GetOutlines(create);
+    const bool create = info[0].As<Boolean>();
+    outlines = Base->GetOutlines(create);
   }
 
   if (!outlines)
@@ -466,52 +467,52 @@ BaseDocument::GetOutlines(const CallbackInfo& info)
 Napi::Value
 BaseDocument::GetNamesTree(const CallbackInfo& info)
 {
-  auto names = base->GetNamesTree(info[0].As<Boolean>());
+  auto names = Base->GetNamesTree(info[0].As<Boolean>());
   if (!names)
     return info.Env().Null();
-  return Obj::constructor.New(
+  return Obj::Constructor.New(
     { External<PdfObject>::New(info.Env(), names->GetObject()) });
 }
 Napi::Value
 BaseDocument::CreatePage(const CallbackInfo& info)
 {
-  auto r = Rect::Unwrap(info[0].As<Object>())->GetRect();
-  auto page = base->CreatePage(r);
+  const auto r = Rect::Unwrap(info[0].As<Object>())->GetRect();
+  const auto page = Base->CreatePage(r);
   return Page::constructor.New({ External<PdfPage>::New(info.Env(), page) });
 }
 Napi::Value
 BaseDocument::CreatePages(const Napi::CallbackInfo& info)
 {
-  auto coll = info[0].As<Array>();
+  const auto coll = info[0].As<Array>();
   vector<PdfRect> rects;
   for (uint32_t i = 0; i < coll.Length(); i++) {
     rects.emplace_back(
       Rect::Unwrap(coll.Get(static_cast<uint32_t>(i)).As<Object>())->GetRect());
   }
-  base->CreatePages(rects);
-  return Number::New(info.Env(), base->GetPageCount());
+  Base->CreatePages(rects);
+  return Number::New(info.Env(), Base->GetPageCount());
 }
 Napi::Value
 BaseDocument::InsertPage(const Napi::CallbackInfo& info)
 {
-  auto rect = Rect::Unwrap(info[0].As<Object>())->GetRect();
-  int index = info[1].As<Number>();
-  base->InsertPage(rect, index);
+  const auto rect = Rect::Unwrap(info[0].As<Object>())->GetRect();
+  const int index = info[1].As<Number>();
+  Base->InsertPage(rect, index);
   return Page::constructor.New(
-    { External<PdfPage>::New(info.Env(), base->GetPage(index)) });
+    { External<PdfPage>::New(info.Env(), Base->GetPage(index)) });
 }
 
 void
 BaseDocument::Append(const Napi::CallbackInfo& info)
 {
   if (info.Length() == 1 && info[0].IsArray()) {
-    auto docs = info[0].As<Array>();
+    const auto docs = info[0].As<Array>();
     for (unsigned int i = 0; i < docs.Length(); i++) {
       auto arg = docs.Get(i);
       if (arg.IsObject() &&
           arg.As<Object>().InstanceOf(Document::constructor.Value())) {
         auto mergedDoc = Document::Unwrap(arg.As<Object>());
-        base->Append(mergedDoc->GetDocument());
+        Base->Append(mergedDoc->GetDocument());
       } else {
         TypeError::New(info.Env(),
                        "Only Document's can be appended, StreamDocument not "
@@ -523,27 +524,27 @@ BaseDocument::Append(const Napi::CallbackInfo& info)
   } else if (info.Length() == 1 && info[0].IsObject() &&
              info[0].As<Object>().InstanceOf(Document::constructor.Value())) {
     auto mergedDoc = Document::Unwrap(info[0].As<Object>());
-    base->Append(mergedDoc->GetDocument());
+    Base->Append(mergedDoc->GetDocument());
   }
 }
 
 Napi::Value
 BaseDocument::GetAttachment(const CallbackInfo& info)
 {
-  string name = info[0].As<String>();
-  if (base->GetAttachment(name)) {
+  const string name = info[0].As<String>();
+  if (Base->GetAttachment(name)) {
     return FileSpec::constructor.New({ External<PdfObject>::New(
-      info.Env(), base->GetAttachment(name)->GetObject()) });
+      info.Env(), Base->GetAttachment(name)->GetObject()) });
   }
   PdfObject* embeddedFiles =
-    base->GetNamesTree(false)->GetObject()->MustGetIndirectKey(
+    Base->GetNamesTree(false)->GetObject()->MustGetIndirectKey(
       Name::EMBEDDED_FILES);
   for (auto& i : embeddedFiles->MustGetIndirectKey(Name::KIDS)->GetArray()) {
     PdfObject* kid = nullptr;
     PdfObject* names = nullptr;
-    PdfObject* filespec = nullptr;
+    PdfObject* fileSpec = nullptr;
     if (i.IsReference()) {
-      kid = base->GetObjects()->GetObject(i.GetReference());
+      kid = Base->GetObjects()->GetObject(i.GetReference());
     } else if (i.IsDictionary()) {
       kid = &i;
     } else
@@ -558,21 +559,21 @@ BaseDocument::GetAttachment(const CallbackInfo& info)
     for (auto&& ii : names->GetArray()) {
       PdfObject* item;
       if (ii.IsReference()) {
-        item = base->GetObjects()->GetObject(ii.GetReference());
+        item = Base->GetObjects()->GetObject(ii.GetReference());
       } else
         item = &ii;
       if (item->IsDictionary() && item->GetDictionary().HasKey(Name::TYPE) &&
           item->GetDictionary().GetKey(Name::TYPE)->GetName() ==
             Name::FILESPEC) {
-        filespec = item;
+        fileSpec = item;
         break;
       }
     }
-    if (filespec && filespec->GetDictionary().HasKey(Name::UF)) {
-      PdfObject* uf = filespec->MustGetIndirectKey(Name::UF);
+    if (fileSpec && fileSpec->GetDictionary().HasKey(Name::UF)) {
+      const auto uf = fileSpec->MustGetIndirectKey(Name::UF);
       if (uf->IsString() && uf->GetString().GetStringUtf8() == name) {
         return FileSpec::constructor.New(
-          { External<PdfObject>::New(info.Env(), filespec) });
+          { External<PdfObject>::New(info.Env(), fileSpec) });
       }
     }
   }
@@ -582,12 +583,12 @@ BaseDocument::GetAttachment(const CallbackInfo& info)
 void
 BaseDocument::AddNamedDestination(const Napi::CallbackInfo& info)
 {
-  PdfPage page = Page::Unwrap(info[0].As<Object>())->page;
-  EPdfDestinationFit fit =
+  auto page = Page::Unwrap(info[0].As<Object>())->page;
+  const auto fit =
     static_cast<EPdfDestinationFit>(info[1].As<Number>().Int32Value());
-  string name = info[2].As<String>().Utf8Value();
-  auto destination = new PdfDestination(&page, fit);
-  base->AddNamedDestination(*destination, name);
+  const auto name = info[2].As<String>().Utf8Value();
+  const auto destination = new PdfDestination(&page, fit);
+  Base->AddNamedDestination(*destination, name);
 }
 
 Napi::Value
@@ -601,13 +602,13 @@ BaseDocument::CreateXObject(const CallbackInfo& info)
       .ThrowAsJavaScriptException();
     return info.Env().Undefined();
   }
-  return XObject::constructor.New(
-    { info[0].As<Object>(), External<PdfDocument>::New(info.Env(), base) });
+  return XObject::Constructor.New(
+    { info[0].As<Object>(), External<PdfDocument>::New(info.Env(), Base) });
 }
 Napi::Value
 BaseDocument::GetForm(const CallbackInfo& info)
 {
-  Napi::Object instance =
+  const auto instance =
     Form::constructor.New({ External<BaseDocument>::New(info.Env(), this),
                             Boolean::New(info.Env(), true) });
   return instance;
@@ -620,7 +621,7 @@ BaseDocument::CreateFontSubset(const Napi::CallbackInfo& info)
       .ThrowAsJavaScriptException();
     return info.Env().Undefined();
   }
-  PdfFont* font = CreateFontObject(info.Env(), info[0].As<Object>(), true);
+  const auto font = CreateFontObject(info.Env(), info[0].As<Object>(), true);
   return Font::constructor.New({ External<PdfFont>::New(info.Env(), font) });
 }
 PdfFont*
@@ -630,12 +631,12 @@ BaseDocument::CreateFontObject(napi_env env, Napi::Object opts, bool subset)
   if (!opts.Has("fontName")) {
     TypeError::New(env, "Requires fontName").ThrowAsJavaScriptException();
   }
-  auto fontName = opts.Get("fontName").As<String>().Utf8Value();
-  bool bold = opts.Has("bold") ? opts.Get("bold").As<Boolean>() : false;
-  bool italic = opts.Has("italic") ? opts.Get("italic").As<Boolean>() : false;
-  bool embed = opts.Has("embed") ? opts.Get("embed").As<Boolean>() : false;
+  const auto fontName = opts.Get("fontName").As<String>().Utf8Value();
+  const auto bold = opts.Has("bold") ? opts.Get("bold").As<Boolean>() : false;
+  const auto italic = opts.Has("italic") ? opts.Get("italic").As<Boolean>() : false;
+  const auto embed = opts.Has("embed") ? opts.Get("embed").As<Boolean>() : false;
   const PdfEncoding* encoding = nullptr;
-  string filename =
+  const auto filename =
     opts.Has("fileName") ? opts.Get("fileName").As<String>().Utf8Value() : "";
 #ifndef PODOFO_HAVE_FONTCONFIG
   std::cout << "This build does not include fontconfig. To load a font you "
@@ -648,7 +649,7 @@ BaseDocument::CreateFontObject(napi_env env, Napi::Object opts, bool subset)
       .ThrowAsJavaScriptException();
   }
 #endif
-  int n = opts.Has("encoding") ? opts.Get("encoding").As<Number>() : 1;
+  const auto n = opts.Has("encoding") ? opts.Get("encoding").As<Number>() : 1;
   switch (n) {
     case 1:
       encoding = PdfEncodingFactory::GlobalWinAnsiEncodingInstance();
@@ -684,14 +685,14 @@ BaseDocument::CreateFontObject(napi_env env, Napi::Object opts, bool subset)
     PdfFont* font;
     if (subset) {
       font =
-        base->CreateFontSubset(fontName.c_str(),
+        Base->CreateFontSubset(fontName.c_str(),
                                bold,
                                italic,
                                false,
                                encoding,
                                filename.empty() ? nullptr : filename.c_str());
     } else {
-      font = base->CreateFont(fontName.c_str(),
+      font = Base->CreateFont(fontName.c_str(),
                               bold,
                               italic,
                               false,

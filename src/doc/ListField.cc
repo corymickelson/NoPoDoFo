@@ -30,7 +30,7 @@ namespace NoPoDoFo {
 ListField::ListField(PdfField& field)
   : field(field)
 {
-  dbglog = spdlog::get("dbglog");
+  dbglog = spdlog::get("DbgLog");
 }
 
 ListField::~ListField()

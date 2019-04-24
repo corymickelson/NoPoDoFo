@@ -51,9 +51,9 @@ FileSpec::Initialize(Napi::Env& env, Napi::Object& target)
 FileSpec::FileSpec(const CallbackInfo& info)
   : ObjectWrap<FileSpec>(info)
 {
-  dbglog = spdlog::get("dbglog");
+  dbglog = spdlog::get("DbgLog");
   if (info.Length() == 1 && info[0].IsObject() &&
-      info[0].As<Object>().InstanceOf(Obj::constructor.Value())) {
+      info[0].As<Object>().InstanceOf(Obj::Constructor.Value())) {
     spec =
       make_unique<PdfFileSpec>(&Obj::Unwrap(info[0].As<Object>())->GetObject());
   } else if (info.Length() == 1 && info[0].Type() == napi_external) {
@@ -64,9 +64,9 @@ FileSpec::FileSpec(const CallbackInfo& info)
     auto docObj = info[1].As<Object>();
     PdfDocument* doc;
     if (docObj.InstanceOf(Document::constructor.Value()))
-      doc = Document::Unwrap(docObj)->base;
+      doc = Document::Unwrap(docObj)->Base;
     else if (docObj.InstanceOf(StreamDocument::constructor.Value()))
-      doc = StreamDocument::Unwrap(docObj)->base;
+      doc = StreamDocument::Unwrap(docObj)->Base;
     else {
       TypeError::New(
         info.Env(),

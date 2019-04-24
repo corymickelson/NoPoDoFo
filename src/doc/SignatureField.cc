@@ -45,7 +45,7 @@ FunctionReference SignatureField::constructor; // NOLINT
 SignatureField::SignatureField(const CallbackInfo& info)
   : ObjectWrap<SignatureField>(info)
 {
-  dbglog = spdlog::get("dbglog");
+  dbglog = spdlog::get("DbgLog");
   try {
     // Create a new Signature Field
     if (info.Length() == 2) {
@@ -54,13 +54,13 @@ SignatureField::SignatureField(const CallbackInfo& info)
       if (nObj.InstanceOf(Document::constructor.Value())) {
         field = make_shared<PdfSignatureField>(
           &annot->GetAnnotation(),
-          Document::Unwrap(nObj)->base->GetAcroForm(),
-          Document::Unwrap(nObj)->base);
+          Document::Unwrap(nObj)->Base->GetAcroForm(),
+          Document::Unwrap(nObj)->Base);
       } else if (nObj.InstanceOf(StreamDocument::constructor.Value())) {
         field = make_shared<PdfSignatureField>(
           &annot->GetAnnotation(),
-          StreamDocument::Unwrap(nObj)->base->GetAcroForm(),
-          StreamDocument::Unwrap(nObj)->base);
+          StreamDocument::Unwrap(nObj)->Base->GetAcroForm(),
+          StreamDocument::Unwrap(nObj)->Base);
       } else {
         TypeError::New(info.Env(), "Document instance required")
           .ThrowAsJavaScriptException();
@@ -146,7 +146,7 @@ Napi::Value
 SignatureField::GetFieldObject(const Napi::CallbackInfo& info)
 {
   auto o = field->GetFieldObject();
-  return Obj::constructor.New({ External<PdfObject>::New(info.Env(), o) });
+  return Obj::Constructor.New({ External<PdfObject>::New(info.Env(), o) });
 }
 void
 SignatureField::SetAppearanceStream(const CallbackInfo& info)
@@ -183,7 +183,7 @@ SignatureField::SetDate(const CallbackInfo& info)
     GetField()->SetSignatureDate(
       PdfDate(PdfString(info[0].As<String>().Utf8Value())));
   } else if (info.Length() == 1 && info[0].IsObject() &&
-             info[0].As<Object>().InstanceOf(Date::constructor.Value())) {
+             info[0].As<Object>().InstanceOf(Date::Constructor.Value())) {
     GetField()->SetSignatureDate(Date::Unwrap(info[0].As<Object>())->GetDate());
   } else {
     GetField()->SetSignatureDate(PdfDate());
@@ -226,7 +226,7 @@ SignatureField::GetSignatureObject(const CallbackInfo& info)
   }
   auto o =
     External<PdfObject>::New(info.Env(), GetField()->GetSignatureObject());
-  return Obj::constructor.New({ o });
+  return Obj::Constructor.New({ o });
 }
 
 Napi::Value
@@ -263,7 +263,7 @@ Napi::Value
 SignatureField::GetAnnotation(const Napi::CallbackInfo& info)
 {
   PdfAnnotation* annot = field->GetWidgetAnnotation();
-  return Annotation::constructor.New(
+  return Annotation::Constructor.New(
     { External<PdfAnnotation>::New(info.Env(), annot) });
 }
 }

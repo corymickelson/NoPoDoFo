@@ -41,7 +41,7 @@ Outline::Outline(const CallbackInfo& info)
   : ObjectWrap(info)
   , outline(*info[0].As<External<PdfOutlineItem>>().Data())
 {
-  dbglog = spdlog::get("dbglog");
+  dbglog = spdlog::get("DbgLog");
 }
 Outline::~Outline()
 {
@@ -102,7 +102,7 @@ Outline::CreateNext(const Napi::CallbackInfo& info)
     return Outline::constructor.New(
       { External<PdfOutlineItem>::New(info.Env(), item) });
   }
-  if (info[1].As<Object>().InstanceOf(Action::constructor.Value())) {
+  if (info[1].As<Object>().InstanceOf(Action::Constructor.Value())) {
     PdfAction& action = Action::Unwrap(info[1].As<Object>())->GetAction();
     auto item = GetOutline().CreateNext(name, action);
     return Outline::constructor.New(
@@ -170,13 +170,13 @@ Outline::GetDestination(const Napi::CallbackInfo& info)
   PdfDestination* d;
   if (info[0].As<Object>().InstanceOf(Document::constructor.Value())) {
     d =
-      GetOutline().GetDestination(Document::Unwrap(info[0].As<Object>())->base);
+      GetOutline().GetDestination(Document::Unwrap(info[0].As<Object>())->Base);
     if (!d)
       return info.Env().Null();
   } else if (info[0].As<Object>().InstanceOf(
                StreamDocument::constructor.Value())) {
     d = GetOutline().GetDestination(
-      StreamDocument::Unwrap(info[0].As<Object>())->base);
+      StreamDocument::Unwrap(info[0].As<Object>())->Base);
     if (!d)
       return info.Env().Null();
   } else {
@@ -193,7 +193,7 @@ Outline::GetAction(const Napi::CallbackInfo& info)
   PdfAction* a = GetOutline().GetAction();
   if (!a)
     return info.Env().Null();
-  return Action::constructor.New({ External<PdfAction>::New(info.Env(), a) });
+  return Action::Constructor.New({ External<PdfAction>::New(info.Env(), a) });
 }
 void
 Outline::SetAction(const Napi::CallbackInfo&, const Napi::Value& value)
@@ -225,7 +225,7 @@ Outline::SetTextFormat(const Napi::CallbackInfo&, const Napi::Value& value)
 Napi::Value
 Outline::GetTextColor(const Napi::CallbackInfo& info)
 {
-  return Color::constructor.New({
+  return Color::Constructor.New({
     Number::New(info.Env(), GetOutline().GetTextColorRed()),
     Number::New(info.Env(), GetOutline().GetTextColorGreen()),
     Number::New(info.Env(), GetOutline().GetTextColorBlue()),
@@ -239,7 +239,7 @@ Outline::SetTextColor(const Napi::CallbackInfo& info, const Napi::Value& value)
       .ThrowAsJavaScriptException();
     return;
   }
-  PdfColor color = *Color::Unwrap(value.As<Object>())->color;
+  PdfColor color = *Color::Unwrap(value.As<Object>())->Clr;
   if (!color.IsRGB()) {
     cout << "Outline text coloring only supports color format RGB, color "
             "automatically converted to RGB"
