@@ -35,21 +35,21 @@ FunctionReference Stream::constructor; // NOLINT
 
 Stream::Stream(const CallbackInfo& info)
   : ObjectWrap(info)
-  , stream(info.Length() == 1 && info[0].IsExternal()
+  , Strm(info.Length() == 1 && info[0].IsExternal()
              ? *info[0].As<External<PdfStream>>().Data()
              : *Obj::Unwrap(info[0].As<Object>())->GetObject().GetStream())
 {
-  dbglog = spdlog::get("DbgLog");
+  DbgLog = spdlog::get("DbgLog");
 }
 Stream::~Stream()
 {
-  dbglog->debug("Stream Cleanup");
+  DbgLog->debug("Stream Cleanup");
 }
 void
 Stream::Initialize(Napi::Env& env, Napi::Object& target)
 {
   HandleScope scope(env);
-  Function ctor =
+  auto ctor =
     DefineClass(env,
                 "Stream",
                 { InstanceMethod("write", &Stream::Write),
@@ -64,55 +64,55 @@ Stream::Initialize(Napi::Env& env, Napi::Object& target)
   target.Set("Stream", ctor);
 }
 
-class StreamWriteAsync : public Napi::AsyncWorker
+class StreamWriteAsync final : public Napi::AsyncWorker
 {
 public:
   StreamWriteAsync(Napi::Function& cb, Stream* stream, string arg)
     : AsyncWorker(cb, "stream_write_async", stream->Value())
-    , stream(stream)
-    , arg(std::move(arg))
+    , NStrm(stream)
+    , Arg(std::move(arg))
   {}
 
 private:
-  Stream* stream;
-  PdfRefCountedBuffer buffer;
-  PdfOutputDevice* device = nullptr;
-  string arg;
+  Stream* NStrm;
+  PdfRefCountedBuffer RefBuffer;
+  PdfOutputDevice* Device = nullptr;
+  string Arg;
 
   // AsyncWorker interface
 protected:
   void Execute() override
   {
     try {
-      if (!arg.empty()) {
-        PdfOutputDevice fileDevice(arg.c_str());
-        device = &fileDevice;
+      if (!Arg.empty()) {
+        PdfOutputDevice fileDevice(Arg.c_str());
+        Device = &fileDevice;
       } else {
-        PdfOutputDevice memDevice(&buffer);
-        device = &memDevice;
+        PdfOutputDevice memDevice(&RefBuffer);
+        Device = &memDevice;
       }
-      stream->GetStream().Write(device);
+      NStrm->GetStream().Write(Device);
     } catch (PdfError& err) {
       SetError(String::New(Env(), ErrorHandler::WriteMsg(err)));
     }
   }
   void OnOK() override
   {
-    if (arg.empty()) {
+    if (Arg.empty()) {
       Callback().Call(
         { Env().Null(),
-          Buffer<char>::Copy(Env(), buffer.GetBuffer(), buffer.GetSize()) });
+          Buffer<char>::Copy(Env(), RefBuffer.GetBuffer(), RefBuffer.GetSize()) });
     }
-    Callback().Call({ Env().Null(), String::New(Env(), arg) });
+    Callback().Call({ Env().Null(), String::New(Env(), Arg) });
   }
 };
 
-Napi::Value
+JsValue
 Stream::Write(const CallbackInfo& info)
 {
   string output;
   Function cb;
-  vector<int> opts =
+  const auto opts =
     AssertCallbackInfo(info,
                        { { 0, { option(napi_function), option(napi_string) } },
                          { 1, { nullopt, option(napi_function) } } });
@@ -133,13 +133,13 @@ Stream::Write(const CallbackInfo& info)
 void
 Stream::BeginAppend(const Napi::CallbackInfo& info)
 {
-  std::vector<int> opt = AssertCallbackInfo(
+  const auto opt = AssertCallbackInfo(
     info,
     { { 0, { nullopt, option(napi_boolean), option(napi_external) } },
       { 1, { nullopt, option(napi_boolean) } },
       { 2, { nullopt, option(napi_boolean) } } });
-  bool clearExisting = true;
-  bool deleteFilter = true;
+  auto clearExisting = true;
+  auto deleteFilter = true;
   std::vector<EPdfFilter>* filters = nullptr;
   if (opt[0] == 0) {
     GetStream().BeginAppend();
@@ -167,10 +167,10 @@ Stream::Set(const Napi::CallbackInfo& info)
     return;
   }
   if (info[0].IsBuffer()) {
-    char* data = info[0].As<Buffer<char>>().Data();
+    const auto data = info[0].As<Buffer<char>>().Data();
     GetStream().Set(data);
   } else if (info[0].IsString()) {
-    string data = info[0].As<String>().Utf8Value();
+    const auto data = info[0].As<String>().Utf8Value();
     GetStream().Set(data.c_str());
   }
 }
@@ -185,10 +185,10 @@ Stream::Append(const Napi::CallbackInfo& info)
 
   try {
     if (info[0].IsBuffer()) {
-      auto data = info[0].As<Buffer<char>>();
+      const auto data = info[0].As<Buffer<char>>();
       GetStream().Append(data.Data(), data.Length());
     } else if (info[0].IsString()) {
-      string data = info[0].As<String>().Utf8Value();
+      const auto data = info[0].As<String>().Utf8Value();
       GetStream().Append(data);
     }
   } catch (PdfError& err) {
@@ -200,22 +200,22 @@ Stream::EndAppend(const Napi::CallbackInfo&)
 {
   GetStream().EndAppend();
 }
-Napi::Value
+JsValue
 Stream::IsAppending(const Napi::CallbackInfo& info)
 {
   return Boolean::New(info.Env(), GetStream().IsAppending());
 }
-Napi::Value
+JsValue
 Stream::Length(const Napi::CallbackInfo& info)
 {
   return Number::New(info.Env(), GetStream().GetLength());
 }
-Napi::Value
+JsValue
 Stream::GetCopy(const Napi::CallbackInfo& info)
 {
-  bool filtered = false;
+  auto filtered = false;
   auto l = GetStream().GetLength();
-  char* internalBuffer = static_cast<char*>(podofo_malloc(sizeof(char) * l));
+  auto internalBuffer = static_cast<char*>(podofo_malloc(sizeof(char) * l));
   if (info.Length() == 1 && info[0].IsBoolean()) {
     filtered = info[0].As<Boolean>();
   }
@@ -224,8 +224,8 @@ Stream::GetCopy(const Napi::CallbackInfo& info)
   } else {
     GetStream().GetCopy(&internalBuffer, &l);
   }
-  auto output = Buffer<char>::Copy(info.Env(), internalBuffer, l);
+  const auto output = Buffer<char>::Copy(info.Env(), internalBuffer, l);
   podofo_free(internalBuffer);
-  return output;
+  return JsValue(output);
 }
 }

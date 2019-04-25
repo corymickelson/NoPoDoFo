@@ -335,7 +335,7 @@ Page::GetAnnotation(const CallbackInfo& info)
   int index = info[0].As<Number>();
   auto ptr = page.GetAnnotation(index);
   auto instance = External<PdfAnnotation>::New(info.Env(), ptr);
-  return Annotation::constructor.New({ instance });
+  return Annotation::Constructor.New({ instance });
 }
 Napi::Value
 Page::CreateAnnotation(const CallbackInfo& info)
@@ -345,7 +345,7 @@ Page::CreateAnnotation(const CallbackInfo& info)
   auto obj = info[1].As<Object>();
   Rect* rect = Rect::Unwrap(obj);
   PdfAnnotation* annot = page.CreateAnnotation(type, rect->GetRect());
-  auto instance = Annotation::constructor.New(
+  auto instance = Annotation::Constructor.New(
     { External<PdfAnnotation>::New(info.Env(), annot) });
   return instance;
 }
@@ -357,7 +357,7 @@ Page::CreateAnnotation(const CallbackInfo& info)
 Value
 Page::CreateField(const CallbackInfo& info)
 {
-  if (!info[1].As<Object>().InstanceOf(Annotation::constructor.Value())) {
+  if (!info[1].As<Object>().InstanceOf(Annotation::Constructor.Value())) {
     TypeError::New(info.Env(), "Requires in instance of Annotation")
       .ThrowAsJavaScriptException();
     return info.Env().Undefined();

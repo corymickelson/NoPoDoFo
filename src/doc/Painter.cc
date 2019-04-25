@@ -141,7 +141,7 @@ Painter::SetPage(const Napi::CallbackInfo& info)
   if (info[0].As<Object>().InstanceOf(Page::constructor.Value())) {
     auto canvas = Page::Unwrap(info[0].As<Object>());
     painter->SetPage(&canvas->page);
-  } else if (info[0].As<Object>().InstanceOf(XObject::constructor.Value())) {
+  } else if (info[0].As<Object>().InstanceOf(XObject::Constructor.Value())) {
     auto canvas = &XObject::Unwrap(info[0].As<Object>())->GetXObject();
     painter->SetPage(canvas);
   } else {

@@ -244,7 +244,7 @@ JsValue
 Obj::Reference(const CallbackInfo& info)
 {
   auto r = GetObject().Reference();
-  return Ref::constructor.New({ External<PdfReference>::New(info.Env(), &r) });
+  return Ref::Constructor.New({ External<PdfReference>::New(info.Env(), &r) });
 }
 
 void

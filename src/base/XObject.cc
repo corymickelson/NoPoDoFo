@@ -28,33 +28,33 @@ using namespace PoDoFo;
 
 namespace NoPoDoFo {
 
-FunctionReference XObject::constructor; // NOLINT
+FunctionReference XObject::Constructor; // NOLINT
 
 XObject::XObject(const CallbackInfo& info)
   : ObjectWrap(info)
 {
-  dbglog = spdlog::get("DbgLog");
+  DbgLog = spdlog::get("DbgLog");
   // create an xobject from an existing object (must be an xobject)
   if (info[0].IsExternal()) {
-    dbglog->debug("XObject copy");
+    DbgLog->debug("XObject copy");
     auto copy = info[0].As<External<PdfXObject>>().Data();
-    xobj = new PdfXObject(*copy);
+    XObj = new PdfXObject(*copy);
   }
   // create new XObject
   else if (info.Length() && info[0].IsObject() &&
            info[0].As<Object>().InstanceOf(Rect::constructor.Value()) &&
            info[1].IsExternal()) {
     auto rect = Rect::Unwrap(info[0].As<Object>());
-    dbglog->debug("New XObject");
+    DbgLog->debug("New XObject");
     PdfDocument* doc = info[1].As<External<PdfDocument>>().Data();
-    xobj = new PdfXObject(rect->GetRect(), doc);
+    XObj = new PdfXObject(rect->GetRect(), doc);
   }
 }
 XObject::~XObject()
 {
-  dbglog->debug("XObject Cleanup");
+  DbgLog->debug("XObject Cleanup");
   HandleScope scope(Env());
-  delete xobj;
+  delete XObj;
 }
 
 void
@@ -70,8 +70,8 @@ XObject::Initialize(Napi::Env& env, Object& target)
         "contentsForAppending", &XObject::GetContentsForAppending, nullptr),
       InstanceAccessor("resource", &XObject::GetResources, nullptr),
       InstanceAccessor("pageMediaBox", &XObject::GetPageSize, nullptr) });
-  constructor = Napi::Persistent(ctor);
-  constructor.SuppressDestruct();
+  Constructor = Napi::Persistent(ctor);
+  Constructor.SuppressDestruct();
   target.Set("XObject", ctor);
 }
 
@@ -79,27 +79,27 @@ Value
 XObject::GetContents(const CallbackInfo& info)
 {
   return Obj::Constructor.New(
-    { External<PdfObject>::New(info.Env(), xobj->GetContents()) });
+    { External<PdfObject>::New(info.Env(), XObj->GetContents()) });
 }
 
 Value
 XObject::GetContentsForAppending(const CallbackInfo& info)
 {
   return Obj::Constructor.New(
-    { External<PdfObject>::New(info.Env(), xobj->GetContentsForAppending()) });
+    { External<PdfObject>::New(info.Env(), XObj->GetContentsForAppending()) });
 }
 
 Value
 XObject::GetResources(const CallbackInfo& info)
 {
   return Obj::Constructor.New(
-    { External<PdfObject>::New(info.Env(), xobj->GetResources()) });
+    { External<PdfObject>::New(info.Env(), XObj->GetResources()) });
 }
 
 Value
 XObject::GetPageSize(const CallbackInfo& info)
 {
-  PdfRect rect = xobj->GetPageSize();
+  PdfRect rect = XObj->GetPageSize();
   double left, bottom, width, height;
   left = rect.GetLeft();
   bottom = rect.GetBottom();
@@ -114,7 +114,7 @@ XObject::GetPageSize(const CallbackInfo& info)
 Napi::Value
 XObject::Reference(const Napi::CallbackInfo& info)
 {
-  auto r = xobj->GetObject()->Reference();
-  return Ref::constructor.New({ External<PdfReference>::New(info.Env(), &r) });
+  auto r = XObj->GetObject()->Reference();
+  return Ref::Constructor.New({ External<PdfReference>::New(info.Env(), &r) });
 }
 }

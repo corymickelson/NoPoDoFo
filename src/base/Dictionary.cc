@@ -137,9 +137,9 @@ Dictionary::AddKey(const CallbackInfo& info)
       auto dict = Dictionary::Unwrap(v.As<Object>());
       GetDictionary().AddKey(key, dict->GetDictionary());
     } else if (v.IsObject() &&
-               v.As<Object>().InstanceOf(Ref::constructor.Value())) {
+               v.As<Object>().InstanceOf(Ref::Constructor.Value())) {
       auto refValue = Ref::Unwrap(v.As<Object>());
-      GetDictionary().AddKey(key, *refValue->self);
+      GetDictionary().AddKey(key, *refValue->Self);
     } else if (v.IsObject() &&
                v.As<Object>().InstanceOf(Obj::Constructor.Value())) {
       auto obj = Obj::Unwrap(v.As<Object>())->GetObject();
@@ -264,7 +264,7 @@ Dictionary::GetKey(const CallbackInfo& info)
         info.Env(), stream, static_cast<size_t>(length));
     }
     case ePdfDataType_Reference: {
-      return Ref::constructor.New(
+      return Ref::Constructor.New(
         { Number::New(info.Env(), v->GetReference().ObjectNumber()),
           Number::New(info.Env(), v->GetReference().GenerationNumber()) });
     }

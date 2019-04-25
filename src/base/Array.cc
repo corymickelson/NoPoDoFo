@@ -190,7 +190,7 @@ Array::GetObjAtIndex(const CallbackInfo& info)
   PdfObject* item;
   if (GetArray()[index].IsReference()) {
     auto indirect = GetArray()[index].GetReference();
-    return Ref::constructor.New(
+    return Ref::Constructor.New(
       { External<PdfReference>::New(info.Env(), &indirect) });
   } else {
     item = &(GetArray()[index]);

@@ -61,7 +61,7 @@ Field::Field(EPdfField type, const CallbackInfo& info)
         int index = info[1].As<Number>();
         field = new PdfField(page->page.GetField(index));
       }
-    } else if (arg1.InstanceOf(Annotation::constructor.Value())) {
+    } else if (arg1.InstanceOf(Annotation::Constructor.Value())) {
       PdfAnnotation* annotation = &Annotation::Unwrap(arg1)->GetAnnotation();
       if (info[1].IsObject() &&
           info[1].As<Object>().InstanceOf(Form::constructor.Value())) {
@@ -307,7 +307,7 @@ JsValue
 Field::GetAnnotation(const Napi::CallbackInfo& info)
 {
   PdfAnnotation* annot = field->GetWidgetAnnotation();
-  return Annotation::constructor.New(
+  return Annotation::Constructor.New(
     { External<PdfAnnotation>::New(info.Env(), annot) });
 }
 JsValue

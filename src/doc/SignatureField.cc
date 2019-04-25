@@ -263,7 +263,7 @@ Napi::Value
 SignatureField::GetAnnotation(const Napi::CallbackInfo& info)
 {
   PdfAnnotation* annot = field->GetWidgetAnnotation();
-  return Annotation::constructor.New(
+  return Annotation::Constructor.New(
     { External<PdfAnnotation>::New(info.Env(), annot) });
 }
 }

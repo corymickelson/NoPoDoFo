@@ -322,8 +322,8 @@ BaseDocument::GetObject(const CallbackInfo& info)
     PdfReference r(o, gen);
     ref = &r;
   } else if (info[0].IsObject() &&
-             info[0].As<Object>().InstanceOf(Ref::constructor.Value())) {
-    ref = Ref::Unwrap(info[0].As<Object>())->self;
+             info[0].As<Object>().InstanceOf(Ref::Constructor.Value())) {
+    ref = Ref::Unwrap(info[0].As<Object>())->Self;
   }
   if (!ref) {
     Error::New(info.Env(), "NoPoDoFo is unable to resolve null reference")
@@ -602,7 +602,7 @@ BaseDocument::CreateXObject(const CallbackInfo& info)
       .ThrowAsJavaScriptException();
     return info.Env().Undefined();
   }
-  return XObject::constructor.New(
+  return XObject::Constructor.New(
     { info[0].As<Object>(), External<PdfDocument>::New(info.Env(), Base) });
 }
 Napi::Value

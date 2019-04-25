@@ -275,12 +275,12 @@ Form::RefreshAppearances(const CallbackInfo& info)
     AssertCallbackInfo(info, { { 0, { napi_object, napi_external } } });
   if (opts[0] == 0) {
     auto obj = info[0].As<Object>();
-    if (obj.InstanceOf(Ref::constructor.Value())) {
+    if (obj.InstanceOf(Ref::Constructor.Value())) {
       auto r = Ref::Unwrap(obj);
-      PdfObject* appObj = doc.GetObjects()->GetObject(*r->self);
+      PdfObject* appObj = doc.GetObjects()->GetObject(*r->Self);
       PdfXObject x(appObj);
       xApp = &x;
-    } else if (obj.InstanceOf(XObject::constructor.Value())) {
+    } else if (obj.InstanceOf(XObject::Constructor.Value())) {
       auto xo = XObject::Unwrap(obj);
       xApp = &xo->GetXObject();
     } else {

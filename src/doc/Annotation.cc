@@ -38,17 +38,17 @@ using std::stringstream;
 
 namespace NoPoDoFo {
 
-FunctionReference Annotation::constructor; // NOLINT
+FunctionReference Annotation::Constructor; // NOLINT
 
 Annotation::Annotation(const CallbackInfo& info)
   : ObjectWrap(info)
-  , annot(*info[0].As<External<PdfAnnotation>>().Data())
+  , Annot(*info[0].As<External<PdfAnnotation>>().Data())
 {
-  dbglog = spdlog::get("DbgLog");
+  DbgLog = spdlog::get("DbgLog");
 }
 
 Annotation::~Annotation() {
-  dbglog->debug("Annotation Cleanup");
+  DbgLog->debug("Annotation Cleanup");
 }
 void
 Annotation::Initialize(Napi::Env& env, Napi::Object& target)
@@ -81,29 +81,29 @@ Annotation::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceMethod("getType", &Annotation::GetType),
     });
 
-  constructor = Persistent(ctor);
-  constructor.SuppressDestruct();
+  Constructor = Persistent(ctor);
+  Constructor.SuppressDestruct();
   target.Set("Annotation", ctor);
 }
 void
-Annotation::SetFlags(const CallbackInfo& info, const Napi::Value& value)
+Annotation::SetFlags(const CallbackInfo& info, const JsValue& value)
 {
   if (!value.IsNumber()) {
     throw Napi::TypeError::New(
       info.Env(), "SetFlag must be an instance of NpdfAnnotationType");
   }
   int jsValue = info[0].As<Number>();
-  auto flag = static_cast<PoDoFo::EPdfAnnotationFlags>(jsValue);
+  const auto flag = static_cast<PoDoFo::EPdfAnnotationFlags>(jsValue);
   GetAnnotation().SetFlags(flag);
 }
 
-Napi::Value
+JsValue
 Annotation::GetFlags(const CallbackInfo& info)
 {
   return Napi::Number::New(info.Env(), GetAnnotation().GetFlags());
 }
 
-Napi::Value
+JsValue
 Annotation::HasAppearanceStream(const CallbackInfo& info)
 {
   return Napi::Boolean::New(info.Env(), GetAnnotation().HasAppearanceStream());
@@ -113,7 +113,7 @@ void
 Annotation::SetAppearanceStream(const CallbackInfo& info)
 {
   if (info.Length() != 1 || !info[0].IsObject() ||
-      !info[0].As<Object>().InstanceOf(XObject::constructor.Value())) {
+      !info[0].As<Object>().InstanceOf(XObject::Constructor.Value())) {
     TypeError::New(info.Env(),
                    "Requires an instance of XObject as the first argument")
       .ThrowAsJavaScriptException();
@@ -142,7 +142,7 @@ Annotation::SetBorderStyle(const CallbackInfo& info)
 }
 
 void
-Annotation::SetTitle(const CallbackInfo& info, const Napi::Value& value)
+Annotation::SetTitle(const CallbackInfo& info, const JsValue& value)
 {
   if (!value.IsString()) {
     throw Napi::TypeError::New(
@@ -158,7 +158,7 @@ Annotation::SetTitle(const CallbackInfo& info, const Napi::Value& value)
   }
 }
 
-Napi::Value
+JsValue
 Annotation::GetTitle(const CallbackInfo& info)
 {
   return Napi::String::New(info.Env(),
@@ -166,7 +166,7 @@ Annotation::GetTitle(const CallbackInfo& info)
 }
 
 void
-Annotation::SetContent(const CallbackInfo& info, const Napi::Value& value)
+Annotation::SetContent(const CallbackInfo& info, const JsValue& value)
 {
   if (value.IsEmpty()) {
     throw Napi::Error::New(info.Env(),
@@ -176,7 +176,7 @@ Annotation::SetContent(const CallbackInfo& info, const Napi::Value& value)
   GetAnnotation().SetContents(content);
 }
 
-Napi::Value
+JsValue
 Annotation::GetContent(const CallbackInfo& info)
 {
   return Napi::String::New(info.Env(),
@@ -184,7 +184,7 @@ Annotation::GetContent(const CallbackInfo& info)
 }
 
 void
-Annotation::SetDestination(const CallbackInfo& info, const Napi::Value& value)
+Annotation::SetDestination(const CallbackInfo& info, const JsValue& value)
 {
   if (value.As<Object>().InstanceOf(Destination::constructor.Value())) {
     auto destination = Destination::Unwrap(value.As<Object>());
@@ -195,7 +195,7 @@ Annotation::SetDestination(const CallbackInfo& info, const Napi::Value& value)
   }
 }
 
-Napi::Value
+JsValue
 Annotation::GetDestination(const CallbackInfo& info)
 {
   if (!GetAnnotation().HasDestination())
@@ -207,9 +207,9 @@ Annotation::GetDestination(const CallbackInfo& info)
 }
 
 void
-Annotation::SetAction(const CallbackInfo& info, const Napi::Value& value)
+Annotation::SetAction(const CallbackInfo& info, const JsValue& value)
 {
-  if (!value.As<Object>().InstanceOf(Action::constructor.Value())) {
+  if (!value.As<Object>().InstanceOf(Action::Constructor.Value())) {
     TypeError::New(info.Env(), "Requires instance of Action")
       .ThrowAsJavaScriptException();
     return;
@@ -218,7 +218,7 @@ Annotation::SetAction(const CallbackInfo& info, const Napi::Value& value)
   GetAnnotation().SetAction(action->GetAction());
 }
 
-Napi::Value
+JsValue
 Annotation::GetAction(const CallbackInfo& info)
 {
   if (!GetAnnotation().HasAction()) {
@@ -236,7 +236,7 @@ Annotation::GetAction(const CallbackInfo& info)
 }
 
 void
-Annotation::SetOpen(const CallbackInfo& info, const Napi::Value& value)
+Annotation::SetOpen(const CallbackInfo& info, const JsValue& value)
 {
   if (!value.IsBoolean()) {
     throw Napi::Error::New(info.Env(), "Requires Boolean type");
@@ -244,14 +244,14 @@ Annotation::SetOpen(const CallbackInfo& info, const Napi::Value& value)
   GetAnnotation().SetOpen(value.As<Boolean>());
 }
 
-Napi::Value
+JsValue
 Annotation::GetOpen(const CallbackInfo& info)
 {
   return Napi::Boolean::New(info.Env(), GetAnnotation().GetOpen());
 }
 
 void
-Annotation::SetColor(const CallbackInfo& info, const Napi::Value& value)
+Annotation::SetColor(const CallbackInfo& info, const JsValue& value)
 {
   vector<NPDFColorFormat> types = { NPDFColorFormat::RGB,
                                     NPDFColorFormat::GreyScale,
@@ -260,7 +260,7 @@ Annotation::SetColor(const CallbackInfo& info, const Napi::Value& value)
     Color::Unwrap(value.As<Object>())->Clr, types, GetAnnotation().SetColor)
 }
 
-Napi::Value
+JsValue
 Annotation::GetColor(const CallbackInfo& info)
 {
   auto color = GetAnnotation().GetColor();
@@ -292,7 +292,7 @@ Annotation::GetColor(const CallbackInfo& info)
   return Value();
 }
 
-Napi::Value
+JsValue
 Annotation::GetType(const CallbackInfo& info)
 {
   string jsType;
@@ -414,7 +414,7 @@ Annotation::GetType(const CallbackInfo& info)
 }
 
 void
-Annotation::SetQuadPoints(const CallbackInfo& info, const Napi::Value& value)
+Annotation::SetQuadPoints(const CallbackInfo& info, const JsValue& value)
 {
   PdfArray points;
   auto nArray = value.As<Array>();
@@ -432,7 +432,7 @@ Annotation::SetQuadPoints(const CallbackInfo& info, const Napi::Value& value)
   }
 }
 
-Napi::Value
+JsValue
 Annotation::GetQuadPoints(const CallbackInfo& info)
 {
   auto jsArray = Array::New(info.Env());
@@ -444,7 +444,7 @@ Annotation::GetQuadPoints(const CallbackInfo& info)
   }
   return jsArray;
 }
-Napi::Value
+JsValue
 Annotation::GetAttachment(const CallbackInfo& info)
 {
   if (!GetAnnotation().HasFileAttachement()) {
@@ -458,9 +458,9 @@ Annotation::GetAttachment(const CallbackInfo& info)
     }) });
 }
 void
-Annotation::SetAttachment(const CallbackInfo& info, const Napi::Value& value)
+Annotation::SetAttachment(const CallbackInfo& info, const JsValue& value)
 {}
-Napi::Value
+JsValue
 Annotation::GetRect(const CallbackInfo& info)
 {
   PdfRect rect = GetAnnotation().GetRect();
@@ -470,7 +470,7 @@ Annotation::GetRect(const CallbackInfo& info)
                                  Number::New(info.Env(), rect.GetHeight()) });
 }
 void
-Annotation::SetRect(const CallbackInfo& info, const Napi::Value& value)
+Annotation::SetRect(const CallbackInfo& info, const JsValue& value)
 {
   if (!value.As<Object>().InstanceOf(Rect::constructor.Value())) {
     Error::New(info.Env(), "NoPoDoFo Rect required")

@@ -24,29 +24,31 @@
 #include <podofo/podofo.h>
 #include <spdlog/logger.h>
 
+using JsValue = Napi::Value;
+
 namespace NoPoDoFo {
 class Stream : public Napi::ObjectWrap<Stream>
 {
 public:
   explicit Stream(const Napi::CallbackInfo& callbackInfo);
+  explicit Stream(const Stream&) = delete;
+  const Stream& operator=(const Stream&) = delete;
   ~Stream();
   static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
-  Napi::Value Write(const Napi::CallbackInfo&);
-  Napi::Value GetBuffer(const Napi::CallbackInfo&);
-  Napi::Value GetFilteredBuffer(const Napi::CallbackInfo&);
+  JsValue Write(const Napi::CallbackInfo&);
   void Set(const Napi::CallbackInfo&);
   void BeginAppend(const Napi::CallbackInfo&);
   void Append(const Napi::CallbackInfo&);
   void EndAppend(const Napi::CallbackInfo&);
-  Napi::Value IsAppending(const Napi::CallbackInfo&);
-  Napi::Value Length(const Napi::CallbackInfo&);
-  Napi::Value GetCopy(const Napi::CallbackInfo&);
-  PoDoFo::PdfStream& GetStream() { return  stream; }
+  JsValue IsAppending(const Napi::CallbackInfo&);
+  JsValue Length(const Napi::CallbackInfo&);
+  JsValue GetCopy(const Napi::CallbackInfo&);
+  PoDoFo::PdfStream& GetStream() const { return  Strm; }
 
 private:
-  PoDoFo::PdfStream& stream;
-  std::shared_ptr<spdlog::logger> dbglog;
+  PoDoFo::PdfStream& Strm;
+  std::shared_ptr<spdlog::logger> DbgLog;
 };
 }
 #endif // NPDF_STREAM_H
