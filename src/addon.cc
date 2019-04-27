@@ -56,19 +56,20 @@
 #include <napi.h>
 
 Napi::Object
-init(Napi::Env env, Napi::Object exports)
+INIT(Napi::Env env, Napi::Object exports)
 {
 #if PODOFO_VERSION_MINOR < 9 && PODOFO_VERSION_PATCH < 6
   Napi::Error::New(env, "PoDoFo Version must be >= 0.9.6")
     .ThrowAsJavaScriptException();
   return;
 #endif
-  auto debugLog = spdlog::basic_logger_mt("DbgLog", "DbgLog.txt");
-  debugLog->flush_on(spdlog::level::debug);
+  auto dbgLog = spdlog::basic_logger_mt("DbgLog", "DbgLog.txt");
+  dbgLog->set_level(spdlog::level::debug);
+  dbgLog->flush_on(spdlog::level::debug);
 #ifdef NOPODOFO_DEBUG
-  DbgLog->info("/******************************************************/")
-  DbgLog->info( "/***** You are running a Debug build of NoPoDoFo ******/")
-  DbgLog->info( "/******************************************************/")
+  dbgLog->info("/******************************************************/")
+  dbgLog->info( "/***** You are running a Debug build of NoPoDoFo ******/")
+  dbgLog->info( "/******************************************************/")
 #endif
   NoPoDoFo::Action::Initialize(env, exports);
   NoPoDoFo::Date::Initialize(env, exports);
@@ -108,4 +109,4 @@ init(Napi::Env env, Napi::Object exports)
   return exports;
 }
 
-NODE_API_MODULE(npdf, init);
+NODE_API_MODULE(npdf, INIT);

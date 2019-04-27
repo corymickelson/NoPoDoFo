@@ -441,7 +441,7 @@ export namespace nopodofo {
         uri?: string
         script?: string
 
-        getObject(): Object
+        getObject(): nopodofo.Object
 
         addToDictionary(dictionary: Dictionary): void
     }

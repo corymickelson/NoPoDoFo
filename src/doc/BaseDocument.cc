@@ -56,7 +56,6 @@ namespace NoPoDoFo {
  */
 BaseDocument::BaseDocument(const Napi::CallbackInfo& info, const bool inMem)
 {
-
   DbgLog = spdlog::get("DbgLog");
   if (inMem) {
     Base = new PdfMemDocument();
@@ -109,13 +108,13 @@ BaseDocument::~BaseDocument()
   delete StreamDocRefCountedBuffer;
 }
 
-Napi::Value
+JsValue
 BaseDocument::GetPageCount(const CallbackInfo& info)
 {
   const auto pages = Base->GetPageCount();
   return Number::New(info.Env(), pages);
 }
-Napi::Value
+JsValue
 BaseDocument::GetPage(const CallbackInfo& info)
 {
   const int n = info[0].As<Number>();
@@ -134,14 +133,14 @@ BaseDocument::SetHideMenubar(const Napi::CallbackInfo&)
   Base->SetHideMenubar();
 }
 
-Napi::Value
+JsValue
 BaseDocument::GetPageMode(const CallbackInfo& info)
 {
   return Number::New(info.Env(), static_cast<int>(Base->GetPageMode()));
 }
 
 void
-BaseDocument::SetPageMode(const CallbackInfo&, const Napi::Value& value)
+BaseDocument::SetPageMode(const CallbackInfo&, const JsValue& value)
 {
   int flag = value.As<Number>();
   const auto mode = static_cast<EPdfPageMode>(flag);
@@ -149,7 +148,7 @@ BaseDocument::SetPageMode(const CallbackInfo&, const Napi::Value& value)
 }
 
 void
-BaseDocument::SetPageLayout(const CallbackInfo&, const Napi::Value& value)
+BaseDocument::SetPageLayout(const CallbackInfo&, const JsValue& value)
 {
   int flag = value.As<Number>();
   const auto mode = static_cast<EPdfPageLayout>(flag);
@@ -193,14 +192,14 @@ BaseDocument::SetDisplayDocTitle(const CallbackInfo&)
 }
 
 void
-BaseDocument::SetPrintingScale(const CallbackInfo&, const Napi::Value& value)
+BaseDocument::SetPrintingScale(const CallbackInfo&, const JsValue& value)
 {
   PdfName scale(value.As<String>().Utf8Value());
   Base->SetPrintScaling(scale);
 }
 
 void
-BaseDocument::SetLanguage(const CallbackInfo&, const Napi::Value& value)
+BaseDocument::SetLanguage(const CallbackInfo&, const JsValue& value)
 {
   Base->SetLanguage(value.As<String>().Utf8Value());
 }
@@ -222,7 +221,7 @@ BaseDocument::AttachFile(const CallbackInfo& info)
   Base->AttachFile(attachment);
 }
 
-Napi::Value
+JsValue
 BaseDocument::GetVersion(const CallbackInfo& info)
 {
   const auto versionE = Base->GetPdfVersion();
@@ -260,13 +259,13 @@ BaseDocument::GetVersion(const CallbackInfo& info)
   return Number::New(info.Env(), v);
 }
 
-Napi::Value
+JsValue
 BaseDocument::IsLinearized(const CallbackInfo& info)
 {
   return Boolean::New(info.Env(), Base->IsLinearized());
 }
 
-Napi::Value
+JsValue
 BaseDocument::GetWriteMode(const CallbackInfo& info)
 {
   string writeMode;
@@ -283,7 +282,7 @@ BaseDocument::GetWriteMode(const CallbackInfo& info)
   return Napi::String::New(info.Env(), writeMode);
 }
 
-Napi::Value
+JsValue
 BaseDocument::GetObjects(const CallbackInfo& info)
 {
   try {
@@ -306,7 +305,7 @@ BaseDocument::GetObjects(const CallbackInfo& info)
   return info.Env().Undefined();
 }
 
-Napi::Value
+JsValue
 BaseDocument::GetObject(const CallbackInfo& info)
 {
   PdfReference* ref = nullptr;
@@ -342,7 +341,7 @@ BaseDocument::GetObject(const CallbackInfo& info)
   return Obj::Constructor.New({ External<PdfObject>::New(info.Env(), target) });
 }
 
-Napi::Value
+JsValue
 BaseDocument::IsAllowed(const CallbackInfo& info)
 {
   const auto allowed = info[0].As<String>().Utf8Value();
@@ -371,7 +370,7 @@ BaseDocument::IsAllowed(const CallbackInfo& info)
   return Napi::Boolean::New(info.Env(), is);
 }
 
-Napi::Value
+JsValue
 BaseDocument::CreateFont(const CallbackInfo& info)
 {
   if (info.Length() < 1 || !info[0].IsObject()) {
@@ -387,7 +386,7 @@ BaseDocument::CreateFont(const CallbackInfo& info)
  * @param info
  * @return
  */
-Napi::Value
+JsValue
 BaseDocument::InsertExistingPage(const CallbackInfo& info)
 {
   auto memDoc = Document::Unwrap(info[0].As<Object>());
@@ -409,7 +408,7 @@ BaseDocument::InsertExistingPage(const CallbackInfo& info)
   Base->InsertExistingPageAt(memDoc->GetDocument(), memPageN, atN);
   return Number::New(info.Env(), Base->GetPageCount());
 }
-Napi::Value
+JsValue
 BaseDocument::GetInfo(const CallbackInfo& info)
 {
   auto i = Base->GetInfo();
@@ -428,7 +427,7 @@ BaseDocument::GetInfo(const CallbackInfo& info)
  * @param info
  * @return Obj - The outline object dictionary
  */
-Napi::Value
+JsValue
 BaseDocument::GetOutlines(const CallbackInfo& info)
 {
   auto opts = AssertCallbackInfo(
@@ -464,7 +463,7 @@ BaseDocument::GetOutlines(const CallbackInfo& info)
     { External<PdfOutlineItem>::New(info.Env(), outlines),
       External<BaseDocument>::New(info.Env(), this) });
 }
-Napi::Value
+JsValue
 BaseDocument::GetNamesTree(const CallbackInfo& info)
 {
   auto names = Base->GetNamesTree(info[0].As<Boolean>());
@@ -473,14 +472,14 @@ BaseDocument::GetNamesTree(const CallbackInfo& info)
   return Obj::Constructor.New(
     { External<PdfObject>::New(info.Env(), names->GetObject()) });
 }
-Napi::Value
+JsValue
 BaseDocument::CreatePage(const CallbackInfo& info)
 {
   const auto r = Rect::Unwrap(info[0].As<Object>())->GetRect();
   const auto page = Base->CreatePage(r);
   return Page::constructor.New({ External<PdfPage>::New(info.Env(), page) });
 }
-Napi::Value
+JsValue
 BaseDocument::CreatePages(const Napi::CallbackInfo& info)
 {
   const auto coll = info[0].As<Array>();
@@ -492,7 +491,7 @@ BaseDocument::CreatePages(const Napi::CallbackInfo& info)
   Base->CreatePages(rects);
   return Number::New(info.Env(), Base->GetPageCount());
 }
-Napi::Value
+JsValue
 BaseDocument::InsertPage(const Napi::CallbackInfo& info)
 {
   const auto rect = Rect::Unwrap(info[0].As<Object>())->GetRect();
@@ -528,7 +527,7 @@ BaseDocument::Append(const Napi::CallbackInfo& info)
   }
 }
 
-Napi::Value
+JsValue
 BaseDocument::GetAttachment(const CallbackInfo& info)
 {
   const string name = info[0].As<String>();
@@ -591,7 +590,7 @@ BaseDocument::AddNamedDestination(const Napi::CallbackInfo& info)
   Base->AddNamedDestination(*destination, name);
 }
 
-Napi::Value
+JsValue
 BaseDocument::CreateXObject(const CallbackInfo& info)
 {
   if (info.Length() != 1 || !info[0].IsObject() ||
@@ -605,7 +604,7 @@ BaseDocument::CreateXObject(const CallbackInfo& info)
   return XObject::Constructor.New(
     { info[0].As<Object>(), External<PdfDocument>::New(info.Env(), Base) });
 }
-Napi::Value
+JsValue
 BaseDocument::GetForm(const CallbackInfo& info)
 {
   const auto instance =
@@ -613,7 +612,7 @@ BaseDocument::GetForm(const CallbackInfo& info)
                             Boolean::New(info.Env(), true) });
   return instance;
 }
-Napi::Value
+JsValue
 BaseDocument::CreateFontSubset(const Napi::CallbackInfo& info)
 {
   if (info.Length() < 1 || !info[0].IsObject()) {

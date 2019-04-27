@@ -1,7 +1,3 @@
-//
-// Created by oak on 5/19/18.
-//
-
 #include "Action.h"
 #include "../ValidateArguments.h"
 #include "../base/Dictionary.h"

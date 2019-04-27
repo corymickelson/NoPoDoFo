@@ -10,7 +10,6 @@ import {
     NPDFCreateFontOpts,
     Callback
 } from "../index"
-import {isNullOrUndefined} from "util";
 
 /**
  * @class NDocument
@@ -144,12 +143,14 @@ export class NDocument implements nopodofo.Base {
         if (!this._form) {
             this._form = this.base.form
         }
+        this.children.push(this._form)
         return this._form
     }
     get body(): nopodofo.Object[] {
         if (!this._body) {
             this._body = this.base.body
         }
+        this.children.push(this._body)
         return this._body
     }
     get version(): NPDFVersion {
@@ -271,7 +272,7 @@ export class NDocument implements nopodofo.Base {
         this.children.push(d)
         return d
     }
-    private children: any[] = []
+    children: any[] = []
     get memory(): nopodofo.Document|undefined {
         if(this.base instanceof  nopodofo.Document) {
             return this.base
