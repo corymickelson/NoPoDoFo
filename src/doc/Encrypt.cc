@@ -35,7 +35,7 @@ using std::vector;
 
 namespace NoPoDoFo {
 
-Napi::FunctionReference Encrypt::constructor; // NOLINT
+Napi::FunctionReference Encrypt::Constructor; // NOLINT
 
 /**
  * @note PdfEncrypt is owned by the PdfDocument
@@ -45,7 +45,7 @@ Encrypt::Encrypt(const Napi::CallbackInfo& info)
   : ObjectWrap(info)
 {
 #if defined(PODOFO_HAVE_OPENSSL) || defined(PODOFO_HAVE_OPENSSL_1_1)
-  if (info[0].As<Object>().InstanceOf(Document::constructor.Value())) {
+  if (info[0].As<Object>().InstanceOf(Document::Constructor.Value())) {
     auto doc = Document::Unwrap(info[0].As<Object>());
     if (doc->GetDocument().GetEncrypt() == nullptr) {
       Error::New(info.Env(),
@@ -53,9 +53,9 @@ Encrypt::Encrypt(const Napi::CallbackInfo& info)
         .ThrowAsJavaScriptException();
       return;
     }
-    encrypt = doc->GetDocument().GetEncrypt();
+    Self = doc->GetDocument().GetEncrypt();
   } else if (info[0].IsExternal()) {
-    encrypt = info[0].As<External<PdfEncrypt>>().Data();
+    Self = info[0].As<External<PdfEncrypt>>().Data();
   } else {
     TypeError::New(info.Env(), "Invalid constructor args")
       .ThrowAsJavaScriptException();
@@ -65,12 +65,12 @@ Encrypt::Encrypt(const Napi::CallbackInfo& info)
   Error::New(info.Env(), "This build does not include OpenSSL")
     .ThrowAsJavaScriptException();
 #endif
-  dbglog = spdlog::get("DbgLog");
+  DbgLog = spdlog::get("DbgLog");
 }
 
 Encrypt::~Encrypt()
 {
-  dbglog->debug("Encrypt Cleanup");
+  DbgLog->debug("Encrypt Cleanup");
 }
 
 void
@@ -87,8 +87,8 @@ Encrypt::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceAccessor("encryptionKey", &Encrypt::GetEncryptionKey, nullptr),
       InstanceAccessor("keyLength", &Encrypt::GetKeyLength, nullptr),
       InstanceMethod("isAllowed", &Encrypt::IsAllowed) });
-  constructor = Persistent(ctor);
-  constructor.SuppressDestruct();
+  Constructor = Persistent(ctor);
+  Constructor.SuppressDestruct();
   target.Set("Encrypt", ctor);
 }
 
@@ -252,21 +252,21 @@ Encrypt::IsAllowed(const CallbackInfo& info)
   bool is = false;
   try {
     if (key == "Copy") {
-      is = encrypt->IsCopyAllowed();
+      is = Self->IsCopyAllowed();
     } else if (key == "Print") {
-      is = encrypt->IsEditAllowed();
+      is = Self->IsEditAllowed();
     } else if (key == "Edit") {
-      is = encrypt->IsEditAllowed();
+      is = Self->IsEditAllowed();
     } else if (key == "EditNotes") {
-      is = encrypt->IsEditNotesAllowed();
+      is = Self->IsEditNotesAllowed();
     } else if (key == "FillAndSign") {
-      is = encrypt->IsFillAndSignAllowed();
+      is = Self->IsFillAndSignAllowed();
     } else if (key == "Accessible") {
-      is = encrypt->IsAccessibilityAllowed();
+      is = Self->IsAccessibilityAllowed();
     } else if (key == "DocAssembly") {
-      is = encrypt->IsDocAssemblyAllowed();
+      is = Self->IsDocAssemblyAllowed();
     } else if (key == "HighPrint") {
-      is = encrypt->IsHighPrintAllowed();
+      is = Self->IsHighPrintAllowed();
     } else {
       throw Napi::Error::New(info.Env(), "Key unknown");
     }
@@ -283,28 +283,28 @@ Napi::Value
 Encrypt::GetOwnerValue(const CallbackInfo& info)
 {
   return String::New(info.Env(),
-                     reinterpret_cast<const char*>(encrypt->GetOValue()));
+                     reinterpret_cast<const char*>(Self->GetOValue()));
 }
 
 Napi::Value
 Encrypt::GetUserValue(const CallbackInfo& info)
 {
   return String::New(info.Env(),
-                     reinterpret_cast<const char*>(encrypt->GetUValue()));
+                     reinterpret_cast<const char*>(Self->GetUValue()));
 }
 
 Napi::Value
 Encrypt::GetProtectionsValue(const CallbackInfo& info)
 {
   auto perm = Object::New(info.Env());
-  perm.Set("Accessible", encrypt->IsAccessibilityAllowed());
-  perm.Set("Print", encrypt->IsPrintAllowed());
-  perm.Set("Copy", encrypt->IsCopyAllowed());
-  perm.Set("DocAssembly", encrypt->IsDocAssemblyAllowed());
-  perm.Set("Edit", encrypt->IsEditAllowed());
-  perm.Set("EditNotes", encrypt->IsEditNotesAllowed());
-  perm.Set("FillAndSign", encrypt->IsFillAndSignAllowed());
-  perm.Set("HighPrint", encrypt->IsHighPrintAllowed());
+  perm.Set("Accessible", Self->IsAccessibilityAllowed());
+  perm.Set("Print", Self->IsPrintAllowed());
+  perm.Set("Copy", Self->IsCopyAllowed());
+  perm.Set("DocAssembly", Self->IsDocAssemblyAllowed());
+  perm.Set("Edit", Self->IsEditAllowed());
+  perm.Set("EditNotes", Self->IsEditNotesAllowed());
+  perm.Set("FillAndSign", Self->IsFillAndSignAllowed());
+  perm.Set("HighPrint", Self->IsHighPrintAllowed());
   return perm;
 }
 
@@ -312,12 +312,12 @@ Napi::Value
 Encrypt::GetEncryptionKey(const CallbackInfo& info)
 {
   return String::New(
-    info.Env(), reinterpret_cast<const char*>(encrypt->GetEncryptionKey()));
+    info.Env(), reinterpret_cast<const char*>(Self->GetEncryptionKey()));
 }
 
 Napi::Value
 Encrypt::GetKeyLength(const CallbackInfo& info)
 {
-  return Number::New(info.Env(), encrypt->GetKeyLength());
+  return Number::New(info.Env(), Self->GetKeyLength());
 }
 }

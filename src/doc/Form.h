@@ -27,38 +27,41 @@
 
 using std::cout;
 using std::endl;
+using JsValue = Napi::Value;
 
 namespace NoPoDoFo {
 class Form : public Napi::ObjectWrap<Form>
 {
 public:
   explicit Form(const Napi::CallbackInfo&);
+	explicit Form(const Form&) = delete;
+	const Form&operator=(const Form&) = delete;
   ~Form();
-  static Napi::FunctionReference constructor;
+  static Napi::FunctionReference Constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
-  void SetNeedAppearances(const Napi::CallbackInfo&, const Napi::Value&);
-  Napi::Value GetNeedAppearances(const Napi::CallbackInfo&);
-  Napi::Value GetFormDictionary(const Napi::CallbackInfo&);
-  Napi::Value SigFlags(const Napi::CallbackInfo&);
-  void SetSigFlags(const Napi::CallbackInfo&, const Napi::Value&);
-  Napi::Value GetDefaultAppearance(const Napi::CallbackInfo&);
-  void SetDefaultAppearance(const Napi::CallbackInfo&, const Napi::Value&);
-  Napi::Value GetResource(const Napi::CallbackInfo&);
-  void SetResource(const Napi::CallbackInfo&, const Napi::Value&);
-  Napi::Value GetCalculationOrder(const Napi::CallbackInfo&);
-  void SetCalculationOrder(const Napi::CallbackInfo&, const Napi::Value&);
+  void SetNeedAppearances(const Napi::CallbackInfo&, const JsValue&);
+  JsValue GetNeedAppearances(const Napi::CallbackInfo&);
+  JsValue GetFormDictionary(const Napi::CallbackInfo&);
+  JsValue SigFlags(const Napi::CallbackInfo&);
+  void SetSigFlags(const Napi::CallbackInfo&, const JsValue&);
+  JsValue GetDefaultAppearance(const Napi::CallbackInfo&);
+  void SetDefaultAppearance(const Napi::CallbackInfo&, const JsValue&);
+  JsValue GetResource(const Napi::CallbackInfo&);
+  void SetResource(const Napi::CallbackInfo&, const JsValue&);
+  JsValue GetCalculationOrder(const Napi::CallbackInfo&);
+  void SetCalculationOrder(const Napi::CallbackInfo&, const JsValue&);
   void RefreshAppearances(const Napi::CallbackInfo&);
-  PoDoFo::PdfAcroForm* GetForm() { return doc.GetAcroForm(create); }
-  PoDoFo::PdfDictionary* GetDictionary()
+	PoDoFo::PdfAcroForm* GetForm() { return Doc.GetAcroForm(Create); }
+  PoDoFo::PdfDictionary* GetDictionary() const
   {
-    return &(doc.GetAcroForm()->GetObject()->GetDictionary());
+    return &(Doc.GetAcroForm()->GetObject()->GetDictionary());
   }
 
   std::map<std::string, PoDoFo::PdfObject*> GetFieldAPKeys(PoDoFo::PdfField*);
 private:
-  bool create = true;
-  PoDoFo::PdfDocument& doc;
-  std::shared_ptr<spdlog::logger> dbglog;
+  bool Create = true;
+  PoDoFo::PdfDocument& Doc;
+  std::shared_ptr<spdlog::logger> DbgLog;
 };
 }
 #endif

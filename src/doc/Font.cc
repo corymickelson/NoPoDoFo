@@ -34,18 +34,18 @@ using std::string;
 
 namespace NoPoDoFo {
 
-FunctionReference Font::constructor; // NOLINT
+FunctionReference Font::Constructor; // NOLINT
 
 Font::Font(const Napi::CallbackInfo& info)
   : ObjectWrap(info)
-  , font(*info[0].As<External<PdfFont>>().Data())
+  , Self(*info[0].As<External<PdfFont>>().Data())
 {
-  dbglog = spdlog::get("DbgLog");
+  DbgLog = spdlog::get("DbgLog");
 }
 
 Font::~Font()
 {
-  dbglog->debug("Font Cleanup");
+  DbgLog->debug("Font Cleanup");
 }
 
 void
@@ -73,8 +73,8 @@ Font::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceMethod("stringWidth", &Font::StringWidth),
       InstanceMethod("isSubsetting", &Font::IsSubsetting),
       InstanceMethod("embedSubsetFont", &Font::EmbedSubsetFont) });
-  constructor = Napi::Persistent(ctor);
-  constructor.SuppressDestruct();
+  Constructor = Napi::Persistent(ctor);
+  Constructor.SuppressDestruct();
   target.Set("Font", ctor);
 }
 Napi::Value
@@ -165,10 +165,8 @@ Font::GetIdentifier(const Napi::CallbackInfo& info)
 Napi::Value
 Font::GetEncoding(const Napi::CallbackInfo& info)
 {
-  const PdfEncoding* encoding = GetFont().GetEncoding();
-  // Encoding must be const cast to a pointer to pass via Napi ObjectWrap Constructor
-  // Encoding is immediately set back to const in the constructor.
-  return Encoding::constructor.New({ External<PdfEncoding>::New(
+  const auto encoding = GetFont().GetEncoding();
+  return Encoding::Constructor.New({ External<PdfEncoding>::New(
     info.Env(), const_cast<PdfEncoding*>(encoding)) });
 }
 Napi::Value
@@ -215,7 +213,7 @@ Font::IsItalic(const Napi::CallbackInfo& info)
 Napi::Value
 Font::StringWidth(const CallbackInfo& info)
 {
-  string text = info[0].As<String>().Utf8Value();
+  const string text = info[0].As<String>().Utf8Value();
   return Number::New(info.Env(), GetFont().GetFontMetrics()->StringWidth(text));
 }
 
@@ -228,8 +226,8 @@ Font::GetObject(const CallbackInfo& info)
 void
 Font::WriteToStream(const Napi::CallbackInfo& info)
 {
-  string content = info[0].As<String>().Utf8Value();
-  auto streamWrap = info[1].As<Object>();
+  const string content = info[0].As<String>().Utf8Value();
+  const auto streamWrap = info[1].As<Object>();
   if (!streamWrap.InstanceOf(Stream::constructor.Value())) {
     throw Error::New(info.Env(), "not an instance of NoPoDoFo::Stream");
   }

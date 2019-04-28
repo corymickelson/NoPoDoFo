@@ -40,10 +40,10 @@ public:
   JsValue ToString(const Napi::CallbackInfo&);
   JsValue IsValid(const Napi::CallbackInfo&);
 
-  PoDoFo::PdfDate GetDate() const { return *Ts; }
+  PoDoFo::PdfDate GetDate() const { return *Self; }
 
 private:
-  PoDoFo::PdfDate* Ts;
+  PoDoFo::PdfDate* Self;
   std::shared_ptr<spdlog::logger> DbgLog;
 };
 }

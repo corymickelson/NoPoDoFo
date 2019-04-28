@@ -35,7 +35,7 @@ FunctionReference Stream::constructor; // NOLINT
 
 Stream::Stream(const CallbackInfo& info)
   : ObjectWrap(info)
-  , Strm(info.Length() == 1 && info[0].IsExternal()
+  , Self(info.Length() == 1 && info[0].IsExternal()
              ? *info[0].As<External<PdfStream>>().Data()
              : *Obj::Unwrap(info[0].As<Object>())->GetObject().GetStream())
 {

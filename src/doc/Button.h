@@ -24,20 +24,24 @@
 #include <podofo/podofo.h>
 #include <spdlog/logger.h>
 
+using JsValue = Napi::Value;
+
 namespace NoPoDoFo {
 
 class Button
 {
 public:
-  explicit Button(PoDoFo::PdfField&);
+	explicit Button(PoDoFo::PdfField&);
+  explicit Button(const Button&) = delete;
+  const Button&operator=(const Button&) = delete;
   ~Button();
-  Napi::Value GetCaption(const Napi::CallbackInfo&);
-  void SetCaption(const Napi::CallbackInfo&, const Napi::Value&);
+  JsValue GetCaption(const Napi::CallbackInfo&);
+  void SetCaption(const Napi::CallbackInfo&, const JsValue&);
 
-  PoDoFo::PdfButton* button;
+  PoDoFo::PdfButton* Btn;
 
-private:
-  std::shared_ptr<spdlog::logger> dbglog;
+protected:
+	std::shared_ptr<spdlog::logger> DbgLog;
 };
 }
 #endif // NPDF_BUTTON_H

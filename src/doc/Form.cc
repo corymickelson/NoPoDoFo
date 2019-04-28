@@ -41,23 +41,23 @@ using std::stringstream;
 
 namespace NoPoDoFo {
 
-FunctionReference Form::constructor; // NOLINT
+FunctionReference Form::Constructor; // NOLINT
 
 Form::Form(const Napi::CallbackInfo& info)
   : ObjectWrap(info)
-  , create(info[1].As<Boolean>())
-  , doc(info[0].IsExternal()
+  , Create(info[1].As<Boolean>())
+  , Doc(info[0].IsExternal()
           ? *info[0].As<External<BaseDocument>>().Data()->Base
-          : *(info[0].As<Object>().InstanceOf(Document::constructor.Value())
+          : *(info[0].As<Object>().InstanceOf(Document::Constructor.Value())
                 ? Document::Unwrap(info[0].As<Object>())->Base
                 : StreamDocument::Unwrap(info[0].As<Object>())->Base))
 {
-  dbglog = spdlog::get("DbgLog");
+  DbgLog = spdlog::get("DbgLog");
 }
 
 Form::~Form()
 {
-  dbglog->debug("Form Cleanup");
+  DbgLog->debug("Form Cleanup");
 }
 
 void
@@ -77,12 +77,12 @@ Form::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceAccessor(
         "CO", &Form::GetCalculationOrder, &Form::SetCalculationOrder),
       InstanceAccessor("DR", &Form::GetResource, &Form::SetResource) });
-  constructor = Napi::Persistent(ctor);
-  constructor.SuppressDestruct();
+  Constructor = Napi::Persistent(ctor);
+  Constructor.SuppressDestruct();
   target.Set("Form", ctor);
 }
 void
-Form::SetNeedAppearances(const CallbackInfo& info, const Napi::Value& value)
+Form::SetNeedAppearances(const CallbackInfo& info, const JsValue& value)
 {
   if (value.IsEmpty()) {
     throw Napi::Error::New(info.Env(), "value required");
@@ -93,13 +93,13 @@ Form::SetNeedAppearances(const CallbackInfo& info, const Napi::Value& value)
   GetForm()->SetNeedAppearances(value.As<Boolean>());
 }
 
-Napi::Value
+JsValue
 Form::GetNeedAppearances(const CallbackInfo& info)
 {
   return Napi::Boolean::New(info.Env(), GetForm()->GetNeedAppearances());
 }
 
-Napi::Value
+JsValue
 Form::GetFormDictionary(const CallbackInfo& info)
 {
   PdfDictionary& obj = GetForm()->GetObject()->GetDictionary();
@@ -109,7 +109,7 @@ Form::GetFormDictionary(const CallbackInfo& info)
   return ptr;
 }
 
-Napi::Value
+JsValue
 Form::SigFlags(const CallbackInfo& info)
 {
   long flag = 0;
@@ -120,7 +120,7 @@ Form::SigFlags(const CallbackInfo& info)
 }
 
 void
-Form::SetSigFlags(const CallbackInfo& info, const Napi::Value& value)
+Form::SetSigFlags(const CallbackInfo& info, const JsValue& value)
 {
   if (!value.IsNumber()) {
     TypeError::New(info.Env(), "value must be of type number")
@@ -145,7 +145,7 @@ Form::SetSigFlags(const CallbackInfo& info, const Napi::Value& value)
   }
 }
 
-Napi::Value
+JsValue
 Form::GetDefaultAppearance(const CallbackInfo& info)
 {
   if (GetDictionary()->HasKey(Name::DA)) {
@@ -161,7 +161,7 @@ Form::GetDefaultAppearance(const CallbackInfo& info)
 }
 
 void
-Form::SetDefaultAppearance(const CallbackInfo& info, const Napi::Value& value)
+Form::SetDefaultAppearance(const CallbackInfo& info, const JsValue& value)
 {
   if (!value.IsString()) {
     Error::New(info.Env(), "Value must be a string")
@@ -179,13 +179,13 @@ Form::SetDefaultAppearance(const CallbackInfo& info, const Napi::Value& value)
   }
 }
 
-Napi::Value
+JsValue
 Form::GetResource(const CallbackInfo& info)
 {
   if (GetDictionary()->HasKey(Name::DR)) {
     PdfObject* drObj = GetDictionary()->GetKey(Name::DR);
     if (drObj->IsReference()) {
-      drObj = doc.GetObjects()->GetObject(drObj->GetReference());
+      drObj = Doc.GetObjects()->GetObject(drObj->GetReference());
     }
     return Dictionary::Constructor.New(
       { External<PdfObject>::New(info.Env(), drObj),
@@ -195,7 +195,7 @@ Form::GetResource(const CallbackInfo& info)
 }
 
 void
-Form::SetResource(const CallbackInfo& info, const Napi::Value& value)
+Form::SetResource(const CallbackInfo& info, const JsValue& value)
 {
   if (!value.As<Object>().InstanceOf(Dictionary::Constructor.Value())) {
     TypeError::New(
@@ -220,7 +220,7 @@ Form::SetResource(const CallbackInfo& info, const Napi::Value& value)
   }
 }
 
-Napi::Value
+JsValue
 Form::GetCalculationOrder(const CallbackInfo& info)
 {
   Array js = Array::New(info.Env());
@@ -234,7 +234,7 @@ Form::GetCalculationOrder(const CallbackInfo& info)
       auto arr = co->GetArray();
       for (const auto& item : arr) {
         if (item.IsReference()) {
-          auto value = doc.GetObjects()->GetObject(item.GetReference());
+          auto value = Doc.GetObjects()->GetObject(item.GetReference());
           auto nObj = Obj::Constructor.New(
             { External<PdfObject>::New(info.Env(), value) });
           if (!value->IsDictionary()) {
@@ -255,7 +255,7 @@ Form::GetCalculationOrder(const CallbackInfo& info)
 }
 
 void
-Form::SetCalculationOrder(const CallbackInfo& info, const Napi::Value& value)
+Form::SetCalculationOrder(const CallbackInfo& info, const JsValue& value)
 {
   Error::New(info.Env(), "Not yet implemented").ThrowAsJavaScriptException();
 }
@@ -277,7 +277,7 @@ Form::RefreshAppearances(const CallbackInfo& info)
     auto obj = info[0].As<Object>();
     if (obj.InstanceOf(Ref::Constructor.Value())) {
       auto r = Ref::Unwrap(obj);
-      PdfObject* appObj = doc.GetObjects()->GetObject(*r->Self);
+      PdfObject* appObj = Doc.GetObjects()->GetObject(*r->Self);
       PdfXObject x(appObj);
       xApp = &x;
     } else if (obj.InstanceOf(XObject::Constructor.Value())) {
@@ -299,8 +299,8 @@ Form::RefreshAppearances(const CallbackInfo& info)
   if (!GetDictionary()->HasKey(Name::FIELDS)) {
     return;
   }
-  for (int i = 0; i < doc.GetPageCount(); i++) {
-    PdfPage* page = doc.GetPage(i);
+  for (int i = 0; i < Doc.GetPageCount(); i++) {
+    PdfPage* page = Doc.GetPage(i);
     for (int ii = 0; ii < page->GetNumFields(); ++ii) {
       if (page->GetField(ii).GetWidgetAnnotation()->HasAppearanceStream()) {
         PdfField iiField = page->GetField(ii);

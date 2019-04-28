@@ -24,13 +24,13 @@ Action::Action(const Napi::CallbackInfo& info)
                          { 1, { nullopt, option(napi_number) } } });
   // Create Copy Constructor Action
   if (opts[0] == 0 && info.Length() == 1) {
-    Act =
+    Self =
       new PdfAction(info[0].As<External<PdfAction>>().Data()->GetObject());
   }
   // Create a new Action
   else if (opts[0] == 1 && opts[1] == 1) {
     PdfDocument* doc;
-    if (info[0].As<Object>().InstanceOf(Document::constructor.Value())) {
+    if (info[0].As<Object>().InstanceOf(Document::Constructor.Value())) {
       doc = Document::Unwrap(info[0].As<Object>())->Base;
     } else if (info[0].As<Object>().InstanceOf(
                  StreamDocument::constructor.Value())) {
@@ -41,7 +41,7 @@ Action::Action(const Napi::CallbackInfo& info)
       return;
     }
     const auto t = static_cast<EPdfAction>(info[1].As<Number>().Uint32Value());
-    Act = new PdfAction(t, doc);
+    Self = new PdfAction(t, doc);
   } else {
     TypeError::New(
       info.Env(),
@@ -53,7 +53,7 @@ Action::Action(const Napi::CallbackInfo& info)
 Action::~Action()
 {
   DbgLog->debug("Action Cleanup");
-  delete Act;
+  delete Self;
 }
 void
 Action::Initialize(Napi::Env& env, Napi::Object& target)

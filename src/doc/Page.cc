@@ -126,7 +126,7 @@ Page::GetField(const Napi::Env& env, int index)
       return PushButton::constructor.New(
         { External<PdfField>::New(env, &field) });
     case ePdfField_CheckBox:
-      return CheckBox::constructor.New(
+      return CheckBox::Constructor.New(
         { External<PdfField>::New(env, &field) });
     case ePdfField_RadioButton:
       Error::New(env, "RadioButton not yet implemented")
@@ -136,7 +136,7 @@ Page::GetField(const Napi::Env& env, int index)
       return TextField::Constructor.New(
         { External<PdfField>::New(env, &field) });
     case ePdfField_ComboBox:
-      return ComboBox::constructor.New(
+      return ComboBox::Constructor.New(
         { External<PdfField>::New(env, &field) });
     case ePdfField_ListBox:
       return ListBox::constructor.New({ External<PdfField>::New(env, &field) });
@@ -362,7 +362,7 @@ Page::CreateField(const CallbackInfo& info)
       .ThrowAsJavaScriptException();
     return info.Env().Undefined();
   }
-  if (!info[2].As<Object>().InstanceOf(Form::constructor.Value())) {
+  if (!info[2].As<Object>().InstanceOf(Form::Constructor.Value())) {
     TypeError::New(info.Env(), "Requires in instance of Form")
       .ThrowAsJavaScriptException();
     return info.Env().Undefined();
@@ -378,14 +378,14 @@ Page::CreateField(const CallbackInfo& info)
     case ePdfField_PushButton:
       return PushButton::constructor.New({ widget->Value(), form->Value() });
     case ePdfField_CheckBox:
-      return CheckBox::constructor.New({ widget->Value(), form->Value() });
+      return CheckBox::Constructor.New({ widget->Value(), form->Value() });
     case ePdfField_RadioButton:
       break;
     case ePdfField_TextField:
       return TextField::Constructor.New(
         { widget->Value(), form->Value(), opts });
     case ePdfField_ComboBox:
-      return ComboBox::constructor.New({ widget->Value(), form->Value() });
+      return ComboBox::Constructor.New({ widget->Value(), form->Value() });
     case ePdfField_ListBox:
       return ListBox::constructor.New({ widget->Value(), form->Value() });
     case ePdfField_Signature:

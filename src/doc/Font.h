@@ -27,44 +27,47 @@
 
 using std::cout;
 using std::endl;
+using JsValue = Napi::Value;
 
 namespace NoPoDoFo {
 class Font : public Napi::ObjectWrap<Font>
 {
 public:
   explicit Font(const Napi::CallbackInfo& callbackInfo);
+	explicit Font(const Font&) = delete;
+	const Font&operator=(const Font&) = delete;
   ~Font();
-  static Napi::FunctionReference constructor;
+  static Napi::FunctionReference Constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
-  Napi::Value GetFontSize(const Napi::CallbackInfo&);
-  void SetFontSize(const Napi::CallbackInfo&, const Napi::Value&);
-  Napi::Value GetFontScale(const Napi::CallbackInfo&);
-  void SetFontScale(const Napi::CallbackInfo&, const Napi::Value&);
-  Napi::Value GetFontCharSpace(const Napi::CallbackInfo&);
-  void SetFontCharSpace(const Napi::CallbackInfo&, const Napi::Value&);
-  Napi::Value GetWordSpace(const Napi::CallbackInfo&);
-  void SetWordSpace(const Napi::CallbackInfo&, const Napi::Value&);
-  Napi::Value IsUnderlined(const Napi::CallbackInfo&);
-  void SetUnderline(const Napi::CallbackInfo&, const Napi::Value&);
-  Napi::Value IsStrikeOut(const Napi::CallbackInfo&);
-  void SetStrikeOut(const Napi::CallbackInfo&, const Napi::Value&);
-  Napi::Value GetIdentifier(const Napi::CallbackInfo&);
-  Napi::Value GetEncoding(const Napi::CallbackInfo&);
-  Napi::Value GetFontMetric(const Napi::CallbackInfo&);
-  Napi::Value IsBold(const Napi::CallbackInfo&);
-  Napi::Value IsItalic(const Napi::CallbackInfo&);
-  Napi::Value StringWidth(const Napi::CallbackInfo&);
-  Napi::Value GetObject(const Napi::CallbackInfo&);
+  JsValue GetFontSize(const Napi::CallbackInfo&);
+  void SetFontSize(const Napi::CallbackInfo&, const JsValue&);
+  JsValue GetFontScale(const Napi::CallbackInfo&);
+  void SetFontScale(const Napi::CallbackInfo&, const JsValue&);
+  JsValue GetFontCharSpace(const Napi::CallbackInfo&);
+  void SetFontCharSpace(const Napi::CallbackInfo&, const JsValue&);
+  JsValue GetWordSpace(const Napi::CallbackInfo&);
+  void SetWordSpace(const Napi::CallbackInfo&, const JsValue&);
+  JsValue IsUnderlined(const Napi::CallbackInfo&);
+  void SetUnderline(const Napi::CallbackInfo&, const JsValue&);
+  JsValue IsStrikeOut(const Napi::CallbackInfo&);
+  void SetStrikeOut(const Napi::CallbackInfo&, const JsValue&);
+  JsValue GetIdentifier(const Napi::CallbackInfo&);
+  JsValue GetEncoding(const Napi::CallbackInfo&);
+  JsValue GetFontMetric(const Napi::CallbackInfo&);
+  JsValue IsBold(const Napi::CallbackInfo&);
+  JsValue IsItalic(const Napi::CallbackInfo&);
+  JsValue StringWidth(const Napi::CallbackInfo&);
+  JsValue GetObject(const Napi::CallbackInfo&);
   void WriteToStream(const Napi::CallbackInfo&);
   void EmbedFont(const Napi::CallbackInfo&);
-  Napi::Value IsSubsetting(const Napi::CallbackInfo&);
+  JsValue IsSubsetting(const Napi::CallbackInfo&);
   void EmbedSubsetFont(const Napi::CallbackInfo&);
 
-  PoDoFo::PdfFont& GetFont() { return font; }
+  PoDoFo::PdfFont& GetFont() { return Self; }
 
 private:
-  PoDoFo::PdfFont& font; // owned by the document
-  std::shared_ptr<spdlog::logger> dbglog;
+  PoDoFo::PdfFont& Self; // owned by the document
+  std::shared_ptr<spdlog::logger> DbgLog;
 };
 }
 #endif // NPDF_FONT_H

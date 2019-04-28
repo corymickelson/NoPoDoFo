@@ -24,13 +24,17 @@
 #include <podofo/podofo.h>
 #include <spdlog/logger.h>
 
+using JsValue = Napi::Value;
+
 namespace NoPoDoFo {
 class ExtGState : public Napi::ObjectWrap<ExtGState>
 {
 public:
-  explicit ExtGState(const Napi::CallbackInfo& info);
+	explicit ExtGState(const Napi::CallbackInfo& info);
+  explicit ExtGState(const ExtGState&) = delete;
+  const ExtGState&operator=(const ExtGState&) = delete;
   ~ExtGState();
-  static Napi::FunctionReference constructor;
+  static Napi::FunctionReference Constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
   void SetFillOpacity(const Napi::CallbackInfo& info);
   void SetStrokeOpacity(const Napi::CallbackInfo& info);
@@ -42,11 +46,11 @@ public:
   void SetRenderingIntent(const Napi::CallbackInfo& info);
   void SetFrequency(const Napi::CallbackInfo& info);
 
-  PoDoFo::PdfExtGState* GetExtGState() { return self.get(); }
+  PoDoFo::PdfExtGState* GetExtGState() { return Self.get(); }
 
 private:
-  std::unique_ptr<PoDoFo::PdfExtGState> self;
-  std::shared_ptr<spdlog::logger> dbglog;
+  std::unique_ptr<PoDoFo::PdfExtGState> Self;
+  std::shared_ptr<spdlog::logger> DbgLog;
 };
 }
 #endif

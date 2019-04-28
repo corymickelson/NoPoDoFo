@@ -41,7 +41,7 @@ SimpleTable::SimpleTable(const CallbackInfo& info)
   : ObjectWrap(info)
 {
   dbglog = spdlog::get("DbgLog");
-  if (info[0].As<Object>().InstanceOf(Document::constructor.Value())) {
+  if (info[0].As<Object>().InstanceOf(Document::Constructor.Value())) {
     doc = Document::Unwrap(info[0].As<Object>())->Base;
   } else if (info[0].As<Object>().InstanceOf(
                StreamDocument::constructor.Value())) {
@@ -120,7 +120,7 @@ SimpleTable::GetFont(const CallbackInfo& info)
 {
   const int col = info[0].As<Number>();
   const int row = info[1].As<Number>();
-  return Font::constructor.New(
+  return Font::Constructor.New(
     { External<PdfFont>::New(info.Env(), model->GetFont(col, row)) });
 }
 
@@ -129,7 +129,7 @@ SimpleTable::SetFont(const CallbackInfo& info)
 {
   auto value = info[0].As<Object>();
   if (!value.IsObject() ||
-      !value.As<Object>().InstanceOf(Font::constructor.Value())) {
+      !value.As<Object>().InstanceOf(Font::Constructor.Value())) {
     throw Error::New(info.Env(), "value must be an instance of NoPoDoFo Font");
   }
   model->SetFont(&Font::Unwrap(value.As<Object>())->GetFont());
@@ -220,7 +220,7 @@ SimpleTable::SetForegroundColor(const CallbackInfo& info,
                                 const Napi::Value& value)
 {
 
-  model->SetForegroundColor(*Color::Unwrap(info[0].As<Object>())->Clr);
+  model->SetForegroundColor(*Color::Unwrap(info[0].As<Object>())->Self);
 }
 
 Value
@@ -237,7 +237,7 @@ void
 SimpleTable::SetBackgroundColor(const CallbackInfo& info,
                                 const Napi::Value& value)
 {
-  model->SetBackgroundColor(*Color::Unwrap(info[0].As<Object>())->Clr);
+  model->SetBackgroundColor(*Color::Unwrap(info[0].As<Object>())->Self);
 }
 
 Value

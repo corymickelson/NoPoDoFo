@@ -24,27 +24,31 @@
 #include <podofo/podofo.h>
 #include <spdlog/logger.h>
 
+using JsValue = Napi::Value;
+
 namespace NoPoDoFo {
 
 class Destination : public Napi::ObjectWrap<Destination>
 {
 public:
-  static Napi::FunctionReference constructor;
+  static Napi::FunctionReference Constructor;
   explicit Destination(const Napi::CallbackInfo& info);
+	explicit Destination(const Destination& ) = delete;
+	const Destination&operator=(const Destination&) = delete;
   ~Destination();
   static void Initialize(Napi::Env& env, Napi::Object& target);
-  Napi::Value GetType(const Napi::CallbackInfo&);
-  Napi::Value GetZoom(const Napi::CallbackInfo&);
-  Napi::Value GetRect(const Napi::CallbackInfo&);
-  Napi::Value GetTop(const Napi::CallbackInfo&);
-  Napi::Value GetLeft(const Napi::CallbackInfo&);
-  Napi::Value GetDValue(const Napi::CallbackInfo&);
-  Napi::Value GetObject(const Napi::CallbackInfo&);
+  JsValue GetType(const Napi::CallbackInfo&);
+  JsValue GetZoom(const Napi::CallbackInfo&);
+  JsValue GetRect(const Napi::CallbackInfo&);
+  JsValue GetTop(const Napi::CallbackInfo&);
+  JsValue GetLeft(const Napi::CallbackInfo&);
+  JsValue GetDValue(const Napi::CallbackInfo&);
+  JsValue GetObject(const Napi::CallbackInfo&);
   void AddToDictionary(const Napi::CallbackInfo&);
-  PoDoFo::PdfDestination& GetDestination() { return *destination; }
-  PoDoFo::PdfDestination* destination;
+  PoDoFo::PdfDestination& GetDestination() const { return *Self; }
+  PoDoFo::PdfDestination* Self;
 private:
-  std::shared_ptr<spdlog::logger> dbglog;
+  std::shared_ptr<spdlog::logger> DbgLog;
 };
 
 }

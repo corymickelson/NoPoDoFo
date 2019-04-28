@@ -27,20 +27,19 @@ using std::endl;
 
 namespace NoPoDoFo {
 
-FunctionReference CheckBox::constructor; // NOLINT
+FunctionReference CheckBox::Constructor; // NOLINT
 
 CheckBox::CheckBox(const CallbackInfo& info)
   : ObjectWrap<CheckBox>(info)
   , Field(ePdfField_CheckBox, info)
   , Button(Field::GetField())
-  , field(Field::GetField())
+  , FormField(Field::GetField())
 {
-  dbglog = spdlog::get("DbgLog");
 }
 
 CheckBox::~CheckBox()
 {
-  dbglog->debug("CheckBox Cleanup");
+  Field::DbgLog->debug("CheckBox Cleanup");
 }
 
 void
@@ -77,19 +76,19 @@ CheckBox::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceMethod("setMouseAction", &CheckBox::SetMouseAction),
       InstanceMethod("setPageAction", &CheckBox::SetPageAction),
       InstanceMethod("setHighlightingMode", &CheckBox::SetHighlightingMode) });
-  constructor = Napi::Persistent(ctor);
-  constructor.SuppressDestruct();
+  Constructor = Napi::Persistent(ctor);
+  Constructor.SuppressDestruct();
 
   target.Set("Checkbox", ctor);
 }
-Napi::Value
+JsValue
 CheckBox::IsChecked(const CallbackInfo& info)
 {
   return Napi::Boolean::New(info.Env(), GetCheckBox().IsChecked());
 }
 
 void
-CheckBox::SetChecked(const CallbackInfo& info, const Napi::Value& value)
+CheckBox::SetChecked(const CallbackInfo& info, const JsValue& value)
 {
   if (!value.IsBoolean()) {
     throw Napi::TypeError::New(info.Env(),

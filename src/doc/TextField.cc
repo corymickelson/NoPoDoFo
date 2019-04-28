@@ -42,7 +42,7 @@ TextField::TextField(const CallbackInfo& info)
   dbglog = spdlog::get("DbgLog");
   if (info[info.Length() - 1].IsObject() &&
       !info[info.Length() - 1].As<Object>().InstanceOf(
-        Document::constructor.Value()) &&
+        Document::Constructor.Value()) &&
       !info[info.Length() - 1].As<Object>().InstanceOf(
         StreamDocument::constructor.Value())) {
     auto opts = info[info.Length() - 1].As<Object>();

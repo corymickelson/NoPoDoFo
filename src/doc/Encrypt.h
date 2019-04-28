@@ -27,26 +27,29 @@
 #include <spdlog/logger.h>
 using std::cout;
 using std::endl;
+using JsValue = Napi::Value;
 
 namespace NoPoDoFo {
 class Encrypt : public Napi::ObjectWrap<Encrypt>
 {
 public:
-  explicit Encrypt(const Napi::CallbackInfo&);
+	explicit Encrypt(const Napi::CallbackInfo&);
+  explicit Encrypt(const Encrypt&) = delete;
+  const Encrypt&operator=(const Encrypt&) = delete;
   ~Encrypt();
-  static Napi::FunctionReference constructor;
+  static Napi::FunctionReference Constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
-  static Napi::Value CreateEncrypt(const Napi::CallbackInfo&);
-  Napi::Value IsAllowed(const Napi::CallbackInfo&);
-  Napi::Value GetOwnerValue(const Napi::CallbackInfo&);
-  Napi::Value GetUserValue(const Napi::CallbackInfo&);
-  Napi::Value GetProtectionsValue(const Napi::CallbackInfo&);
-  Napi::Value GetEncryptionKey(const Napi::CallbackInfo&);
-  Napi::Value GetKeyLength(const Napi::CallbackInfo&);
+  static JsValue CreateEncrypt(const Napi::CallbackInfo&);
+  JsValue IsAllowed(const Napi::CallbackInfo&);
+  JsValue GetOwnerValue(const Napi::CallbackInfo&);
+  JsValue GetUserValue(const Napi::CallbackInfo&);
+  JsValue GetProtectionsValue(const Napi::CallbackInfo&);
+  JsValue GetEncryptionKey(const Napi::CallbackInfo&);
+  JsValue GetKeyLength(const Napi::CallbackInfo&);
 
-  const PoDoFo::PdfEncrypt* encrypt;
+  const PoDoFo::PdfEncrypt* Self;
 private:
-  std::shared_ptr<spdlog::logger> dbglog;
+  std::shared_ptr<spdlog::logger> DbgLog;
 };
 }
 #endif

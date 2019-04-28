@@ -40,7 +40,7 @@ using std::stringstream;
 
 namespace NoPoDoFo {
 
-FunctionReference Document::constructor; // NOLINT
+FunctionReference Document::Constructor; // NOLINT
 
 void
 Document::Initialize(Napi::Env& env, Napi::Object& target)
@@ -97,20 +97,19 @@ Document::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceMethod("getFont", &Document::GetFont),
       InstanceMethod("listFonts", &Document::ListFonts),
       InstanceMethod("addNamedDestination", &Document::AddNamedDestination) });
-  constructor = Napi::Persistent(ctor);
-  constructor.SuppressDestruct();
+  Constructor = Napi::Persistent(ctor);
+  Constructor.SuppressDestruct();
   target.Set("Document", ctor);
 }
 Document::Document(const CallbackInfo& info)
   : ObjectWrap(info)
   , BaseDocument(info, true)
 {
-  dbglog = spdlog::get("DbgLog");
 }
 
 Document::~Document()
 {
-  dbglog->debug("Document Cleanup");
+  DbgLog->debug("Document Cleanup");
 }
 
 void
@@ -120,7 +119,7 @@ Document::SetPassword(const CallbackInfo& info)
   if (value.IsEmpty() || !value.IsString()) {
     throw Napi::Error::New(info.Env(), "password must be of type string");
   }
-  string password = value.As<String>().Utf8Value();
+  const auto password = value.As<String>().Utf8Value();
   try {
     GetDocument().SetPassword(password);
   } catch (PdfError& err) {
@@ -129,14 +128,14 @@ Document::SetPassword(const CallbackInfo& info)
     ErrorHandler(err, info);
   }
 }
-Napi::Value
+JsValue
 Document::ListFonts(const CallbackInfo& info)
 {
-  fonts.clear();
-  this->fonts = Document::GetFonts(GetDocument());
+  this->Fonts.clear();
+  this->Fonts = Document::GetFonts(GetDocument());
   auto list = Array::New(info.Env());
   uint32_t n = 0;
-  for (auto item : fonts) {
+  for (auto item : this->Fonts) {
     string itemId = item->GetIdentifier().GetName();
     string itemName = item->GetFontMetrics()->GetFontname();
     auto v = Object::New(info.Env());
@@ -155,8 +154,8 @@ Document::GetPdfFont(PdfMemDocument& doc, string_view id)
 {
   vector<PdfFont*> fonts = Document::GetFonts(doc);
   for (auto item : fonts) {
-    string itemId = item->GetIdentifier().GetName();
-    string itemName = item->GetFontMetrics()->GetFontname();
+    const auto itemId = item->GetIdentifier().GetName();
+    const auto itemName = item->GetFontMetrics()->GetFontname();
     if (itemId == id || itemName == id) {
       if (item->IsSubsetting()) {
         cout << "WARNING: This is a font subset" << endl;
@@ -166,26 +165,22 @@ Document::GetPdfFont(PdfMemDocument& doc, string_view id)
   }
   return nullptr;
 }
-Value
+JsValue
 Document::GetFont(const CallbackInfo& info)
 {
   try {
     auto id = info[0].As<String>().Utf8Value();
-    if (fonts.empty()) {
-      this->fonts = Document::GetFonts(GetDocument());
+    if (Fonts.empty()) {
+      this->Fonts = Document::GetFonts(GetDocument());
     }
-    for (auto item : fonts) {
-      string itemId = item->GetIdentifier().GetName();
-      string itemName = item->GetFontMetrics()->GetFontname();
+    for (auto item : Fonts) {
+      const auto itemId = item->GetIdentifier().GetName();
+      const auto itemName = item->GetFontMetrics()->GetFontname();
       if (itemId == id || itemName == id) {
-        //        EscapableHandleScope scope(info.Env());
-        //        return scope.Escape(
-        //          Font::constructor.New({ External<PdfFont>::New(info.Env(),
-        //          item) }));
         if (item->IsSubsetting()) {
           cout << "WARNING: This is a font subset" << endl;
         }
-        return Font::constructor.New(
+        return Font::Constructor.New(
           { External<PdfFont>::New(info.Env(), item) });
       }
     }
@@ -251,7 +246,7 @@ Document::DeletePages(const CallbackInfo& info)
 }
 
 void
-Document::SetEncrypt(const CallbackInfo& info, const Napi::Value& value)
+Document::SetEncrypt(const CallbackInfo& info, const JsValue& value)
 {
   if (!value.IsExternal()) {
     TypeError::New(
@@ -270,7 +265,7 @@ Document::SetEncrypt(const CallbackInfo& info, const Napi::Value& value)
     throw Error::New(info.Env(), msg.str());
   }
 }
-Napi::Value
+JsValue
 Document::GetTrailer(const CallbackInfo& info)
 {
   const PdfObject* trailerPdObject = GetDocument().GetTrailer();
@@ -281,7 +276,7 @@ Document::GetTrailer(const CallbackInfo& info)
   return instance;
 }
 
-Napi::Value
+JsValue
 Document::GetCatalog(const CallbackInfo& info)
 {
   auto* catalog = GetDocument().GetCatalog();
@@ -297,20 +292,20 @@ class DocumentWriteAsync : public AsyncWorker
 public:
   DocumentWriteAsync(Napi::Function& cb, Document& doc, string arg)
     : Napi::AsyncWorker(cb, "document_write_async", doc.Value())
-    , doc(doc)
-    , arg(std::move(arg))
+    , Doc(doc)
+    , Arg(std::move(arg))
   {}
 
 private:
-  Document& doc;
-  string arg = "";
+  Document& Doc;
+  string Arg = "";
 
 protected:
   void Execute() override
   {
     try {
-      PdfOutputDevice device(arg.c_str());
-      doc.GetDocument().Write(&device);
+      PdfOutputDevice device(Arg.c_str());
+      Doc.GetDocument().Write(&device);
     } catch (PdfError& err) {
       SetError(String::New(Env(), ErrorHandler::WriteMsg(err)));
     } catch (Napi::Error& err) {
@@ -320,46 +315,46 @@ protected:
   void OnOK() override
   {
     HandleScope scope(Env());
-    Callback().Call({ Env().Null(), String::New(Env(), arg) });
+    Callback().Call({ Env().Null(), String::New(Env(), Arg) });
   }
 };
 
 class DocumentLoadBufferAsync : public AsyncWorker
 {
 public:
-  DocumentLoadBufferAsync(Function& _cb,
-                          Document& _doc,
-                          PdfRefCountedInputDevice* _input,
-                          bool _forUpdate,
-                          string _pwd)
-    : AsyncWorker(_cb, "document_load_buffer_async", _doc.Value())
-    , doc(_doc)
-    , data(_input)
-    , forUpdate(_forUpdate)
-    , pwd(std::move(_pwd))
+  DocumentLoadBufferAsync(Function& cb,
+                          Document& doc,
+                          PdfRefCountedInputDevice* input,
+                          bool forUpdate,
+                          string pwd)
+    : AsyncWorker(cb, "document_load_buffer_async", doc.Value())
+    , Doc(doc)
+    , Data(input)
+    , ForUpdate(forUpdate)
+    , Pwd(std::move(pwd))
   {}
-  ~DocumentLoadBufferAsync() { delete data; }
+  ~DocumentLoadBufferAsync() { delete Data; }
 
 private:
-  Document& doc;
-  PdfRefCountedInputDevice* data;
-  bool forUpdate;
-  string pwd;
+  Document& Doc;
+  PdfRefCountedInputDevice* Data;
+  bool ForUpdate;
+  string Pwd;
 
 protected:
   void Execute() override
   {
-    TRY_LOAD(doc.GetDocument(),
+    TRY_LOAD(Doc.GetDocument(),
             string(""),
-            *data,
-            pwd,
-            forUpdate,
+            *Data,
+            Pwd,
+            ForUpdate,
             DocumentInputDevice::Memory);
   }
   void OnOK() override
   {
     HandleScope scope(Env());
-    Callback().Call({ Env().Null(), doc.Value() });
+    Callback().Call({ Env().Null(), Doc.Value() });
   }
 };
 
@@ -367,38 +362,38 @@ class DocumentLoadAsync : public AsyncWorker
 {
 public:
   DocumentLoadAsync(Function& cb,
-                    Document& _doc,
-                    string _arg,
-                    bool _forUpdate,
-                    string _pwd)
-    : AsyncWorker(cb, "document_load_async", _doc.Value())
-    , doc(_doc)
-    , arg(std::move(_arg))
-    , pwd(std::move(_pwd))
-    , forUpdate(_forUpdate)
+                    Document& doc,
+                    string arg,
+                    bool forUpdate,
+                    string pwd)
+    : AsyncWorker(cb, "document_load_async", doc.Value())
+    , Doc(doc)
+    , Arg(std::move(arg))
+    , Pwd(std::move(pwd))
+    , ForUpdate(forUpdate)
   {}
 
 private:
-  Document& doc;
-  string arg;
-  string pwd;
-  bool forUpdate;
+  Document& Doc;
+  string Arg;
+  string Pwd;
+  bool ForUpdate;
 
   // AsyncWorker interface
 protected:
   void Execute() override
   {
-    TRY_LOAD(doc.GetDocument(),
-            arg,
+    TRY_LOAD(Doc.GetDocument(),
+            Arg,
             nullptr,
-            pwd,
-            forUpdate,
+            Pwd,
+            ForUpdate,
             DocumentInputDevice::Disk);
   }
   void OnOK() override
   {
     HandleScope scope(Env());
-    Callback().Call({ Env().Null(), doc.Value() });
+    Callback().Call({ Env().Null(), Doc.Value() });
   }
 };
 
@@ -408,7 +403,7 @@ protected:
  * @param info
  * @return
  */
-Napi::Value
+JsValue
 Document::Load(const CallbackInfo& info)
 {
   if (info.Length() < 2) {
@@ -451,7 +446,7 @@ Document::Load(const CallbackInfo& info)
       .ThrowAsJavaScriptException();
     return info.Env().Undefined();
   }
-  loadForIncrementalUpdates = forUpdate;
+  LoadForIncrementalUpdates = forUpdate;
   worker->Queue();
 
   return info.Env().Undefined();
@@ -462,31 +457,31 @@ class DocumentWriteBufferAsync final : public AsyncWorker
 public:
   DocumentWriteBufferAsync(Function& cb, Document& doc)
     : AsyncWorker(cb, "document_write_buffer_async", doc.Value())
-    , doc(doc)
+    , Doc(doc)
   {}
 
 private:
-  Document& doc;
-  PdfRefCountedBuffer output;
+  Document& Doc;
+  PdfRefCountedBuffer Output;
 
 protected:
   void Execute() override
   {
-    PdfOutputDevice device(&output);
-    doc.GetDocument().Write(&device);
+    PdfOutputDevice device(&Output);
+    Doc.GetDocument().Write(&device);
   }
   void OnOK() override
   {
-    if (output.GetSize() == 0) {
+    if (Output.GetSize() == 0) {
       SetError("Error, failed to write to buffer");
     }
     Callback().Call({ Env().Null(),
                       Buffer<char>::Copy(
-                        Env(), output.GetBuffer(), output.GetSize()) });
+                        Env(), Output.GetBuffer(), Output.GetSize()) });
   }
 };
 
-Napi::Value
+JsValue
 Document::Write(const CallbackInfo& info)
 {
   try {
@@ -517,12 +512,12 @@ Document::Write(const CallbackInfo& info)
 class GCAsync : public AsyncWorker
 {
 public:
-  GCAsync(const Function& _cb, PdfRefCountedInputDevice* _in, string& _pwd)
-    : AsyncWorker(_cb, "gc_async")
-    , in(_in)
-    , pwd(std::move(_pwd))
+  GCAsync(const Function& cb, PdfRefCountedInputDevice* in, string& pwd)
+    : AsyncWorker(cb, "gc_async")
+    , In(in)
+    , Pwd(std::move(pwd))
   {}
-  ~GCAsync() { delete in; }
+  ~GCAsync() { delete In; }
 
 protected:
   void Execute() override
@@ -535,9 +530,9 @@ protected:
       do {
         try {
           if (!incorrect) {
-            parser.ParseFile(*in, false);
+            parser.ParseFile(*In, false);
           } else {
-            parser.SetPassword(pwd);
+            parser.SetPassword(Pwd);
           }
         } catch (PdfError& e) {
           if (e.GetError() == ePdfError_InvalidPassword) {
@@ -552,7 +547,7 @@ protected:
       if (parser.GetEncrypted()) {
         writer.SetEncrypted(*(parser.GetEncrypt()));
       }
-      PdfOutputDevice device(&r);
+      PdfOutputDevice device(&CountedBuffer);
       writer.Write(&device);
     } catch (PdfError& e) {
       SetError(e.what());
@@ -561,17 +556,17 @@ protected:
   void OnOK() override
   {
     HandleScope scope(Env());
-    auto buffer = Buffer<char>::Copy(Env(), r.GetBuffer(), r.GetSize());
+    auto buffer = Buffer<char>::Copy(Env(), CountedBuffer.GetBuffer(), CountedBuffer.GetSize());
     Callback().Call({ Env().Null(), buffer });
   }
 
 private:
-  PdfRefCountedInputDevice* in;
-  PdfRefCountedBuffer r;
-  string pwd;
+  PdfRefCountedInputDevice* In;
+  PdfRefCountedBuffer CountedBuffer;
+  string Pwd;
 };
 
-Napi::Value
+JsValue
 Document::GC(const Napi::CallbackInfo& info)
 {
   if (info.Length() < 2) {
@@ -600,13 +595,13 @@ Document::GC(const Napi::CallbackInfo& info)
   return info.Env().Undefined();
 }
 
-Napi::Value
+JsValue
 Document::CreatePage(const Napi::CallbackInfo& info)
 {
   return BaseDocument::CreatePage(info);
 }
 
-Napi::Value
+JsValue
 Document::GetEncrypt(const Napi::CallbackInfo& info)
 {
   auto enc = GetDocument().GetEncrypt();
@@ -615,10 +610,10 @@ Document::GetEncrypt(const Napi::CallbackInfo& info)
   }
   // Encrypt is immediately set back to const in the Encrypt constructor.
   // This const_cast is only necessary for passing the pointer via Napi.
-  return Encrypt::constructor.New(
+  return Encrypt::Constructor.New(
     { External<PdfEncrypt>::New(info.Env(), const_cast<PdfEncrypt*>(enc)) });
 }
-Napi::Value
+JsValue
 Document::InsertPages(const Napi::CallbackInfo& info)
 {
   if (info.Length() < 3) {
@@ -627,7 +622,7 @@ Document::InsertPages(const Napi::CallbackInfo& info)
     return info.Env().Undefined();
   }
   if (!info[0].IsObject() ||
-      !info[0].As<Object>().InstanceOf(Document::constructor.Value())) {
+      !info[0].As<Object>().InstanceOf(Document::Constructor.Value())) {
     TypeError::New(info.Env(), "Requires an instance of Document")
       .ThrowAsJavaScriptException();
     return info.Env().Undefined();
@@ -644,7 +639,7 @@ Document::InsertPages(const Napi::CallbackInfo& info)
   return Number::New(info.Env(), GetDocument().GetPageCount());
 }
 
-Napi::Value
+JsValue
 Document::HasSignature(const CallbackInfo& info)
 {
   for (int i = 0; i < Base->GetPageCount(); i++) {
@@ -658,7 +653,7 @@ Document::HasSignature(const CallbackInfo& info)
   }
   return Boolean::New(info.Env(), false);
 }
-Napi::Value
+JsValue
 Document::GetSignatures(const CallbackInfo& info)
 {
   auto js = Array::New(info.Env());

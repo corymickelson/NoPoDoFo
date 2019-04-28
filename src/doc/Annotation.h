@@ -64,10 +64,10 @@ public:
   JsValue GetAttachment(const CallbackInfo&);
   void SetAttachment(const CallbackInfo&, const JsValue&);
 
-  PoDoFo::PdfAnnotation& GetAnnotation() const { return Annot; }
+  PoDoFo::PdfAnnotation& GetAnnotation() const { return Self; }
 
 private:
-  PoDoFo::PdfAnnotation& Annot;
+  PoDoFo::PdfAnnotation& Self;
   std::shared_ptr<spdlog::logger> DbgLog;
 };
 }

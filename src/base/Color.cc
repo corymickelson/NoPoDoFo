@@ -76,21 +76,21 @@ Color::Color(const CallbackInfo& info)
   DbgLog = spdlog::get("DbgLog");
   if (opts[0] == 3) {
     const auto cs = info[0].As<String>().Utf8Value().c_str();
-    Clr = new PdfColor(PdfColor::FromString(cs));
+    Self = new PdfColor(PdfColor::FromString(cs));
   } else if (opts[0] == 0 && opts[1] == 0) {
-    Clr = new PdfColor(info[0].As<Number>().FloatValue());
+    Self = new PdfColor(info[0].As<Number>().FloatValue());
   } else if (opts[0] == 1) {
-    Clr = new PdfColor(*Color::Unwrap(info[0].As<Object>())->Clr);
+    Self = new PdfColor(*Color::Unwrap(info[0].As<Object>())->Self);
   } else if (opts[0] == 2) {
-    Clr = new PdfColor(*info[0].As<External<PdfColor>>().Data());
+    Self = new PdfColor(*info[0].As<External<PdfColor>>().Data());
   } else if (opts[0] == 0 && opts[1] == 1 && opts[2] == 1 && opts[3] == 0) {
-    Clr = new PdfColor(info[0].As<Number>().FloatValue(),
+    Self = new PdfColor(info[0].As<Number>().FloatValue(),
                          info[1].As<Number>().FloatValue(),
                          info[2].As<Number>().FloatValue());
   }
 
   else if (opts[0] == 0 && opts[1] == 1 && opts[2] == 1 && opts[3] == 1) {
-    Clr = new PdfColor(info[0].As<Number>().FloatValue(),
+    Self = new PdfColor(info[0].As<Number>().FloatValue(),
                          info[1].As<Number>().FloatValue(),
                          info[2].As<Number>().FloatValue(),
                          info[3].As<Number>().FloatValue());
@@ -104,46 +104,46 @@ Color::~Color()
 {
   DbgLog->debug("Color Cleanup");
   HandleScope scope(Env());
-  delete Clr;
+  delete Self;
 }
 
 JsValue
 Color::IsRGB(const CallbackInfo& info)
 {
-  return Boolean::New(info.Env(), Clr->IsRGB());
+  return Boolean::New(info.Env(), Self->IsRGB());
 }
 
 JsValue
 Color::IsCMYK(const CallbackInfo& info)
 {
-  return Boolean::New(info.Env(), Clr->IsCMYK());
+  return Boolean::New(info.Env(), Self->IsCMYK());
 }
 JsValue
 Color::IsGreyScale(const CallbackInfo& info)
 {
-  return Boolean::New(info.Env(), Clr->IsGrayScale());
+  return Boolean::New(info.Env(), Self->IsGrayScale());
 }
 JsValue
 Color::GetName(const CallbackInfo& info)
 {
-  return String::New(info.Env(), Clr->GetName());
+  return String::New(info.Env(), Self->GetName());
 }
 JsValue
 Color::GetDensity(const CallbackInfo& info)
 {
-  return Number::New(info.Env(), Clr->GetDensity());
+  return Number::New(info.Env(), Self->GetDensity());
 }
 JsValue
 Color::ConvertToGreyScale(const CallbackInfo& info)
 {
-  PdfColor greyScale = Clr->ConvertToGrayScale();
+  PdfColor greyScale = Self->ConvertToGrayScale();
   return Color::Constructor.New(
     { Number::New(info.Env(), greyScale.GetGrayScale()) });
 }
 JsValue
 Color::ConvertToRGB(const CallbackInfo& info)
 {
-  PdfColor rgb = Clr->ConvertToRGB();
+  PdfColor rgb = Self->ConvertToRGB();
   return Color::Constructor.New({ Number::New(info.Env(), rgb.GetRed()),
                                   Number::New(info.Env(), rgb.GetGreen()),
                                   Number::New(info.Env(), rgb.GetBlue()) });
@@ -151,7 +151,7 @@ Color::ConvertToRGB(const CallbackInfo& info)
 JsValue
 Color::ConvertToCMYK(const CallbackInfo& info)
 {
-  PdfColor cmyk = Clr->ConvertToCMYK();
+  PdfColor cmyk = Self->ConvertToCMYK();
   return Color::Constructor.New({ Number::New(info.Env(), cmyk.GetCyan()),
                                   Number::New(info.Env(), cmyk.GetMagenta()),
                                   Number::New(info.Env(), cmyk.GetYellow()),
@@ -160,55 +160,55 @@ Color::ConvertToCMYK(const CallbackInfo& info)
 JsValue
 Color::GetGrey(const CallbackInfo& info)
 {
-  return Number::New(info.Env(), Clr->GetGrayScale());
+  return Number::New(info.Env(), Self->GetGrayScale());
 }
 JsValue
 Color::GetCyan(const CallbackInfo& info)
 {
-  return Number::New(info.Env(), Clr->GetCyan());
+  return Number::New(info.Env(), Self->GetCyan());
 }
 JsValue
 Color::GetMagenta(const CallbackInfo& info)
 {
-  return Number::New(info.Env(), Clr->GetMagenta());
+  return Number::New(info.Env(), Self->GetMagenta());
 }
 JsValue
 Color::GetYellow(const CallbackInfo& info)
 {
-  return Number::New(info.Env(), Clr->GetYellow());
+  return Number::New(info.Env(), Self->GetYellow());
 }
 JsValue
 Color::GetBlack(const CallbackInfo& info)
 {
-  return Number::New(info.Env(), Clr->GetBlack());
+  return Number::New(info.Env(), Self->GetBlack());
 }
 JsValue
 Color::GetBlue(const CallbackInfo& info)
 {
-  return Number::New(info.Env(), Clr->GetBlue());
+  return Number::New(info.Env(), Self->GetBlue());
 }
 JsValue
 Color::GetRed(const CallbackInfo& info)
 {
-  return Number::New(info.Env(), Clr->GetRed());
+  return Number::New(info.Env(), Self->GetRed());
 }
 JsValue
 Color::GetGreen(const CallbackInfo& info)
 {
-  return Number::New(info.Env(), Clr->GetGreen());
+  return Number::New(info.Env(), Self->GetGreen());
 }
 JsValue
 Color::GetColorStreamString(const CallbackInfo& info)
 {
   stringstream ss;
   PdfLocaleImbue(ss);
-  if (Clr->IsCMYK()) {
-    ss << Clr->GetCyan() << " " << Clr->GetMagenta() << " "
-       << Clr->GetYellow() << " " << Clr->GetBlack() << " " << CMYK_OP;
-  } else if (Clr->IsGrayScale()) {
-    ss << Clr->GetGrayScale() << " " << GREY_OP;
-  } else if (Clr->IsRGB()) {
-    ss << Clr->GetRed() << " " << Clr->GetGreen() << " " << Clr->GetBlue()
+  if (Self->IsCMYK()) {
+    ss << Self->GetCyan() << " " << Self->GetMagenta() << " "
+       << Self->GetYellow() << " " << Self->GetBlack() << " " << CMYK_OP;
+  } else if (Self->IsGrayScale()) {
+    ss << Self->GetGrayScale() << " " << GREY_OP;
+  } else if (Self->IsRGB()) {
+    ss << Self->GetRed() << " " << Self->GetGreen() << " " << Self->GetBlue()
        << " " << RGB_OP;
   } else {
     Error::New(info.Env(),

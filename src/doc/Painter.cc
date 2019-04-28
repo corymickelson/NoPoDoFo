@@ -48,7 +48,7 @@ Painter::Painter(const Napi::CallbackInfo& info)
 {
   dbglog = spdlog::get("DbgLog");
   auto o = info[0].As<Object>();
-  if (o.InstanceOf(Document::constructor.Value())) {
+  if (o.InstanceOf(Document::Constructor.Value())) {
     isMemDoc = true;
     document = Document::Unwrap(o)->Base;
   } else if (o.InstanceOf(StreamDocument::constructor.Value())) {
@@ -155,7 +155,7 @@ Painter::SetPage(const Napi::CallbackInfo& info)
 void
 Painter::SetColor(const CallbackInfo& info)
 {
-  painter->SetColor(*Color::Unwrap(info[0].As<Object>())->Clr);
+  painter->SetColor(*Color::Unwrap(info[0].As<Object>())->Self);
 }
 
 void
@@ -387,7 +387,7 @@ Painter::GetFont(const Napi::CallbackInfo& info)
   if (!painter->GetFont()) {
     return info.Env().Null();
   }
-  return Font::constructor.New(
+  return Font::Constructor.New(
     { External<PdfFont>::New(info.Env(), painter->GetFont()) });
 }
 void
@@ -656,7 +656,7 @@ void
 Painter::SetExtGState(const CallbackInfo& info)
 {
   auto wrap = info[0].As<Object>();
-  if (!wrap.InstanceOf(ExtGState::constructor.Value())) {
+  if (!wrap.InstanceOf(ExtGState::Constructor.Value())) {
     throw TypeError::New(info.Env(), "must be of type ExtGState");
   }
   ExtGState* state = ExtGState::Unwrap(wrap);

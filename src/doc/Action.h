@@ -29,10 +29,10 @@ public:
   void SetScript(const Napi::CallbackInfo&, const JsValue&);
   JsValue GetObject(const Napi::CallbackInfo&);
   void AddToDictionary(const Napi::CallbackInfo&);
-  PoDoFo::PdfAction& GetAction() const { return *Act; }
+  PoDoFo::PdfAction& GetAction() const { return *Self; }
 
 private:
-  PoDoFo::PdfAction* Act;
+  PoDoFo::PdfAction* Self;
   std::shared_ptr<spdlog::logger> DbgLog;
 };
 }

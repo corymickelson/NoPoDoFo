@@ -32,12 +32,12 @@ using std::string;
 
 namespace NoPoDoFo {
 
-FunctionReference Image::constructor; // NOLINT
+FunctionReference Image::Constructor; // NOLINT
 
 Image::Image(const CallbackInfo& info)
   : ObjectWrap(info)
 {
-  dbglog = spdlog::get("DbgLog");
+  DbgLog = spdlog::get("DbgLog");
 #if defined(PODOFO_HAVE_JPEG_LIB) && defined(PODOFO_HAVE_PNG_LIB) &&           \
   defined(PODOFO_HAVE_TIFF_LIB)
   if (info.Length() < 2 || !info[0].IsObject() ||
@@ -48,16 +48,16 @@ Image::Image(const CallbackInfo& info)
     return;
   }
   auto iObj = info[0].As<Object>();
-  if (iObj.InstanceOf(Document::constructor.Value())) {
-    doc = Document::Unwrap(iObj)->Base;
+  if (iObj.InstanceOf(Document::Constructor.Value())) {
+    Doc = Document::Unwrap(iObj)->Base;
   } else if (iObj.InstanceOf(StreamDocument::constructor.Value())) {
-    doc = StreamDocument::Unwrap(iObj)->Base;
+    Doc = StreamDocument::Unwrap(iObj)->Base;
   }
   int format = 0;
   if (info.Length() >= 3 && info[2].IsString()) {
     format = info[2].As<Number>();
   }
-  img = make_unique<PdfImage>(doc);
+  Self = make_unique<PdfImage>(Doc);
   string file;
   unsigned char* buffer;
   size_t bufLen = 0;
@@ -75,27 +75,27 @@ Image::Image(const CallbackInfo& info)
   switch (format) {
     case 0:
       if (bufLen > 0)
-        img->LoadFromData(buffer, bufLen);
+        Self->LoadFromData(buffer, bufLen);
       else
-        img->LoadFromFile(file.c_str());
+        Self->LoadFromFile(file.c_str());
       break;
     case 1:
       if (bufLen > 0)
-        img->LoadFromPngData(buffer, bufLen);
+        Self->LoadFromPngData(buffer, bufLen);
       else
-        img->LoadFromPng(file.c_str());
+        Self->LoadFromPng(file.c_str());
       break;
     case 2:
       if (bufLen > 0)
-        img->LoadFromTiffData(buffer, bufLen);
+        Self->LoadFromTiffData(buffer, bufLen);
       else
-        img->LoadFromTiff(file.c_str());
+        Self->LoadFromTiff(file.c_str());
       break;
     case 3:
       if (bufLen > 0)
-        img->LoadFromJpegData(buffer, bufLen);
+        Self->LoadFromJpegData(buffer, bufLen);
       else
-        img->LoadFromJpeg(file.c_str());
+        Self->LoadFromJpeg(file.c_str());
       break;
     default:
       break;
@@ -109,9 +109,9 @@ Image::Image(const CallbackInfo& info)
 
 Image::~Image()
 {
-  dbglog->debug("Image Cleanup");
+  DbgLog->debug("Image Cleanup");
   HandleScope scope(Env());
-  doc = nullptr;
+  Doc = nullptr;
 }
 void
 Image::Initialize(Napi::Env& env, Napi::Object& target)
@@ -125,8 +125,8 @@ Image::Initialize(Napi::Env& env, Napi::Object& target)
                   InstanceAccessor("height", &Image::GetHeight, nullptr),
                   InstanceMethod("setInterpolate", &Image::SetInterpolate),
                 });
-  constructor = Napi::Persistent(ctor);
-  constructor.SuppressDestruct();
+  Constructor = Napi::Persistent(ctor);
+  Constructor.SuppressDestruct();
 
   target.Set("Image", ctor);
 }
@@ -134,18 +134,18 @@ Image::Initialize(Napi::Env& env, Napi::Object& target)
 Napi::Value
 Image::GetHeight(const CallbackInfo& info)
 {
-  return Napi::Number::New(info.Env(), img->GetHeight());
+  return Napi::Number::New(info.Env(), Self->GetHeight());
 }
 
 Napi::Value
 Image::GetWidth(const CallbackInfo& info)
 {
-  return Napi::Number::New(info.Env(), img->GetWidth());
+  return Napi::Number::New(info.Env(), Self->GetWidth());
 }
 
 void
 Image::SetInterpolate(const CallbackInfo& info)
 {
-  img->SetInterpolate(info[0].As<Boolean>());
+  Self->SetInterpolate(info[0].As<Boolean>());
 }
 }

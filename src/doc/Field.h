@@ -35,8 +35,8 @@ namespace NoPoDoFo {
 
 typedef struct AppearanceCtx
 {
-  PoDoFo::PdfDocument* doc;
-  PoDoFo::PdfFont* font;
+  PoDoFo::PdfDocument* Doc;
+  PoDoFo::PdfFont* Font;
   int fontSize;
   int pageIndex;
 } AppearanceCtx;
@@ -44,6 +44,8 @@ class Field
 {
 public:
   explicit Field(PoDoFo::EPdfField type, const Napi::CallbackInfo& info);
+	explicit Field(const Field&) = delete;
+	const Field&operator=(const Field&) = delete;
   ~Field();
   JsValue GetType(const Napi::CallbackInfo&);
   JsValue GetFieldName(const Napi::CallbackInfo&);
@@ -72,23 +74,23 @@ public:
   void SetJustification(const Napi::CallbackInfo&, const Napi::Value&);
   JsValue GetFieldObject(const Napi::CallbackInfo&);
   virtual void RefreshAppearanceStream();
-  PoDoFo::PdfField& GetField() { return *field; }
-  PoDoFo::PdfDictionary& GetFieldDictionary()
+  PoDoFo::PdfField& GetField() const { return *Self; }
+  PoDoFo::PdfDictionary& GetFieldDictionary() const
   {
-    return field->GetFieldObject()->GetDictionary();
+    return Self->GetFieldObject()->GetDictionary();
   }
   std::map<std::string, PoDoFo::PdfObject*> GetFieldRefreshKeys(
     PoDoFo::PdfField*);
   PoDoFo::PdfFont* GetDAFont(string_view);
-  string fieldName;
-  string fieldType;
+  string FieldName;
+  string FieldType;
 
 protected:
   string TypeString();
+	std::shared_ptr<spdlog::logger> DbgLog;
 private:
-  PoDoFo::PdfField* field;
-  vector<PoDoFo::PdfObject*> children;
-  std::shared_ptr<spdlog::logger> dbglog;
+  PoDoFo::PdfField* Self;
+  vector<PoDoFo::PdfObject*> Children;
 };
 }
 #endif // NPDF_PDFFIELD_H

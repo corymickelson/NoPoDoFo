@@ -31,23 +31,23 @@ using std::endl;
 namespace NoPoDoFo {
 Button::Button(PdfField& field)
 {
-  button = new PdfButton(field);
-  dbglog = spdlog::get("DbgLog");
+  Btn = new PdfButton(field);
+  DbgLog = spdlog::get("DbgLog");
 }
 
 Button::~Button()
 {
-  dbglog->debug("Button Cleanup");
-  delete button;
+  DbgLog->debug("Button Cleanup");
+  delete Btn;
 }
-Napi::Value
+JsValue
 Button::GetCaption(const Napi::CallbackInfo& info)
 {
-  return String::New(info.Env(), button->GetCaption().GetStringUtf8());
+  return String::New(info.Env(), Btn->GetCaption().GetStringUtf8());
 }
 void
-Button::SetCaption(const Napi::CallbackInfo&, const Napi::Value& value)
+Button::SetCaption(const Napi::CallbackInfo&, const JsValue& value)
 {
-  button->SetCaption(PdfString(value.As<String>().Utf8Value()));
+  Btn->SetCaption(PdfString(value.As<String>().Utf8Value()));
 }
 }

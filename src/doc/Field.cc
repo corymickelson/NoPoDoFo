@@ -49,38 +49,38 @@ namespace NoPoDoFo {
  */
 Field::Field(EPdfField type, const CallbackInfo& info)
 {
-  dbglog = spdlog::get("DbgLog");
+  DbgLog = spdlog::get("DbgLog");
   if (info[0].IsExternal()) {
     auto arg = info[0].As<External<PdfField>>().Data();
-    field = new PdfField(*arg);
+    Self = new PdfField(*arg);
   } else {
     auto arg1 = info[0].As<Object>();
     if (arg1.InstanceOf(Page::constructor.Value())) {
       auto page = Page::Unwrap(arg1);
       if (info[1].IsNumber()) {
         int index = info[1].As<Number>();
-        field = new PdfField(page->page.GetField(index));
+        Self = new PdfField(page->page.GetField(index));
       }
     } else if (arg1.InstanceOf(Annotation::Constructor.Value())) {
       PdfAnnotation* annotation = &Annotation::Unwrap(arg1)->GetAnnotation();
       if (info[1].IsObject() &&
-          info[1].As<Object>().InstanceOf(Form::constructor.Value())) {
+          info[1].As<Object>().InstanceOf(Form::Constructor.Value())) {
         PdfAcroForm* form = Form::Unwrap(info[1].As<Object>())->GetForm();
         switch (type) {
           case PoDoFo::ePdfField_PushButton:
-            field = new PdfPushButton(annotation, form);
+            Self = new PdfPushButton(annotation, form);
             break;
           case PoDoFo::ePdfField_CheckBox:
-            field = new PdfCheckBox(annotation, form);
+            Self = new PdfCheckBox(annotation, form);
             break;
           case PoDoFo::ePdfField_TextField:
-            field = new PdfTextField(annotation, form);
+            Self = new PdfTextField(annotation, form);
             break;
           case PoDoFo::ePdfField_ComboBox:
-            field = new PdfComboBox(annotation, form);
+            Self = new PdfComboBox(annotation, form);
             break;
           case PoDoFo::ePdfField_ListBox:
-            field = new PdfListBox(annotation, form);
+            Self = new PdfListBox(annotation, form);
             break;
           case PoDoFo::ePdfField_Signature:
           case PoDoFo::ePdfField_RadioButton:
@@ -97,15 +97,15 @@ Field::Field(EPdfField type, const CallbackInfo& info)
       return;
     }
   }
-  fieldName = field->GetFieldName().GetStringUtf8();
-  fieldType = TypeString();
+  FieldName = Self->GetFieldName().GetStringUtf8();
+  FieldType = TypeString();
 }
 
 Field::~Field()
 {
-  dbglog->debug("Field Cleanup");
-  delete field;
-  for (auto c : children) {
+  DbgLog->debug("Field Cleanup");
+  delete Self;
+  for (auto c : Children) {
     delete c;
   }
 }
@@ -114,7 +114,7 @@ string
 Field::TypeString()
 {
   string typeStr;
-  switch (field->GetType()) {
+  switch (Self->GetType()) {
     case PoDoFo::EPdfField::ePdfField_CheckBox:
       typeStr = "CheckBox";
       break;
@@ -145,7 +145,7 @@ Field::TypeString()
 JsValue
 Field::GetType(const Napi::CallbackInfo& info)
 {
-  return Number::New(info.Env(), static_cast<int>(field->GetType()));
+  return Number::New(info.Env(), static_cast<int>(Self->GetType()));
 }
 
 JsValue
@@ -156,7 +156,7 @@ Field::GetFieldName(const CallbackInfo& info)
 }
 
 void
-Field::SetFieldName(const CallbackInfo&, const Napi::Value& value)
+Field::SetFieldName(const CallbackInfo&, const JsValue& value)
 {
   string name = value.As<String>().Utf8Value();
   GetField().SetFieldName(PdfString(name));
@@ -166,59 +166,59 @@ JsValue
 Field::GetAlternateName(const CallbackInfo& info)
 {
   return Napi::String::New(info.Env(),
-                           field->GetAlternateName().GetStringUtf8());
+                           Self->GetAlternateName().GetStringUtf8());
 }
 
 JsValue
 Field::GetMappingName(const CallbackInfo& info)
 {
-  return Napi::String::New(info.Env(), field->GetMappingName().GetStringUtf8());
+  return Napi::String::New(info.Env(), Self->GetMappingName().GetStringUtf8());
 }
 
 void
-Field::SetAlternateName(const CallbackInfo&, const Napi::Value& value)
+Field::SetAlternateName(const CallbackInfo&, const JsValue& value)
 {
-  field->SetAlternateName(value.As<String>().Utf8Value());
+  Self->SetAlternateName(value.As<String>().Utf8Value());
 }
 
 void
-Field::SetMappingName(const CallbackInfo&, const Napi::Value& value)
+Field::SetMappingName(const CallbackInfo&, const JsValue& value)
 {
-  field->SetMappingName(value.As<String>().Utf8Value());
+  Self->SetMappingName(value.As<String>().Utf8Value());
 }
 
 void
-Field::SetRequired(const CallbackInfo&, const Napi::Value& value)
+Field::SetRequired(const CallbackInfo&, const JsValue& value)
 {
-  field->SetRequired(value.As<Boolean>());
+  Self->SetRequired(value.As<Boolean>());
 }
 
 JsValue
 Field::IsRequired(const CallbackInfo& info)
 {
-  return Napi::Boolean::New(info.Env(), field->IsRequired());
+  return Napi::Boolean::New(info.Env(), Self->IsRequired());
 }
 
 JsValue
 Field::IsReadOnly(const Napi::CallbackInfo& info)
 {
-  return Boolean::New(info.Env(), field->IsReadOnly());
+  return Boolean::New(info.Env(), Self->IsReadOnly());
 }
 
 void
-Field::SetReadOnly(const Napi::CallbackInfo&, const Napi::Value& value)
+Field::SetReadOnly(const Napi::CallbackInfo&, const JsValue& value)
 {
-  field->SetReadOnly(value.As<Boolean>());
+  Self->SetReadOnly(value.As<Boolean>());
 }
 void
-Field::SetExport(const Napi::CallbackInfo&, const Napi::Value& value)
+Field::SetExport(const Napi::CallbackInfo&, const JsValue& value)
 {
-  field->SetExport(value.As<Boolean>());
+  Self->SetExport(value.As<Boolean>());
 }
 JsValue
 Field::IsExport(const Napi::CallbackInfo& info)
 {
-  return Boolean::New(info.Env(), field->IsExport());
+  return Boolean::New(info.Env(), Self->IsExport());
 }
 /**
  * @note (color:Array<number>, transparent?: boolean)
@@ -231,9 +231,9 @@ Field::SetBackground(const Napi::CallbackInfo& info)
   vector<NPDFColorFormat> types = { NPDFColorFormat::GreyScale,
                                     NPDFColorFormat::RGB,
                                     NPDFColorFormat::CMYK };
-  NPDF_COLOR_ACCESSOR(Color::Unwrap(info[0].As<Object>())->Clr,
+  NPDF_COLOR_ACCESSOR(Color::Unwrap(info[0].As<Object>())->Self,
                     types,
-                    field->SetBackgroundColor)
+                    Self->SetBackgroundColor)
 }
 void
 Field::SetBorder(const Napi::CallbackInfo& info)
@@ -242,7 +242,7 @@ Field::SetBorder(const Napi::CallbackInfo& info)
                                     NPDFColorFormat::RGB,
                                     NPDFColorFormat::CMYK };
   NPDF_COLOR_ACCESSOR(
-    Color::Unwrap(info[0].As<Object>())->Clr, types, field->SetBorderColor)
+    Color::Unwrap(info[0].As<Object>())->Self, types, Self->SetBorderColor)
 }
 
 void
@@ -250,7 +250,7 @@ Field::SetHighlightingMode(const Napi::CallbackInfo& info)
 {
   EPdfHighlightingMode mode =
     static_cast<EPdfHighlightingMode>(info[0].As<Number>().Uint32Value());
-  field->SetHighlightingMode(mode);
+  Self->SetHighlightingMode(mode);
 }
 /**
  * @note (type: NPDFMouseActionEnum: 'up'|'down'|'enter'|'exit', action:
@@ -264,16 +264,16 @@ Field::SetMouseAction(const Napi::CallbackInfo& info)
   PdfAction& action = Action::Unwrap(info[1].As<Object>())->GetAction();
   switch (onMouse) {
     case 0: // up
-      field->SetMouseUpAction(action);
+      Self->SetMouseUpAction(action);
       break;
     case 1: // down
-      field->SetMouseDownAction(action);
+      Self->SetMouseDownAction(action);
       break;
     case 2: // enter
-      field->SetMouseEnterAction(action);
+      Self->SetMouseEnterAction(action);
       break;
     case 3: // exit
-      field->SetMouseLeaveAction(action);
+      Self->SetMouseLeaveAction(action);
       break;
     default:
       TypeError::New(info.Env(), "Unknown mouse action. See NPDFMouseEvents")
@@ -287,16 +287,16 @@ Field::SetPageAction(const Napi::CallbackInfo& info)
   PdfAction& action = Action::Unwrap(info[1].As<Object>())->GetAction();
   switch (onMouse) {
     case 0: // open
-      field->SetPageOpenAction(action);
+      Self->SetPageOpenAction(action);
       break;
     case 1: // close
-      field->SetPageCloseAction(action);
+      Self->SetPageCloseAction(action);
       break;
     case 2: // visible
-      field->SetPageVisibleAction(action);
+      Self->SetPageVisibleAction(action);
       break;
     case 3: // invisible
-      field->SetPageInvisibleAction(action);
+      Self->SetPageInvisibleAction(action);
       break;
     default:
       TypeError::New(info.Env(), "Unknown mouse action. See NPDFMouseEvents")
@@ -306,7 +306,7 @@ Field::SetPageAction(const Napi::CallbackInfo& info)
 JsValue
 Field::GetAnnotation(const Napi::CallbackInfo& info)
 {
-  PdfAnnotation* annot = field->GetWidgetAnnotation();
+  PdfAnnotation* annot = Self->GetWidgetAnnotation();
   return Annotation::Constructor.New(
     { External<PdfAnnotation>::New(info.Env(), annot) });
 }
@@ -314,7 +314,7 @@ JsValue
 Field::GetAppearanceStream(const Napi::CallbackInfo& info)
 {
   if (GetFieldDictionary().HasKey(Name::AP)) {
-    auto ap = field->GetFieldObject()->MustGetIndirectKey(Name::AP);
+    auto ap = Self->GetFieldObject()->MustGetIndirectKey(Name::AP);
     return Dictionary::Constructor.New(
       { External<PdfObject>::New(info.Env(), ap), Number::New(info.Env(), 0) });
   } else {
@@ -323,7 +323,7 @@ Field::GetAppearanceStream(const Napi::CallbackInfo& info)
 }
 void
 Field::SetAppearanceStream(const Napi::CallbackInfo& info,
-                           const Napi::Value& value)
+                           const JsValue& value)
 {
   if (GetFieldDictionary().HasKey(Name::AP)) {
     GetFieldDictionary().RemoveKey(Name::AP);
@@ -344,7 +344,7 @@ JsValue
 Field::GetDefaultAppearance(const Napi::CallbackInfo& info)
 {
   if (GetFieldDictionary().HasKey(Name::DA)) {
-    auto da = field->GetFieldObject()->MustGetIndirectKey(Name::DA);
+    auto da = Self->GetFieldObject()->MustGetIndirectKey(Name::DA);
     return String::New(info.Env(), da->GetString().GetStringUtf8());
   } else {
     return info.Env().Null();
@@ -352,7 +352,7 @@ Field::GetDefaultAppearance(const Napi::CallbackInfo& info)
 }
 void
 Field::SetDefaultAppearance(const Napi::CallbackInfo& info,
-                            const Napi::Value& value)
+                            const JsValue& value)
 {
   if (GetFieldDictionary().HasKey(Name::DA)) {
     GetFieldDictionary().RemoveKey(Name::DA);
@@ -371,17 +371,17 @@ Field::SetDefaultAppearance(const Napi::CallbackInfo& info,
 JsValue
 Field::GetJustification(const Napi::CallbackInfo& info)
 {
-  if (field->GetFieldObject()->GetDictionary().HasKey(Name::Q)) {
+  if (Self->GetFieldObject()->GetDictionary().HasKey(Name::Q)) {
     return Number::New(
       info.Env(),
-      field->GetFieldObject()->MustGetIndirectKey(Name::Q)->GetNumber());
+      Self->GetFieldObject()->MustGetIndirectKey(Name::Q)->GetNumber());
   } else {
     return info.Env().Null();
   }
 }
 void
 Field::SetJustification(const Napi::CallbackInfo& info,
-                        const Napi::Value& value)
+                        const JsValue& value)
 {
   if (value.IsNumber()) {
     pdf_int64 qValue = value.As<Number>();
@@ -401,7 +401,7 @@ JsValue
 Field::GetFieldObject(const CallbackInfo& info)
 {
   return Obj::Constructor.New(
-    { External<PdfObject>::New(info.Env(), field->GetFieldObject()) });
+    { External<PdfObject>::New(info.Env(), Self->GetFieldObject()) });
 }
 
 std::map<std::string, PoDoFo::PdfObject*>
@@ -495,13 +495,13 @@ Field::RefreshAppearanceStream()
       xObj.AddResource(
         f->GetIdentifier(), f->GetObject()->Reference(), Name::FONT);
     }
-    if (field->GetWidgetAnnotation()->GetObject()->GetDictionary().HasKey(
+    if (Self->GetWidgetAnnotation()->GetObject()->GetDictionary().HasKey(
           Name::DA)) {
-      field->GetWidgetAnnotation()->GetObject()->GetDictionary().RemoveKey(
+      Self->GetWidgetAnnotation()->GetObject()->GetDictionary().RemoveKey(
         Name::DA);
     }
     // Add the DA key from apKeys in case the DA was taken from the form
-    field->GetWidgetAnnotation()->GetObject()->GetDictionary().AddKey(
+    Self->GetWidgetAnnotation()->GetObject()->GetDictionary().AddKey(
       Name::DA, apKeys.find(Name::DA)->second);
   }
   ss << "2.0 2.0 " << TEXT_POS_OP << endl;
@@ -515,8 +515,8 @@ Field::RefreshAppearanceStream()
 
   PdfRect r(0,
             0,
-            field->GetWidgetAnnotation()->GetRect().GetWidth(),
-            field->GetWidgetAnnotation()->GetRect().GetHeight());
+            Self->GetWidgetAnnotation()->GetRect().GetWidth(),
+            Self->GetWidgetAnnotation()->GetRect().GetHeight());
   xObj.GetObject()->GetDictionary().RemoveKey(Name::BBOX);
   PdfVariant ra;
   r.ToVariant(ra);
@@ -545,7 +545,7 @@ Field::GetDAFont(string_view da)
     fontAndSize.substr(1, static_cast<size_t>(firstSpace - 1));
   PdfFont* font;
   auto memDoc = dynamic_cast<PdfMemDocument*>(
-    field->GetWidgetAnnotation()->GetObject()->GetOwner()->GetParentDocument());
+    Self->GetWidgetAnnotation()->GetObject()->GetOwner()->GetParentDocument());
   if ((font = Document::GetPdfFont(*memDoc, ftName)) == nullptr) {
   }
   return font;

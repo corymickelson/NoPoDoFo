@@ -96,7 +96,7 @@ Napi::Value
 Outline::CreateNext(const Napi::CallbackInfo& info)
 {
   string name = info[0].As<String>().Utf8Value();
-  if (info[1].As<Object>().InstanceOf(Destination::constructor.Value())) {
+  if (info[1].As<Object>().InstanceOf(Destination::Constructor.Value())) {
     auto d = Destination::Unwrap(info[1].As<Object>())->GetDestination();
     PdfOutlineItem* item = GetOutline().CreateNext(name, d);
     return Outline::constructor.New(
@@ -168,7 +168,7 @@ Napi::Value
 Outline::GetDestination(const Napi::CallbackInfo& info)
 {
   PdfDestination* d;
-  if (info[0].As<Object>().InstanceOf(Document::constructor.Value())) {
+  if (info[0].As<Object>().InstanceOf(Document::Constructor.Value())) {
     d =
       GetOutline().GetDestination(Document::Unwrap(info[0].As<Object>())->Base);
     if (!d)
@@ -184,7 +184,7 @@ Outline::GetDestination(const Napi::CallbackInfo& info)
       .ThrowAsJavaScriptException();
     return {};
   }
-  return Destination::constructor.New(
+  return Destination::Constructor.New(
     { External<PdfDestination>::New(info.Env(), d) });
 }
 Napi::Value
@@ -239,7 +239,7 @@ Outline::SetTextColor(const Napi::CallbackInfo& info, const Napi::Value& value)
       .ThrowAsJavaScriptException();
     return;
   }
-  PdfColor color = *Color::Unwrap(value.As<Object>())->Clr;
+  PdfColor color = *Color::Unwrap(value.As<Object>())->Self;
   if (!color.IsRGB()) {
     cout << "Outline text coloring only supports color format RGB, color "
             "automatically converted to RGB"

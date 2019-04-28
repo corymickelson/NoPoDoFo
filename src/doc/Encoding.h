@@ -24,22 +24,25 @@
 #include <podofo/podofo.h>
 #include <spdlog/logger.h>
 
+using JsValue = Napi::Value;
+
 namespace NoPoDoFo {
 class Encoding : public Napi::ObjectWrap<Encoding>
 {
 public:
   explicit Encoding(const Napi::CallbackInfo& callbackInfo);
+	explicit Encoding(const Encoding&) = delete;
+	const Encoding&operator=(const Encoding&) = delete;
   ~Encoding();
-  static Napi::FunctionReference constructor;
+  static Napi::FunctionReference Constructor;
   static void Initialize(Napi::Env&, Napi::Object& target);
-  Napi::Value AddToDictionary(const Napi::CallbackInfo&);
-  Napi::Value ConvertToUnicode(const Napi::CallbackInfo&);
-  Napi::Value ConvertToEncoding(const Napi::CallbackInfo&);
-  Napi::Value GetData(const Napi::CallbackInfo&);
+  JsValue AddToDictionary(const Napi::CallbackInfo&);
+  JsValue ConvertToUnicode(const Napi::CallbackInfo&);
+  JsValue ConvertToEncoding(const Napi::CallbackInfo&);
 
 private:
-  const PoDoFo::PdfEncoding* encoding;
-  std::shared_ptr<spdlog::logger> dbglog;
+  const PoDoFo::PdfEncoding* Self;
+  std::shared_ptr<spdlog::logger> DbgLog;
 };
 }
 #endif // NPDF_ENCODING_H

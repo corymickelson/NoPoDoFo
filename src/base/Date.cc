@@ -43,24 +43,24 @@ Date::Date(const Napi::CallbackInfo& info)
     info, { { 0, { option(napi_string), nullopt, option(napi_external) } } });
   DbgLog = spdlog::get("DbgLog");
   if (argIndex[0] == 0) {
-    Ts = new PdfDate(info[0].As<String>().Utf8Value());
-    if (!Ts->IsValid()) {
+    Self = new PdfDate(info[0].As<String>().Utf8Value());
+    if (!Self->IsValid()) {
       Error::New(info.Env(),
                  "Invalid Date format. See NoPoDoFo Date docs for details.")
         .ThrowAsJavaScriptException();
     }
   } else if (argIndex[0] == 1) {
-    Ts = new PdfDate();
+    Self = new PdfDate();
   } else if (argIndex[0] == 2) {
     const auto copy = info[0].As<External<PdfDate>>().Data();
-    Ts = new PdfDate(*copy);
+    Self = new PdfDate(*copy);
   }
 }
 Date::~Date()
 {
   DbgLog->debug("Date Cleanup");
   HandleScope scope(Env());
-  delete Ts;
+  delete Self;
 }
 void
 Date::Initialize(Napi::Env& env, Napi::Object& target)
@@ -78,12 +78,12 @@ JsValue
 Date::ToString(const CallbackInfo& info)
 {
   PdfString value;
-  Ts->ToString(value);
+  Self->ToString(value);
   return String::New(info.Env(), value.GetStringUtf8());
 }
 JsValue
 Date::IsValid(const CallbackInfo& info)
 {
-  return Boolean::New(info.Env(), Ts->IsValid());
+  return Boolean::New(info.Env(), Self->IsValid());
 }
 }

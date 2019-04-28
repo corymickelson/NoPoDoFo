@@ -23,24 +23,27 @@
 #include <napi.h>
 #include <podofo/podofo.h>
 #include <spdlog/logger.h>
+using JsValue = Napi::Value;
 
 namespace NoPoDoFo {
 class Image : public Napi::ObjectWrap<Image>
 {
 public:
   explicit Image(const Napi::CallbackInfo&);
+	explicit Image(const Image&)= delete;
+	const Image&operator=(const Image&) = delete;
   ~Image();
-  static Napi::FunctionReference constructor;
+  static Napi::FunctionReference Constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
-  Napi::Value GetWidth(const Napi::CallbackInfo&);
-  Napi::Value GetHeight(const Napi::CallbackInfo&);
+  JsValue GetWidth(const Napi::CallbackInfo&);
+  JsValue GetHeight(const Napi::CallbackInfo&);
   void SetInterpolate(const Napi::CallbackInfo&);
-  PoDoFo::PdfImage GetImage() { return *img; }
+  PoDoFo::PdfImage GetImage() const { return *Self; }
 
 private:
-  std::unique_ptr<PoDoFo::PdfImage> img;
-  PoDoFo::PdfDocument* doc;
-  std::shared_ptr<spdlog::logger> dbglog;
+  std::unique_ptr<PoDoFo::PdfImage> Self;
+  PoDoFo::PdfDocument* Doc;
+  std::shared_ptr<spdlog::logger> DbgLog;
 };
 }
 #endif // NPDF_IMAGE_H

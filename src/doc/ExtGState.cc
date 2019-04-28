@@ -34,19 +34,19 @@ using std::make_unique;
 using std::string;
 using std::vector;
 
-FunctionReference ExtGState::constructor; // NOLINT
+FunctionReference ExtGState::Constructor; // NOLINT
 
 ExtGState::ExtGState(const Napi::CallbackInfo& info)
   : ObjectWrap(info)
 {
-  dbglog = spdlog::get("DbgLog");
+  DbgLog = spdlog::get("DbgLog");
   auto o = info[0].As<Object>();
-  if (o.InstanceOf(Document::constructor.Value())) {
+  if (o.InstanceOf(Document::Constructor.Value())) {
     auto d = Document::Unwrap(o);
-    self = make_unique<PdfExtGState>(&d->GetDocument());
+    Self = make_unique<PdfExtGState>(&d->GetDocument());
   } else if (o.InstanceOf(StreamDocument::constructor.Value())) {
     auto d = StreamDocument::Unwrap(o);
-    self = make_unique<PdfExtGState>(d->Base);
+    Self = make_unique<PdfExtGState>(d->Base);
   } else {
     Error::New(
       info.Env(),
@@ -57,7 +57,7 @@ ExtGState::ExtGState(const Napi::CallbackInfo& info)
 
 ExtGState::~ExtGState()
 {
-  dbglog->debug("ExtGState Cleanup");
+  DbgLog->debug("ExtGState Cleanup");
 }
 
 void
@@ -76,30 +76,29 @@ ExtGState::Initialize(Napi::Env& env, Object& target)
       InstanceMethod("setNonZeroOverprint", &ExtGState::SetNonZeroOverprint),
       InstanceMethod("setRenderingIntent", &ExtGState::SetRenderingIntent),
       InstanceMethod("setFrequency", &ExtGState::SetFrequency) });
-  constructor = Persistent(ctor);
-  constructor.SuppressDestruct();
+  Constructor = Persistent(ctor);
+  Constructor.SuppressDestruct();
   target.Set("ExtGState", ctor);
 }
 
 void
 ExtGState::SetFillOpacity(const CallbackInfo& info)
 {
-  float value = info[0].As<Number>().FloatValue();
-  self->SetFillOpacity(value);
+  const float value = info[0].As<Number>().FloatValue();
+  Self->SetFillOpacity(value);
 }
 
 void
 ExtGState::SetStrokeOpacity(const CallbackInfo& info)
 {
-  float value = info[0].As<Number>().FloatValue();
-  self->SetStrokeOpacity(value);
+  const float value = info[0].As<Number>().FloatValue();
+  Self->SetStrokeOpacity(value);
 }
 
-// todo:Fix this
 void
 ExtGState::SetBlendMode(const CallbackInfo& info)
 {
-  string value = info[0].As<String>().Utf8Value();
+  const string value = info[0].As<String>().Utf8Value();
   vector<string> candidateValues = { "Normal",     "Multiply",   "Screen",
                                      "Overlay",    "Darken",     "Lighten",
                                      "ColorDodge", "ColorBurn",  "HardLight",
@@ -108,7 +107,7 @@ ExtGState::SetBlendMode(const CallbackInfo& info)
                                      "Luminosity" };
   if (find(candidateValues.begin(), candidateValues.end(), value) !=
       candidateValues.end()) {
-    self->SetBlendMode(value.c_str());
+    Self->SetBlendMode(value.c_str());
   } else {
     throw Error::New(info.Env(),
                      "Blend mode must be one of type NPdfBlendMode");
@@ -118,37 +117,37 @@ ExtGState::SetBlendMode(const CallbackInfo& info)
 void
 ExtGState::SetOverprint(const CallbackInfo& info)
 {
-  self->SetOverprint(info[0].As<Boolean>());
+  Self->SetOverprint(info[0].As<Boolean>());
 }
 
 void
 ExtGState::SetFillOverprint(const CallbackInfo& info)
 {
-  self->SetFillOverprint(info[0].As<Boolean>());
+  Self->SetFillOverprint(info[0].As<Boolean>());
 }
 
 void
 ExtGState::SetStrokeOverprint(const CallbackInfo& info)
 {
-  self->SetStrokeOverprint(info[0].As<Boolean>());
+  Self->SetStrokeOverprint(info[0].As<Boolean>());
 }
 
 void
 ExtGState::SetNonZeroOverprint(const CallbackInfo& info)
 {
-  self->SetNonZeroOverprint(info[0].As<Boolean>());
+  Self->SetNonZeroOverprint(info[0].As<Boolean>());
 }
 
 void
 ExtGState::SetRenderingIntent(const CallbackInfo& info)
 {
-  string v = info[0].As<String>().Utf8Value();
+  const string v = info[0].As<String>().Utf8Value();
   vector<string> candidateValues = {
     "AbsoluteColorimetric", "RelativeColorimetric", "Perceptual", "Saturation"
   };
   if (find(candidateValues.begin(), candidateValues.end(), v) !=
       candidateValues.end()) {
-    self->SetRenderingIntent(v.c_str());
+    Self->SetRenderingIntent(v.c_str());
   } else {
     throw Error::New(info.Env(),
                      "rendering must be of type NPdfRenderingIntent");
@@ -158,7 +157,7 @@ ExtGState::SetRenderingIntent(const CallbackInfo& info)
 void
 ExtGState::SetFrequency(const CallbackInfo& info)
 {
-  double v = info[0].As<Number>();
-  self->SetFrequency(v);
+  const double v = info[0].As<Number>();
+  Self->SetFrequency(v);
 }
 }

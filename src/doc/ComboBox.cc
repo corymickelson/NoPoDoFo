@@ -30,19 +30,18 @@ using std::endl;
 
 namespace NoPoDoFo {
 
-FunctionReference ComboBox::constructor; // NOLINT
+FunctionReference ComboBox::Constructor; // NOLINT
 
 ComboBox::ComboBox(const Napi::CallbackInfo& info)
   : ObjectWrap(info)
   , Field(ePdfField_ComboBox, info)
   , ListField(Field::GetField())
-  , field(Field::GetField())
+  , FormField(Field::GetField())
 {
-  dbglog = spdlog::get("DbgLog");
 }
 ComboBox::~ComboBox()
 {
-  dbglog->debug("ComboBox Cleanup");
+  Field::DbgLog->debug("ComboBox Cleanup");
 }
 void
 ComboBox::Initialize(Napi::Env& env, Napi::Object& target)
@@ -94,16 +93,16 @@ ComboBox::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceMethod("setHighlightingMode", &ComboBox::SetHighlightingMode)
 
     });
-  constructor = Napi::Persistent(ctor);
-  constructor.SuppressDestruct();
+  Constructor = Napi::Persistent(ctor);
+  Constructor.SuppressDestruct();
   target.Set("ComboBox", ctor);
 }
 void
-ComboBox::SetEditable(const Napi::CallbackInfo&, const Napi::Value& value)
+ComboBox::SetEditable(const Napi::CallbackInfo&, const JsValue& value)
 {
   GetComboBox().SetEditable(value.As<Napi::Boolean>());
 }
-Napi::Value
+JsValue
 ComboBox::GetEditable(const Napi::CallbackInfo& info)
 {
   return Napi::Boolean::New(info.Env(), GetComboBox().IsEditable());

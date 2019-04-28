@@ -51,7 +51,7 @@ SignatureField::SignatureField(const CallbackInfo& info)
     if (info.Length() == 2) {
       auto annot = Annotation::Unwrap(info[0].As<Object>());
       auto nObj = info[1].As<Object>();
-      if (nObj.InstanceOf(Document::constructor.Value())) {
+      if (nObj.InstanceOf(Document::Constructor.Value())) {
         field = make_shared<PdfSignatureField>(
           &annot->GetAnnotation(),
           Document::Unwrap(nObj)->Base->GetAcroForm(),

@@ -30,23 +30,22 @@ using std::string;
 
 namespace NoPoDoFo {
 
-FunctionReference Encoding::constructor; // NOLINT
+FunctionReference Encoding::Constructor; // NOLINT
 
 Encoding::Encoding(const Napi::CallbackInfo& info)
   : ObjectWrap(info)
-  , encoding(info[0].As<External<PdfEncoding>>().Data())
+  , Self(info[0].As<External<PdfEncoding>>().Data())
 {
-  dbglog = spdlog::get("DbgLog");
+  DbgLog = spdlog::get("DbgLog");
 }
 Encoding::~Encoding()
 {
-  dbglog->debug("Encoding Cleanup");
-  HandleScope scope(Env());
-  if (!encoding->IsAutoDelete()) {
-    dbglog->debug("Encoding is NOT auto deleted, deleting now");
-    delete encoding;
+  DbgLog->debug("Encoding Cleanup");
+  if (!Self->IsAutoDelete()) {
+    DbgLog->debug("Encoding is NOT auto deleted, deleting now");
+    delete Self;
   } else {
-    dbglog->debug("Encoding is an auto deleted object, nothing deleted");
+    DbgLog->debug("Encoding is an auto deleted object, nothing deleted");
   }
 }
 void
@@ -58,41 +57,36 @@ Encoding::Initialize(Napi::Env& env, Napi::Object& target)
     "Encoding",
     { InstanceMethod("addToDictionary", &Encoding::AddToDictionary),
       InstanceMethod("convertToUnicode", &Encoding::ConvertToUnicode),
-      InstanceMethod("convertToEncoding", &Encoding::ConvertToEncoding),
-      InstanceMethod("data", &Encoding::GetData) });
-  constructor = Persistent(ctor);
-  constructor.SuppressDestruct();
+      InstanceMethod("convertToEncoding", &Encoding::ConvertToEncoding) });
+  Constructor = Persistent(ctor);
+  Constructor.SuppressDestruct();
   target.Set("Encoding", ctor);
 }
 Napi::Value
 Encoding::AddToDictionary(const Napi::CallbackInfo& info)
 {
   auto wrap = info[0].As<Object>();
-  Dictionary* d = Dictionary::Unwrap(wrap);
-  encoding->AddToDictionary(d->GetDictionary());
+  auto d = Dictionary::Unwrap(wrap);
+  Self->AddToDictionary(d->GetDictionary());
   return info.Env().Undefined();
 }
 Napi::Value
 Encoding::ConvertToUnicode(const Napi::CallbackInfo& info)
 {
-  string content = info[0].As<String>().Utf8Value();
-  Font* font = Font::Unwrap(info[1].As<Object>());
-  PdfString buffer =
-    encoding->ConvertToUnicode(PdfString(content), &font->GetFont());
+  const string content = info[0].As<String>().Utf8Value();
+  auto font = Font::Unwrap(info[1].As<Object>());
+  const auto buffer =
+    Self->ConvertToUnicode(PdfString(content), &font->GetFont());
   return String::New(info.Env(), buffer.GetStringUtf8());
 }
 Napi::Value
 Encoding::ConvertToEncoding(const Napi::CallbackInfo& info)
 {
-  string content = info[0].As<String>().Utf8Value();
-  Font* font = Font::Unwrap(info[1].As<Object>());
-  PdfRefCountedBuffer buffer =
-    encoding->ConvertToEncoding(PdfString(content), &font->GetFont());
+  const string content = info[0].As<String>().Utf8Value();
+  auto font = Font::Unwrap(info[1].As<Object>());
+  const auto buffer =
+    Self->ConvertToEncoding(PdfString(content), &font->GetFont());
   return String::New(info.Env(), buffer.GetBuffer());
 }
-Napi::Value
-Encoding::GetData(const Napi::CallbackInfo& info)
-{
-  return info.Env().Undefined();
-}
+
 }

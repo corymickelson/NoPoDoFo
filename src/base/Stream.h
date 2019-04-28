@@ -44,10 +44,10 @@ public:
   JsValue IsAppending(const Napi::CallbackInfo&);
   JsValue Length(const Napi::CallbackInfo&);
   JsValue GetCopy(const Napi::CallbackInfo&);
-  PoDoFo::PdfStream& GetStream() const { return  Strm; }
+  PoDoFo::PdfStream& GetStream() const { return  Self; }
 
 private:
-  PoDoFo::PdfStream& Strm;
+  PoDoFo::PdfStream& Self;
   std::shared_ptr<spdlog::logger> DbgLog;
 };
 }

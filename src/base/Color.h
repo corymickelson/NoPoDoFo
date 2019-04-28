@@ -61,7 +61,7 @@ public:
   JsValue ConvertToRGB(const CallbackInfo&);
   JsValue ConvertToCMYK(const CallbackInfo&);
   JsValue GetColorStreamString(const CallbackInfo &);
-  PdfColor* Clr;
+  PdfColor* Self;
 
 private:
   std::shared_ptr<spdlog::logger> DbgLog;

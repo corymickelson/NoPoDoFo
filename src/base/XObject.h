@@ -41,10 +41,10 @@ public:
   JsValue GetResources(const Napi::CallbackInfo&);
   JsValue GetPageSize(const Napi::CallbackInfo&);
   JsValue Reference(const Napi::CallbackInfo&);
-  PoDoFo::PdfXObject& GetXObject() const { return *XObj; }
+  PoDoFo::PdfXObject& GetXObject() const { return *Self; }
 
 private:
-  PoDoFo::PdfXObject* XObj;
+  PoDoFo::PdfXObject* Self;
   std::shared_ptr<spdlog::logger> DbgLog;
 };
 }

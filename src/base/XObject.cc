@@ -38,7 +38,7 @@ XObject::XObject(const CallbackInfo& info)
   if (info[0].IsExternal()) {
     DbgLog->debug("XObject copy");
     auto copy = info[0].As<External<PdfXObject>>().Data();
-    XObj = new PdfXObject(*copy);
+    Self = new PdfXObject(*copy);
   }
   // create new XObject
   else if (info.Length() && info[0].IsObject() &&
@@ -47,14 +47,14 @@ XObject::XObject(const CallbackInfo& info)
     auto rect = Rect::Unwrap(info[0].As<Object>());
     DbgLog->debug("New XObject");
     PdfDocument* doc = info[1].As<External<PdfDocument>>().Data();
-    XObj = new PdfXObject(rect->GetRect(), doc);
+    Self = new PdfXObject(rect->GetRect(), doc);
   }
 }
 XObject::~XObject()
 {
   DbgLog->debug("XObject Cleanup");
   HandleScope scope(Env());
-  delete XObj;
+  delete Self;
 }
 
 void
@@ -79,27 +79,27 @@ Value
 XObject::GetContents(const CallbackInfo& info)
 {
   return Obj::Constructor.New(
-    { External<PdfObject>::New(info.Env(), XObj->GetContents()) });
+    { External<PdfObject>::New(info.Env(), Self->GetContents()) });
 }
 
 Value
 XObject::GetContentsForAppending(const CallbackInfo& info)
 {
   return Obj::Constructor.New(
-    { External<PdfObject>::New(info.Env(), XObj->GetContentsForAppending()) });
+    { External<PdfObject>::New(info.Env(), Self->GetContentsForAppending()) });
 }
 
 Value
 XObject::GetResources(const CallbackInfo& info)
 {
   return Obj::Constructor.New(
-    { External<PdfObject>::New(info.Env(), XObj->GetResources()) });
+    { External<PdfObject>::New(info.Env(), Self->GetResources()) });
 }
 
 Value
 XObject::GetPageSize(const CallbackInfo& info)
 {
-  PdfRect rect = XObj->GetPageSize();
+  PdfRect rect = Self->GetPageSize();
   double left, bottom, width, height;
   left = rect.GetLeft();
   bottom = rect.GetBottom();
@@ -114,7 +114,7 @@ XObject::GetPageSize(const CallbackInfo& info)
 Napi::Value
 XObject::Reference(const Napi::CallbackInfo& info)
 {
-  auto r = XObj->GetObject()->Reference();
+  auto r = Self->GetObject()->Reference();
   return Ref::Constructor.New({ External<PdfReference>::New(info.Env(), &r) });
 }
 }

@@ -42,7 +42,7 @@ FunctionReference Annotation::Constructor; // NOLINT
 
 Annotation::Annotation(const CallbackInfo& info)
   : ObjectWrap(info)
-  , Annot(*info[0].As<External<PdfAnnotation>>().Data())
+  , Self(*info[0].As<External<PdfAnnotation>>().Data())
 {
   DbgLog = spdlog::get("DbgLog");
 }
@@ -186,7 +186,7 @@ Annotation::GetContent(const CallbackInfo& info)
 void
 Annotation::SetDestination(const CallbackInfo& info, const JsValue& value)
 {
-  if (value.As<Object>().InstanceOf(Destination::constructor.Value())) {
+  if (value.As<Object>().InstanceOf(Destination::Constructor.Value())) {
     auto destination = Destination::Unwrap(value.As<Object>());
     GetAnnotation().SetDestination(destination->GetDestination());
   } else {
@@ -202,7 +202,7 @@ Annotation::GetDestination(const CallbackInfo& info)
     return info.Env().Null();
   auto doc = Document::Unwrap(info[0].As<Object>())->Base;
   PdfDestination d = GetAnnotation().GetDestination(doc);
-  return Destination::constructor.New(
+  return Destination::Constructor.New(
     { External<PdfDestination>::New(info.Env(), &d) });
 }
 
@@ -257,7 +257,7 @@ Annotation::SetColor(const CallbackInfo& info, const JsValue& value)
                                     NPDFColorFormat::GreyScale,
                                     NPDFColorFormat::CMYK };
   NPDF_COLOR_ACCESSOR(
-    Color::Unwrap(value.As<Object>())->Clr, types, GetAnnotation().SetColor)
+    Color::Unwrap(value.As<Object>())->Self, types, GetAnnotation().SetColor)
 }
 
 JsValue
@@ -451,7 +451,7 @@ Annotation::GetAttachment(const CallbackInfo& info)
     return info.Env().Null();
   }
   auto file = GetAnnotation().GetFileAttachement()->GetObject();
-  return FileSpec::constructor.New({ External<PdfObject>::New(
+  return FileSpec::Constructor.New({ External<PdfObject>::New(
     info.Env(), new PdfObject(*file), [](Napi::Env env, PdfObject* data) {
       HandleScope scope(env);
       delete data;

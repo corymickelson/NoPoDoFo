@@ -29,6 +29,8 @@
 using namespace Napi;
 using namespace PoDoFo;
 
+using JsValue = Napi::Value;
+
 namespace NoPoDoFo {
 class CheckBox
   : public ObjectWrap<CheckBox>
@@ -37,17 +39,16 @@ class CheckBox
 {
 public:
   explicit CheckBox(const CallbackInfo& callbackInfo);
+	explicit CheckBox(const CheckBox&) = delete;
+	const CheckBox&operator=(const CheckBox&) = delete;
   ~CheckBox();
-  static Napi::FunctionReference constructor;
+  static Napi::FunctionReference Constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
-  Napi::Value IsChecked(const CallbackInfo&);
-  void SetChecked(const CallbackInfo&, const Napi::Value&);
+  JsValue IsChecked(const CallbackInfo&);
+  void SetChecked(const CallbackInfo&, const JsValue&);
 
-  PoDoFo::PdfCheckBox GetCheckBox() { return PoDoFo::PdfCheckBox(field); }
-  PoDoFo::PdfField& field;
-
-private:
-  std::shared_ptr<spdlog::logger> dbglog;
+  PoDoFo::PdfCheckBox GetCheckBox() { return PoDoFo::PdfCheckBox(FormField); }
+  PoDoFo::PdfField& FormField;
 };
 }
 #endif // NPDF_CHECKBOX_H

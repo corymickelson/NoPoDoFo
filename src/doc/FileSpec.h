@@ -24,20 +24,24 @@
 #include <podofo/podofo.h>
 #include <spdlog/logger.h>
 
+using JsValue = Napi::Value;
+
 namespace NoPoDoFo {
 class FileSpec : public Napi::ObjectWrap<FileSpec>
 {
 public:
-  explicit FileSpec(const Napi::CallbackInfo&);
+	explicit FileSpec(const Napi::CallbackInfo&);
+  explicit FileSpec(const FileSpec&) = delete;
+  const FileSpec&operator=(const FileSpec&) = delete;
   ~FileSpec();
-  static Napi::FunctionReference constructor;
+  static Napi::FunctionReference Constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
-  Napi::Value GetFileName(const Napi::CallbackInfo&);
-  Napi::Value Data(const Napi::CallbackInfo&);
+  JsValue GetFileName(const Napi::CallbackInfo&);
+  JsValue Data(const Napi::CallbackInfo&);
 
 private:
-  std::unique_ptr<PoDoFo::PdfFileSpec> spec;
-  std::shared_ptr<spdlog::logger> dbglog;
+  std::unique_ptr<PoDoFo::PdfFileSpec> Self;
+  std::shared_ptr<spdlog::logger> DbgLog;
 };
 }
 #endif // NPDF_FILESPEC_H
