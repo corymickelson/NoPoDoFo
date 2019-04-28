@@ -123,7 +123,7 @@ BaseDocument::GetPage(const CallbackInfo &info)
 			.ThrowAsJavaScriptException();
 		return {};
 	}
-	return Page::constructor.New(
+	return Page::Constructor.New(
 		{External<PdfPage>::New(info.Env(), Base->GetPage(n))});
 }
 
@@ -466,7 +466,7 @@ BaseDocument::CreatePage(const CallbackInfo &info)
 {
 	const auto r = Rect::Unwrap(info[0].As<Object>())->GetRect();
 	const auto page = Base->CreatePage(r);
-	return Page::constructor.New({External<PdfPage>::New(info.Env(), page)});
+	return Page::Constructor.New({External<PdfPage>::New(info.Env(), page)});
 }
 JsValue
 BaseDocument::CreatePages(const Napi::CallbackInfo &info)
@@ -486,7 +486,7 @@ BaseDocument::InsertPage(const Napi::CallbackInfo &info)
 	const auto rect = Rect::Unwrap(info[0].As<Object>())->GetRect();
 	const int index = info[1].As<Number>();
 	Base->InsertPage(rect, index);
-	return Page::constructor.New(
+	return Page::Constructor.New(
 		{External<PdfPage>::New(info.Env(), Base->GetPage(index))});
 }
 
@@ -590,7 +590,7 @@ BaseDocument::GetAttachment(const CallbackInfo &info)
 void
 BaseDocument::AddNamedDestination(const Napi::CallbackInfo &info)
 {
-	auto page = Page::Unwrap(info[0].As<Object>())->page;
+	auto page = Page::Unwrap(info[0].As<Object>())->Self;
 	const auto fit =
 		static_cast<EPdfDestinationFit>(info[1].As<Number>().Int32Value());
 	const auto name = info[2].As<String>().Utf8Value();

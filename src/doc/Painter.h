@@ -25,12 +25,15 @@
 #include <napi.h>
 #include <podofo/podofo.h>
 #include <spdlog/logger.h>
+using JsValue = Napi::Value;
 
 namespace NoPoDoFo {
 class Painter : public Napi::ObjectWrap<Painter>
 {
 public:
   explicit Painter(const Napi::CallbackInfo& callbackInfo);
+  explicit Painter(const Painter&) = delete;
+  const Painter& operator=(const Painter&) = delete;
   ~Painter();
   static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
@@ -38,7 +41,7 @@ public:
   void SetPage(const Napi::CallbackInfo&);
   void SetColor(const Napi::CallbackInfo&);
   void SetColorCMYK(const Napi::CallbackInfo&);
-  Napi::Value GetCanvas(const Napi::CallbackInfo&);
+  JsValue GetCanvas(const Napi::CallbackInfo&);
   void SetStrokingGrey(const Napi::CallbackInfo&);
   void SetGrey(const Napi::CallbackInfo&);
   void SetStrokingColorCMYK(const Napi::CallbackInfo&);
@@ -46,8 +49,8 @@ public:
   void SetStrokeStyle(const Napi::CallbackInfo&);
   void SetLineCapStyle(const Napi::CallbackInfo&);
   void SetLineJoinStyle(const Napi::CallbackInfo&);
-  void SetFont(const Napi::CallbackInfo&, const Napi::Value&);
-  Napi::Value GetFont(const Napi::CallbackInfo&);
+  void SetFont(const Napi::CallbackInfo&, const JsValue&);
+  JsValue GetFont(const Napi::CallbackInfo&);
   void SetClipRect(const Napi::CallbackInfo&);
   void SetMiterLimit(const Napi::CallbackInfo&);
   void Rectangle(const Napi::CallbackInfo&);
@@ -71,33 +74,33 @@ public:
   void Save(const Napi::CallbackInfo&);
   void Restore(const Napi::CallbackInfo&);
   void SetExtGState(const Napi::CallbackInfo&);
-  void SetTabWidth(const Napi::CallbackInfo&, const Napi::Value&);
-  Napi::Value GetTabWidth(const Napi::CallbackInfo&);
-  Napi::Value GetCurrentPath(const Napi::CallbackInfo&);
+  void SetTabWidth(const Napi::CallbackInfo&, const JsValue&);
+  JsValue GetTabWidth(const Napi::CallbackInfo&);
+  JsValue GetCurrentPath(const Napi::CallbackInfo&);
   void FinishPage(const Napi::CallbackInfo&);
   void DrawText(const Napi::CallbackInfo&);
   void DrawImage(const Napi::CallbackInfo&);
   void DrawMultiLineText(const Napi::CallbackInfo&);
   void DrawLine(const Napi::CallbackInfo&);
   void DrawTextAligned(const Napi::CallbackInfo&);
-  Napi::Value GetMultiLineText(const Napi::CallbackInfo&);
+  JsValue GetMultiLineText(const Napi::CallbackInfo&);
   void BeginText(const Napi::CallbackInfo& info);
   void EndText(const Napi::CallbackInfo& info);
   void AddText(const Napi::CallbackInfo&);
   void MoveTextPosition(const Napi::CallbackInfo&);
   void DrawGlyph(const Napi::CallbackInfo&);
-  Napi::Value GetPrecision(const Napi::CallbackInfo&);
-  void SetPrecision(const Napi::CallbackInfo&, const Napi::Value&);
+  JsValue GetPrecision(const Napi::CallbackInfo&);
+  void SetPrecision(const Napi::CallbackInfo&, const JsValue&);
 
-  PoDoFo::PdfPainter& GetPainter() { return *painter; }
+  PoDoFo::PdfPainter& GetPainter() const { return *Self; }
 
 private:
-  bool isMemDoc = false;
-  std::unique_ptr<PoDoFo::PdfPainter> painter;
-  PoDoFo::PdfDocument* document;
-  void GetCMYK(Napi::Value&, float* cmyk);
-  void GetRGB(Napi::Value&, float* rgb);
-  std::shared_ptr<spdlog::logger> dbglog;
+  bool IsMemDoc = false;
+  std::unique_ptr<PoDoFo::PdfPainter> Self;
+  PoDoFo::PdfDocument* Doc;
+  void GetCMYK(JsValue&, float* CMYK);
+  void GetRGB(JsValue&, float* rgb);
+  std::shared_ptr<spdlog::logger> DbgLog;
 };
 }
 #endif // NPDF_PAINTER_H

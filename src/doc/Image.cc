@@ -50,7 +50,7 @@ Image::Image(const CallbackInfo& info)
   auto iObj = info[0].As<Object>();
   if (iObj.InstanceOf(Document::Constructor.Value())) {
     Doc = Document::Unwrap(iObj)->Base;
-  } else if (iObj.InstanceOf(StreamDocument::constructor.Value())) {
+  } else if (iObj.InstanceOf(StreamDocument::Constructor.Value())) {
     Doc = StreamDocument::Unwrap(iObj)->Base;
   }
   int format = 0;

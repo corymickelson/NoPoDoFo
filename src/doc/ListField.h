@@ -24,30 +24,34 @@
 #include <podofo/podofo.h>
 #include <spdlog/logger.h>
 
+using JsValue = Napi::Value;
+
 namespace NoPoDoFo {
 class ListField
 {
 public:
   explicit ListField(PoDoFo::PdfField&);
+  explicit ListField(const ListField&) = delete;
+  const ListField& operator=(const ListField&) = delete;
   ~ListField();
   void InsertItem(const Napi::CallbackInfo&);
   void RemoveItem(const Napi::CallbackInfo&);
-  Napi::Value GetItem(const Napi::CallbackInfo&);
-  Napi::Value GetItemCount(const Napi::CallbackInfo&);
-  void SetSelectedItem(const Napi::CallbackInfo&, const Napi::Value&);
-  Napi::Value GetSelectedItem(const Napi::CallbackInfo&);
-  Napi::Value IsComboBox(const Napi::CallbackInfo&);
-  void SetSpellCheckEnabled(const Napi::CallbackInfo&, const Napi::Value&);
-  Napi::Value IsSpellCheckEnabled(const Napi::CallbackInfo&);
-  void SetSorted(const Napi::CallbackInfo&, const Napi::Value&);
-  Napi::Value IsSorted(const Napi::CallbackInfo&);
-  void SetMultiSelect(const Napi::CallbackInfo&, const Napi::Value&);
-  Napi::Value IsMultiSelect(const Napi::CallbackInfo&);
-  PoDoFo::PdfListField GetListField() { return PoDoFo::PdfListField(field); }
+  JsValue GetItem(const Napi::CallbackInfo&);
+  JsValue GetItemCount(const Napi::CallbackInfo&);
+  void SetSelectedItem(const Napi::CallbackInfo&, const JsValue&);
+  JsValue GetSelectedItem(const Napi::CallbackInfo&);
+  JsValue IsComboBox(const Napi::CallbackInfo&);
+  void SetSpellCheckEnabled(const Napi::CallbackInfo&, const JsValue&);
+  JsValue IsSpellCheckEnabled(const Napi::CallbackInfo&);
+  void SetSorted(const Napi::CallbackInfo&, const JsValue&);
+  JsValue IsSorted(const Napi::CallbackInfo&);
+  void SetMultiSelect(const Napi::CallbackInfo&, const JsValue&);
+  JsValue IsMultiSelect(const Napi::CallbackInfo&);
+  PoDoFo::PdfListField GetListField() { return PoDoFo::PdfListField(Self); }
 
 private:
-  PoDoFo::PdfField& field;
-  std::shared_ptr<spdlog::logger> dbglog;
+  PoDoFo::PdfField& Self;
+  std::shared_ptr<spdlog::logger> DbgLog;
 };
 }
 #endif

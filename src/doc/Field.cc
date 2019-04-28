@@ -39,7 +39,6 @@ using std::map;
 using std::string;
 using std::stringstream;
 using std::vector;
-using tl::nullopt;
 
 namespace NoPoDoFo {
 
@@ -51,15 +50,15 @@ Field::Field(EPdfField type, const CallbackInfo& info)
 {
   DbgLog = spdlog::get("DbgLog");
   if (info[0].IsExternal()) {
-    auto arg = info[0].As<External<PdfField>>().Data();
+    const auto arg = info[0].As<External<PdfField>>().Data();
     Self = new PdfField(*arg);
   } else {
-    auto arg1 = info[0].As<Object>();
-    if (arg1.InstanceOf(Page::constructor.Value())) {
+    const auto arg1 = info[0].As<Object>();
+    if (arg1.InstanceOf(Page::Constructor.Value())) {
       auto page = Page::Unwrap(arg1);
       if (info[1].IsNumber()) {
-        int index = info[1].As<Number>();
-        Self = new PdfField(page->page.GetField(index));
+        const int index = info[1].As<Number>();
+        Self = new PdfField(page->Self.GetField(index));
       }
     } else if (arg1.InstanceOf(Annotation::Constructor.Value())) {
       PdfAnnotation* annotation = &Annotation::Unwrap(arg1)->GetAnnotation();

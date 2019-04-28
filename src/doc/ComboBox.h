@@ -25,22 +25,25 @@
 #include <napi.h>
 #include <podofo/podofo.h>
 
+using JsValue = Napi::Value;
+
 namespace NoPoDoFo {
-class ComboBox
-  : public Napi::ObjectWrap<ComboBox>
+class ComboBox final
+  : public ObjectWrap<ComboBox>
   , public Field
   , public ListField
 {
 public:
-  explicit ComboBox(const Napi::CallbackInfo&);
-  ~ComboBox();
-  static Napi::FunctionReference Constructor;
-  static void Initialize(Napi::Env&, Napi::Object&);
-  void SetEditable(const Napi::CallbackInfo&, const Napi::Value&);
-  Napi::Value GetEditable(const Napi::CallbackInfo&);
+  explicit ComboBox(const CallbackInfo&);
+  explicit ComboBox(const ComboBox&) = delete;
+  const ComboBox& operator=(const ComboBox&) = delete;
+  static FunctionReference Constructor;
+  static void Initialize(Napi::Env&, Object&);
+  void SetEditable(const CallbackInfo&, const Napi::Value&);
+  JsValue GetEditable(const CallbackInfo&);
 
-  PoDoFo::PdfComboBox GetComboBox() { return PoDoFo::PdfComboBox(FormField); }
-  PoDoFo::PdfField& FormField;
+  PdfComboBox GetComboBox() const { return PdfComboBox(FormField); }
+  PdfField& FormField;
 };
 }
 

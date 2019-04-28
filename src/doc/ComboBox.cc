@@ -39,10 +39,6 @@ ComboBox::ComboBox(const Napi::CallbackInfo& info)
   , FormField(Field::GetField())
 {
 }
-ComboBox::~ComboBox()
-{
-  Field::DbgLog->debug("ComboBox Cleanup");
-}
 void
 ComboBox::Initialize(Napi::Env& env, Napi::Object& target)
 {

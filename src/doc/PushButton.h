@@ -9,27 +9,29 @@
 #include "Field.h"
 #include <napi.h>
 #include <podofo/podofo.h>
+using JsValue = Value;
 
 namespace NoPoDoFo {
 
-class PushButton
-  : public Napi::ObjectWrap<PushButton>
-  , public Field
-  , public Button
+class PushButton final
+  : public ObjectWrap<PushButton>
+    , public Field
+    , public Button
 {
 public:
-  static Napi::FunctionReference constructor;
-  explicit PushButton(const Napi::CallbackInfo& callbackInfo);
-  ~PushButton();
-  static void Initialize(Napi::Env& env, Napi::Object& target);
-  Napi::Value GetRolloverCaption(const Napi::CallbackInfo&);
-  Napi::Value GetAlternateCaption(const Napi::CallbackInfo&);
-  void SetRolloverCaption(const Napi::CallbackInfo&, const Napi::Value&);
-  void SetAlternateCaption(const Napi::CallbackInfo&, const Napi::Value&);
-  PoDoFo::PdfPushButton GetPushButton() { return PoDoFo::PdfPushButton(field); }
-  PoDoFo::PdfField& field;
+  static FunctionReference Constructor;
+  explicit PushButton(const CallbackInfo& callbackInfo);
+  explicit PushButton(const PushButton&) = delete;
+  const PushButton& operator=(const PushButton&) = delete;
+  static void Initialize(Napi::Env& env, Object& target);
+  JsValue GetRolloverCaption(const CallbackInfo&);
+  JsValue GetAlternateCaption(const CallbackInfo&);
+  void SetRolloverCaption(const CallbackInfo&, const JsValue&);
+  void SetAlternateCaption(const CallbackInfo&, const JsValue&);
+  PdfPushButton GetPushButton() { return PdfPushButton(Self); }
+  PdfField& Self;
 private:
-  std::shared_ptr<spdlog::logger> dbglog;
+  std::shared_ptr<spdlog::logger> DbgLog;
 };
 }
 #endif // NPDF_PUSHBUTTON_H

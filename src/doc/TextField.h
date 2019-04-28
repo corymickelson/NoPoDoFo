@@ -23,11 +23,10 @@
 #include "Field.h"
 #include <napi.h>
 #include <podofo/podofo.h>
-#include <string>
-
+using JsValue = Napi::Value;
 namespace NoPoDoFo {
 using namespace std;
-class TextField
+class TextField final
   : public Napi::ObjectWrap<TextField>
   , public Field
 {
@@ -36,29 +35,29 @@ public:
   explicit TextField(const Napi::CallbackInfo&);
   ~TextField();
   static void Initialize(Napi::Env& env, Napi::Object& target);
-  void SetText(const Napi::CallbackInfo&, const Napi::Value&);
-  Napi::Value Text(const Napi::CallbackInfo&);
-  void SetMaxLen(const Napi::CallbackInfo&, const Napi::Value&);
-  Napi::Value GetMaxLen(const Napi::CallbackInfo&);
-  void SetMultiLine(const Napi::CallbackInfo&, const Napi::Value&);
-  Napi::Value IsMultiLine(const Napi::CallbackInfo&);
-  void SetPasswordField(const Napi::CallbackInfo&, const Napi::Value&);
-  Napi::Value IsPasswordField(const Napi::CallbackInfo&);
-  void SetFileField(const Napi::CallbackInfo&, const Napi::Value&);
-  Napi::Value IsFileField(const Napi::CallbackInfo&);
-  void SetSpellcheckEnabled(const Napi::CallbackInfo&, const Napi::Value&);
-  Napi::Value IsSpellcheckEnabled(const Napi::CallbackInfo&);
-  void SetScrollEnabled(const Napi::CallbackInfo&, const Napi::Value&);
-  Napi::Value IsScrollEnabled(const Napi::CallbackInfo&);
-  void SetCombs(const Napi::CallbackInfo&, const Napi::Value&);
-  Napi::Value IsCombs(const Napi::CallbackInfo&);
-  void SetRichText(const Napi::CallbackInfo&, const Napi::Value&);
-  Napi::Value IsRichText(const Napi::CallbackInfo&);
+  void SetText(const Napi::CallbackInfo&, const JsValue&);
+  JsValue Text(const Napi::CallbackInfo&);
+  void SetMaxLen(const Napi::CallbackInfo&, const JsValue&);
+  JsValue GetMaxLen(const Napi::CallbackInfo&);
+  void SetMultiLine(const Napi::CallbackInfo&, const JsValue&);
+  JsValue IsMultiLine(const Napi::CallbackInfo&);
+  void SetPasswordField(const Napi::CallbackInfo&, const JsValue&);
+  JsValue IsPasswordField(const Napi::CallbackInfo&);
+  void SetFileField(const Napi::CallbackInfo&, const JsValue&);
+  JsValue IsFileField(const Napi::CallbackInfo&);
+  void SetSpellcheckEnabled(const Napi::CallbackInfo&, const JsValue&);
+  JsValue IsSpellcheckEnabled(const Napi::CallbackInfo&);
+  void SetScrollEnabled(const Napi::CallbackInfo&, const JsValue&);
+  JsValue IsScrollEnabled(const Napi::CallbackInfo&);
+  void SetCombs(const Napi::CallbackInfo&, const JsValue&);
+  JsValue IsCombs(const Napi::CallbackInfo&);
+  void SetRichText(const Napi::CallbackInfo&, const JsValue&);
+  JsValue IsRichText(const Napi::CallbackInfo&);
   void RefreshAppearanceStream(const Napi::CallbackInfo&);
-  PoDoFo::PdfTextField GetText() { return PoDoFo::PdfTextField(field); }
-  PoDoFo::PdfField& field;
+  PoDoFo::PdfTextField GetText() const { return PoDoFo::PdfTextField(Self); }
+  PoDoFo::PdfField& Self;
 private:
-  std::shared_ptr<spdlog::logger> dbglog;
+  std::shared_ptr<spdlog::logger> DbgLog;
 };
 }
 #endif // NPDF_TEXTFIELD_H

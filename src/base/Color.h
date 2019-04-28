@@ -60,7 +60,7 @@ public:
   JsValue ConvertToGreyScale(const CallbackInfo&);
   JsValue ConvertToRGB(const CallbackInfo&);
   JsValue ConvertToCMYK(const CallbackInfo&);
-  JsValue GetColorStreamString(const CallbackInfo &);
+  JsValue GetColorStreamString(const CallbackInfo&);
   PdfColor* Self;
 
 private:

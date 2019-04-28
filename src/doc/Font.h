@@ -34,8 +34,8 @@ class Font : public Napi::ObjectWrap<Font>
 {
 public:
   explicit Font(const Napi::CallbackInfo& callbackInfo);
-	explicit Font(const Font&) = delete;
-	const Font&operator=(const Font&) = delete;
+  explicit Font(const Font&) = delete;
+  const Font& operator=(const Font&) = delete;
   ~Font();
   static Napi::FunctionReference Constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);

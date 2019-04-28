@@ -36,7 +36,7 @@ FunctionReference Rect::constructor; // NOLINT
 Rect::Rect(const CallbackInfo& info)
   : ObjectWrap(info)
 {
-  dbglog = spdlog::get("DbgLog");
+  DbgLog = spdlog::get("DbgLog");
   vector<int> opts = AssertCallbackInfo(
     info,
     {
@@ -47,10 +47,10 @@ Rect::Rect(const CallbackInfo& info)
     });
   switch (opts[0]) {
     case 0:
-      rect = new PdfRect();
+      Self = new PdfRect();
       break;
     case 1:
-      rect = new PdfRect(*info[0].As<External<PdfRect>>().Data());
+      Self = new PdfRect(*info[0].As<External<PdfRect>>().Data());
       break;
     case 2:
       if (opts[1] == 0 || opts[2] == 0 || opts[3] == 0) {
@@ -60,7 +60,7 @@ Rect::Rect(const CallbackInfo& info)
           .ThrowAsJavaScriptException();
         return;
       }
-      rect = new PdfRect(info[0].As<Number>().DoubleValue(),
+      Self = new PdfRect(info[0].As<Number>().DoubleValue(),
                          info[1].As<Number>().DoubleValue(),
                          info[2].As<Number>().DoubleValue(),
                          info[3].As<Number>().DoubleValue());
@@ -75,9 +75,9 @@ Rect::Rect(const CallbackInfo& info)
 
 Rect::~Rect()
 {
-  dbglog->debug("Rect Cleanup");
+  DbgLog->debug("Rect Cleanup");
   HandleScope scope(Env());
-  delete rect;
+  delete Self;
 }
 
 void

@@ -31,7 +31,7 @@ namespace NoPoDoFo {
 class Button
 {
 public:
-	explicit Button(PoDoFo::PdfField&);
+  explicit Button(PoDoFo::PdfField&);
   explicit Button(const Button&) = delete;
   const Button&operator=(const Button&) = delete;
   ~Button();

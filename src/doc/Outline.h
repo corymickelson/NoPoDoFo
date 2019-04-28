@@ -25,6 +25,7 @@
 #include <spdlog/logger.h>
 
 using std::vector;
+using JsValue = Napi::Value;
 
 namespace NoPoDoFo {
 
@@ -36,34 +37,35 @@ class Outline : public Napi::ObjectWrap<Outline>
 {
 public:
   explicit Outline(const Napi::CallbackInfo& info);
+  explicit Outline(const Outline&) = delete;
+  const Outline& operator=(const Outline&) = delete;
   ~Outline();
   static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
-  //  void CreateRoot(const Napi::CallbackInfo&);
-  Napi::Value CreateChild(const Napi::CallbackInfo&);
-  Napi::Value CreateNext(const Napi::CallbackInfo&);
-  Napi::Value InsertChild(const Napi::CallbackInfo&);
-  Napi::Value Prev(const Napi::CallbackInfo&);
-  Napi::Value Next(const Napi::CallbackInfo&);
-  Napi::Value First(const Napi::CallbackInfo&);
-  Napi::Value Last(const Napi::CallbackInfo&);
-  Napi::Value GetParent(const Napi::CallbackInfo&);
-  Napi::Value Erase(const Napi::CallbackInfo&);
-  Napi::Value GetDestination(const Napi::CallbackInfo&);
-  void SetDestination(const Napi::CallbackInfo&, const Napi::Value&);
-  Napi::Value GetAction(const Napi::CallbackInfo&);
-  void SetAction(const Napi::CallbackInfo&, const Napi::Value&);
-  Napi::Value GetTitle(const Napi::CallbackInfo&);
-  void SetTitle(const Napi::CallbackInfo&, const Napi::Value&);
-  Napi::Value GetTextFormat(const Napi::CallbackInfo&);
-  void SetTextFormat(const Napi::CallbackInfo&, const Napi::Value&);
-  Napi::Value GetTextColor(const Napi::CallbackInfo&);
-  void SetTextColor(const Napi::CallbackInfo&, const Napi::Value&);
-  PoDoFo::PdfOutlineItem& GetOutline() { return outline; }
+  JsValue CreateChild(const Napi::CallbackInfo&);
+  JsValue CreateNext(const Napi::CallbackInfo&);
+  JsValue InsertChild(const Napi::CallbackInfo&);
+  JsValue Prev(const Napi::CallbackInfo&);
+  JsValue Next(const Napi::CallbackInfo&);
+  JsValue First(const Napi::CallbackInfo&);
+  JsValue Last(const Napi::CallbackInfo&);
+  JsValue GetParent(const Napi::CallbackInfo&);
+  JsValue Erase(const Napi::CallbackInfo&);
+  JsValue GetDestination(const Napi::CallbackInfo&);
+  void SetDestination(const Napi::CallbackInfo&, const JsValue&);
+  JsValue GetAction(const Napi::CallbackInfo&);
+  void SetAction(const Napi::CallbackInfo&, const JsValue&);
+  JsValue GetTitle(const Napi::CallbackInfo&);
+  void SetTitle(const Napi::CallbackInfo&, const JsValue&);
+  JsValue GetTextFormat(const Napi::CallbackInfo&);
+  void SetTextFormat(const Napi::CallbackInfo&, const JsValue&);
+  JsValue GetTextColor(const Napi::CallbackInfo&);
+  void SetTextColor(const Napi::CallbackInfo&, const JsValue&);
+  PoDoFo::PdfOutlineItem& GetOutline() { return Self; }
 
 private:
-  PoDoFo::PdfOutlineItem& outline; // owned by the document
-  std::shared_ptr<spdlog::logger> dbglog;
+  PoDoFo::PdfOutlineItem& Self; // owned by the document
+  std::shared_ptr<spdlog::logger> DbgLog;
 };
 }
 #endif // NPDF_OUTLINE_H

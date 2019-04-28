@@ -30,9 +30,9 @@ namespace NoPoDoFo {
 class ExtGState : public Napi::ObjectWrap<ExtGState>
 {
 public:
-	explicit ExtGState(const Napi::CallbackInfo& info);
+  explicit ExtGState(const Napi::CallbackInfo& info);
   explicit ExtGState(const ExtGState&) = delete;
-  const ExtGState&operator=(const ExtGState&) = delete;
+  const ExtGState& operator=(const ExtGState&) = delete;
   ~ExtGState();
   static Napi::FunctionReference Constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
@@ -46,7 +46,7 @@ public:
   void SetRenderingIntent(const Napi::CallbackInfo& info);
   void SetFrequency(const Napi::CallbackInfo& info);
 
-  PoDoFo::PdfExtGState* GetExtGState() { return Self.get(); }
+  PoDoFo::PdfExtGState* GetExtGState() const { return Self.get(); }
 
 private:
   std::unique_ptr<PoDoFo::PdfExtGState> Self;

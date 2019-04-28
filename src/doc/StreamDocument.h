@@ -24,27 +24,28 @@
 
 #include <napi.h>
 #include <podofo/podofo.h>
+using JsValue = Napi::Value;
 
 namespace NoPoDoFo {
-class StreamDocument
+class StreamDocument final
   : public Napi::ObjectWrap<StreamDocument>
-  , public BaseDocument
+    , public BaseDocument
 {
 public:
-  static Napi::FunctionReference constructor;
+  static Napi::FunctionReference Constructor;
   explicit StreamDocument(const Napi::CallbackInfo&);
+  explicit StreamDocument(const StreamDocument&) = delete;
+  const StreamDocument& operator=(const StreamDocument&) = delete;
   ~StreamDocument();
   static void Initialize(Napi::Env& env, Napi::Object& target);
-  Napi::Value Close(const Napi::CallbackInfo&);
+  JsValue Close(const Napi::CallbackInfo&);
   void Append(const Napi::CallbackInfo&) override;
-  Napi::Value InsertExistingPage(const Napi::CallbackInfo&) override;
-  PoDoFo::PdfStreamedDocument& GetStreamedDocument()
+  JsValue InsertExistingPage(const Napi::CallbackInfo&) override;
+
+  PoDoFo::PdfStreamedDocument& GetStreamedDocument() const
   {
     return *dynamic_cast<PoDoFo::PdfStreamedDocument*>(BaseDocument::Base);
   }
-
-private:
-  std::shared_ptr<spdlog::logger> dbglog;
 };
 };
 #endif

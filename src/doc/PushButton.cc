@@ -10,20 +10,15 @@ using namespace PoDoFo;
 
 namespace NoPoDoFo {
 
-FunctionReference PushButton::constructor; // NOLINT
+FunctionReference PushButton::Constructor; // NOLINT
 
 PushButton::PushButton(const Napi::CallbackInfo& info)
   : ObjectWrap<PushButton>(info)
   , Field(ePdfField_PushButton, info)
   , Button(Field::GetField())
-  , field(Field::GetField())
+  , Self(Field::GetField())
 {
-  dbglog = spdlog::get("DbgLog");
-}
-
-PushButton::~PushButton()
-{
-  dbglog->debug("PushButton Cleanup");
+  DbgLog = spdlog::get("DbgLog");
 }
 
 void
@@ -73,8 +68,8 @@ PushButton::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceMethod("setHighlightingMode", &PushButton::SetHighlightingMode)
 
     });
-  constructor = Persistent(ctor);
-  constructor.SuppressDestruct();
+  Constructor = Persistent(ctor);
+  Constructor.SuppressDestruct();
   target.Set("PushButton", ctor);
 }
 Napi::Value

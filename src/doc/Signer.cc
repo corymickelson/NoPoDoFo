@@ -23,8 +23,6 @@
 #include "../base/Names.h"
 #include "Document.h"
 #include "SignatureField.h"
-#include "StreamDocument.h"
-
 #include <map>
 #include <sstream>
 #include <vector>
@@ -46,7 +44,7 @@ using tl::nullopt;
 
 namespace NoPoDoFo {
 
-FunctionReference Signer::constructor; // NOLINT
+FunctionReference Signer::Constructor; // NOLINT
 
 /**
  * todo: StreamDocument support
@@ -55,9 +53,9 @@ FunctionReference Signer::constructor; // NOLINT
  */
 Signer::Signer(const Napi::CallbackInfo& info)
   : ObjectWrap(info)
-  , doc(Document::Unwrap(info[0].As<Object>())->GetDocument())
+  , Doc(Document::Unwrap(info[0].As<Object>())->GetDocument())
 {
-  dbglog = spdlog::get("DbgLog");
+  DbgLog = spdlog::get("DbgLog");
   if (info.Length() < 1) {
     Error::New(info.Env(), "Document required to construct Signer")
       .ThrowAsJavaScriptException();
@@ -69,19 +67,19 @@ Signer::Signer(const Napi::CallbackInfo& info)
     return;
   }
   if (info.Length() >= 2 && info[1].IsString()) {
-    output = info[1].As<String>().Utf8Value();
+    Output = info[1].As<String>().Utf8Value();
   }
 }
 
 Signer::~Signer()
 {
-  dbglog->debug("Signer Cleanup");
+  DbgLog->debug("Signer Cleanup");
   HandleScope scope(Env());
-  if (cert != nullptr) {
-    X509_free(cert);
+  if (Cert != nullptr) {
+    X509_free(Cert);
   }
-  if (pkey) {
-    EVP_PKEY_free(pkey);
+  if (Pkey) {
+    EVP_PKEY_free(Pkey);
   }
 }
 
@@ -97,17 +95,17 @@ Signer::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceMethod("write", &Signer::SignWorker),
       InstanceMethod("loadCertificateAndKey", &Signer::LoadCertificateAndKey),
     });
-  constructor = Persistent(ctor);
-  constructor.SuppressDestruct();
+  Constructor = Persistent(ctor);
+  Constructor.SuppressDestruct();
   target.Set("Signer", ctor);
 }
 
 void
 Signer::SetField(const CallbackInfo& info, const Napi::Value& value)
 {
-  field = SignatureField::Unwrap(value.As<Object>())->GetField();
+  Field = SignatureField::Unwrap(value.As<Object>())->GetField();
   try {
-    field->EnsureSignatureObject();
+    Field->EnsureSignatureObject();
   } catch (PdfError& err) {
     ErrorHandler(err, info);
   }
@@ -116,8 +114,8 @@ Signer::SetField(const CallbackInfo& info, const Napi::Value& value)
 Value
 Signer::GetField(const CallbackInfo& info)
 {
-  return SignatureField::constructor.New(
-    { External<PdfSignatureField>::New(info.Env(), field.get()) });
+  return SignatureField::Constructor.New(
+    { External<PdfSignatureField>::New(info.Env(), Field.get()) });
 }
 
 class SignAsync : public AsyncWorker
@@ -150,7 +148,7 @@ protected:
     OPENSSL_init();
 #endif
     try {
-      PdfObject* acroform = self.doc.GetAcroForm(false)->GetObject();
+      PdfObject* acroform = self.Doc.GetAcroForm(false)->GetObject();
       size_t sigBuffer = 65535, sigBufferLen;
       int rc;
       char* sigData;
@@ -171,23 +169,23 @@ protected:
 
       // Create an output device for the signed document
       PdfOutputDevice outputDevice =
-        self.output.empty() ? PdfOutputDevice(&buffer)
-                            : PdfOutputDevice(self.output.c_str(), true);
+        self.Output.empty() ? PdfOutputDevice(&buffer)
+                            : PdfOutputDevice(self.Output.c_str(), true);
       PdfSignOutputDevice signer(&outputDevice);
 
       // minimally ensure signature field name property is filled, defaults to
       // "NoPoDoFo.SignatureField"
-      if (self.field->GetFieldName().GetStringUtf8().empty()) {
-        self.field->SetFieldName("NoPoDoFo.SignatureField");
+      if (self.Field->GetFieldName().GetStringUtf8().empty()) {
+        self.Field->SetFieldName("NoPoDoFo.SignatureField");
       }
 
-      self.field->SetSignatureDate(PdfDate());
+      self.Field->SetSignatureDate(PdfDate());
 
       // Set output device to write signature to designated area.
       signer.SetSignatureSize(static_cast<size_t>(minSigSize));
 
-      self.field->SetSignature(*signer.GetSignatureBeacon());
-      self.doc.WriteUpdate(&signer, true);
+      self.Field->SetSignature(*signer.GetSignatureBeacon());
+      self.Doc.WriteUpdate(&signer, true);
 
       if (!signer.HasSignaturePosition()) {
         SetError("Cannot find signature position in the document data");
@@ -217,7 +215,7 @@ protected:
         return;
       }
       p7 = PKCS7_sign(
-        self.cert, self.pkey, nullptr, memory, PKCS7_DETACHED | PKCS7_BINARY);
+        self.Cert, self.Pkey, nullptr, memory, PKCS7_DETACHED | PKCS7_BINARY);
       if (!p7) {
         BIO_free(memory);
         podofo_free(sigData);
@@ -278,13 +276,13 @@ protected:
   void OnOK() override
   {
     HandleScope scope(Env());
-    if (!self.output.empty()) {
-      if (FILE* file = fopen(self.output.c_str(), "rb")) {
+    if (!self.Output.empty()) {
+      if (FILE* file = fopen(self.Output.c_str(), "rb")) {
         fclose(file);
         Callback().Call({ Env().Undefined() });
       } else {
         stringstream msg;
-        msg << "Failed to write to: " << self.output << endl;
+        msg << "Failed to write to: " << self.Output << endl;
         Callback().Call({ String::New(Env(), msg.str()) });
       }
     } else {
@@ -356,9 +354,9 @@ protected:
       SetError("Failed to open Certificate file");
       return;
     }
-    signer.cert = PEM_read_X509(file, nullptr, nullptr, nullptr);
+    signer.Cert = PEM_read_X509(file, nullptr, nullptr, nullptr);
     minSigSize += minimumSignerSize(file);
-    if (!signer.cert) {
+    if (!signer.Cert) {
       SetError("Failed to decode Certificate file");
     }
     fclose(file);
@@ -366,10 +364,10 @@ protected:
     // Load Private key
     if (!(file = fopen(key.c_str(), "rb"))) {
       SetError("Failed to open Private key file");
-      X509_free(signer.cert);
+      X509_free(signer.Cert);
       return;
     }
-    signer.pkey =
+    signer.Pkey =
       PEM_read_PrivateKey(file,
                           nullptr,
                           [](char* buf,
@@ -386,9 +384,9 @@ protected:
                             return res;
                           },
                           static_cast<void*>(&pwd));
-    if (!signer.pkey) {
+    if (!signer.Pkey) {
       SetError("Failed to decode Private key file");
-      X509_free(signer.cert);
+      X509_free(signer.Cert);
       return;
     }
     minSigSize += minimumSignerSize(file);

@@ -23,6 +23,7 @@
 #include <napi.h>
 #include <podofo/podofo.h>
 #include <spdlog/logger.h>
+using JsValue = Napi::Value;
 
 namespace NoPoDoFo {
 
@@ -30,52 +31,54 @@ class SimpleTable : public Napi::ObjectWrap<SimpleTable>
 {
 public:
   explicit SimpleTable(const Napi::CallbackInfo&);
+  explicit SimpleTable(const SimpleTable&) = delete;
+  const SimpleTable& operator=(const SimpleTable&) = delete;
   ~SimpleTable();
-  static Napi::FunctionReference constructor;
+  static Napi::FunctionReference Constructor;
   static void Initialize(Napi::Env&, Napi::Object&);
-  Napi::Value GetFont(const Napi::CallbackInfo&);
+  JsValue GetFont(const Napi::CallbackInfo&);
   void SetFont(const Napi::CallbackInfo&);
-  Napi::Value GetText(const Napi::CallbackInfo&);
+  JsValue GetText(const Napi::CallbackInfo&);
   void SetText(const Napi::CallbackInfo&);
-  Napi::Value GetBorderWidth(const Napi::CallbackInfo&);
-  void SetBorderWidth(const Napi::CallbackInfo&, const Napi::Value&);
-  Napi::Value GetBorderColor(const Napi::CallbackInfo&);
+  JsValue GetBorderWidth(const Napi::CallbackInfo&);
+  void SetBorderWidth(const Napi::CallbackInfo&, const JsValue&);
+  JsValue GetBorderColor(const Napi::CallbackInfo&);
   void SetBorderEnabled(const Napi::CallbackInfo&);
-  Napi::Value HasBorders(const Napi::CallbackInfo&);
-  Napi::Value GetImage(const Napi::CallbackInfo&);
-  Napi::Value HasImage(const Napi::CallbackInfo&);
-  Napi::Value GetForegroundColor(const Napi::CallbackInfo&);
-  void SetForegroundColor(const Napi::CallbackInfo&, const Napi::Value&);
-  Napi::Value GetBackgroundColor(const Napi::CallbackInfo&);
-  void SetBackgroundColor(const Napi::CallbackInfo&, const Napi::Value&);
-  Napi::Value HasBackgroundColor(const Napi::CallbackInfo&);
+  JsValue HasBorders(const Napi::CallbackInfo&);
+  JsValue GetImage(const Napi::CallbackInfo&);
+  JsValue HasImage(const Napi::CallbackInfo&);
+  JsValue GetForegroundColor(const Napi::CallbackInfo&);
+  void SetForegroundColor(const Napi::CallbackInfo&, const JsValue&);
+  JsValue GetBackgroundColor(const Napi::CallbackInfo&);
+  void SetBackgroundColor(const Napi::CallbackInfo&, const JsValue&);
+  JsValue HasBackgroundColor(const Napi::CallbackInfo&);
   void SetBackgroundEnabled(const Napi::CallbackInfo&);
-  Napi::Value GetAlignment(const Napi::CallbackInfo&);
-  void SetAlignment(const Napi::CallbackInfo&, const Napi::Value&);
-  Napi::Value GetVerticalAlignment(const Napi::CallbackInfo&);
-  Napi::Value HasWordWrap(const Napi::CallbackInfo&);
-  void SetWordWrapEnabled(const Napi::CallbackInfo&, const Napi::Value&);
+  JsValue GetAlignment(const Napi::CallbackInfo&);
+  void SetAlignment(const Napi::CallbackInfo&, const JsValue&);
+  JsValue GetVerticalAlignment(const Napi::CallbackInfo&);
+  JsValue HasWordWrap(const Napi::CallbackInfo&);
+  void SetWordWrapEnabled(const Napi::CallbackInfo&, const JsValue&);
 
   // PdfTable
   void Draw(const Napi::CallbackInfo&);
-  Napi::Value GetWidth(const Napi::CallbackInfo&);
-  void SetTableWidth(const Napi::CallbackInfo&, const Napi::Value&);
-  Napi::Value GetHeight(const Napi::CallbackInfo&);
-  void SetTableHeight(const Napi::CallbackInfo&, const Napi::Value&);
-  Napi::Value GetCols(const Napi::CallbackInfo&);
-  Napi::Value GetRows(const Napi::CallbackInfo&);
+  JsValue GetWidth(const Napi::CallbackInfo&);
+  void SetTableWidth(const Napi::CallbackInfo&, const JsValue&);
+  JsValue GetHeight(const Napi::CallbackInfo&);
+  void SetTableHeight(const Napi::CallbackInfo&, const JsValue&);
+  JsValue GetCols(const Napi::CallbackInfo&);
+  JsValue GetRows(const Napi::CallbackInfo&);
   void SetColumnWidths(const Napi::CallbackInfo&);
   void SetColumnWidth(const Napi::CallbackInfo&);
   void SetRowHeights(const Napi::CallbackInfo&);
   void SetRowHeight(const Napi::CallbackInfo&);
-  void SetAutoPageBreak(const Napi::CallbackInfo&, const Napi::Value&);
-  Napi::Value GetAutoPageBreak(const Napi::CallbackInfo&);
+  void SetAutoPageBreak(const Napi::CallbackInfo&, const JsValue&);
+  JsValue GetAutoPageBreak(const Napi::CallbackInfo&);
 
 private:
-  PoDoFo::PdfSimpleTableModel* model = nullptr;
-  PoDoFo::PdfTable* table = nullptr;
-  PoDoFo::PdfDocument* doc = nullptr;
-  std::shared_ptr<spdlog::logger> dbglog;
+  PoDoFo::PdfSimpleTableModel* Model = nullptr;
+  PoDoFo::PdfTable* Table = nullptr;
+  PoDoFo::PdfDocument* Doc = nullptr;
+  std::shared_ptr<spdlog::logger> DbgLog;
 };
 }
 #endif // NPDF_SIMPLETABLE_H

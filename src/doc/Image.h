@@ -30,8 +30,8 @@ class Image : public Napi::ObjectWrap<Image>
 {
 public:
   explicit Image(const Napi::CallbackInfo&);
-	explicit Image(const Image&)= delete;
-	const Image&operator=(const Image&) = delete;
+  explicit Image(const Image&) = delete;
+  const Image& operator=(const Image&) = delete;
   ~Image();
   static Napi::FunctionReference Constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);

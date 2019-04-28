@@ -29,6 +29,7 @@
 
 using std::cout;
 using std::endl;
+using JsValue = Napi::Value;
 
 namespace NoPoDoFo {
 
@@ -36,32 +37,34 @@ class Page : public Napi::ObjectWrap<Page>
 {
 public:
   explicit Page(const Napi::CallbackInfo& callbackInfo);
+  explicit Page(const Page&) = delete;
+  const Page operator=(const Page&) = delete;
   ~Page();
-  static Napi::FunctionReference constructor;
+  static Napi::FunctionReference Constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
-  Napi::Value GetRotation(const Napi::CallbackInfo&);
-  Napi::Value GetNumFields(const Napi::CallbackInfo&);
-  void SetRotation(const Napi::CallbackInfo&, const Napi::Value&);
-  Napi::Value GetField(const Napi::CallbackInfo&);
-  Napi::Value GetField(const Napi::Env&, int);
-  Napi::Value GetFields(const Napi::CallbackInfo&);
-  Napi::Value GetFieldIndex(const Napi::CallbackInfo&);
-  void SetPageWidth(const Napi::CallbackInfo&, const Napi::Value&);
-  void SetPageHeight(const Napi::CallbackInfo&, const Napi::Value&);
-  Napi::Value GetPageWidth(const Napi::CallbackInfo&);
-  Napi::Value GetPageHeight(const Napi::CallbackInfo&);
-  Napi::Value GetTrimBox(const Napi::CallbackInfo&);
-  void SetTrimBox(const Napi::CallbackInfo&, const Napi::Value&);
-  Napi::Value GetPageNumber(const Napi::CallbackInfo&);
-  Napi::Value GetContents(const Napi::CallbackInfo&);
-  Napi::Value GetResources(const Napi::CallbackInfo&);
-  Napi::Value GetMediaBox(const Napi::CallbackInfo&);
-  Napi::Value GetBleedBox(const Napi::CallbackInfo&);
-  Napi::Value GetArtBox(const Napi::CallbackInfo&);
-  Napi::Value CreateAnnotation(const Napi::CallbackInfo&);
-  Napi::Value GetAnnotation(const Napi::CallbackInfo&);
-  Napi::Value CreateField(const Napi::CallbackInfo&);
-  Napi::Value GetNumAnnots(const Napi::CallbackInfo&);
+  JsValue GetRotation(const Napi::CallbackInfo&);
+  JsValue GetNumFields(const Napi::CallbackInfo&);
+  void SetRotation(const Napi::CallbackInfo&, const JsValue&);
+  JsValue GetField(const Napi::CallbackInfo&);
+  JsValue GetField(const Napi::Env&, int);
+  JsValue GetFields(const Napi::CallbackInfo&);
+  JsValue GetFieldIndex(const Napi::CallbackInfo&);
+  void SetPageWidth(const Napi::CallbackInfo&, const JsValue&);
+  void SetPageHeight(const Napi::CallbackInfo&, const JsValue&);
+  JsValue GetPageWidth(const Napi::CallbackInfo&);
+  JsValue GetPageHeight(const Napi::CallbackInfo&);
+  JsValue GetTrimBox(const Napi::CallbackInfo&);
+  void SetTrimBox(const Napi::CallbackInfo&, const JsValue&);
+  JsValue GetPageNumber(const Napi::CallbackInfo&);
+  JsValue GetContents(const Napi::CallbackInfo&);
+  JsValue GetResources(const Napi::CallbackInfo&);
+  JsValue GetMediaBox(const Napi::CallbackInfo&);
+  JsValue GetBleedBox(const Napi::CallbackInfo&);
+  JsValue GetArtBox(const Napi::CallbackInfo&);
+  JsValue CreateAnnotation(const Napi::CallbackInfo&);
+  JsValue GetAnnotation(const Napi::CallbackInfo&);
+  JsValue CreateField(const Napi::CallbackInfo&);
+  JsValue GetNumAnnots(const Napi::CallbackInfo&);
   void DeleteAnnotation(const Napi::CallbackInfo&);
   void DeleteField(const Napi::CallbackInfo&);
   static bool DeleteFormField(PoDoFo::PdfPage&,
@@ -70,12 +73,12 @@ public:
 #if NOPODOFO_SDK
   void FlattenFields(const Napi::CallbackInfo&);
 #endif
-  PoDoFo::PdfPage& page;
+  PoDoFo::PdfPage& Self;
   Napi::Object ExtractAndApplyRectValues(const Napi::CallbackInfo&,
                                          PoDoFo::PdfRect&);
 
 private:
-  std::shared_ptr<spdlog::logger> dbglog;
+  std::shared_ptr<spdlog::logger> DbgLog;
 };
 }
 #endif // NPDF_PDFPAGE_HPP

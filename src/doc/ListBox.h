@@ -28,21 +28,18 @@
 namespace NoPoDoFo {
 
 class ListBox final
-  : public Napi::ObjectWrap<ListBox>
+  : public ObjectWrap<ListBox>
   , public Field
   , public ListField
 {
 public:
-  explicit ListBox(const Napi::CallbackInfo&);
-  ~ListBox();
-  static Napi::FunctionReference constructor;
-  static void Initialize(Napi::Env&, Napi::Object&);
-
-  PoDoFo::PdfListBox GetField() { return PoDoFo::PdfListBox(field); }
+  explicit ListBox(const CallbackInfo&);
+  static FunctionReference Constructor;
+  static void Initialize(Napi::Env&, Object&);
+  PdfListBox GetField() const;
 
 private:
-  PoDoFo::PdfField& field;
-  std::shared_ptr<spdlog::logger> dbglog;
+  PdfField& Self;
 };
 }
 

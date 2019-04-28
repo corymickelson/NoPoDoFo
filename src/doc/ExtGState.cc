@@ -44,7 +44,7 @@ ExtGState::ExtGState(const Napi::CallbackInfo& info)
   if (o.InstanceOf(Document::Constructor.Value())) {
     auto d = Document::Unwrap(o);
     Self = make_unique<PdfExtGState>(&d->GetDocument());
-  } else if (o.InstanceOf(StreamDocument::constructor.Value())) {
+  } else if (o.InstanceOf(StreamDocument::Constructor.Value())) {
     auto d = StreamDocument::Unwrap(o);
     Self = make_unique<PdfExtGState>(d->Base);
   } else {

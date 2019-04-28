@@ -30,7 +30,7 @@ using std::string;
 
 namespace NoPoDoFo {
 
-FunctionReference StreamDocument::constructor; // NOLINT
+FunctionReference StreamDocument::Constructor; // NOLINT
 
 /**
  * @note Javascript args (filename:string, create:boolean, options: {
@@ -42,12 +42,10 @@ StreamDocument::StreamDocument(const CallbackInfo& info)
   : ObjectWrap(info)
   , BaseDocument(info, false)
 {
-  dbglog = spdlog::get("DbgLog");
-  cout << "Stream Document" << endl;
 }
 StreamDocument::~StreamDocument()
 {
- dbglog->debug("StreamDocument Cleanup");
+ DbgLog->debug("StreamDocument Cleanup");
 }
 void
 StreamDocument::Initialize(Napi::Env& env, Napi::Object& target)
@@ -98,20 +96,19 @@ StreamDocument::Initialize(Napi::Env& env, Napi::Object& target)
                      &StreamDocument::AddNamedDestination)
 
     });
-  constructor = Napi::Persistent(ctor);
-  constructor.SuppressDestruct();
+  Constructor = Napi::Persistent(ctor);
+  Constructor.SuppressDestruct();
   target.Set("StreamDocument", ctor);
 }
 
-Napi::Value
+JsValue
 StreamDocument::Close(const CallbackInfo& info)
 {
   GetStreamedDocument().Close();
   if (Output.empty()) {
-    cout << "Streaming to nodejs buffer" << endl;
-    return Buffer<char>::Copy(info.Env(),
-                              StreamDocRefCountedBuffer->GetBuffer(),
-                              StreamDocRefCountedBuffer->GetSize());
+    return Napi::Value(Buffer<char>::Copy(info.Env(),
+                                          StreamDocRefCountedBuffer->GetBuffer(),
+                                          StreamDocRefCountedBuffer->GetSize()));
   }
   return String::New(info.Env(), Output);
 }
@@ -121,7 +118,7 @@ StreamDocument::Append(const Napi::CallbackInfo& info)
   cout << "StreamDocument does not currently support the append operation"
        << endl;
 }
-Napi::Value
+JsValue
 StreamDocument::InsertExistingPage(const Napi::CallbackInfo&)
 {
   cout << "StreamDocument does not currently support this operation" << endl;

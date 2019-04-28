@@ -35,31 +35,31 @@ using tl::nullopt;
 
 namespace NoPoDoFo {
 
-FunctionReference SimpleTable::constructor; // NOLINT
+FunctionReference SimpleTable::Constructor; // NOLINT
 
 SimpleTable::SimpleTable(const CallbackInfo& info)
   : ObjectWrap(info)
 {
-  dbglog = spdlog::get("DbgLog");
+  DbgLog = spdlog::get("DbgLog");
   if (info[0].As<Object>().InstanceOf(Document::Constructor.Value())) {
-    doc = Document::Unwrap(info[0].As<Object>())->Base;
+    Doc = Document::Unwrap(info[0].As<Object>())->Base;
   } else if (info[0].As<Object>().InstanceOf(
-               StreamDocument::constructor.Value())) {
-    doc = StreamDocument::Unwrap(info[0].As<Object>())->Base;
+               StreamDocument::Constructor.Value())) {
+    Doc = StreamDocument::Unwrap(info[0].As<Object>())->Base;
   }
   const int cols = info[1].As<Number>();
   const int rows = info[2].As<Number>();
-  model = new PdfSimpleTableModel(cols, rows);
-  table = new PdfTable(cols, rows);
+  Model = new PdfSimpleTableModel(cols, rows);
+  Table = new PdfTable(cols, rows);
 }
 
 SimpleTable::~SimpleTable()
 {
-  dbglog->debug("SimpleTable Cleanup");
+  DbgLog->debug("SimpleTable Cleanup");
   HandleScope scope(Env());
-  delete model;
-  delete table;
-  doc = nullptr;
+  delete Model;
+  delete Table;
+  Doc = nullptr;
 }
 
 void
@@ -110,8 +110,8 @@ SimpleTable::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceMethod("setColumnWidth", &SimpleTable::SetColumnWidth),
       InstanceMethod("setRowHeight", &SimpleTable::SetRowHeight),
       InstanceMethod("setRowHeights", &SimpleTable::SetRowHeights) });
-  constructor = Napi::Persistent(ctor);
-  constructor.SuppressDestruct();
+  Constructor = Napi::Persistent(ctor);
+  Constructor.SuppressDestruct();
   target.Set("SimpleTable", ctor);
 }
 
@@ -121,18 +121,18 @@ SimpleTable::GetFont(const CallbackInfo& info)
   const int col = info[0].As<Number>();
   const int row = info[1].As<Number>();
   return Font::Constructor.New(
-    { External<PdfFont>::New(info.Env(), model->GetFont(col, row)) });
+    { External<PdfFont>::New(info.Env(), Model->GetFont(col, row)) });
 }
 
 void
 SimpleTable::SetFont(const CallbackInfo& info)
 {
-  auto value = info[0].As<Object>();
+  const auto value = info[0].As<Object>();
   if (!value.IsObject() ||
       !value.As<Object>().InstanceOf(Font::Constructor.Value())) {
     throw Error::New(info.Env(), "value must be an instance of NoPoDoFo Font");
   }
-  model->SetFont(&Font::Unwrap(value.As<Object>())->GetFont());
+  Model->SetFont(&Font::Unwrap(value.As<Object>())->GetFont());
 }
 
 Value
@@ -140,7 +140,7 @@ SimpleTable::GetText(const CallbackInfo& info)
 {
   const int col = info[0].As<Number>();
   const int row = info[1].As<Number>();
-  return String::New(info.Env(), model->GetText(col, row).GetStringUtf8());
+  return String::New(info.Env(), Model->GetText(col, row).GetStringUtf8());
 }
 
 void
@@ -149,19 +149,19 @@ SimpleTable::SetText(const CallbackInfo& info)
   const int col = info[0].As<Number>();
   const int row = info[1].As<Number>();
   const auto text = info[2].As<String>().Utf8Value();
-  model->SetText(col, row, text);
+  Model->SetText(col, row, text);
 }
 
 Value
 SimpleTable::GetBorderWidth(const CallbackInfo& info)
 {
-  return Number::New(info.Env(), model->GetBorderWidth());
+  return Number::New(info.Env(), Model->GetBorderWidth());
 }
 
 void
 SimpleTable::SetBorderWidth(const CallbackInfo& info, const Napi::Value& value)
 {
-  model->SetBorderWidth(value.As<Number>().DoubleValue());
+  Model->SetBorderWidth(value.As<Number>().DoubleValue());
 }
 
 Value
@@ -169,7 +169,7 @@ SimpleTable::GetBorderColor(const CallbackInfo& info)
 {
   const int col = info[0].As<Number>();
   const int row = info[1].As<Number>();
-  auto color = model->GetBorderColor(col, row);
+  auto color = Model->GetBorderColor(col, row);
   return Color::Constructor.New(
     { External<PdfColor>::New(info.Env(), &color) });
 }
@@ -177,13 +177,13 @@ SimpleTable::GetBorderColor(const CallbackInfo& info)
 void
 SimpleTable::SetBorderEnabled(const CallbackInfo& info)
 {
-  model->SetBorderEnabled(info[0].As<Boolean>());
+  Model->SetBorderEnabled(info[0].As<Boolean>());
 }
 
 Value
 SimpleTable::HasBorders(const CallbackInfo& info)
 {
-  return Boolean::New(info.Env(), model->HasBorders());
+  return Boolean::New(info.Env(), Model->HasBorders());
 }
 
 Value
@@ -191,7 +191,7 @@ SimpleTable::GetImage(const CallbackInfo& info)
 {
   const int col = info[0].As<Number>();
   const int row = info[1].As<Number>();
-  auto image = model->GetImage(col, row);
+  auto image = Model->GetImage(col, row);
   auto* pStream = dynamic_cast<PdfMemStream*>(image->GetObject()->GetStream());
   const auto stream = pStream->Get();
   const auto length = pStream->GetLength();
@@ -204,14 +204,14 @@ SimpleTable::HasImage(const CallbackInfo& info)
 {
   const int col = info[0].As<Number>();
   const int row = info[1].As<Number>();
-  return Boolean::New(info.Env(), model->HasImage(col, row));
+  return Boolean::New(info.Env(), Model->HasImage(col, row));
 }
 Value
 SimpleTable::GetForegroundColor(const CallbackInfo& info)
 {
   const int col = info[0].As<Number>();
   const int row = info[1].As<Number>();
-  auto color = model->GetForegroundColor(col, row);
+  auto color = Model->GetForegroundColor(col, row);
   return Color::Constructor.New(
     { External<PdfColor>::New(info.Env(), &color) });
 }
@@ -220,7 +220,7 @@ SimpleTable::SetForegroundColor(const CallbackInfo& info,
                                 const Napi::Value& value)
 {
 
-  model->SetForegroundColor(*Color::Unwrap(info[0].As<Object>())->Self);
+  Model->SetForegroundColor(*Color::Unwrap(info[0].As<Object>())->Self);
 }
 
 Value
@@ -228,7 +228,7 @@ SimpleTable::GetBackgroundColor(const CallbackInfo& info)
 {
   const int col = info[0].As<Number>();
   const int row = info[1].As<Number>();
-  auto color = model->GetForegroundColor(col, row);
+  auto color = Model->GetForegroundColor(col, row);
   return Color::Constructor.New(
     { External<PdfColor>::New(info.Env(), &color) });
 }
@@ -237,7 +237,7 @@ void
 SimpleTable::SetBackgroundColor(const CallbackInfo& info,
                                 const Napi::Value& value)
 {
-  model->SetBackgroundColor(*Color::Unwrap(info[0].As<Object>())->Self);
+  Model->SetBackgroundColor(*Color::Unwrap(info[0].As<Object>())->Self);
 }
 
 Value
@@ -245,13 +245,13 @@ SimpleTable::HasBackgroundColor(const CallbackInfo& info)
 {
   const int col = info[0].As<Number>();
   const int row = info[1].As<Number>();
-  return Boolean::New(info.Env(), model->HasBackgroundColor(col, row));
+  return Boolean::New(info.Env(), Model->HasBackgroundColor(col, row));
 }
 
 void
 SimpleTable::SetBackgroundEnabled(const CallbackInfo& info)
 {
-  model->SetBackgroundEnabled(info[0].As<Boolean>());
+  Model->SetBackgroundEnabled(info[0].As<Boolean>());
 }
 
 Value
@@ -259,7 +259,7 @@ SimpleTable::GetAlignment(const CallbackInfo& info)
 {
   const int col = info[0].As<Number>();
   const int row = info[1].As<Number>();
-  const int alignment = model->GetAlignment(col, row);
+  const int alignment = Model->GetAlignment(col, row);
   string alignmentResponse;
   switch (alignment) {
     case 0:
@@ -292,7 +292,7 @@ SimpleTable::SetAlignment(const CallbackInfo& info, const Napi::Value& value)
     throw Error::New(info.Env(),
                      R"(value must be one of ["LEFT", "CENTER", "RIGHT"])");
   }
-  model->SetAlignment(static_cast<EPdfAlignment>(i));
+  Model->SetAlignment(static_cast<EPdfAlignment>(i));
 }
 
 Value
@@ -301,7 +301,7 @@ SimpleTable::GetVerticalAlignment(const CallbackInfo& info)
   const int col = info[0].As<Number>();
   const int row = info[1].As<Number>();
   string i;
-  switch (static_cast<int>(model->GetVerticalAlignment(col, row))) {
+  switch (static_cast<int>(Model->GetVerticalAlignment(col, row))) {
     case 0:
       i = "TOP";
       break;
@@ -322,14 +322,14 @@ SimpleTable::HasWordWrap(const CallbackInfo& info)
 {
   const int col = info[0].As<Number>();
   const int row = info[1].As<Number>();
-  return Boolean::New(info.Env(), model->HasWordWrap(col, row));
+  return Boolean::New(info.Env(), Model->HasWordWrap(col, row));
 }
 
 void
 SimpleTable::SetWordWrapEnabled(const CallbackInfo& info,
                                 const Napi::Value& value)
 {
-  model->SetWordWrapEnabled(value.As<Boolean>());
+  Model->SetWordWrapEnabled(value.As<Boolean>());
 }
 
 void
@@ -339,10 +339,10 @@ SimpleTable::Draw(const CallbackInfo& info)
   const double posX = point.Get("x").As<Number>();
   const double posY = point.Get("y").As<Number>();
   auto painter = Painter::Unwrap(info[1].As<Object>());
-  if (!table->GetModel()) {
-    table->SetModel(model);
+  if (!Table->GetModel()) {
+    Table->SetModel(Model);
   }
-  table->Draw(posX, posY, &painter->GetPainter());
+  Table->Draw(posX, posY, &painter->GetPainter());
 }
 
 Value
@@ -351,14 +351,14 @@ SimpleTable::GetWidth(const CallbackInfo& info)
   const double posX = info[0].As<Number>();
   const double posY = info[1].As<Number>();
   auto page = Page::Unwrap(info[2].As<Object>());
-  const auto w = table->GetWidth(posX, posY, &page->page);
+  const auto w = Table->GetWidth(posX, posY, &page->Self);
   return Number::New(info.Env(), w);
 }
 
 void
 SimpleTable::SetTableWidth(const CallbackInfo& info, const Napi::Value& value)
 {
-  table->SetTableWidth(value.As<Number>().DoubleValue());
+  Table->SetTableWidth(value.As<Number>().DoubleValue());
 }
 
 Value
@@ -367,26 +367,26 @@ SimpleTable::GetHeight(const CallbackInfo& info)
   const double posX = info[0].As<Number>();
   const double posY = info[1].As<Number>();
   auto page = Page::Unwrap(info[2].As<Object>());
-  const auto w = table->GetHeight(posX, posY, &page->page);
+  const auto w = Table->GetHeight(posX, posY, &page->Self);
   return Number::New(info.Env(), w);
 }
 
 void
 SimpleTable::SetTableHeight(const CallbackInfo& info, const Napi::Value& value)
 {
-  table->SetTableHeight(value.As<Number>().DoubleValue());
+  Table->SetTableHeight(value.As<Number>().DoubleValue());
 }
 
 Value
 SimpleTable::GetCols(const CallbackInfo& info)
 {
-  return Number::New(info.Env(), table->GetCols());
+  return Number::New(info.Env(), Table->GetCols());
 }
 
 Value
 SimpleTable::GetRows(const CallbackInfo& info)
 {
-  return Number::New(info.Env(), table->GetRows());
+  return Number::New(info.Env(), Table->GetRows());
 }
 
 void
@@ -399,13 +399,13 @@ SimpleTable::SetColumnWidths(const CallbackInfo& info)
     const double index = array.Get(i).As<Number>();
     ws[i] = index;
   }
-  table->SetColumnWidths(ws);
+  Table->SetColumnWidths(ws);
 }
 
 void
 SimpleTable::SetColumnWidth(const CallbackInfo& info)
 {
-  table->SetColumnWidth(info[0].As<Number>().DoubleValue());
+  Table->SetColumnWidth(info[0].As<Number>().DoubleValue());
 }
 
 void
@@ -419,21 +419,21 @@ SimpleTable::SetRowHeights(const CallbackInfo& info)
     const double index = array.Get(i).As<Number>();
     pdHeights[i] = index;
   }
-  table->SetRowHeights(pdHeights);
+  Table->SetRowHeights(pdHeights);
 }
 
 void
 SimpleTable::SetRowHeight(const CallbackInfo& info)
 {
-  table->SetRowHeight(info[0].As<Number>().DoubleValue());
+  Table->SetRowHeight(info[0].As<Number>().DoubleValue());
 }
 
 void
 SimpleTable::SetAutoPageBreak(const CallbackInfo& info,
                               const Napi::Value& value)
 {
-  auto* d = static_cast<void*>(doc);
-  table->SetAutoPageBreak(
+  auto* d = static_cast<void*>(Doc);
+  Table->SetAutoPageBreak(
     value.As<Boolean>(),
     [](PdfRect& rect, void* data) -> PdfPage* {
       return static_cast<PdfMemDocument*>(data)->CreatePage(rect);
@@ -444,7 +444,7 @@ SimpleTable::SetAutoPageBreak(const CallbackInfo& info,
 Value
 SimpleTable::GetAutoPageBreak(const CallbackInfo& info)
 {
-  return Boolean::New(info.Env(), table->GetAutoPageBreak());
+  return Boolean::New(info.Env(), Table->GetAutoPageBreak());
 }
 
 }

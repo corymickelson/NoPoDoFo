@@ -70,6 +70,7 @@ enum DocumentInputDevice
   Disk,
   Memory
 };
+
 int
 FileAccess(std::string& file);
 
@@ -100,6 +101,7 @@ FileAccess(std::string& file);
       }                                                                        \
     }                                                                          \
   }
+
 enum NPDFColorFormat
 {
   GreyScale = 0,

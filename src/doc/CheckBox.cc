@@ -22,8 +22,6 @@
 #include <iostream>
 #include <spdlog/spdlog.h>
 
-using std::cout;
-using std::endl;
 
 namespace NoPoDoFo {
 
@@ -32,14 +30,9 @@ FunctionReference CheckBox::Constructor; // NOLINT
 CheckBox::CheckBox(const CallbackInfo& info)
   : ObjectWrap<CheckBox>(info)
   , Field(ePdfField_CheckBox, info)
-  , Button(Field::GetField())
-  , FormField(Field::GetField())
+  , Button(GetField())
+  , Self(GetField())
 {
-}
-
-CheckBox::~CheckBox()
-{
-  Field::DbgLog->debug("CheckBox Cleanup");
 }
 
 void
@@ -94,7 +87,7 @@ CheckBox::SetChecked(const CallbackInfo& info, const JsValue& value)
     throw Napi::TypeError::New(info.Env(),
                                "CheckBox.checked requires boolean value");
   }
-  bool checked = value.As<Boolean>();
+  const bool checked = value.As<Boolean>();
   GetCheckBox().SetChecked(checked);
 }
 }

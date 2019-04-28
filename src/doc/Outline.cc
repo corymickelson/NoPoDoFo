@@ -39,13 +39,13 @@ FunctionReference Outline::constructor; // NOLINT
 
 Outline::Outline(const CallbackInfo& info)
   : ObjectWrap(info)
-  , outline(*info[0].As<External<PdfOutlineItem>>().Data())
+  , Self(*info[0].As<External<PdfOutlineItem>>().Data())
 {
-  dbglog = spdlog::get("DbgLog");
+  DbgLog = spdlog::get("DbgLog");
 }
 Outline::~Outline()
 {
-  dbglog->debug("Outline Cleanup");
+  DbgLog->debug("Outline Cleanup");
 }
 void
 Outline::Initialize(Napi::Env& env, Napi::Object& target)
@@ -113,7 +113,7 @@ Outline::CreateNext(const Napi::CallbackInfo& info)
 Napi::Value
 Outline::InsertChild(const Napi::CallbackInfo& info)
 {
-  GetOutline().InsertChild(&Outline::Unwrap(info[0].As<Object>())->outline);
+  GetOutline().InsertChild(&Outline::Unwrap(info[0].As<Object>())->Self);
   return info.Env().Undefined();
 }
 Napi::Value
@@ -174,7 +174,7 @@ Outline::GetDestination(const Napi::CallbackInfo& info)
     if (!d)
       return info.Env().Null();
   } else if (info[0].As<Object>().InstanceOf(
-               StreamDocument::constructor.Value())) {
+               StreamDocument::Constructor.Value())) {
     d = GetOutline().GetDestination(
       StreamDocument::Unwrap(info[0].As<Object>())->Base);
     if (!d)

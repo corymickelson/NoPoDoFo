@@ -19,5 +19,5 @@
     ],
     "experimentalDecorators": true
   },
-  "include": ["spec/bench/*.ts", "spec/unit/*.ts", "lib/*.ts"]
+  "include": ["spec/bench/*.ts", "spec/unit/*.ts"]
 }

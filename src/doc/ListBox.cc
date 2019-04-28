@@ -26,21 +26,16 @@ using namespace PoDoFo;
 
 namespace NoPoDoFo {
 
-FunctionReference ListBox::constructor; // NOLINT
+FunctionReference ListBox::Constructor; // NOLINT
 
 ListBox::ListBox(const Napi::CallbackInfo& info)
   : ObjectWrap(info)
   , Field(ePdfField_ListBox, info)
   , ListField(Field::GetField())
-  , field(Field::GetField())
+  , Self(Field::GetField())
 {
-  dbglog = spdlog::get("DbgLog");
 }
 
-ListBox::~ListBox()
-{
-  dbglog->debug("ListBox Cleanup");
-}
 
 void
 ListBox::Initialize(Napi::Env& env, Napi::Object& target)
@@ -85,8 +80,14 @@ ListBox::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceMethod("setMouseAction", &ListBox::SetMouseAction),
       InstanceMethod("setPageAction", &ListBox::SetPageAction),
       InstanceMethod("setHighlightingMode", &ListBox::SetHighlightingMode) });
-  constructor = Persistent(ctor);
-  constructor.SuppressDestruct();
+  Constructor = Persistent(ctor);
+  Constructor.SuppressDestruct();
   target.Set("ListBox", ctor);
+}
+
+PdfListBox
+ListBox::GetField() const
+{
+  return PdfListBox(Self);
 }
 }

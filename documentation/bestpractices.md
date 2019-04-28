@@ -34,7 +34,7 @@ seen in unit tests Image, and FileAttachment.
 ## Where NoPoDoFo breaks from Javascript
 
 NoPoDoFo is a C++ library, and as such it is responsible for the management of it's own memory. NoPoDoFo follows the
-Aggregation pattern, this pattern if you are unfamiliar states that an object ...
+Aggregation pattern, in this pattern the "parent" object may hold ownership of it's child object's resources.
 The effect that this pattern has on NoPoDoFo is that a child class of a Document/StreamDocument, ex a Page, is bound to 
 the lifetime of the parent, the child is not responsible for it's resource allocation(s) or destruction,
 when the parent goes out of scope(allowing the instance to be gc'd) the child will be destroyed along with the parent,

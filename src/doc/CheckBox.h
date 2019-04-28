@@ -29,26 +29,29 @@
 using namespace Napi;
 using namespace PoDoFo;
 
-using JsValue = Napi::Value;
+using JsValue = Value;
 
 namespace NoPoDoFo {
-class CheckBox
+class CheckBox final
   : public ObjectWrap<CheckBox>
-  , public Field
-  , public Button
+    , public Field
+    , public Button
 {
 public:
   explicit CheckBox(const CallbackInfo& callbackInfo);
-	explicit CheckBox(const CheckBox&) = delete;
-	const CheckBox&operator=(const CheckBox&) = delete;
-  ~CheckBox();
-  static Napi::FunctionReference Constructor;
-  static void Initialize(Napi::Env& env, Napi::Object& target);
+  explicit CheckBox(const CheckBox&) = delete;
+  const CheckBox& operator=(const CheckBox&) = delete;
+  static FunctionReference Constructor;
+  static void Initialize(Napi::Env& env, Object& target);
   JsValue IsChecked(const CallbackInfo&);
   void SetChecked(const CallbackInfo&, const JsValue&);
 
-  PoDoFo::PdfCheckBox GetCheckBox() { return PoDoFo::PdfCheckBox(FormField); }
-  PoDoFo::PdfField& FormField;
+  PdfCheckBox GetCheckBox() const
+  {
+    return PdfCheckBox(Self);
+  }
+
+  PdfField& Self;
 };
 }
 #endif // NPDF_CHECKBOX_H

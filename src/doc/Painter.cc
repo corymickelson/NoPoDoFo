@@ -46,27 +46,27 @@ FunctionReference Painter::constructor; // NOLINT
 Painter::Painter(const Napi::CallbackInfo& info)
   : ObjectWrap(info)
 {
-  dbglog = spdlog::get("DbgLog");
+  DbgLog = spdlog::get("DbgLog");
   auto o = info[0].As<Object>();
   if (o.InstanceOf(Document::Constructor.Value())) {
-    isMemDoc = true;
-    document = Document::Unwrap(o)->Base;
-  } else if (o.InstanceOf(StreamDocument::constructor.Value())) {
-    isMemDoc = false;
-    document = StreamDocument::Unwrap(o)->Base;
+    IsMemDoc = true;
+    Doc = Document::Unwrap(o)->Base;
+  } else if (o.InstanceOf(StreamDocument::Constructor.Value())) {
+    IsMemDoc = false;
+    Doc = StreamDocument::Unwrap(o)->Base;
   } else {
     TypeError::New(info.Env(), "requires an instance of BaseDocument")
       .ThrowAsJavaScriptException();
     return;
   }
-  painter = make_unique<PdfPainter>();
+  Self = make_unique<PdfPainter>();
 }
 
 Painter::~Painter()
 {
-  dbglog->debug("Painter Cleanup");
+  DbgLog->debug("Painter Cleanup");
   HandleScope scope(Env());
-  document = nullptr;
+  Doc = nullptr;
 }
 
 void
@@ -138,12 +138,12 @@ Painter::SetPage(const Napi::CallbackInfo& info)
   if (!info[0].IsObject()) {
     throw Napi::Error::New(info.Env(), "args[0] must be an instance of Page.");
   }
-  if (info[0].As<Object>().InstanceOf(Page::constructor.Value())) {
+  if (info[0].As<Object>().InstanceOf(Page::Constructor.Value())) {
     auto canvas = Page::Unwrap(info[0].As<Object>());
-    painter->SetPage(&canvas->page);
+    Self->SetPage(&canvas->Self);
   } else if (info[0].As<Object>().InstanceOf(XObject::Constructor.Value())) {
     auto canvas = &XObject::Unwrap(info[0].As<Object>())->GetXObject();
-    painter->SetPage(canvas);
+    Self->SetPage(canvas);
   } else {
     TypeError::New(info.Env(),
                    "Painter must be an instance of PdfCanvas: XObject or Page")
@@ -155,7 +155,7 @@ Painter::SetPage(const Napi::CallbackInfo& info)
 void
 Painter::SetColor(const CallbackInfo& info)
 {
-  painter->SetColor(*Color::Unwrap(info[0].As<Object>())->Self);
+  Self->SetColor(*Color::Unwrap(info[0].As<Object>())->Self);
 }
 
 void
@@ -168,13 +168,13 @@ Painter::SetColorCMYK(const CallbackInfo& info)
   auto js = info[0].As<Array>();
   float cmyk[4];
   GetCMYK(js, cmyk);
-  painter->SetColorCMYK(cmyk[0], cmyk[1], cmyk[2], cmyk[3]);
+  Self->SetColorCMYK(cmyk[0], cmyk[1], cmyk[2], cmyk[3]);
 }
 
 Napi::Value
 Painter::GetCanvas(const CallbackInfo& info)
 {
-  PdfStream* instance = painter->GetCanvas();
+  PdfStream* instance = Self->GetCanvas();
   if (!instance) {
     return info.Env().Null();
   }
@@ -189,7 +189,7 @@ Painter::SetStrokingGrey(const CallbackInfo& info)
   if (value < 0.0 || value > 1.0) {
     throw Error::New(info.Env(), "value must be between 0.0 and 1.0");
   }
-  painter->SetStrokingGray(value);
+  Self->SetStrokingGray(value);
 }
 
 void
@@ -199,7 +199,7 @@ Painter::SetGrey(const CallbackInfo& info)
   if (value < 0.0 || value > 1.0) {
     throw Error::New(info.Env(), "value must be between 0.0 and 1.0");
   }
-  painter->SetGray(value);
+  Self->SetGray(value);
 }
 
 void
@@ -212,21 +212,21 @@ Painter::SetStrokingColorCMYK(const CallbackInfo& info)
   auto js = info[0].As<Array>();
   float cmyk[4];
   GetCMYK(js, cmyk);
-  painter->SetStrokingColorCMYK(cmyk[0], cmyk[1], cmyk[2], cmyk[3]);
+  Self->SetStrokingColorCMYK(cmyk[0], cmyk[1], cmyk[2], cmyk[3]);
 }
 
 void
 Painter::SetStrokeWidth(const Napi::CallbackInfo& info)
 {
   float value = info[0].As<Number>();
-  painter->SetStrokeWidth(value);
+  Self->SetStrokeWidth(value);
 }
 
 void
 Painter::FinishPage(const CallbackInfo& info)
 {
   try {
-    painter->FinishPage();
+    Self->FinishPage();
   } catch (PdfError& err) {
     ErrorHandler(err, info);
   }
@@ -247,7 +247,7 @@ Painter::DrawText(const CallbackInfo& info)
   x = d.Get("x").As<Number>();
   y = d.Get("y").As<Number>();
   try {
-    painter->DrawText(
+    Self->DrawText(
       x, y, PdfString(reinterpret_cast<const pdf_utf8*>(text.c_str())));
   } catch (PdfError& err) {
     ErrorHandler(err, info);
@@ -275,7 +275,7 @@ Painter::DrawMultiLineText(const CallbackInfo& info)
       static_cast<EPdfVerticalAlignment>(info[3].As<Number>().Int32Value());
   }
   try {
-    painter->DrawMultiLineText(
+    Self->DrawMultiLineText(
       rect,
       PdfString(reinterpret_cast<const pdf_utf8*>(text.c_str())),
       alignment,
@@ -326,7 +326,7 @@ Painter::DrawImage(const CallbackInfo& info)
           .ThrowAsJavaScriptException();
       }
     }
-    painter->DrawImage(x, y, &img, width, height);
+    Self->DrawImage(x, y, &img, width, height);
   } catch (PdfError& err) {
     ErrorHandler(err, info);
   } catch (Napi::Error& err) {
@@ -338,7 +338,7 @@ Napi::Value
 Painter::GetPrecision(const CallbackInfo& info)
 {
   return Napi::Number::New(info.Env(),
-                           static_cast<double>(painter->GetPrecision()));
+                           static_cast<double>(Self->GetPrecision()));
 }
 void
 Painter::SetPrecision(const CallbackInfo& info, const Napi::Value& value)
@@ -348,7 +348,7 @@ Painter::SetPrecision(const CallbackInfo& info, const Napi::Value& value)
   }
   unsigned short p =
     static_cast<unsigned short>(value.As<Number>().Uint32Value());
-  painter->SetPrecision(p);
+  Self->SetPrecision(p);
 }
 
 void
@@ -356,19 +356,19 @@ Painter::SetStrokeStyle(const Napi::CallbackInfo& info)
 {
   int styleIndex = info[0].As<Number>();
   auto scale = info[1].As<Number>();
-  painter->SetStrokeStyle(
+  Self->SetStrokeStyle(
     static_cast<EPdfStrokeStyle>(styleIndex), nullptr, false, scale, false);
 }
 void
 Painter::SetLineCapStyle(const Napi::CallbackInfo& info)
 {
-  painter->SetLineCapStyle(
+  Self->SetLineCapStyle(
     static_cast<EPdfLineCapStyle>(info[0].As<Number>().Int32Value()));
 }
 void
 Painter::SetLineJoinStyle(const Napi::CallbackInfo& info)
 {
-  painter->SetLineJoinStyle(
+  Self->SetLineJoinStyle(
     static_cast<EPdfLineJoinStyle>(info[0].As<Number>().Int32Value()));
 }
 void
@@ -376,7 +376,7 @@ Painter::SetFont(const Napi::CallbackInfo& info, const Napi::Value& value)
 {
   Font* font = Font::Unwrap(value.As<Object>());
   try {
-    painter->SetFont(&font->GetFont());
+    Self->SetFont(&font->GetFont());
   } catch (PdfError& err) {
     ErrorHandler(err, info);
   }
@@ -384,24 +384,24 @@ Painter::SetFont(const Napi::CallbackInfo& info, const Napi::Value& value)
 Napi::Value
 Painter::GetFont(const Napi::CallbackInfo& info)
 {
-  if (!painter->GetFont()) {
+  if (!Self->GetFont()) {
     return info.Env().Null();
   }
   return Font::Constructor.New(
-    { External<PdfFont>::New(info.Env(), painter->GetFont()) });
+    { External<PdfFont>::New(info.Env(), Self->GetFont()) });
 }
 void
 Painter::SetClipRect(const Napi::CallbackInfo& info)
 {
   Rect* r = Rect::Unwrap(info[0].As<Object>());
-  painter->SetClipRect(r->GetRect());
+  Self->SetClipRect(r->GetRect());
 }
 
 void
 Painter::SetMiterLimit(const CallbackInfo& info)
 {
   float limit = info[0].As<Number>();
-  painter->SetMiterLimit(limit);
+  Self->SetMiterLimit(limit);
 }
 
 void
@@ -409,7 +409,7 @@ Painter::Rectangle(const CallbackInfo& info)
 {
   Rect* r = Rect::Unwrap(info[0].As<Object>());
   try {
-    painter->Rectangle(r->GetRect());
+    Self->Rectangle(r->GetRect());
   } catch (PdfError& err) {
     ErrorHandler(err, info);
   }
@@ -425,7 +425,7 @@ Painter::Ellipse(const CallbackInfo& info)
   width = o.Get("width").As<Number>();
   height = o.Get("height").As<Number>();
   try {
-    painter->Ellipse(x, y, width, height);
+    Self->Ellipse(x, y, width, height);
   } catch (PdfError& err) {
     ErrorHandler(err, info);
   }
@@ -439,14 +439,14 @@ Painter::Circle(const CallbackInfo& info)
   x = o.Get("x").As<Number>();
   y = o.Get("y").As<Number>();
   radius = o.Get("radius").As<Number>();
-  painter->Circle(x, y, radius);
+  Self->Circle(x, y, radius);
 }
 
 void
 Painter::ClosePath(const CallbackInfo& info)
 {
   try {
-    painter->ClosePath();
+    Self->ClosePath();
   } catch (PdfError& err) {
     ErrorHandler(err, info);
   }
@@ -460,7 +460,7 @@ Painter::LineTo(const CallbackInfo& info)
   x = o.Get("x").As<Number>();
   y = o.Get("y").As<Number>();
   try {
-    painter->LineTo(x, y);
+    Self->LineTo(x, y);
   } catch (PdfError& err) {
     ErrorHandler(err, info);
   }
@@ -474,7 +474,7 @@ Painter::MoveTo(const CallbackInfo& info)
   x = o.Get("x").As<Number>();
   y = o.Get("y").As<Number>();
   try {
-    painter->MoveTo(x, y);
+    Self->MoveTo(x, y);
   } catch (PdfError& err) {
     ErrorHandler(err, info);
   }
@@ -494,7 +494,7 @@ Painter::CubicBezierTo(const CallbackInfo& info)
   d3x = d3.Get("x").As<Number>();
   d3y = d3.Get("y").As<Number>();
   try {
-    painter->CubicBezierTo(d1x, d1y, d2x, d2y, d3x, d3y);
+    Self->CubicBezierTo(d1x, d1y, d2x, d2y, d3x, d3y);
   } catch (PdfError& err) {
     ErrorHandler(err, info);
   }
@@ -505,7 +505,7 @@ Painter::HorizontalLineTo(const CallbackInfo& info)
 {
   float value = info[0].As<Number>();
   try {
-    painter->HorizontalLineTo(value);
+    Self->HorizontalLineTo(value);
   } catch (PdfError& err) {
     ErrorHandler(err, info);
   }
@@ -516,7 +516,7 @@ Painter::VerticalLineTo(const CallbackInfo& info)
 {
   float value = info[0].As<Number>();
   try {
-    painter->VerticalLineTo(value);
+    Self->VerticalLineTo(value);
   } catch (PdfError& err) {
     ErrorHandler(err, info);
   }
@@ -533,7 +533,7 @@ Painter::SmoothCurveTo(const CallbackInfo& info)
   d2x = d2.Get("x").As<Number>();
   d2y = d2.Get("y").As<Number>();
   try {
-    painter->SmoothCurveTo(d1x, d1y, d2x, d2y);
+    Self->SmoothCurveTo(d1x, d1y, d2x, d2y);
   } catch (PdfError& err) {
     ErrorHandler(err, info);
   }
@@ -550,7 +550,7 @@ Painter::QuadCurveTo(const CallbackInfo& info)
   d2x = d2.Get("x").As<Number>();
   d2y = d2.Get("y").As<Number>();
   try {
-    painter->QuadCurveTo(d1x, d1y, d2x, d2y);
+    Self->QuadCurveTo(d1x, d1y, d2x, d2y);
   } catch (PdfError& err) {
     ErrorHandler(err, info);
   }
@@ -569,14 +569,14 @@ Painter::ArcTo(const CallbackInfo& info)
   p1y = point1.Get("y").As<Number>();
   p2x = point2.Get("x").As<Number>();
   p2y = point2.Get("y").As<Number>();
-  painter->ArcTo(p1x, p1y, p2x, p2y, rotation, large, sweep);
+  Self->ArcTo(p1x, p1y, p2x, p2y, rotation, large, sweep);
 }
 
 void
 Painter::Close(const CallbackInfo& info)
 {
   try {
-    painter->Close();
+    Self->Close();
   } catch (PdfError& err) {
     ErrorHandler(err, info);
   }
@@ -586,7 +586,7 @@ void
 Painter::Stroke(const CallbackInfo& info)
 {
   try {
-    painter->Stroke();
+    Self->Stroke();
   } catch (PdfError& err) {
     ErrorHandler(err, info);
   }
@@ -596,7 +596,7 @@ void
 Painter::FillAndStroke(const CallbackInfo& info)
 {
   try {
-    painter->FillAndStroke();
+    Self->FillAndStroke();
   } catch (PdfError& err) {
     ErrorHandler(err, info);
   }
@@ -606,7 +606,7 @@ void
 Painter::Fill(const CallbackInfo& info)
 {
   try {
-    painter->Fill();
+    Self->Fill();
   } catch (PdfError& err) {
     ErrorHandler(err, info);
   }
@@ -616,7 +616,7 @@ void
 Painter::EndPath(const CallbackInfo& info)
 {
   try {
-    painter->EndPath();
+    Self->EndPath();
   } catch (PdfError& err) {
     ErrorHandler(err, info);
   }
@@ -626,7 +626,7 @@ void
 Painter::Clip(const CallbackInfo& info)
 {
   try {
-    painter->Clip();
+    Self->Clip();
   } catch (PdfError& err) {
     ErrorHandler(err, info);
   }
@@ -636,7 +636,7 @@ void
 Painter::Save(const CallbackInfo& info)
 {
   try {
-    painter->Save();
+    Self->Save();
   } catch (PdfError& err) {
     ErrorHandler(err, info);
   }
@@ -646,7 +646,7 @@ void
 Painter::Restore(const CallbackInfo& info)
 {
   try {
-    painter->Restore();
+    Self->Restore();
   } catch (PdfError& err) {
     ErrorHandler(err, info);
   }
@@ -661,7 +661,7 @@ Painter::SetExtGState(const CallbackInfo& info)
   }
   ExtGState* state = ExtGState::Unwrap(wrap);
   try {
-    painter->SetExtGState(state->GetExtGState());
+    Self->SetExtGState(state->GetExtGState());
   } catch (PdfError& err) {
     ErrorHandler(err, info);
   }
@@ -672,7 +672,7 @@ Painter::SetTabWidth(const CallbackInfo& info, const Napi::Value& value)
 {
   int n = value.As<Number>();
   try {
-    painter->SetTabWidth(static_cast<unsigned short>(n));
+    Self->SetTabWidth(static_cast<unsigned short>(n));
   } catch (PdfError& err) {
     ErrorHandler(err, info);
   }
@@ -681,13 +681,13 @@ Painter::SetTabWidth(const CallbackInfo& info, const Napi::Value& value)
 Napi::Value
 Painter::GetTabWidth(const CallbackInfo& info)
 {
-  return Number::New(info.Env(), painter->GetTabWidth());
+  return Number::New(info.Env(), Self->GetTabWidth());
 }
 
 Napi::Value
 Painter::GetCurrentPath(const CallbackInfo& info)
 {
-  return String::New(info.Env(), painter->GetCurrentPath().str());
+  return String::New(info.Env(), Self->GetCurrentPath().str());
 }
 
 void
@@ -700,7 +700,7 @@ Painter::DrawLine(const CallbackInfo& info)
   startY = start.Get("y").As<Number>().DoubleValue();
   endX = end.Get("x").As<Number>().DoubleValue();
   endY = end.Get("y").As<Number>().DoubleValue();
-  painter->DrawLine(startX, startY, endX, endY);
+  Self->DrawLine(startX, startY, endX, endY);
 }
 
 void
@@ -722,7 +722,7 @@ Painter::DrawTextAligned(const CallbackInfo& info)
   y = o.Get("y").As<Number>();
   width = o.Get("width").As<Number>();
   try {
-    painter->DrawTextAligned(
+    Self->DrawTextAligned(
       x,
       y,
       width,
@@ -740,7 +740,7 @@ Painter::GetMultiLineText(const CallbackInfo& info)
   string text = info[1].As<String>().Utf8Value();
   bool skipSpaces = info[2].As<Boolean>();
   vector<PdfString> lines =
-    painter->GetMultiLineTextAsLines(width, PdfString(text), skipSpaces);
+    Self->GetMultiLineTextAsLines(width, PdfString(text), skipSpaces);
   auto js = Array::New(info.Env());
   uint32_t count = 0;
   for (auto& i : lines) {
@@ -758,7 +758,7 @@ Painter::BeginText(const CallbackInfo& info)
   x = point.Get("x").As<Number>();
   y = point.Get("y").As<Number>();
   try {
-    painter->BeginText(x, y);
+    Self->BeginText(x, y);
   } catch (PdfError& err) {
     ErrorHandler(err, info);
   }
@@ -768,7 +768,7 @@ void
 Painter::EndText(const CallbackInfo& info)
 {
   try {
-    painter->EndText();
+    Self->EndText();
   } catch (PdfError& err) {
     ErrorHandler(err, info);
   }
@@ -778,7 +778,7 @@ void
 Painter::AddText(const CallbackInfo& info)
 {
   try {
-    painter->AddText(PdfString(reinterpret_cast<const pdf_utf8*>(
+    Self->AddText(PdfString(reinterpret_cast<const pdf_utf8*>(
       info[0].As<String>().Utf8Value().c_str())));
   } catch (PdfError& err) {
     ErrorHandler(err, info);
@@ -793,7 +793,7 @@ Painter::MoveTextPosition(const CallbackInfo& info)
   x = point.Get("x").As<Number>();
   y = point.Get("y").As<Number>();
   try {
-    painter->MoveTextPos(x, y);
+    Self->MoveTextPos(x, y);
   } catch (PdfError& err) {
     ErrorHandler(err, info);
   }
@@ -802,30 +802,30 @@ Painter::MoveTextPosition(const CallbackInfo& info)
 void
 Painter::DrawGlyph(const CallbackInfo& info)
 {
-  if (!isMemDoc) {
+  if (!IsMemDoc) {
     TypeError::New(info.Env(), "Requires instance of PdfMemDocument")
       .ThrowAsJavaScriptException();
     return;
   }
-  auto sharedMemDoc = static_cast<PdfMemDocument*>(document);
+  auto sharedMemDoc = static_cast<PdfMemDocument*>(Doc);
   auto point = info[0].As<Object>();
   string glyph = info[1].As<String>().Utf8Value();
   double x, y;
   x = point.Get("x").As<Number>();
   y = point.Get("y").As<Number>();
   try {
-    painter->DrawGlyph(sharedMemDoc, x, y, glyph.c_str());
+    Self->DrawGlyph(sharedMemDoc, x, y, glyph.c_str());
   } catch (PdfError& err) {
     ErrorHandler(err, info);
   }
 }
 
 void
-Painter::GetCMYK(Napi::Value& value, float* cmyk)
+Painter::GetCMYK(Napi::Value& value, float* CMYK)
 {
   auto js = value.As<Array>();
   for (uint8_t i = 0; i < js.Length(); i++) {
-    cmyk[i] = js.Get(i).As<Number>().FloatValue();
+    CMYK[i] = js.Get(i).As<Number>().FloatValue();
   }
 }
 

@@ -36,7 +36,7 @@ using std::make_shared;
 
 namespace NoPoDoFo {
 
-FunctionReference SignatureField::constructor; // NOLINT
+FunctionReference SignatureField::Constructor; // NOLINT
 
 /**
  * @note JS new SignatureField(annotation: IAnnotation, doc: IBase)
@@ -45,19 +45,19 @@ FunctionReference SignatureField::constructor; // NOLINT
 SignatureField::SignatureField(const CallbackInfo& info)
   : ObjectWrap<SignatureField>(info)
 {
-  dbglog = spdlog::get("DbgLog");
+  DbgLog = spdlog::get("DbgLog");
   try {
     // Create a new Signature Field
     if (info.Length() == 2) {
       auto annot = Annotation::Unwrap(info[0].As<Object>());
       auto nObj = info[1].As<Object>();
       if (nObj.InstanceOf(Document::Constructor.Value())) {
-        field = make_shared<PdfSignatureField>(
+        Self = make_shared<PdfSignatureField>(
           &annot->GetAnnotation(),
           Document::Unwrap(nObj)->Base->GetAcroForm(),
           Document::Unwrap(nObj)->Base);
-      } else if (nObj.InstanceOf(StreamDocument::constructor.Value())) {
-        field = make_shared<PdfSignatureField>(
+      } else if (nObj.InstanceOf(StreamDocument::Constructor.Value())) {
+        Self = make_shared<PdfSignatureField>(
           &annot->GetAnnotation(),
           StreamDocument::Unwrap(nObj)->Base->GetAcroForm(),
           StreamDocument::Unwrap(nObj)->Base);
@@ -68,7 +68,7 @@ SignatureField::SignatureField(const CallbackInfo& info)
       }
     } // Copy an existing Signature field.
     else if (info.Length() == 1 && info[0].IsExternal()) {
-      field = make_shared<PdfSignatureField>(
+      Self = make_shared<PdfSignatureField>(
         info[0].As<External<PdfAnnotation>>().Data());
     } else {
       Error::New(info.Env(), "Invalid constructor args")
@@ -80,24 +80,24 @@ SignatureField::SignatureField(const CallbackInfo& info)
   }
 
   try {
-    field->EnsureSignatureObject();
-    signatureInfo = SignatureInfo{ {} };
-    if (field->GetSignatureObject()->IsDictionary()) {
-      auto signatureDict = field->GetSignatureObject()->GetDictionary();
+    Self->EnsureSignatureObject();
+    Info = SignatureInfo{};
+    if (Self->GetSignatureObject()->IsDictionary()) {
+      auto signatureDict = Self->GetSignatureObject()->GetDictionary();
       if (signatureDict.HasKey(Name::BYTERANGE) &&
           signatureDict.GetKey(Name::BYTERANGE)->IsArray()) {
-        PdfArray byteRange = signatureDict.GetKey(Name::BYTERANGE)->GetArray();
+        auto byteRange = signatureDict.GetKey(Name::BYTERANGE)->GetArray();
         for (auto& i : byteRange) {
-          signatureInfo.range.emplace_back(i.GetNumber());
+          Info.Range.emplace_back(i.GetNumber());
         }
       }
       if (signatureDict.HasKey(Name::CONTENTS) &&
           (signatureDict.GetKey(Name::CONTENTS)->IsString() ||
            signatureDict.GetKey(Name::CONTENTS)->IsHexString())) {
-        PdfObject contents = *signatureDict.GetKey(Name::CONTENTS);
+        const auto contents = *signatureDict.GetKey(Name::CONTENTS);
         string out;
         contents.ToString(out);
-        signatureInfo.contents = out;
+        Info.Contents = out;
       }
     } else {
       cout << "Could not parse Signature Object" << endl;
@@ -109,7 +109,7 @@ SignatureField::SignatureField(const CallbackInfo& info)
 
 SignatureField::~SignatureField()
 {
-  dbglog->debug("SignatureField Cleanup");
+  DbgLog->debug("SignatureField Cleanup");
 }
 
 
@@ -136,8 +136,8 @@ SignatureField::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceMethod("getObject", &SignatureField::GetSignatureObject),
       InstanceMethod("ensureSignatureObject",
                      &SignatureField::EnsureSignatureObject) });
-  constructor = Napi::Persistent(ctor);
-  constructor.SuppressDestruct();
+  Constructor = Napi::Persistent(ctor);
+  Constructor.SuppressDestruct();
 
   target.Set("SignatureField", ctor);
 }
@@ -145,14 +145,14 @@ SignatureField::Initialize(Napi::Env& env, Napi::Object& target)
 Napi::Value
 SignatureField::GetFieldObject(const Napi::CallbackInfo& info)
 {
-  auto o = field->GetFieldObject();
+  auto o = Self->GetFieldObject();
   return Obj::Constructor.New({ External<PdfObject>::New(info.Env(), o) });
 }
 void
 SignatureField::SetAppearanceStream(const CallbackInfo& info)
 {
   XObject* xobj = XObject::Unwrap(info[0].As<Object>());
-  field->SetAppearanceStream(&xobj->GetXObject());
+  Self->SetAppearanceStream(&xobj->GetXObject());
 }
 
 void
@@ -200,7 +200,7 @@ void
 SignatureField::AddCertificateReference(const CallbackInfo& info)
 {
   auto body =
-    field->GetFieldObject()->GetOwner()->GetParentDocument()->GetObjects();
+    Self->GetFieldObject()->GetOwner()->GetParentDocument()->GetObjects();
   auto it = body->begin();
   while (it != body->end()) {
     if ((*it)->IsDictionary()) {
@@ -233,7 +233,7 @@ Napi::Value
 SignatureField::EnsureSignatureObject(const CallbackInfo& info)
 {
   try {
-    field->EnsureSignatureObject();
+    Self->EnsureSignatureObject();
   } catch (PdfError& err) {
     ErrorHandler(err, info);
   }
@@ -242,18 +242,18 @@ SignatureField::EnsureSignatureObject(const CallbackInfo& info)
 Napi::Value
 SignatureField::GetInfo(const Napi::CallbackInfo& info)
 {
-  Object infoObj = Object::New(info.Env());
-  if (!signatureInfo.range.empty()) {
-    Napi::Array byteRange = Napi::Array::New(info.Env());
-    for (uint32_t i = 0; i < signatureInfo.range.size(); i++) {
-      byteRange.Set(i, Number::New(info.Env(), signatureInfo.range[i]));
+  auto infoObj = Object::New(info.Env());
+  if (!Info.Range.empty()) {
+    auto byteRange = Napi::Array::New(info.Env());
+    for (uint32_t i = 0; i < Info.Range.size(); i++) {
+      byteRange.Set(i, Number::New(info.Env(), Info.Range[i]));
     }
     infoObj.Set("byteRange", byteRange);
   } else {
     infoObj.Set("byteRange", info.Env().Undefined());
   }
-  if (!signatureInfo.contents.empty()) {
-    infoObj.Set("signature", String::New(info.Env(), signatureInfo.contents));
+  if (!Info.Contents.empty()) {
+    infoObj.Set("signature", String::New(info.Env(), Info.Contents));
   } else {
     infoObj.Set("signature", info.Env().Undefined());
   }
@@ -262,7 +262,7 @@ SignatureField::GetInfo(const Napi::CallbackInfo& info)
 Napi::Value
 SignatureField::GetAnnotation(const Napi::CallbackInfo& info)
 {
-  PdfAnnotation* annot = field->GetWidgetAnnotation();
+  PdfAnnotation* annot = Self->GetWidgetAnnotation();
   return Annotation::Constructor.New(
     { External<PdfAnnotation>::New(info.Env(), annot) });
 }

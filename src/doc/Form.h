@@ -34,8 +34,8 @@ class Form : public Napi::ObjectWrap<Form>
 {
 public:
   explicit Form(const Napi::CallbackInfo&);
-	explicit Form(const Form&) = delete;
-	const Form&operator=(const Form&) = delete;
+  explicit Form(const Form&) = delete;
+  const Form& operator=(const Form&) = delete;
   ~Form();
   static Napi::FunctionReference Constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
@@ -51,7 +51,8 @@ public:
   JsValue GetCalculationOrder(const Napi::CallbackInfo&);
   void SetCalculationOrder(const Napi::CallbackInfo&, const JsValue&);
   void RefreshAppearances(const Napi::CallbackInfo&);
-	PoDoFo::PdfAcroForm* GetForm() { return Doc.GetAcroForm(Create); }
+  PoDoFo::PdfAcroForm* GetForm() const { return Doc.GetAcroForm(Create); }
+
   PoDoFo::PdfDictionary* GetDictionary() const
   {
     return &(Doc.GetAcroForm()->GetObject()->GetDictionary());

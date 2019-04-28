@@ -61,16 +61,16 @@ Destination::Destination(const CallbackInfo& info)
     if (opts[1] == 0) {
       if (opts[2] == 1) {
         Self = new PdfDestination(
-          &page->page,
+          &page->Self,
           static_cast<EPdfDestinationFit>(info[1].As<Number>().Int32Value()));
       } else if (opts[2] == 0) {
         Self = new PdfDestination(
-          &page->page,
+          &page->Self,
           static_cast<EPdfDestinationFit>(info[1].As<Number>().Int32Value()),
           info[2].As<Number>().DoubleValue());
       } else if (opts[2] == 0 && opts[3] == 0) {
         Self =
-          new PdfDestination(&page->page,
+          new PdfDestination(&page->Self,
                              info[1].As<Number>().DoubleValue(),  // left
                              info[2].As<Number>().DoubleValue(),  // top
                              info[3].As<Number>().DoubleValue()); // zoom
@@ -78,7 +78,7 @@ Destination::Destination(const CallbackInfo& info)
 
     } else if (opts[1] == 1) {
       Self = new PdfDestination(
-        &page->page, Rect::Unwrap(info[1].As<Object>())->GetRect());
+        &page->Self, Rect::Unwrap(info[1].As<Object>())->GetRect());
     } else {
       Error::New(info.Env()).ThrowAsJavaScriptException();
     }

@@ -27,22 +27,24 @@
 
 using std::string;
 using std::vector;
+using JsValue = Napi::Value;
 
 namespace NoPoDoFo {
 
 struct SignatureInfo
 {
-public:
-  vector<uint32_t> range = {};
-  string contents;
+  vector<uint32_t> Range = {};
+  string Contents;
 };
 
 class SignatureField : public Napi::ObjectWrap<SignatureField>
 {
 public:
   explicit SignatureField(const Napi::CallbackInfo&);
+  explicit SignatureField(const SignatureField&) = delete;
+  const SignatureField& operator=(const SignatureField&) = delete;
   ~SignatureField();
-  static Napi::FunctionReference constructor;
+  static Napi::FunctionReference Constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
   void SetAppearanceStream(const Napi::CallbackInfo&);
   void SetReason(const Napi::CallbackInfo&);
@@ -51,19 +53,20 @@ public:
   void SetDate(const Napi::CallbackInfo&);
   void SetFieldName(const Napi::CallbackInfo&);
   void AddCertificateReference(const Napi::CallbackInfo&);
-  Napi::Value GetAnnotation(const Napi::CallbackInfo&);
-  Napi::Value GetFieldObject(const Napi::CallbackInfo&);
-  Napi::Value GetSignatureObject(const Napi::CallbackInfo&);
-  Napi::Value EnsureSignatureObject(const Napi::CallbackInfo&);
-  Napi::Value GetInfo(const Napi::CallbackInfo&);
-  PoDoFo::PdfData* GetSignatureData() { return signatureBuffer.get(); }
-  std::shared_ptr<PoDoFo::PdfSignatureField> GetField() { return field; }
+  JsValue GetAnnotation(const Napi::CallbackInfo&);
+  JsValue GetFieldObject(const Napi::CallbackInfo&);
+  JsValue GetSignatureObject(const Napi::CallbackInfo&);
+  JsValue EnsureSignatureObject(const Napi::CallbackInfo&);
+  JsValue GetInfo(const Napi::CallbackInfo&);
+  PoDoFo::PdfData* GetSignatureData() const { return SigningContent.get(); }
+  std::shared_ptr<PoDoFo::PdfSignatureField> GetField() const { return Self; }
 
 private:
-  std::shared_ptr<PoDoFo::PdfSignatureField> field;
-  std::unique_ptr<PoDoFo::PdfData> signatureBuffer;
-  SignatureInfo signatureInfo;
-  std::shared_ptr<spdlog::logger> dbglog;
+
+  std::shared_ptr<PoDoFo::PdfSignatureField> Self;
+  std::unique_ptr<PoDoFo::PdfData> SigningContent;
+  SignatureInfo Info;
+  std::shared_ptr<spdlog::logger> DbgLog;
 };
 }
 #endif

@@ -30,9 +30,9 @@ namespace NoPoDoFo {
 class FileSpec : public Napi::ObjectWrap<FileSpec>
 {
 public:
-	explicit FileSpec(const Napi::CallbackInfo&);
+  explicit FileSpec(const Napi::CallbackInfo&);
   explicit FileSpec(const FileSpec&) = delete;
-  const FileSpec&operator=(const FileSpec&) = delete;
+  const FileSpec& operator=(const FileSpec&) = delete;
   ~FileSpec();
   static Napi::FunctionReference Constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);

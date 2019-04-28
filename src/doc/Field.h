@@ -29,59 +29,59 @@ using std::cout;
 using std::endl;
 using std::string;
 using std::vector;
-using JsValue = Napi::Value;
+using JsValue = Value;
 
 namespace NoPoDoFo {
 
 typedef struct AppearanceCtx
 {
-  PoDoFo::PdfDocument* Doc;
-  PoDoFo::PdfFont* Font;
-  int fontSize;
-  int pageIndex;
+  PdfDocument* Doc;
+  PdfFont* Font;
+  int FontSize;
+  int PageIndex;
 } AppearanceCtx;
 class Field
 {
 public:
-  explicit Field(PoDoFo::EPdfField type, const Napi::CallbackInfo& info);
+  explicit Field(EPdfField type, const CallbackInfo& info);
 	explicit Field(const Field&) = delete;
 	const Field&operator=(const Field&) = delete;
-  ~Field();
-  JsValue GetType(const Napi::CallbackInfo&);
-  JsValue GetFieldName(const Napi::CallbackInfo&);
-  void SetFieldName(const Napi::CallbackInfo&, const Napi::Value&);
-  JsValue GetAlternateName(const Napi::CallbackInfo&);
-  JsValue GetMappingName(const Napi::CallbackInfo&);
-  void SetAlternateName(const Napi::CallbackInfo&, const Napi::Value&);
-  void SetMappingName(const Napi::CallbackInfo&, const Napi::Value&);
-  void SetRequired(const Napi::CallbackInfo&, const Napi::Value&);
-  JsValue IsRequired(const Napi::CallbackInfo&);
-  void SetReadOnly(const Napi::CallbackInfo&, const Napi::Value&);
-  JsValue IsReadOnly(const Napi::CallbackInfo&);
-  void SetExport(const Napi::CallbackInfo&, const Napi::Value&);
-  JsValue IsExport(const Napi::CallbackInfo&);
-  void SetBackground(const Napi::CallbackInfo&);
-  void SetBorder(const Napi::CallbackInfo&);
-  void SetHighlightingMode(const Napi::CallbackInfo&);
-  void SetMouseAction(const Napi::CallbackInfo&);
-  void SetPageAction(const Napi::CallbackInfo&);
-  JsValue GetAnnotation(const Napi::CallbackInfo&);
-  JsValue GetAppearanceStream(const Napi::CallbackInfo&);
-  void SetAppearanceStream(const Napi::CallbackInfo&, const Napi::Value&);
-  JsValue GetDefaultAppearance(const Napi::CallbackInfo&);
-  void SetDefaultAppearance(const Napi::CallbackInfo&, const Napi::Value&);
-  JsValue GetJustification(const Napi::CallbackInfo&);
-  void SetJustification(const Napi::CallbackInfo&, const Napi::Value&);
-  JsValue GetFieldObject(const Napi::CallbackInfo&);
+  virtual ~Field();
+  JsValue GetType(const CallbackInfo&);
+  JsValue GetFieldName(const CallbackInfo&);
+  void SetFieldName(const CallbackInfo&, const Value&);
+  JsValue GetAlternateName(const CallbackInfo&);
+  JsValue GetMappingName(const CallbackInfo&);
+  void SetAlternateName(const CallbackInfo&, const Value&);
+  void SetMappingName(const CallbackInfo&, const Value&);
+  void SetRequired(const CallbackInfo&, const Value&);
+  JsValue IsRequired(const CallbackInfo&);
+  void SetReadOnly(const CallbackInfo&, const Value&);
+  JsValue IsReadOnly(const CallbackInfo&);
+  void SetExport(const CallbackInfo&, const Value&);
+  JsValue IsExport(const CallbackInfo&);
+  void SetBackground(const CallbackInfo&);
+  void SetBorder(const CallbackInfo&);
+  void SetHighlightingMode(const CallbackInfo&);
+  void SetMouseAction(const CallbackInfo&);
+  void SetPageAction(const CallbackInfo&);
+  JsValue GetAnnotation(const CallbackInfo&);
+  JsValue GetAppearanceStream(const CallbackInfo&);
+  void SetAppearanceStream(const CallbackInfo&, const Value&);
+  JsValue GetDefaultAppearance(const CallbackInfo&);
+  void SetDefaultAppearance(const CallbackInfo&, const Value&);
+  JsValue GetJustification(const CallbackInfo&);
+  void SetJustification(const CallbackInfo&, const Value&);
+  JsValue GetFieldObject(const CallbackInfo&);
   virtual void RefreshAppearanceStream();
-  PoDoFo::PdfField& GetField() const { return *Self; }
-  PoDoFo::PdfDictionary& GetFieldDictionary() const
+  PdfField& GetField() const { return *Self; }
+  PdfDictionary& GetFieldDictionary() const
   {
     return Self->GetFieldObject()->GetDictionary();
   }
-  std::map<std::string, PoDoFo::PdfObject*> GetFieldRefreshKeys(
-    PoDoFo::PdfField*);
-  PoDoFo::PdfFont* GetDAFont(string_view);
+  std::map<std::string, PdfObject*> GetFieldRefreshKeys(
+    PdfField*);
+  PdfFont* GetDAFont(string_view);
   string FieldName;
   string FieldType;
 
@@ -89,8 +89,8 @@ protected:
   string TypeString();
 	std::shared_ptr<spdlog::logger> DbgLog;
 private:
-  PoDoFo::PdfField* Self;
-  vector<PoDoFo::PdfObject*> Children;
+  PdfField* Self;
+  vector<PdfObject*> Children;
 };
 }
 #endif // NPDF_PDFFIELD_H

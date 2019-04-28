@@ -31,8 +31,8 @@ class Encoding : public Napi::ObjectWrap<Encoding>
 {
 public:
   explicit Encoding(const Napi::CallbackInfo& callbackInfo);
-	explicit Encoding(const Encoding&) = delete;
-	const Encoding&operator=(const Encoding&) = delete;
+  explicit Encoding(const Encoding&) = delete;
+  const Encoding& operator=(const Encoding&) = delete;
   ~Encoding();
   static Napi::FunctionReference Constructor;
   static void Initialize(Napi::Env&, Napi::Object& target);

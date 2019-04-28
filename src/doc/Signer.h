@@ -21,6 +21,7 @@
 #define NPDF_SIGNER_H
 
 #include <napi.h>
+#include <podofo/podofo.h>
 #include <openssl/crypto.h>
 #include <openssl/err.h>
 #include <openssl/evp.h>
@@ -28,31 +29,33 @@
 #include <openssl/pkcs7.h>
 #include <openssl/ssl.h>
 #include <openssl/x509.h>
-#include <podofo/podofo.h>
 #include <spdlog/spdlog.h>
 
+using JsValue = Napi::Value;
 namespace NoPoDoFo {
 class Signer : public Napi::ObjectWrap<Signer>
 {
 public:
-  static Napi::FunctionReference constructor;
+  static Napi::FunctionReference Constructor;
   explicit Signer(const Napi::CallbackInfo&);
+  explicit Signer(const Signer&) = delete;
+  const Signer& operator=(const Signer&) = delete;
   ~Signer();
   static void Initialize(Napi::Env& env, Napi::Object& target);
-  void SetField(const Napi::CallbackInfo&, const Napi::Value&);
-  Napi::Value GetField(const Napi::CallbackInfo&);
-  Napi::Value SignWorker(const Napi::CallbackInfo&);
-  Napi::Value LoadCertificateAndKey(const Napi::CallbackInfo&);
+  void SetField(const Napi::CallbackInfo&, const JsValue&);
+  JsValue GetField(const Napi::CallbackInfo&);
+  JsValue SignWorker(const Napi::CallbackInfo&);
+  JsValue LoadCertificateAndKey(const Napi::CallbackInfo&);
 
-  PoDoFo::PdfMemDocument& doc;
-  std::string output;
-  std::shared_ptr<PoDoFo::PdfSignatureField> field;
+  PoDoFo::PdfMemDocument& Doc;
+  std::string Output;
+  std::shared_ptr<PoDoFo::PdfSignatureField> Field;
 
-  EVP_PKEY* pkey = nullptr;
-  X509* cert = nullptr;
+  EVP_PKEY* Pkey = nullptr;
+  X509* Cert = nullptr;
 
 private:
-  std::shared_ptr<spdlog::logger> dbglog;
+  std::shared_ptr<spdlog::logger> DbgLog;
 };
 }
 #endif

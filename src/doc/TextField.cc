@@ -37,14 +37,14 @@ FunctionReference TextField::Constructor; // NOLINT
 TextField::TextField(const CallbackInfo& info)
   : ObjectWrap(info)
   , Field(ePdfField_TextField, info)
-  , field(Field::GetField())
+  , Self(GetField())
 {
-  dbglog = spdlog::get("DbgLog");
+  DbgLog = spdlog::get("DbgLog");
   if (info[info.Length() - 1].IsObject() &&
       !info[info.Length() - 1].As<Object>().InstanceOf(
         Document::Constructor.Value()) &&
       !info[info.Length() - 1].As<Object>().InstanceOf(
-        StreamDocument::constructor.Value())) {
+        StreamDocument::Constructor.Value())) {
     auto opts = info[info.Length() - 1].As<Object>();
     if (opts.Has("maxLen")) {
       int maxLen = opts.Get("maxLen").As<Number>();
@@ -82,7 +82,7 @@ TextField::TextField(const CallbackInfo& info)
 }
 TextField::~TextField()
 {
- dbglog->debug("TextField Cleanup");
+ DbgLog->debug("TextField Cleanup");
 }
 void
 TextField::Initialize(Napi::Env& env, Napi::Object& target)
@@ -144,7 +144,7 @@ TextField::Initialize(Napi::Env& env, Napi::Object& target)
   target.Set("TextField", ctor);
 }
 void
-TextField::SetText(const CallbackInfo& info, const Napi::Value& value)
+TextField::SetText(const CallbackInfo& info, const JsValue& value)
 {
   if (!value.IsString()) {
     throw Napi::Error::New(info.Env(),
@@ -155,89 +155,89 @@ TextField::SetText(const CallbackInfo& info, const Napi::Value& value)
   GetText().SetText(v);
 }
 
-Napi::Value
+JsValue
 TextField::Text(const CallbackInfo& info)
 {
   return Napi::String::New(info.Env(), GetText().GetText().GetStringUtf8());
 }
 void
-TextField::SetMaxLen(const Napi::CallbackInfo& info, const Napi::Value& value)
+TextField::SetMaxLen(const Napi::CallbackInfo& info, const JsValue& value)
 {
   GetText().SetMaxLen(value.As<Number>().Int64Value());
 }
-Napi::Value
+JsValue
 TextField::GetMaxLen(const Napi::CallbackInfo& info)
 {
   return Number::New(info.Env(), GetText().GetMaxLen());
 }
 void
 TextField::SetMultiLine(const Napi::CallbackInfo& info,
-                        const Napi::Value& value)
+                        const JsValue& value)
 {
   GetText().SetMultiLine(value.As<Boolean>());
 }
-Napi::Value
+JsValue
 TextField::IsMultiLine(const Napi::CallbackInfo& info)
 {
   return Boolean::New(info.Env(), GetText().IsMultiLine());
 }
 void
-TextField::SetPasswordField(const Napi::CallbackInfo&, const Napi::Value& value)
+TextField::SetPasswordField(const Napi::CallbackInfo&, const JsValue& value)
 {
   GetText().SetPasswordField(value.As<Boolean>());
 }
-Napi::Value
+JsValue
 TextField::IsPasswordField(const Napi::CallbackInfo& info)
 {
   return Boolean::New(info.Env(), GetText().IsPasswordField());
 }
 void
-TextField::SetFileField(const Napi::CallbackInfo&, const Napi::Value& value)
+TextField::SetFileField(const Napi::CallbackInfo&, const JsValue& value)
 {
   GetText().SetFileField(value.As<Boolean>());
 }
-Napi::Value
+JsValue
 TextField::IsFileField(const Napi::CallbackInfo& info)
 {
   return Boolean::New(info.Env(), GetText().IsFileField());
 }
 void
 TextField::SetSpellcheckEnabled(const Napi::CallbackInfo&,
-                                const Napi::Value& value)
+                                const JsValue& value)
 {
   GetText().SetSpellcheckingEnabled(value.As<Boolean>());
 }
-Napi::Value
+JsValue
 TextField::IsSpellcheckEnabled(const Napi::CallbackInfo& info)
 {
   return Boolean::New(info.Env(), GetText().IsSpellcheckingEnabled());
 }
 void
-TextField::SetScrollEnabled(const Napi::CallbackInfo&, const Napi::Value& value)
+TextField::SetScrollEnabled(const Napi::CallbackInfo&, const JsValue& value)
 {
   GetText().SetScrollBarsEnabled(value.As<Boolean>());
 }
-Napi::Value
+JsValue
 TextField::IsScrollEnabled(const Napi::CallbackInfo& info)
 {
   return Boolean::New(info.Env(), GetText().IsScrollBarsEnabled());
 }
 void
-TextField::SetCombs(const Napi::CallbackInfo&, const Napi::Value& value)
+TextField::SetCombs(const Napi::CallbackInfo&, const JsValue& value)
 {
   GetText().SetCombs(value.As<Boolean>());
 }
-Napi::Value
+JsValue
 TextField::IsCombs(const Napi::CallbackInfo& info)
 {
   return Boolean::New(info.Env(), GetText().IsCombs());
 }
 void
-TextField::SetRichText(const Napi::CallbackInfo&, const Napi::Value& value)
+TextField::SetRichText(const Napi::CallbackInfo&, const JsValue& value)
 {
   GetText().SetRichText(value.As<Boolean>());
 }
-Napi::Value
+JsValue
 TextField::IsRichText(const Napi::CallbackInfo& info)
 {
   return Boolean::New(info.Env(), GetText().IsRichText());

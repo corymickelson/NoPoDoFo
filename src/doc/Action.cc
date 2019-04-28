@@ -33,7 +33,7 @@ Action::Action(const Napi::CallbackInfo& info)
     if (info[0].As<Object>().InstanceOf(Document::Constructor.Value())) {
       doc = Document::Unwrap(info[0].As<Object>())->Base;
     } else if (info[0].As<Object>().InstanceOf(
-                 StreamDocument::constructor.Value())) {
+                 StreamDocument::Constructor.Value())) {
       doc = StreamDocument::Unwrap(info[0].As<Object>())->Base;
     } else {
       Error::New(info.Env(), "Instance of Base is required")

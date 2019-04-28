@@ -28,14 +28,14 @@ using namespace Napi;
 namespace NoPoDoFo {
 
 ListField::ListField(PdfField& field)
-  : field(field)
+  : Self(field)
 {
-  dbglog = spdlog::get("DbgLog");
+  DbgLog = spdlog::get("DbgLog");
 }
 
 ListField::~ListField()
 {
-  dbglog->debug("ListField Cleanup");
+  DbgLog->debug("ListField Cleanup");
 }
 
 void

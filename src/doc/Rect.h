@@ -23,30 +23,33 @@
 #include <napi.h>
 #include <podofo/podofo.h>
 #include <spdlog/logger.h>
+using JsValue = Napi::Value;
 
 namespace NoPoDoFo {
 class Rect : public Napi::ObjectWrap<Rect>
 {
 public:
   explicit Rect(const Napi::CallbackInfo& callbackInfo);
+  explicit Rect(const Rect&) = delete;
+  const Rect& operator=(const Rect&) = delete;
   ~Rect();
   static Napi::FunctionReference constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
 
   void Intersect(const Napi::CallbackInfo&);
-  Napi::Value GetWidth(const Napi::CallbackInfo&);
-  void SetWidth(const Napi::CallbackInfo&, const Napi::Value&);
-  Napi::Value GetHeight(const Napi::CallbackInfo&);
-  void SetHeight(const Napi::CallbackInfo&, const Napi::Value&);
-  Napi::Value GetBottom(const Napi::CallbackInfo&);
-  void SetBottom(const Napi::CallbackInfo&, const Napi::Value&);
-  Napi::Value GetLeft(const Napi::CallbackInfo&);
-  void SetLeft(const Napi::CallbackInfo&, const Napi::Value&);
-  PoDoFo::PdfRect& GetRect() { return *rect; }
+  JsValue GetWidth(const Napi::CallbackInfo&);
+  void SetWidth(const Napi::CallbackInfo&, const JsValue&);
+  JsValue GetHeight(const Napi::CallbackInfo&);
+  void SetHeight(const Napi::CallbackInfo&, const JsValue&);
+  JsValue GetBottom(const Napi::CallbackInfo&);
+  void SetBottom(const Napi::CallbackInfo&, const JsValue&);
+  JsValue GetLeft(const Napi::CallbackInfo&);
+  void SetLeft(const Napi::CallbackInfo&, const JsValue&);
+  PoDoFo::PdfRect& GetRect() const { return *Self; }
 
 private:
-  PoDoFo::PdfRect* rect;
-  std::shared_ptr<spdlog::logger> dbglog;
+  PoDoFo::PdfRect* Self;
+  std::shared_ptr<spdlog::logger> DbgLog;
 };
 }
 #endif // NPDF_RECT_H

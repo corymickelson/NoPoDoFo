@@ -34,47 +34,47 @@ using std::pair;
 using std::string;
 using std::vector;
 
-using JsValue = Napi::Value;
+using JsValue = Value;
 
 namespace NoPoDoFo {
-class Document
-  : public Napi::ObjectWrap<Document>
+class Document final
+  : public ObjectWrap<Document>
   , public BaseDocument
 {
 public:
-  static Napi::FunctionReference Constructor;
-  static PoDoFo::PdfFont* GetPdfFont(PoDoFo::PdfMemDocument&, string_view);
-  static vector<PoDoFo::PdfFont*> GetFonts(PoDoFo::PdfMemDocument&);
-  static void Initialize(Napi::Env& env, Napi::Object& target);
-  static JsValue GC(const Napi::CallbackInfo&);
+  static FunctionReference Constructor;
+  static PdfFont* GetPdfFont(PdfMemDocument&, string_view);
+  static vector<PdfFont*> GetFonts(PdfMemDocument&);
+  static void Initialize(Napi::Env& env, Object& target);
+  static JsValue GC(const CallbackInfo&);
 
-	explicit Document(const Napi::CallbackInfo&);
+	explicit Document(const CallbackInfo&);
   explicit Document(const Document&) = delete;
   const Document&operator=(const Document&) = delete;
   ~Document();
-  JsValue Load(const Napi::CallbackInfo&);
-  JsValue CreatePage(const Napi::CallbackInfo&) override;
-  void DeletePages(const Napi::CallbackInfo&);
-  void SetPassword(const Napi::CallbackInfo&);
-  JsValue Write(const Napi::CallbackInfo&);
-  void SetEncrypt(const Napi::CallbackInfo&, const JsValue&);
-  JsValue GetEncrypt(const Napi::CallbackInfo&);
-  JsValue GetTrailer(const Napi::CallbackInfo&);
-  JsValue GetCatalog(const Napi::CallbackInfo&);
-  JsValue InsertPages(const Napi::CallbackInfo&);
-  JsValue HasSignature(const Napi::CallbackInfo&);
-  JsValue GetFont(const Napi::CallbackInfo&);
-  JsValue ListFonts(const Napi::CallbackInfo&);
-  JsValue GetSignatures(const Napi::CallbackInfo&);
+  JsValue Load(const CallbackInfo&);
+  JsValue CreatePage(const CallbackInfo&) override;
+  void DeletePages(const CallbackInfo&);
+  void SetPassword(const CallbackInfo&);
+  JsValue Write(const CallbackInfo&);
+  void SetEncrypt(const CallbackInfo&, const JsValue&);
+  JsValue GetEncrypt(const CallbackInfo&);
+  JsValue GetTrailer(const CallbackInfo&);
+  JsValue GetCatalog(const CallbackInfo&);
+  JsValue InsertPages(const CallbackInfo&);
+  JsValue HasSignature(const CallbackInfo&);
+  JsValue GetFont(const CallbackInfo&);
+  JsValue ListFonts(const CallbackInfo&);
+  JsValue GetSignatures(const CallbackInfo&);
   bool LoadedForIncrementalUpdates() const { return LoadForIncrementalUpdates; }
-  inline PoDoFo::PdfMemDocument& GetDocument() const
+  inline PdfMemDocument& GetDocument() const
   {
-    return *dynamic_cast<PoDoFo::PdfMemDocument*>(Base);
+    return *dynamic_cast<PdfMemDocument*>(Base);
   }
 
 private:
   bool LoadForIncrementalUpdates = false;
-  vector<PoDoFo::PdfFont*> Fonts;
+  vector<PdfFont*> Fonts;
 };
 }
 #endif // NPDF_PDFMEMDOCUMENT_H

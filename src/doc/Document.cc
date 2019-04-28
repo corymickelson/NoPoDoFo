@@ -665,7 +665,7 @@ Document::GetSignatures(const CallbackInfo& info)
       if (field.GetType() == ePdfField_Signature) {
         cout << "Found field " << field.GetFieldName().GetStringUtf8() << endl;
         js.Set(jsIndex,
-               SignatureField::constructor.New({ External<PdfAnnotation>::New(
+               SignatureField::Constructor.New({ External<PdfAnnotation>::New(
                  info.Env(), field.GetWidgetAnnotation()) }));
         jsIndex++;
       }
