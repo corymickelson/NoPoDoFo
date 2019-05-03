@@ -400,8 +400,7 @@ class ObjWriteAsync final : public Napi::AsyncWorker
 {
 public:
   ObjWriteAsync(Napi::Function& cb, Obj* obj, string dest)
-    : AsyncWorker(cb)
-    , NpdfObj(obj)
+		: AsyncWorker(cb), Self(obj)
     , Arg(std::move(dest))
   {}
 
@@ -410,7 +409,7 @@ protected:
   {
     try {
       PdfOutputDevice device(Arg.c_str());
-      NpdfObj->GetObject().WriteObject(&device, ePdfWriteMode_Default, nullptr);
+			Self->GetObject().WriteObject(&device, ePdfWriteMode_Default, nullptr);
     } catch (PdfError& err) {
       SetError(ErrorHandler::WriteMsg(err));
     } catch (Napi::Error& err) {
@@ -424,7 +423,7 @@ protected:
   }
 
 private:
-  Obj* NpdfObj;
+	Obj *Self;
   string Arg;
 };
 

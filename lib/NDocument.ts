@@ -1,157 +1,40 @@
 import {
-    nopodofo,
+    Callback,
+    nopodofo, NPDFActions,
+    NPDFCreateFontOpts,
+    NPDFDestinationFit,
+    NPDFInfo,
+    NPDFPageLayout,
+    NPDFPageMode,
     NPDFVersion,
     NPDFWriteMode,
-    NPDFPageMode,
-    NPDFPageLayout,
-    NPDFInfo,
-    NPDFDestinationFit,
-    ProtectionOption,
-    NPDFCreateFontOpts,
-    Callback
+    ProtectionOption
 } from "../index"
+import {NPage} from "./NPage"
+import {NXObject} from "./NXObject"
+import {NObject} from "./NObject"
+import {NPainter} from "./NPainter";
+import {NAction} from "./NAction";
+import {NDestination} from "./NDestination";
+import {NRect} from "./NRect";
 
 /**
  * @class NDocument
  */
-export class NDocument implements nopodofo.Base {
-
-    // start StreamDocument
-    close(): string | Buffer {
-        if (!((this.base as any) instanceof nopodofo.StreamDocument)) {
-            throw TypeError('must be an instance of NoPoDoFo.StreamDocument')
+export class NDocument {
+    get painter(): NPainter {
+        if (!this._painter) {
+            this._painter = new nopodofo.Painter(this.base)
         }
-        const output = (this.base as nopodofo.StreamDocument).close()
-        this.finish()
-        return output
-    }
-    // end StreamDocument
-    // start MemDocument
-    get encrypt(): nopodofo.Encrypt {
-        if (!((this.base as any) instanceof nopodofo.Document)) {
-            throw TypeError('must be an instance of NoPoDoFo.Document')
-        }
-        const encrypt = (this.base as nopodofo.Document).encrypt
-        if (!encrypt) {
-            this.children.push(encrypt)
-        }
-        return encrypt
-    }
-    private _trailer?: nopodofo.Object
-    get trailer(): nopodofo.Object {
-        if (!((this.base as any) instanceof nopodofo.Document)) {
-            throw TypeError('must be an instance of NoPoDoFo.Document')
-        }
-        if (this._trailer) {
-            return this._trailer
-        }
-        const trailer = (this.base as nopodofo.Document).trailer
-        this.children.push(trailer)
-        return trailer
-    }
-    private _catalog?: nopodofo.Object
-    get catalog(): nopodofo.Object {
-        if (!((this.base as any) instanceof nopodofo.Document)) {
-            throw TypeError('must be an instance of NoPoDoFo.Document')
-        }
-        if (this._catalog) {
-            return this._catalog
-        }
-        const catalog = (this.base as nopodofo.Document).catalog
-        this.children.push(catalog)
-        return catalog
-    }
-    load(file: string | Buffer, opts: { forUpdate?: boolean; password?: string; }, cb: Callback<void>): void;
-    load(file: string | Buffer, cb: Callback<nopodofo.Document>): void;
-    load(file: any, opts: any, cb?: any) {
-        if (!((this.base as any) instanceof nopodofo.Document)) {
-            throw TypeError('must be an instance of NoPoDoFo.Document')
-        }
-    }
-    setPassword(pwd: string): void {
-        if (!((this.base as any) instanceof nopodofo.Document)) {
-            throw TypeError('must be an instance of NoPoDoFo.Document')
-        }
-        (this.base as nopodofo.Document).setPassword(pwd)
-    }
-    getFont(name: string): nopodofo.Font {
-        if (!((this.base as any) instanceof nopodofo.Document)) {
-            throw TypeError('must be an instance of NoPoDoFo.Document')
-        }
-        const font = (this.base as nopodofo.Document).getFont(name)
-        this.children.push(font)
-        return font
-    }
-    listFonts(): { name: string; id: string; file: string; }[] {
-        if (!((this.base as any) instanceof nopodofo.Document)) {
-            throw TypeError('must be an instance of NoPoDoFo.Document')
-        }
-        const fonts = (this.base as nopodofo.Document).listFonts()
-        this.children.push(fonts)
-        return fonts
-    }
-    splicePages(startIndex: number, count: number): void {
-        if (!((this.base as any) instanceof nopodofo.Document)) {
-            throw TypeError('must be an instance of NoPoDoFo.Document')
-        }
-        (this.base as nopodofo.Document).splicePages(startIndex, count)
-    }
-    insertPages(fromDoc: nopodofo.Document, startIndex: number, count: number): number {
-        if (!((this.base as any) instanceof nopodofo.Document)) {
-            throw TypeError('must be an instance of NoPoDoFo.Document')
-        }
-        return (this.base as nopodofo.Document).insertPages(fromDoc, startIndex, count)
-    }
-    write(destination: string | Callback<Buffer>, cb?: Callback<string>): void {
-        if (!((this.base as any) instanceof nopodofo.Document)) {
-            throw TypeError('must be an instance of NoPoDoFo.Document')
-        }
-        (this.base as nopodofo.Document).write(destination, cb)
-        this.finish()
-    }
-    hasSignatures(): boolean {
-        if (!((this.base as any) instanceof nopodofo.Document)) {
-            throw TypeError('must be an instance of NoPoDoFo.Document')
-        }
-        return (this.base as nopodofo.Document).hasSignatures()
-    }
-    getSignatures(): nopodofo.SignatureField[] {
-        if (!((this.base as any) instanceof nopodofo.Document)) {
-            throw TypeError('must be an instance of NoPoDoFo.Document')
-        }
-        const signatures = (this.base as nopodofo.Document).getSignatures()
-        this.children.push(signatures)
-        return signatures
-    }
-    append(doc: nopodofo.Document | nopodofo.Document[]): void {
-        if (!((this.base as any) instanceof nopodofo.Document)) {
-            throw TypeError('must be an instance of NoPoDoFo.Document')
-        }
-        (this.base as nopodofo.Document).append(doc)
-    }
-    insertExistingPage(memDoc: nopodofo.Document, index: number, insertIndex: number): number {
-        if (!((this.base as any) instanceof nopodofo.Document)) {
-            throw TypeError('must be an instance of NoPoDoFo.Document')
-        }
-        return (this.base as nopodofo.Document).insertExistingPage(memDoc, index, insertIndex)
+        return new NPainter(this, this._painter)
     }
 
-    // end MemDocument
-    private _body: nopodofo.Object[] = []
-    private _form?: nopodofo.Form
     get form(): nopodofo.Form {
-        if (!this._form) {
-            this._form = this.base.form
-        }
-        this.children.push(this._form)
-        return this._form
+        return this.base.form
     }
-    get body(): nopodofo.Object[] {
-        if (!this._body) {
-            this._body = this.base.body
-        }
-        this.children.push(this._body)
-        return this._body
+
+    get body(): NObject[] {
+        return this.base.body.map(i => new NObject(this, i))
     }
     get version(): NPDFVersion {
         return this.base.version
@@ -174,13 +57,36 @@ export class NDocument implements nopodofo.Base {
     get info(): NPDFInfo {
         return this.base.info
     }
+
+    createRect(init?: { left: number, bottom: number, width: number, height: number }): NRect {
+        return init ? new NRect(this, init.left, init.bottom, init.width, init.height) : new NRect(this)
+    }
+
+    createAction(t: NPDFActions): NAction {
+        const action = new nopodofo.Action(this.base, t)
+        return new NAction(this, action)
+    }
+
+    createDestination(page: NPage, fit: NPDFDestinationFit | NRect | { left: number, top: number, zoom: number }, fitArg?: number): NDestination {
+        let dest: nopodofo.Destination
+        if (fit instanceof NRect) {
+            dest = new nopodofo.Destination(page.self, fit.self)
+        } else if (typeof (fit) === 'object' && Object.keys(fit).every(k => ['left', 'top', 'zoom'].includes(k))) {
+            dest = new nopodofo.Destination(page.self, fit.left, fit.top, fit.zoom)
+        } else {
+            if (fitArg) dest = new nopodofo.Destination(page.self, (fit as NPDFDestinationFit), fitArg)
+            else dest = new nopodofo.Destination(page.self, (fit as NPDFDestinationFit))
+        }
+        return new NDestination(this, dest)
+    }
+
     getPageCount(): number {
         return this.base.getPageCount()
     }
-    getPage(n: number): nopodofo.Page {
+
+    getPage(n: number): NPage {
         const page = this.base.getPage(n)
-        this.children.push(page)
-        return page
+        return new NPage(this, page)
     }
     hideToolbar(): void {
         this.base.hideToolbar()
@@ -206,10 +112,10 @@ export class NDocument implements nopodofo.Base {
     attachFile(file: string): void {
         this.base.attachFile(file)
     }
-    insertPage(rect: nopodofo.Rect, index: number): nopodofo.Page {
-        const page = this.base.insertPage(rect, index)
-        this.children.push(page)
-        return page
+
+    insertPage(rect: NRect, index: number): NPage {
+        const page = this.base.insertPage(rect.self, index)
+        return new NPage(this, page)
     }
     isLinearized(): boolean {
         return this.base.isLinearized()
@@ -222,96 +128,144 @@ export class NDocument implements nopodofo.Base {
     }
     createFont(opts: NPDFCreateFontOpts): nopodofo.Font {
         const font = this.base.createFont(opts)
-        this.children.push(font)
         return font
     }
     createFontSubset(opts: NPDFCreateFontOpts): nopodofo.Font {
         const font = this.base.createFont(opts)
-        this.children.push(font)
         return font
     }
     getOutlines(create?: boolean, root?: string): nopodofo.Outline|null {
         const outlines = this.base.getOutlines(create, root)
-        if (outlines !== null) {
-            this.children.push(outlines)
-        }
         return outlines
     }
-    getObject(ref: nopodofo.Ref): nopodofo.Object {
+
+    getObject(ref: nopodofo.Ref): NObject {
         const obj = this.base.getObject(ref)
-        this.children.push(obj)
-        return obj
+        return new NObject(this, obj)
     }
-    getNames(create: boolean): nopodofo.Object|null {
+
+    getNames(create: boolean): NObject | null {
         const names = this.base.getNames(create)
-        if (names !== null) {
-            this.children.push(names)
+        if (names) {
+            return new NObject(this, names)
         }
-        return names
+        return null
     }
-    createXObject(rect: nopodofo.Rect): nopodofo.XObject {
-        const x = this.base.createXObject(rect)
-        this.children.push(x)
-        return x
+
+    createXObject(rect: NRect): NXObject {
+        const x = this.base.createXObject(rect.self)
+        return new NXObject(this, x)
     }
-    createPage(rect: nopodofo.Rect): nopodofo.Page {
-        const page = this.base.createPage(rect)
-        this.children.push(page)
-        return page
+
+    createPage(rect: NRect): NPage {
+        const page = this.base.createPage(rect.self)
+        return new NPage(this, page)
     }
-    createPages(rects: nopodofo.Rect[]): number {
-        return this.base.createPages(rects)
+
+    createPages(rects: NRect[]): number {
+        return this.base.createPages(rects.map(r => r.self))
     }
     getAttachment(fileName: string): nopodofo.FileSpec {
         const n = this.base.getAttachment(fileName)
-        this.children.push(n)
         return n
     }
     addNamedDestination(page: nopodofo.Page, destination: NPDFDestinationFit, name: string): void {
-        const d = this.base.addNamedDestination(page, destination, name)
-        this.children.push(d)
-        return d
+        this.base.addNamedDestination(page, destination, name)
     }
-    children: any[] = []
-    get memory(): nopodofo.Document|undefined {
-        if(this.base instanceof  nopodofo.Document) {
-            return this.base
-        } else {
-            return undefined
-        }
-    }
-    get stream(): nopodofo.StreamDocument|undefined {
-        if(this.base instanceof nopodofo.StreamDocument) {
-            return this.base
-        } else {
-            return undefined
-        }
-    }
-    private constructor(private base: nopodofo.Base) {
+
+    private _painter?: nopodofo.Painter
+
+    protected constructor(protected base: nopodofo.Base) {
     }
     static async from(
         src: string | Buffer,
         opts: { forUpdate?: boolean, password?: string } = { forUpdate: false, password:"" })
-        : Promise<NDocument> {
+        : Promise<NMemoryDocument> {
         const doc = new nopodofo.Document()
         await new Promise((resolve, reject) => doc.load(src, opts, (e:Error) => e ? reject(e) : resolve(doc)))
-        return new NDocument(doc)
+        return new NMemoryDocument(doc)
     }
     static to(
         dest?: string,
         opts?: { version: NPDFVersion, writer: NPDFWriteMode, encrypt?: nopodofo.Encrypt })
         : NDocument {
         const doc = new nopodofo.StreamDocument(dest, opts)
-        return new NDocument(doc)
+        return new NStreamDocument(doc)
     }
-    /**
-     * @description Set all children of this instance to undefined so they may be collected by the garbage collector
-     */
-    private finish() {
-        console.log(`clearing ${this.children.length} items`)
-        this.children.forEach(c => {
-            c = undefined
-        })
-    }
+
 }
 
+class NMemoryDocument extends NDocument {
+    constructor(base: nopodofo.Base) {
+        super(base)
+    }
+
+    get encrypt(): nopodofo.Encrypt {
+        return (this.base as nopodofo.Document).encrypt
+    }
+
+    get trailer(): NObject {
+        const trailer = (this.base as nopodofo.Document).trailer
+        return new NObject(this, trailer)
+    }
+
+    get catalog(): NObject {
+        const catalog = (this.base as nopodofo.Document).catalog
+        return new NObject(this, catalog)
+    }
+
+    setPassword(pwd: string): void {
+        (this.base as nopodofo.Document).setPassword(pwd)
+    }
+
+    getFont(name: string): nopodofo.Font {
+        const font = (this.base as nopodofo.Document).getFont(name)
+        return font
+    }
+
+    listFonts(): { name: string; id: string; file: string; }[] {
+        const fonts = (this.base as nopodofo.Document).listFonts()
+        return fonts
+    }
+
+    splicePages(startIndex: number, count: number): void {
+        (this.base as nopodofo.Document).splicePages(startIndex, count)
+    }
+
+    insertPages(fromDoc: nopodofo.Document, startIndex: number, count: number): number {
+        return (this.base as nopodofo.Document).insertPages(fromDoc, startIndex, count)
+    }
+
+    write(destination: string | Callback<Buffer>, cb?: Callback<string>): void {
+        (this.base as nopodofo.Document).write(destination, cb)
+    }
+
+    hasSignatures(): boolean {
+        return (this.base as nopodofo.Document).hasSignatures()
+    }
+
+    getSignatures(): nopodofo.SignatureField[] {
+        const signatures = (this.base as nopodofo.Document).getSignatures()
+        return signatures
+    }
+
+    append(doc: nopodofo.Document | nopodofo.Document[]): void {
+        (this.base as nopodofo.Document).append(doc)
+    }
+
+    insertExistingPage(memDoc: NMemoryDocument, index: number, insertIndex: number): number {
+        return (this.base as nopodofo.Document).insertExistingPage(memDoc.base as nopodofo.Document, index, insertIndex)
+    }
+
+}
+
+class NStreamDocument extends NDocument {
+    constructor(base: nopodofo.Base) {
+        super(base)
+    }
+
+    close(): string | Buffer {
+        const output = (this.base as nopodofo.StreamDocument).close()
+        return output
+    }
+}

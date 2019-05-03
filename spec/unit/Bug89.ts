@@ -1,8 +1,6 @@
-import {nopodofo, NPDFAlignment, NPDFVerticalAlignment} from '../../'
 import {TestFixture, AsyncTest, Expect, Timeout} from 'alsatian';
 import {NDocument} from '../../lib/NDocument';
 import {join} from 'path'
-import Painter = nopodofo.Painter;
 
 
 @TestFixture('Bug89-RSS')
@@ -11,19 +9,18 @@ export class Bug89 {
         const n = await NDocument.from(join(__dirname, '../test-documents/bug89_doc.pdf'))
         const cover = await NDocument.from(join(__dirname, '../test-documents/bug89_cover.pdf'))
         const page = n.getPage(0)
-        const painter = new Painter(n.memory as nopodofo.Document)
         const carlito = n.createFont({
             fontName: 'Carlito',
             fileName: join(__dirname, '../test-documents/Carlito-Regular.ttf'),
             embed: true
         })
-        painter.setPage(page)
-        painter.font = carlito
+        n.painter.setPage(page)
+        n.painter.font = carlito
         for (let i = 0; i < 100; i++) {
-            painter.drawText({x: i * 10, y: i * 10}, `TEST ${i}`)
+            n.painter.drawText({x: i * 10, y: i * 10}, `TEST ${i}`)
         }
-        painter.finishPage()
-        n.insertExistingPage(cover.memory as nopodofo.Document, 0, 0)
+        n.painter.finishPage()
+        n.insertExistingPage(cover, 0, 0)
         await new Promise(resolve => n.write((err, data) => {
             if (err) Expect.fail(err.message)
             Expect(Buffer.isBuffer(data))

@@ -6,6 +6,7 @@
   * [Action](documentation/action.md)
   * [Annotation](documentation/annotations.md)
   * [Array](documentation/array.md)
+  * [Best Practices](documentation/bestpractices.md)
   * [CheckBox](documentation/checkbox.md)
   * [Color](documentation/color.md)
   * [ComboBox](documentation/combobox.md)

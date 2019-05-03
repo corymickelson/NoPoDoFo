@@ -448,7 +448,7 @@ BaseDocument::GetOutlines(const CallbackInfo &info)
 		dynamic_cast<PdfOutlines *>(outlines)->CreateRoot(PdfString(root));
 	}
 
-	return Outline::constructor.New(
+	return Outline::Constructor.New(
 		{External<PdfOutlineItem>::New(info.Env(), outlines), External<BaseDocument>::New(info.Env(), this)});
 }
 JsValue

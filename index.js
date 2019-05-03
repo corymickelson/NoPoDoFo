@@ -1,4 +1,14 @@
-exports.nopodofo = require('bindings')('nopodofo')
+let nopodofo
+try {
+    nopodofo = require('./build/Release/nopodofo')
+} catch (e) {
+    try {
+        nopodofo = require('./build/Debug/nopodofo')
+    } catch (e) {
+        throw Error('Unable to find nopodofo binding binary')
+    }
+}
+exports.nopodofo = nopodofo
 exports.CONVERSION = 0.0028346456693
 Object.defineProperty(exports, "__esModule", {value: true});
 var NPDFActions;

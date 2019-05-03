@@ -22,11 +22,15 @@ The value `0.5` is passed to a method on the C++ NoPoDoFo::Painter object which 
 that number to the PoDoFo::Painter instance in memory, no value is returned from this method.
 
 There are however a handful of NoPoDoFo operations that can be somewhat expensive in terms of copy overhead, one such method being
-`Document.body`. The Document body accessor iterates each object of the PDF Document creating a new NoPoDoFo::Object and returning
-all NoPoDoFo::Objects as a new Javascript Array.
+`Document.body`. The Document body accessor iterates each object in a PDF Document, each object is then used to instantiate a new
+NoPoDoFo::Object(this is the binding to the native PDF Object), then all NoPoDoFo::Objects are pushed into an array and passed back
+to the javascript runtime, where upon passing from one runtime to the other all objects are copied from runtime a to runtime b.
+On smaller documents this is negligible but one larger documents this can have a noticeable impact. Unfortunately there is
+no workaround for this at the moment; future work will though include filtering the body before passing back to javascript.
 
+## What is a Ref?
 The NoPoDoFo low level api's, specifically [Dictionary](./dictionary.md) and [Array](./array.md) expose methods for iterating the
-values of the containter. When iterating the keys of an array, or the key(s)/value(s) of a dictionary the caller must check
+values of the container. When iterating the keys of an array, or the key(s)/value(s) of a dictionary the caller must check
 that the return value has been resolved, if the value has not been resolved a [Ref](./ref.md) will be returned. The caller then
 can take this ref and pass it to [document.getObject](./document.md#getobject) to get the actual object value. Examples of this can be
 seen in unit tests Image, and FileAttachment.
@@ -38,4 +42,39 @@ Aggregation pattern, in this pattern the "parent" object may hold ownership of i
 The effect that this pattern has on NoPoDoFo is that a child class of a Document/StreamDocument, ex a Page, is bound to 
 the lifetime of the parent, the child is not responsible for it's resource allocation(s) or destruction,
 when the parent goes out of scope(allowing the instance to be gc'd) the child will be destroyed along with the parent,
-trying to access the instance of Page after the Document has gone out of scope(and been collected) will result in an Error. 
+trying to access the instance of Page after the Document has gone out of scope(and been collected) will result in an Error.
+This type of error can be easily mitigated by just ensuring all nopodofo instances are in the same scope, or that any
+children of Document or StreamDocument do not exist outside the scope of Document or StreamDocument.
+
+Bad:
+```typescript
+import {nopodofo} from '../'
+let page
+async function read(file: string|Buffer) {
+    const doc =  new nopodofo.Document()
+    await new Promise((resolve, reject) => doc.load(file, e => e ?reject(e) : resolve()))
+    page = doc.getPage(0)
+} // doc goes out of scope and the memory segment referenced by page is now invalid
+page.getField(0) // process terminates, page trying to reference something that has already been freed
+```
+
+Good:
+```typescript
+import {nopodofo} from '../'
+async function read(file: string|Buffer) {
+    const doc =  new nopodofo.Document()
+    await new Promise((resolve, reject) => doc.load(file, e => e ?reject(e) : resolve()))
+    let page = doc.getPage(0)
+    let field = page.getField(0)
+    // continue to do whatever your trying to do.
+} // doc goes out of scope and all document dependents go out of scope along with it.
+```
+
+## N lib
+
+<mark>This is still a work in progress and should be used with caution!</mark>
+
+NoPoDoFo also ships what is referred to as the 'N' library. This library is a thin layer atop nopodofo built for the purpose
+of helping end user's mitigate the unintentional destruction of any underlying nopodofo instance(s). In 'N' all members of
+nopodofo are handled by the ```NDocument``` class, in moving the creation of members within this class it is guaranteed
+that the resource will always be available.

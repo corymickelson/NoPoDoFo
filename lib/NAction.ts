@@ -1,39 +1,40 @@
-import {nopodofo, NPDFActions} from '../'
-import {NDocument} from "./NDocument";
+import {nopodofo} from '../'
+import {NDocument} from "./NDocument"
+import {NObject} from "./NObject"
 
-class NAction implements nopodofo.Action {
+export class NAction {
     get uri(): string|undefined {
-        return this._action.uri
+        return this.self.uri
     }
 
     set uri(value: string|undefined) {
-        this._action.uri = value;
-    }
-    get script(): string|undefined {
-        return this._action.script;
+        this.self.uri = value;
     }
 
-    set script(value: string|undefined) {
-        this._action.script = value;
-    }
-    constructor(private parent: NDocument, readonly type: NPDFActions) {
-        this._action = new nopodofo.Action(parent, type)
-        this.parent.children.push(this._action)
+    get script(): string {
+        if (!this.self.script) {
+            return ''
+        } else {
+            return this.self.script
+        }
     }
 
-    private readonly _action: nopodofo.Action
-    private _script: string|undefined;
-    private _uri: string|undefined;
+    set script(value: string) {
+        this.self.script = value
+    }
+
+    constructor(private parent: NDocument, action: nopodofo.Action) {
+        this.self = action
+    }
+
+    readonly self: nopodofo.Action
 
     addToDictionary(dictionary: nopodofo.Dictionary): void {
-        this._action.addToDictionary(dictionary)
+        this.self.addToDictionary(dictionary)
     }
 
-    getObject(): nopodofo.Object {
-        const o = this._action.getObject()
-        if(o !== null) {
-            this.parent.children.push(o)
-        }
-        return o
+    getObject(): NObject {
+        const o = this.self.getObject()
+        return new NObject(this.parent, o)
     }
 }

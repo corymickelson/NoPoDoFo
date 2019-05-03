@@ -35,7 +35,7 @@ using std::string;
 
 namespace NoPoDoFo {
 
-FunctionReference Outline::constructor; // NOLINT
+FunctionReference Outline::Constructor; // NOLINT
 
 Outline::Outline(const CallbackInfo& info)
   : ObjectWrap(info)
@@ -71,8 +71,8 @@ Outline::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceMethod("insertChild", &Outline::InsertChild),
       InstanceMethod("getParent", &Outline::GetParent),
       InstanceMethod("erase", &Outline::Erase) });
-  constructor = Napi::Persistent(ctor);
-  constructor.SuppressDestruct();
+	Constructor = Napi::Persistent(ctor);
+	Constructor.SuppressDestruct();
   target.Set("Outline", ctor);
 }
 void
@@ -89,7 +89,7 @@ Outline::CreateChild(const Napi::CallbackInfo& info)
   string name = info[0].As<String>().Utf8Value();
   auto d = Destination::Unwrap(info[1].As<Object>())->GetDestination();
   PdfOutlineItem* child = GetOutline().CreateChild(name, d);
-  return Outline::constructor.New(
+	return Outline::Constructor.New(
     { External<PdfOutlineItem>::New(info.Env(), child) });
 }
 Napi::Value
@@ -99,13 +99,13 @@ Outline::CreateNext(const Napi::CallbackInfo& info)
   if (info[1].As<Object>().InstanceOf(Destination::Constructor.Value())) {
     auto d = Destination::Unwrap(info[1].As<Object>())->GetDestination();
     PdfOutlineItem* item = GetOutline().CreateNext(name, d);
-    return Outline::constructor.New(
+		return Outline::Constructor.New(
       { External<PdfOutlineItem>::New(info.Env(), item) });
   }
   if (info[1].As<Object>().InstanceOf(Action::Constructor.Value())) {
     PdfAction& action = Action::Unwrap(info[1].As<Object>())->GetAction();
     auto item = GetOutline().CreateNext(name, action);
-    return Outline::constructor.New(
+		return Outline::Constructor.New(
       { External<PdfOutlineItem>::New(info.Env(), item) });
   }
   return info.Env().Undefined();
@@ -122,7 +122,7 @@ Outline::Prev(const Napi::CallbackInfo& info)
   auto prev = GetOutline().Prev();
   if (!prev)
     return info.Env().Null();
-  return Outline::constructor.New(
+	return Outline::Constructor.New(
     { External<PdfOutlineItem>::New(info.Env(), prev) });
 }
 Napi::Value
@@ -131,7 +131,7 @@ Outline::Next(const Napi::CallbackInfo& info)
   auto next = GetOutline().Next();
   if (!next)
     return info.Env().Null();
-  return Outline::constructor.New(
+	return Outline::Constructor.New(
     { External<PdfOutlineItem>::New(info.Env(), next) });
 }
 Napi::Value
@@ -140,7 +140,7 @@ Outline::First(const Napi::CallbackInfo& info)
   auto first = GetOutline().First();
   if (!first)
     return info.Env().Null();
-  return Outline::constructor.New(
+	return Outline::Constructor.New(
     { External<PdfOutlineItem>::New(info.Env(), first) });
 }
 Napi::Value
@@ -149,13 +149,13 @@ Outline::Last(const Napi::CallbackInfo& info)
   auto last = GetOutline().Last();
   if (!last)
     return info.Env().Null();
-  return Outline::constructor.New(
+	return Outline::Constructor.New(
     { External<PdfOutlineItem>::New(info.Env(), last) });
 }
 Napi::Value
 Outline::GetParent(const Napi::CallbackInfo& info)
 {
-  return Outline::constructor.New({ External<PdfOutlineItem>::New(
+	return Outline::Constructor.New({External<PdfOutlineItem>::New(
     info.Env(), GetOutline().GetParentOutline()) });
 }
 Napi::Value

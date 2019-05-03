@@ -40,7 +40,7 @@ public:
   explicit Outline(const Outline&) = delete;
   const Outline& operator=(const Outline&) = delete;
   ~Outline();
-  static Napi::FunctionReference constructor;
+	static Napi::FunctionReference Constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
   JsValue CreateChild(const Napi::CallbackInfo&);
   JsValue CreateNext(const Napi::CallbackInfo&);

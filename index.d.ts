@@ -510,6 +510,7 @@ export namespace nopodofo {
 
     export class Destination {
         constructor(page: Page, fit: NPDFDestinationFit)
+        constructor(page: Page, fit: nopodofo.Rect)
         constructor(page: Page, fit: NPDFDestinationFit, fitArg: number)
         constructor(page: Page, left: number, top: number, zoom: number)
 
@@ -537,7 +538,7 @@ export namespace nopodofo {
         fieldName: string
         alternateName?: string
         mappingName?: string
-        exported?: boolean
+        exported: boolean
         AP?: Dictionary
         DA?: string | null
         readonly widgetAnnotation: Annotation
@@ -618,7 +619,6 @@ export namespace nopodofo {
         scrollEnabled: boolean
         combs: boolean
         richText: boolean
-        alignment?: NPDFAlignment
 
         refreshAppearanceStream(): void
     }
@@ -942,9 +942,9 @@ export namespace nopodofo {
 
         hasStream(): boolean
 
-        getOffset(key: string): Promise<number>
+        getOffset(key: string, cb: Callback<number>): void
 
-        write(output: string, cb: Function): void
+        write(output: string, cb: Callback<string>): void
 
         flateCompressStream(): void
 
@@ -1227,7 +1227,7 @@ export namespace nopodofo {
 
         drawMultiLineText(rect: Rect, value: string, alignment?: NPDFAlignment, vertical?: NPDFVerticalAlignment): void
 
-        getMultiLineText(width: number, text: string, skipSpaces?: boolean): Array
+        getMultiLineText(width: number, text: string, skipSpaces?: boolean): string[]
 
         beginText(point: NPDFPoint): void
 
