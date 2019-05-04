@@ -10,6 +10,7 @@
   * [CheckBox](documentation/checkbox.md)
   * [Color](documentation/color.md)
   * [ComboBox](documentation/combobox.md)
+  * [Configure](documentation/configure.md)
   * [ContentsTokenizer](documentation/contentstokenizer.md)
   * [Data](documentation/data.md)
   * [Date](documentation/date.md)

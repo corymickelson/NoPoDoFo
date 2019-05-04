@@ -2,8 +2,8 @@
 
 - [API Documentation for XObject](#api-documentation-for-xobject)
   - [NoPoDoFo XObject](#nopodofo-xobject)
-  - [## Constructors](#constructors)
-  - [## Properties](#properties)
+  - [Constructors](#constructors)
+  - [Properties](#properties)
     - [contents](#contents)
     - [contentsForAppending](#contentsforappending)
     - [resources](#resources)
@@ -28,10 +28,8 @@ class XObject {
 ```
 
 ## Constructors
--------------
 
 ## Properties
---------------
 
 ### contents
 

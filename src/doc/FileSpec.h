@@ -38,9 +38,12 @@ public:
   static void Initialize(Napi::Env& env, Napi::Object& target);
   JsValue GetFileName(const Napi::CallbackInfo&);
   JsValue Data(const Napi::CallbackInfo&);
-
+  std::shared_ptr<PoDoFo::PdfFileSpec> GetFileSpec() const {
+  	auto copy = Self;
+  	return copy;
+  }
 private:
-  std::unique_ptr<PoDoFo::PdfFileSpec> Self;
+  std::shared_ptr<PoDoFo::PdfFileSpec> Self;
   std::shared_ptr<spdlog::logger> DbgLog;
 };
 }

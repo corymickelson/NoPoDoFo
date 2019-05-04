@@ -27,7 +27,7 @@
 using namespace Napi;
 using namespace PoDoFo;
 
-using std::make_unique;
+using std::make_shared;
 using std::string;
 
 namespace NoPoDoFo {
@@ -54,10 +54,10 @@ FileSpec::FileSpec(const CallbackInfo& info)
   if (info.Length() == 1 && info[0].IsObject() &&
       info[0].As<Object>().InstanceOf(Obj::Constructor.Value())) {
     Self =
-      make_unique<PdfFileSpec>(&Obj::Unwrap(info[0].As<Object>())->GetObject());
+      make_shared<PdfFileSpec>(&Obj::Unwrap(info[0].As<Object>())->GetObject());
   } else if (info.Length() == 1 && info[0].Type() == napi_external) {
     auto pObj = info[0].As<External<PdfObject>>().Data();
-    Self = make_unique<PdfFileSpec>(pObj);
+    Self = make_shared<PdfFileSpec>(pObj);
   } else if (info.Length() >= 2) {
     string file = info[0].As<String>().Utf8Value();
     auto docObj = info[1].As<Object>();
@@ -76,7 +76,7 @@ FileSpec::FileSpec(const CallbackInfo& info)
     if (info.Length() >= 3 && info[2].IsBuffer()) {
       embed = info[2].As<Boolean>();
     }
-    Self = make_unique<PdfFileSpec>(file.c_str(), embed, doc, true);
+    Self = make_shared<PdfFileSpec>(file.c_str(), embed, doc, true);
   } else {
     TypeError::New(info.Env(),
                    "Valid constructor args: [ [Obj], [External<PdfObject>], "
@@ -88,6 +88,9 @@ FileSpec::FileSpec(const CallbackInfo& info)
 FileSpec::~FileSpec()
 {
   DbgLog->debug("FileSpec Cleanup");
+  if(Self.use_count() == 0) {
+  	DbgLog->debug("FileSpec resource count: {}", Self.use_count());
+  }
 }
 
 JsValue

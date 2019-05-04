@@ -18,6 +18,8 @@ FunctionReference Action::Constructor; // NOLINT
 Action::Action(const Napi::CallbackInfo& info)
   : ObjectWrap(info)
 {
+
+	DbgLog = spdlog::get("DbgLog");
   const auto opts =
     AssertCallbackInfo(info,
                        { { 0, { option(napi_external), option(napi_object) } },
@@ -26,6 +28,7 @@ Action::Action(const Napi::CallbackInfo& info)
   if (opts[0] == 0 && info.Length() == 1) {
     Self =
       new PdfAction(info[0].As<External<PdfAction>>().Data()->GetObject());
+    DbgLog->debug("PdfAction Copied from external object");
   }
   // Create a new Action
   else if (opts[0] == 1 && opts[1] == 1) {
@@ -42,13 +45,13 @@ Action::Action(const Napi::CallbackInfo& info)
     }
     const auto t = static_cast<EPdfAction>(info[1].As<Number>().Uint32Value());
     Self = new PdfAction(t, doc);
+    DbgLog->debug("new PdfAction created");
   } else {
     TypeError::New(
       info.Env(),
       "Invalid Action constructor args. Please see the docs for more info.")
       .ThrowAsJavaScriptException();
   }
-  DbgLog = spdlog::get("DbgLog");
 }
 Action::~Action()
 {

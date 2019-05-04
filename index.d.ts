@@ -428,6 +428,10 @@ export enum NPDFRenderingIntent {
 }
 
 export namespace nopodofo {
+
+    export class Configure {
+        enableDebugLogging: boolean
+    }
     /**
      * An Action can be used in conjunction with an outline to create bookmarks on the pdf
      * Action can also used to link annotatoins to external sources, as well as run scripts.

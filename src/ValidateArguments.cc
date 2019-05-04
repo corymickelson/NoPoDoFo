@@ -65,6 +65,7 @@ AssertCallbackInfo(const Napi::CallbackInfo& info,
       if (!valid) {
         stringstream eMsg;
         eMsg << "Invalid function argument at index " << item.first << endl;
+				dbglog->debug(eMsg.str());
         Napi::TypeError::New(info.Env(), eMsg.str())
           .ThrowAsJavaScriptException();
         return {};

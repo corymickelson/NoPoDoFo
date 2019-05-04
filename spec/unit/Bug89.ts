@@ -1,7 +1,7 @@
-import {TestFixture, AsyncTest, Expect, Timeout} from 'alsatian';
+import {TestFixture, AsyncTest, Expect, Timeout, Setup} from 'alsatian';
 import {NDocument} from '../../lib/NDocument';
+import {nopodofo} from '../../'
 import {join} from 'path'
-
 
 @TestFixture('Bug89-RSS')
 export class Bug89 {
@@ -28,6 +28,12 @@ export class Bug89 {
         }))
     }
 
+    @Setup
+    public setup() {
+        const config = new nopodofo.Configure()
+        config.enableDebugLogging = true
+    }
+
     @AsyncTest('RSS memory leak')
     @Timeout(50000)
     public async rssMemoryLeak() {
@@ -40,11 +46,11 @@ export class Bug89 {
                     global.gc()
                 }
                 const used = process.memoryUsage()
-                if(i === 0) {
+                if (i === 0) {
                     startingResidentSetAllocation = used.rss
                     startingExternalAllocation = used.external
                 } else {
-                    if(startingResidentSetAllocation && startingResidentSetAllocation * 2 <= used.rss) {
+                    if (startingResidentSetAllocation && startingResidentSetAllocation * 1.25 <= used.rss) {
                         Expect.fail('RSS doubled')
                     }
                 }

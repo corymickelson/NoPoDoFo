@@ -53,6 +53,7 @@
 #include "doc/SimpleTable.h"
 #include "doc/StreamDocument.h"
 #include "doc/TextField.h"
+#include "Configure.h"
 #include <napi.h>
 
 Napi::Object
@@ -63,14 +64,15 @@ INIT(Napi::Env env, Napi::Object exports)
     .ThrowAsJavaScriptException();
   return;
 #endif
+  std::cout << "Create and Register Debug Logging" << std::endl;
+  std::cout << "To enable debug logging see NoPoDoFo::Configure::EnableDebugLogging" << std::endl;
   auto dbgLog = spdlog::basic_logger_mt("DbgLog", "DbgLog.txt");
-  dbgLog->set_level(spdlog::level::debug);
-  dbgLog->flush_on(spdlog::level::debug);
 #ifdef NOPODOFO_DEBUG
-  dbgLog->info("/******************************************************/")
-  dbgLog->info( "/***** You are running a Debug build of NoPoDoFo ******/")
-  dbgLog->info( "/******************************************************/")
+  std::cout << "/******************************************************/" << std::endl;
+  std::cout << "/***** You are running a Debug build of NoPoDoFo ******/" << std::endl;
+  std::cout << "/******************************************************/" << std::endl;
 #endif
+  NoPoDoFo::Configure::Initialize(env, exports);
   NoPoDoFo::Action::Initialize(env, exports);
   NoPoDoFo::Date::Initialize(env, exports);
   NoPoDoFo::Annotation::Initialize(env, exports);
@@ -105,7 +107,7 @@ INIT(Napi::Env env, Napi::Object exports)
   NoPoDoFo::StreamDocument::Initialize(env, exports);
   NoPoDoFo::TextField::Initialize(env, exports);
   NoPoDoFo::Ref::Initialize(env, exports);
-
+	dbgLog->debug("Initialization Complete");
   return exports;
 }
 

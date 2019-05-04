@@ -13,10 +13,10 @@ import {
 import {NPage} from "./NPage"
 import {NXObject} from "./NXObject"
 import {NObject} from "./NObject"
-import {NPainter} from "./NPainter";
-import {NAction} from "./NAction";
-import {NDestination} from "./NDestination";
-import {NRect} from "./NRect";
+import {NPainter} from "./NPainter"
+import {NAction} from "./NAction"
+import {NDestination} from "./NDestination"
+import {NRect} from "./NRect"
 
 /**
  * @class NDocument
