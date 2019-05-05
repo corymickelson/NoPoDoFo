@@ -4,7 +4,7 @@
     <head>
         <meta charset="UTF-8">
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
-        <title>PushButton · GitBook</title>
+        <title>Configure · GitBook</title>
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta name="description" content="">
         <meta name="generator" content="GitBook 3.2.3">
@@ -57,10 +57,10 @@
     <link rel="shortcut icon" href="../gitbook/images/favicon.ico" type="image/x-icon">
 
     
-    <link rel="next" href="rect.html" />
+    <link rel="next" href="contentstokenizer.html" />
     
     
-    <link rel="prev" href="painter.html" />
+    <link rel="prev" href="combobox.html" />
     
 
     </head>
@@ -220,7 +220,7 @@
             
         </li>
     
-        <li class="chapter " data-level="1.3.8" data-path="configure.html">
+        <li class="chapter active" data-level="1.3.8" data-path="configure.html">
             
                 <a href="configure.html">
             
@@ -493,7 +493,7 @@
             
         </li>
     
-        <li class="chapter active" data-level="1.3.29" data-path="pushbutton.html">
+        <li class="chapter " data-level="1.3.29" data-path="pushbutton.html">
             
                 <a href="pushbutton.html">
             
@@ -735,7 +735,7 @@
     <!-- Title -->
     <h1>
         <i class="fa fa-circle-o-notch fa-spin"></i>
-        <a href=".." >PushButton</a>
+        <a href=".." >Configure</a>
     </h1>
 </div>
 
@@ -750,43 +750,26 @@
     
                                 <section class="normal markdown-section">
                                 
-                                <h1 id="api-documentation-for-pushbutton">API Documentation for PushButton</h1>
+                                <h1 id="api-documentation-for-configure">API Documentation for Configure</h1>
 <ul>
-<li><a href="#api-documentation-for-pushbutton">API Documentation for PushButton</a><ul>
-<li><a href="#nopodofo-pushbutton">NoPoDoFo PushButton</a></li>
+<li><a href="#api-documentation-for-configure">API Documentation for Configure</a><ul>
+<li><a href="#nopodofo-configure">NoPoDoFo Configure</a></li>
 <li><a href="#constructors">Constructors</a></li>
 <li><a href="#properties">Properties</a><ul>
-<li><a href="#rollover">rollover</a></li>
-<li><a href="#rolloveralternate">rolloverAlternate</a></li>
+<li><a href="#enabledebuglogging">enableDebugLogging</a></li>
 </ul>
 </li>
 <li><a href="#methods">Methods</a></li>
 </ul>
 </li>
 </ul>
-<h2 id="nopodofo-pushbutton">NoPoDoFo PushButton</h2>
-<pre><code class="lang-typescript"><span class="hljs-keyword">class</span> PushButton extends Field {
-  <span class="hljs-keyword">new</span>(page: Page, fieldIndex: <span class="hljs-built_in">number</span>): PushButton
-  <span class="hljs-keyword">new</span>(form: Form, annotation: Annotation): PushButton
-
-  rollover: <span class="hljs-built_in">string</span>
-  rolloverAlternate: <span class="hljs-built_in">string</span>
-}
-</code></pre>
+<h2 id="nopodofo-configure">NoPoDoFo Configure</h2>
+<p>Configure exposes runtime configuration options and loggers.</p>
 <h2 id="constructors">Constructors</h2>
-<hr>
-<pre><code class="lang-typescript"><span class="hljs-keyword">new</span>(page: Page, fieldIndex: <span class="hljs-built_in">number</span>): PushButton
-</code></pre>
-<pre><code class="lang-typescript"><span class="hljs-keyword">new</span>(form: Form, annotation: Annotation): PushButton
-</code></pre>
 <h2 id="properties">Properties</h2>
-<hr>
-<h3 id="rollover">rollover</h3>
-<p>Rollover text</p>
-<h3 id="rolloveralternate">rolloverAlternate</h3>
-<p>Rollover alternate text</p>
+<h3 id="enabledebuglogging">enableDebugLogging</h3>
+<p>Enabling debug logging. Debug logs are written to the root of the module as <code>DbgLog.txt</code>.</p>
 <h2 id="methods">Methods</h2>
-<hr>
 
                                 
                                 </section>
@@ -814,12 +797,12 @@
 
             
                 
-                <a href="painter.html" class="navigation navigation-prev " aria-label="Previous page: Painter">
+                <a href="combobox.html" class="navigation navigation-prev " aria-label="Previous page: ComboBox">
                     <i class="fa fa-angle-left"></i>
                 </a>
                 
                 
-                <a href="rect.html" class="navigation navigation-next " aria-label="Next page: Rect">
+                <a href="contentstokenizer.html" class="navigation navigation-next " aria-label="Next page: ContentsTokenizer">
                     <i class="fa fa-angle-right"></i>
                 </a>
                 
@@ -830,7 +813,7 @@
     <script>
         var gitbook = gitbook || [];
         gitbook.push(function() {
-            gitbook.page.hasChanged({"page":{"title":"PushButton","level":"1.3.29","depth":2,"next":{"title":"Rect","level":"1.3.30","depth":2,"path":"documentation/rect.md","ref":"documentation/rect.md","articles":[]},"previous":{"title":"Painter","level":"1.3.28","depth":2,"path":"documentation/painter.md","ref":"documentation/painter.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":[],"pluginsConfig":{"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"documentation/pushbutton.md","mtime":"2019-04-26T23:00:50.728Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2019-05-05T02:25:47.336Z"},"basePath":"..","book":{"language":""}});
+            gitbook.page.hasChanged({"page":{"title":"Configure","level":"1.3.8","depth":2,"next":{"title":"ContentsTokenizer","level":"1.3.9","depth":2,"path":"documentation/contentstokenizer.md","ref":"documentation/contentstokenizer.md","articles":[]},"previous":{"title":"ComboBox","level":"1.3.7","depth":2,"path":"documentation/combobox.md","ref":"documentation/combobox.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":[],"pluginsConfig":{"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"documentation/configure.md","mtime":"2019-05-05T02:11:09.217Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2019-05-05T02:25:47.336Z"},"basePath":"..","book":{"language":""}});
         });
     </script>
 </div>

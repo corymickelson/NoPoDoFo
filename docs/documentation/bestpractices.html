@@ -4,7 +4,7 @@
     <head>
         <meta charset="UTF-8">
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
-        <title>PushButton · GitBook</title>
+        <title>Best Practices · GitBook</title>
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta name="description" content="">
         <meta name="generator" content="GitBook 3.2.3">
@@ -57,10 +57,10 @@
     <link rel="shortcut icon" href="../gitbook/images/favicon.ico" type="image/x-icon">
 
     
-    <link rel="next" href="rect.html" />
+    <link rel="next" href="checkbox.html" />
     
     
-    <link rel="prev" href="painter.html" />
+    <link rel="prev" href="array.html" />
     
 
     </head>
@@ -168,7 +168,7 @@
             
         </li>
     
-        <li class="chapter " data-level="1.3.4" data-path="bestpractices.html">
+        <li class="chapter active" data-level="1.3.4" data-path="bestpractices.html">
             
                 <a href="bestpractices.html">
             
@@ -493,7 +493,7 @@
             
         </li>
     
-        <li class="chapter active" data-level="1.3.29" data-path="pushbutton.html">
+        <li class="chapter " data-level="1.3.29" data-path="pushbutton.html">
             
                 <a href="pushbutton.html">
             
@@ -735,7 +735,7 @@
     <!-- Title -->
     <h1>
         <i class="fa fa-circle-o-notch fa-spin"></i>
-        <a href=".." >PushButton</a>
+        <a href=".." >Best Practices</a>
     </h1>
 </div>
 
@@ -750,43 +750,68 @@
     
                                 <section class="normal markdown-section">
                                 
-                                <h1 id="api-documentation-for-pushbutton">API Documentation for PushButton</h1>
-<ul>
-<li><a href="#api-documentation-for-pushbutton">API Documentation for PushButton</a><ul>
-<li><a href="#nopodofo-pushbutton">NoPoDoFo PushButton</a></li>
-<li><a href="#constructors">Constructors</a></li>
-<li><a href="#properties">Properties</a><ul>
-<li><a href="#rollover">rollover</a></li>
-<li><a href="#rolloveralternate">rolloverAlternate</a></li>
-</ul>
-</li>
-<li><a href="#methods">Methods</a></li>
-</ul>
-</li>
-</ul>
-<h2 id="nopodofo-pushbutton">NoPoDoFo PushButton</h2>
-<pre><code class="lang-typescript"><span class="hljs-keyword">class</span> PushButton extends Field {
-  <span class="hljs-keyword">new</span>(page: Page, fieldIndex: <span class="hljs-built_in">number</span>): PushButton
-  <span class="hljs-keyword">new</span>(form: Form, annotation: Annotation): PushButton
-
-  rollover: <span class="hljs-built_in">string</span>
-  rolloverAlternate: <span class="hljs-built_in">string</span>
-}
+                                <h1 id="nopodofo-best-practices">NoPoDoFo Best Practices</h1>
+<p>NoPoDoFo was built for the purpose of providing a low level api for PDF creation and manipulation.
+While performance is important, performance is not the primary goal of NoPoDoFo.</p>
+<p>Their is a trade off in the grainularity of the api and performance. Calling into NoPoDoFo must cross the
+Javascript | C++ barrier which adds overhead to each NoPoDoFo method invokation. The overhead of most NoPoDoFo api&apos;s
+are typically negligable but should be considered if performance is your primary objective.</p>
+<p>Performance overhead comes in the form of copying data from one runtime to the other, this copy takes place in both directions,
+from Javascript to C++ and from C++ back to Javascript.</p>
+<p>NoPoDoFo attempts to limit this copy overhead by keeping as much of the PDF as possible in external memory; memory outside v8.
+NoPoDoFo api&apos;s where applicable do not return a value to the Javascript runtime(v8) but accept an argument(value) from the Javascript
+runtime and apply that value to the PDF held in external memory. For example, when setting the stroking width:</p>
+<pre><code class="lang-typescript">painter.setStokingWidth(<span class="hljs-number">0.5</span>)
 </code></pre>
-<h2 id="constructors">Constructors</h2>
-<hr>
-<pre><code class="lang-typescript"><span class="hljs-keyword">new</span>(page: Page, fieldIndex: <span class="hljs-built_in">number</span>): PushButton
+<p>The value <code>0.5</code> is passed to a method on the C++ NoPoDoFo::Painter object which converts the Javascript number to a C++ float and applies
+that number to the PoDoFo::Painter instance in memory, no value is returned from this method.</p>
+<p>There are however a handful of NoPoDoFo operations that can be somewhat expensive in terms of copy overhead, one such method being
+<code>Document.body</code>. The Document body accessor iterates each object in a PDF Document, each object is then used to instantiate a new
+NoPoDoFo::Object(this is the binding to the native PDF Object), then all NoPoDoFo::Objects are pushed into an array and passed back
+to the javascript runtime, where upon passing from one runtime to the other all objects are copied from runtime a to runtime b.
+On smaller documents this is negligible but one larger documents this can have a noticeable impact. Unfortunately there is
+no workaround for this at the moment; future work will though include filtering the body before passing back to javascript.</p>
+<h2 id="what-is-a-ref">What is a Ref?</h2>
+<p>The NoPoDoFo low level api&apos;s, specifically <a href="dictionary.html">Dictionary</a> and <a href="array.html">Array</a> expose methods for iterating the
+values of the container. When iterating the keys of an array, or the key(s)/value(s) of a dictionary the caller must check
+that the return value has been resolved, if the value has not been resolved a <a href="ref.html">Ref</a> will be returned. The caller then
+can take this ref and pass it to <a href="document.html#getobject">document.getObject</a> to get the actual object value. Examples of this can be
+seen in unit tests Image, and FileAttachment.</p>
+<h2 id="where-nopodofo-breaks-from-javascript">Where NoPoDoFo breaks from Javascript</h2>
+<p>NoPoDoFo is a C++ library, and as such it is responsible for the management of it&apos;s own memory. NoPoDoFo follows the
+Aggregation pattern, in this pattern the &quot;parent&quot; object may hold ownership of it&apos;s child object&apos;s resources.
+The effect that this pattern has on NoPoDoFo is that a child class of a Document/StreamDocument, ex a Page, is bound to 
+the lifetime of the parent, the child is not responsible for it&apos;s resource allocation(s) or destruction,
+when the parent goes out of scope(allowing the instance to be gc&apos;d) the child will be destroyed along with the parent,
+trying to access the instance of Page after the Document has gone out of scope(and been collected) will result in an Error.
+This type of error can be easily mitigated by just ensuring all nopodofo instances are in the same scope, or that any
+children of Document or StreamDocument do not exist outside the scope of Document or StreamDocument.</p>
+<p>Bad:</p>
+<pre><code class="lang-typescript"><span class="hljs-keyword">import</span> {nopodofo} from <span class="hljs-string">&apos;../&apos;</span>
+<span class="hljs-keyword">let</span> page
+async <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">read</span>(<span class="hljs-params">file: <span class="hljs-built_in">string</span>|Buffer</span>) </span>{
+    <span class="hljs-keyword">const</span> doc =  <span class="hljs-keyword">new</span> nopodofo.Document()
+    await <span class="hljs-keyword">new</span> Promise((resolve, reject) =&gt; doc.load(file, e =&gt; e ?reject(e) : resolve()))
+    page = doc.getPage(<span class="hljs-number">0</span>)
+} <span class="hljs-comment">// doc goes out of scope and the memory segment referenced by page is now invalid</span>
+page.getField(<span class="hljs-number">0</span>) <span class="hljs-comment">// process terminates, page trying to reference something that has already been freed</span>
 </code></pre>
-<pre><code class="lang-typescript"><span class="hljs-keyword">new</span>(form: Form, annotation: Annotation): PushButton
+<p>Good:</p>
+<pre><code class="lang-typescript"><span class="hljs-keyword">import</span> {nopodofo} from <span class="hljs-string">&apos;../&apos;</span>
+async <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">read</span>(<span class="hljs-params">file: <span class="hljs-built_in">string</span>|Buffer</span>) </span>{
+    <span class="hljs-keyword">const</span> doc =  <span class="hljs-keyword">new</span> nopodofo.Document()
+    await <span class="hljs-keyword">new</span> Promise((resolve, reject) =&gt; doc.load(file, e =&gt; e ?reject(e) : resolve()))
+    <span class="hljs-keyword">let</span> page = doc.getPage(<span class="hljs-number">0</span>)
+    <span class="hljs-keyword">let</span> field = page.getField(<span class="hljs-number">0</span>)
+    <span class="hljs-comment">// continue to do whatever your trying to do.</span>
+} <span class="hljs-comment">// doc goes out of scope and all document dependents go out of scope along with it.</span>
 </code></pre>
-<h2 id="properties">Properties</h2>
-<hr>
-<h3 id="rollover">rollover</h3>
-<p>Rollover text</p>
-<h3 id="rolloveralternate">rolloverAlternate</h3>
-<p>Rollover alternate text</p>
-<h2 id="methods">Methods</h2>
-<hr>
+<h2 id="n-lib">N lib</h2>
+<p><mark>This is still a work in progress and should be used with caution!</mark></p>
+<p>NoPoDoFo also ships what is referred to as the &apos;N&apos; library. This library is a thin layer atop nopodofo built for the purpose
+of helping end user&apos;s mitigate the unintentional destruction of any underlying nopodofo instance(s). In &apos;N&apos; all members of
+nopodofo are handled by the <code>NDocument</code> class, in moving the creation of members within this class it is guaranteed
+that the resource will always be available.</p>
 
                                 
                                 </section>
@@ -814,12 +839,12 @@
 
             
                 
-                <a href="painter.html" class="navigation navigation-prev " aria-label="Previous page: Painter">
+                <a href="array.html" class="navigation navigation-prev " aria-label="Previous page: Array">
                     <i class="fa fa-angle-left"></i>
                 </a>
                 
                 
-                <a href="rect.html" class="navigation navigation-next " aria-label="Next page: Rect">
+                <a href="checkbox.html" class="navigation navigation-next " aria-label="Next page: CheckBox">
                     <i class="fa fa-angle-right"></i>
                 </a>
                 
@@ -830,7 +855,7 @@
     <script>
         var gitbook = gitbook || [];
         gitbook.push(function() {
-            gitbook.page.hasChanged({"page":{"title":"PushButton","level":"1.3.29","depth":2,"next":{"title":"Rect","level":"1.3.30","depth":2,"path":"documentation/rect.md","ref":"documentation/rect.md","articles":[]},"previous":{"title":"Painter","level":"1.3.28","depth":2,"path":"documentation/painter.md","ref":"documentation/painter.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":[],"pluginsConfig":{"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"documentation/pushbutton.md","mtime":"2019-04-26T23:00:50.728Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2019-05-05T02:25:47.336Z"},"basePath":"..","book":{"language":""}});
+            gitbook.page.hasChanged({"page":{"title":"Best Practices","level":"1.3.4","depth":2,"next":{"title":"CheckBox","level":"1.3.5","depth":2,"path":"documentation/checkbox.md","ref":"documentation/checkbox.md","articles":[]},"previous":{"title":"Array","level":"1.3.3","depth":2,"path":"documentation/array.md","ref":"documentation/array.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":[],"pluginsConfig":{"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"documentation/bestpractices.md","mtime":"2019-05-05T02:11:09.217Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2019-05-05T02:25:47.336Z"},"basePath":"..","book":{"language":""}});
         });
     </script>
 </div>
