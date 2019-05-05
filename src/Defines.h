@@ -49,7 +49,10 @@
 
 #define access _access
 #define string_view std::string
-#else
+#elif defined(__APPLE__)
+#include <unistd.h>
+#define string_view std::string
+#elif defined(__linux__)
 #include <unistd.h>
 #include <experimental/string_view>
 using std::experimental::string_view;

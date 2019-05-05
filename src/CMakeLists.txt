@@ -73,8 +73,7 @@ if (MSVC)
 	                      ${PODOFO_LIBRARY}
 	                      OpenSSL::SSL
 	                      OpenSSL::Crypto)
-
-else ()
+elseif (APPLE)
 	message("Creating build output directory: build/${CMAKE_BUILD_TYPE}")
 	file(MAKE_DIRECTORY ${CMAKE_SOURCE_DIR}/build/${CMAKE_BUILD_TYPE})
 	find_path(PODOFO_INCLUDE_DIR podofo/podofo.h
@@ -83,6 +82,32 @@ else ()
 	             NAMES podofo
 	             PATHS /opt/local/lib
 	             /usr/lib64
+	             /usr/lib
+	             /usr/local/lib)
+	target_include_directories(${PROJECT_NAME}
+	                           PRIVATE
+	                           ${CMAKE_SOURCE_DIR}/deps/include
+	                           ${NAPI_MODULE}
+	                           ${OPENSSL_INCLUDE_DIR}
+	                           ${CMAKE_JS_INC}
+	                           ${PODOFO_INCLUDE_DIR})
+	target_link_libraries(${PROJECT_NAME}
+	                      PRIVATE
+	                      ${CMAKE_JS_LIB}
+	                      ${OPENSSL_LIBRARIES}
+	                      Threads::Threads
+	                      ${PODOFO_LIBRARY})
+	add_custom_command(TARGET nopodofo POST_BUILD
+	                   COMMAND "${CMAKE_COMMAND}" -E copy $<TARGET_FILE:nopodofo>
+	                   ${CMAKE_SOURCE_DIR}/build/${CMAKE_BUILD_TYPE})
+else ()
+	message("Creating build output directory: build/${CMAKE_BUILD_TYPE}")
+	file(MAKE_DIRECTORY ${CMAKE_SOURCE_DIR}/build/${CMAKE_BUILD_TYPE})
+	find_path(PODOFO_INCLUDE_DIR podofo/podofo.h
+	          PATHS /usr/include /usr/local/include)
+	find_library(PODOFO_LIBRARY
+	             NAMES podofo
+	             PATHS /usr/lib64
 	             /usr/lib
 	             /usr/local/lib)
 	target_include_directories(${PROJECT_NAME}

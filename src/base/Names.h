@@ -74,7 +74,8 @@ const std::string CATALOG = "Catalog";
 const std::string CCITTFAX_DECODE = "CCITTFaxDecode";
 const std::string CCITTFAX_DECODE_ABBREVIATION = "CCF";
 const std::string CENTER_WINDOW = "CenterWindow";
-//const std::string CERT = "Cert";
+
+const std::string CERTIFICATE = "Cert";
 const std::string CF = "CF";
 const std::string CFM = "CFM";
 const std::string CH = "Ch";
