@@ -77,10 +77,14 @@ elseif (APPLE)
 	message("Creating build output directory: build/${CMAKE_BUILD_TYPE}")
 	file(MAKE_DIRECTORY ${CMAKE_SOURCE_DIR}/build/${CMAKE_BUILD_TYPE})
 	find_path(PODOFO_INCLUDE_DIR podofo/podofo.h
-	          PATHS /opt/local/include /usr/include /usr/local/include)
+	          PATHS /usr/local/Cellar/podofo/0.9.6/include 
+		  /opt/local/include
+		  /usr/include
+		  /usr/local/include)
 	find_library(PODOFO_LIBRARY
 	             NAMES podofo
-	             PATHS /opt/local/lib
+	             PATHS /usr/local/Cellar/podofo/0.9.6/lib 
+		     /opt/local/lib
 	             /usr/lib64
 	             /usr/lib
 	             /usr/local/lib)
