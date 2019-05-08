@@ -20,6 +20,7 @@
 #ifndef NPDF_SIGNER_H
 #define NPDF_SIGNER_H
 
+#include <future>
 #include <napi.h>
 #include <podofo/podofo.h>
 #include <openssl/crypto.h>
@@ -33,6 +34,7 @@
 
 using JsValue = Napi::Value;
 namespace NoPoDoFo {
+
 class Signer : public Napi::ObjectWrap<Signer>
 {
 public:
@@ -46,6 +48,7 @@ public:
   JsValue GetField(const Napi::CallbackInfo&);
   JsValue SignWorker(const Napi::CallbackInfo&);
   JsValue LoadCertificateAndKey(const Napi::CallbackInfo&);
+	void GetSigningContent(const Napi::CallbackInfo &);
 
   PoDoFo::PdfMemDocument& Doc;
   std::string Output;
@@ -53,8 +56,6 @@ public:
 
   EVP_PKEY* Pkey = nullptr;
   X509* Cert = nullptr;
-
-private:
   std::shared_ptr<spdlog::logger> DbgLog;
 };
 }

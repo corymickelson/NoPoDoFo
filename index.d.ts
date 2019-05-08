@@ -1112,7 +1112,14 @@ export namespace nopodofo {
          * @param {Callback} [cb] - callback
          * @returns {Number} - minimum signature size
          */
-        loadCertificateAndKey(certificate: string, pkey: string, p: string | Callback<Number>, cb?: Callback<Number>): number
+        loadCertificateAndKey(certificate: string | Buffer, pkey: string | Buffer, p: string | Callback<Number>, cb?: Callback<Number>): number
+
+        /**
+         * Get signing content from the document. This retrieves all contents from the document
+         * with the exception of the signature range.
+         * @param cb
+         */
+        getSigningContent(cb: Callback<string>): void
 
         /**
          * Signs the document output to disk or a node buffer

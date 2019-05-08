@@ -449,7 +449,7 @@ BaseDocument::GetOutlines(const CallbackInfo &info)
 	}
 
 	return Outline::Constructor.New(
-		{External<PdfOutlineItem>::New(info.Env(), outlines), External<BaseDocument>::New(info.Env(), this)});
+		{External<PdfOutlineItem>::New(info.Env(), outlines)});
 }
 JsValue
 BaseDocument::GetNamesTree(const CallbackInfo &info)

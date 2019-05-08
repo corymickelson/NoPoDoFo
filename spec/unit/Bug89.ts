@@ -32,6 +32,7 @@ export class Bug89 {
     public setup() {
         const config = new nopodofo.Configure()
         config.enableDebugLogging = true
+        global.gc()
     }
 
     @AsyncTest('RSS memory leak')
@@ -47,11 +48,11 @@ export class Bug89 {
                 }
                 const used = process.memoryUsage()
                 if (i === 0) {
-                    startingResidentSetAllocation = used.rss
-                    startingExternalAllocation = used.external
+                    startingResidentSetAllocation = Math.round(used.rss / 1024 / 1024 * 100) / 100
+                    startingExternalAllocation = Math.round(used.external / 1024 / 1024 * 100) / 100
                 } else {
-                    if (startingResidentSetAllocation && startingResidentSetAllocation * 1.25 <= used.rss) {
-                        Expect.fail('RSS doubled')
+                    if (startingResidentSetAllocation && startingResidentSetAllocation * 1.5 <= Math.round(used.rss / 1024 / 1024 * 100) / 100) {
+                        Expect.fail(`Starting RSS ${startingResidentSetAllocation}, max exceeded: ${Math.round(used.rss / 1024 / 1024 * 100) / 100}`)
                     }
                 }
                 for (let key in used) {
