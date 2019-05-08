@@ -102,7 +102,7 @@ export enum NPDFVerticalAlignment {
 export enum NPDFAlignment {
     Left,
     Center,
-    Bottom
+    Right
 }
 
 export type NPDFDictionaryKeyType = 'boolean' | 'long' | 'name' | 'real'
