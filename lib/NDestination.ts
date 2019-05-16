@@ -4,7 +4,7 @@ import {NPage} from "./NPage"
 
 export class NDestination {
 
-    constructor(private parent: NDocument, private self: nopodofo.Destination) {
+    constructor(private parent: NDocument, public self: nopodofo.Destination) {
     }
 
     get page(): NPage {

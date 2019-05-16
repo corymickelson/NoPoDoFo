@@ -1,10 +1,25 @@
 /// <reference types="node" />
 
+import {NObject} from "./lib/NObject";
+
 export const CONVERSION = 0.0028346456693
 export type NPDFExternal<T> = Object
 export type Callback<T> = (err: Error, data: T) => void
 
 export function pdfDate(d: Date): string
+
+export enum CertificateType {
+    PKCS7,
+    PKCS12
+}
+
+export enum NPDFOutlineFormat {
+    Default = 0,
+    Italic,
+    Bold,
+    BoldItalic,
+    Unknown = 0xFF
+}
 
 export interface NPDFFontMetrics {
     lineSpacing: number
@@ -432,6 +447,7 @@ export namespace nopodofo {
     export class Configure {
         enableDebugLogging: boolean
     }
+
     /**
      * An Action can be used in conjunction with an outline to create bookmarks on the pdf
      * Action can also used to link annotatoins to external sources, as well as run scripts.
@@ -702,6 +718,7 @@ export namespace nopodofo {
     export class SignatureField {
         readonly widgetAnnotation: Annotation
         readonly obj: Object
+        readonly info: { byteRange: number[], signature: string }
 
         constructor(annotation: Annotation, doc: Document)
 
@@ -723,7 +740,6 @@ export namespace nopodofo {
 
         ensureSignatureObject(): void
 
-        getSignatureInfo(): {}
     }
 
     export class FileSpec {
@@ -808,7 +824,7 @@ export namespace nopodofo {
         /**
          * Get a list of font {name, id} from the current document
          */
-        listFonts(): {name:string, id: string, file: string}[]
+        listFonts(): { name: string, id: string, file: string }[]
 
         /**
          * Deletes one or more pages from the document by removing the pages reference
@@ -1000,6 +1016,19 @@ export namespace nopodofo {
         push(v: Object): void
 
         write(destination: string): void
+
+        /**
+         * @desc Creates a shallow javascript array instance. Ref data types will NOT be resolved, however
+         * nested Array's and Dictionaries will be recursively iterated and inserted into the returned array.
+         * Deeply nested and large array may have performance impact dur to copy overhead.
+         * Please see below for more information on this overhead.
+         * @link{https://corymickelson.github.io/NoPoDoFo/documentation/bestpractices.html}
+         *
+         */
+        asArray(): any[]
+
+        splice(startIndex: number, endIndex: number, ...items: NObject[]): NObject[]
+        splice(startIndex: number, ...items: NObject[]): NObject[]
     }
 
     export class Ref {
@@ -1037,6 +1066,15 @@ export namespace nopodofo {
         write(destination: string, cb: (e: Error, i: string) => void): void
 
         writeSync(destination: string): void
+
+        /**
+         * @desc asObject creates a shallow instance of the underlying PDF Dictionary as a Javascript Object.
+         * Property values of type Ref are NOT resolved, Array and nested Dictionary values
+         * will be recursively iterated however. It should be noted that a deeply nested dictionary
+         * will have additional overhead, for more information on this overhead please read
+         * @link{https://corymickelson.github.io/NoPoDoFo/documentation/bestpractices.html}
+         */
+        asObject(): Object
     }
 
     /**
@@ -1105,21 +1143,11 @@ export namespace nopodofo {
          * After both cert and pkey are loaded, a minimal signature size is calculated and returned to
          * the caller. To complete the signing process this minimum signature size value needs to be
          * provided to the write method.
-         *
-         * @param {string} certificate
-         * @param {string} pkey
-         * @param {string | Callback} p - either the pkey password or callback
-         * @param {Callback} [cb] - callback
-         * @returns {Number} - minimum signature size
          */
-        loadCertificateAndKey(certificate: string | Buffer, pkey: string | Buffer, p: string | Callback<Number>, cb?: Callback<Number>): number
+        loadCertificateAndKey(certificate: string | Buffer, opts?: { certificateType?: CertificateType, password?: string }, cb?: Callback<number>): void
+        loadCertificateAndKey(certificate: string | Buffer, pkey: string | Buffer, opts?: { certificateType?: CertificateType, password?: string }, cb?: Callback<Number>): void
+        loadCertificateAndKey(certificate: string | Buffer, pkey: string | Buffer, cb: Callback<Number>): void
 
-        /**
-         * Get signing content from the document. This retrieves all contents from the document
-         * with the exception of the signature range.
-         * @param cb
-         */
-        getSigningContent(cb: Callback<string>): void
 
         /**
          * Signs the document output to disk or a node buffer
@@ -1385,7 +1413,7 @@ export namespace nopodofo {
         destination: Destination
         action: Action
         title: string
-        textFormat: number
+        textFormat: NPDFOutlineFormat
         textColor: Color
 
         createChild(name: string, value: Destination): Outline

@@ -20,9 +20,9 @@
 #ifndef NPDF_COLOR_H
 #define NPDF_COLOR_H
 
+#include "spdlog/logger.h"
 #include <napi.h>
 #include <podofo/podofo.h>
-#include "spdlog/logger.h"
 
 using Napi::CallbackInfo;
 using JsValue = Napi::Value;

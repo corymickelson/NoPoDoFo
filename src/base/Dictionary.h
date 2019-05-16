@@ -53,6 +53,7 @@ public:
   JsValue Write(const Napi::CallbackInfo&);
   void WriteSync(const Napi::CallbackInfo&);
   JsValue Eq(const Napi::CallbackInfo&);
+  JsValue ToJsObject(const Napi::CallbackInfo&);
   PoDoFo::PdfDictionary& GetDictionary() const { return Init ? *Init : Self; }
 
 private:

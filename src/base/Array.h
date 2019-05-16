@@ -49,7 +49,9 @@ public:
   void SetImmutable(const Napi::CallbackInfo&, const Napi::Value&);
   void Push(const Napi::CallbackInfo&);
   JsValue Pop(const Napi::CallbackInfo&);
+  JsValue Splice(const Napi::CallbackInfo&);
   void Clear(const Napi::CallbackInfo&);
+  JsValue ToJsArray(const Napi::CallbackInfo&);
   PoDoFo::PdfArray& GetArray() const { return Init ? *Init : Self; }
 
 private:

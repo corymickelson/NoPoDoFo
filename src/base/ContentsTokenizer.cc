@@ -43,7 +43,8 @@ ContentsTokenizer::ContentsTokenizer(const Napi::CallbackInfo& info)
   , Doc(*Document::Unwrap(info[0].As<Object>()))
   , PageIndex(info[1].As<Number>().Int32Value())
 {
-  Self = make_unique<PdfContentsTokenizer>(Doc.GetDocument().GetPage(PageIndex));
+  Self =
+    make_unique<PdfContentsTokenizer>(Doc.GetDocument().GetPage(PageIndex));
   DbgLog = spdlog::get("DbgLog");
 }
 
@@ -96,8 +97,8 @@ ContentsTokenizer::ReadIntoData()
           stack.pop();
           auto fontName = stack.top().GetName();
           const auto pFont =
-            Doc.GetDocument().GetPage(PageIndex)->GetFromResources(PdfName("Font"),
-                                                                fontName);
+            Doc.GetDocument().GetPage(PageIndex)->GetFromResources(
+              PdfName("Font"), fontName);
           if (!pFont) {
             throw std::runtime_error("Unable to create font object");
           }

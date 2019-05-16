@@ -17,6 +17,7 @@ import {NPainter} from "./NPainter"
 import {NAction} from "./NAction"
 import {NDestination} from "./NDestination"
 import {NRect} from "./NRect"
+import {NOutlines} from "./NOutlines"
 
 /**
  * @class NDocument
@@ -65,6 +66,10 @@ export class NDocument {
     createAction(t: NPDFActions): NAction {
         const action = new nopodofo.Action(this.base, t)
         return new NAction(this, action)
+    }
+
+    outlines(): NOutlines {
+        return new NOutlines(this)
     }
 
     createDestination(page: NPage, fit: NPDFDestinationFit | NRect | { left: number, top: number, zoom: number }, fitArg?: number): NDestination {

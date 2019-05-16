@@ -57,7 +57,7 @@ Data::Data(const Napi::CallbackInfo& info)
   }
 }
 
- Data::~Data()
+Data::~Data()
 {
   DbgLog->debug("Data Cleanup");
 }
@@ -66,11 +66,10 @@ void
 Data::Initialize(Napi::Env& env, Napi::Object& target)
 {
   HandleScope scope(env);
-  auto ctor =
-    DefineClass(env,
-                "Data",
-                { InstanceAccessor("value", &Data::Value, nullptr),
-                  InstanceMethod("write", &Data::Write) });
+  auto ctor = DefineClass(env,
+                          "Data",
+                          { InstanceAccessor("value", &Data::Value, nullptr),
+                            InstanceMethod("write", &Data::Write) });
   Constructor = Persistent(ctor);
   Constructor.SuppressDestruct();
   target.Set("Data", ctor);

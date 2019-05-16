@@ -85,15 +85,15 @@ Color::Color(const CallbackInfo& info)
     Self = new PdfColor(*info[0].As<External<PdfColor>>().Data());
   } else if (opts[0] == 0 && opts[1] == 1 && opts[2] == 1 && opts[3] == 0) {
     Self = new PdfColor(info[0].As<Number>().FloatValue(),
-                         info[1].As<Number>().FloatValue(),
-                         info[2].As<Number>().FloatValue());
+                        info[1].As<Number>().FloatValue(),
+                        info[2].As<Number>().FloatValue());
   }
 
   else if (opts[0] == 0 && opts[1] == 1 && opts[2] == 1 && opts[3] == 1) {
     Self = new PdfColor(info[0].As<Number>().FloatValue(),
-                         info[1].As<Number>().FloatValue(),
-                         info[2].As<Number>().FloatValue(),
-                         info[3].As<Number>().FloatValue());
+                        info[1].As<Number>().FloatValue(),
+                        info[2].As<Number>().FloatValue(),
+                        info[3].As<Number>().FloatValue());
   } else {
     Error::New(info.Env(), "Color must be one of GreyScale, RGB, or CMYK")
       .ThrowAsJavaScriptException();

@@ -82,7 +82,8 @@ Dictionary::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceMethod("clear", &Dictionary::Clear),
       InstanceMethod("write", &Dictionary::Write),
       InstanceMethod("writeSync", &Dictionary::WriteSync),
-      InstanceMethod("eq", &Dictionary::Eq) });
+      InstanceMethod("eq", &Dictionary::Eq),
+      InstanceMethod("asObject", &Dictionary::ToJsObject)});
   Constructor = Napi::Persistent(ctor);
   Constructor.SuppressDestruct();
 
@@ -432,5 +433,15 @@ Dictionary::Write(const CallbackInfo& info)
     ErrorHandler(err, info);
   }
   return info.Env().Undefined();
+}
+JsValue Dictionary::ToJsObject(const Napi::CallbackInfo &info )
+{
+	Napi::Object target = Napi::Object::New(info.Env());
+	auto it = GetDictionary().GetKeys().begin();
+	while(it != GetDictionary().GetKeys().end()) {
+		Obj::TrickleDown(info.Env(), &(it->first), *it->second, target);
+		it++;
+	}
+	return target;
 }
 }

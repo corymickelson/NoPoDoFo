@@ -1,8 +1,9 @@
-import {AsyncSetup, AsyncTeardown, AsyncTest, Expect, TestCase, TestFixture} from 'alsatian'
+import {AsyncSetup, AsyncTeardown, AsyncTest, Expect, TestCase, TestFixture, Timeout} from 'alsatian'
 import {join} from 'path'
 import {nopodofo} from '../../'
 import Document = nopodofo.Document;
 import StreamDocument = nopodofo.StreamDocument;
+import {NDocument} from "../../lib/index";
 
 @TestFixture("NoPoDoFo PDF Primitives")
 export class PrimitiveSpec {
@@ -57,5 +58,17 @@ export class PrimitiveSpec {
         Expect(noObj.type).toBe('Real')
         let dObj = new nopodofo.Object()
         Expect(dObj.type).toBe('Dictionary')
+    }
+
+    @AsyncTest('NArray and nopodofo.Array equality')
+    public async arrayAsArray() {
+        let doc = await NDocument.from(join(__dirname, '../test-documents/test.pdf'))
+        try {
+            let candidates = doc.body.filter(i => i.type === 'Array')
+            const subject = candidates[0].getArray()
+            Expect(subject[0]).toEqual(subject.at(0))
+        } catch (e) {
+            Expect.fail(e)
+        }
     }
 }

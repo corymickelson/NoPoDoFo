@@ -22,14 +22,15 @@
 
 #include <future>
 #include <napi.h>
-#include <podofo/podofo.h>
 #include <openssl/crypto.h>
 #include <openssl/err.h>
 #include <openssl/evp.h>
 #include <openssl/pem.h>
+#include <openssl/pkcs12.h>
 #include <openssl/pkcs7.h>
 #include <openssl/ssl.h>
 #include <openssl/x509.h>
+#include <podofo/podofo.h>
 #include <spdlog/spdlog.h>
 
 using JsValue = Napi::Value;
@@ -48,7 +49,6 @@ public:
   JsValue GetField(const Napi::CallbackInfo&);
   JsValue SignWorker(const Napi::CallbackInfo&);
   JsValue LoadCertificateAndKey(const Napi::CallbackInfo&);
-	void GetSigningContent(const Napi::CallbackInfo &);
 
   PoDoFo::PdfMemDocument& Doc;
   std::string Output;
@@ -56,7 +56,11 @@ public:
 
   EVP_PKEY* Pkey = nullptr;
   X509* Cert = nullptr;
+  PKCS7* Pkcs7 = nullptr;
+  SHA_CTX ShaCtx{};
+  STACK_OF(X509) * Chain = nullptr;
   std::shared_ptr<spdlog::logger> DbgLog;
+  std::vector<PoDoFo::pdf_uint8> Digest;
 };
 }
 #endif

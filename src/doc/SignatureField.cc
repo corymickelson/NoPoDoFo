@@ -88,7 +88,7 @@ SignatureField::SignatureField(const CallbackInfo& info)
           signatureDict.GetKey(Name::BYTERANGE)->IsArray()) {
         auto byteRange = signatureDict.GetKey(Name::BYTERANGE)->GetArray();
         for (auto& i : byteRange) {
-          Info.Range.emplace_back(i.GetNumber());
+					Info.Range.emplace_back(i.GetNumber());
         }
       }
       if (signatureDict.HasKey(Name::CONTENTS) &&

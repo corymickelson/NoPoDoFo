@@ -39,6 +39,7 @@ public:
   ~Obj();
   static Napi::FunctionReference Constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
+	static void TrickleDown(Napi::Env, const PoDoFo::PdfName *, PoDoFo::PdfObject &, Napi::Value &);
   JsValue GetStream(const Napi::CallbackInfo&);
   JsValue HasStream(const Napi::CallbackInfo&);
   JsValue GetObjectLength(const Napi::CallbackInfo&);
