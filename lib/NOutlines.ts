@@ -2,6 +2,7 @@ import {NDocument} from './NDocument'
 import {nopodofo, NPDFOutlineFormat} from '../index'
 import {NDestination} from "./NDestination";
 import {NAction} from "./NAction";
+import {NObject} from "./NObject";
 
 
 export class NOutlineItem {
@@ -46,20 +47,18 @@ export class NOutlineItem {
         (this.self as nopodofo.Outline).destination = (v as NDestination).self
     }
 
-    get action(): NAction | null {
+    get action(): NAction {
         const item = (this.self as nopodofo.Outline)
         if (item.action) {
             return new NAction(this.parent, item.action)
         } else {
+            // @ts-ignore
             return null
         }
     }
 
-    set action(v: NAction | null) {
-        if (!v) {
-
-        }
-        (this.self as nopodofo.Outline).action = (v as NAction).self
+    set action(v: NAction) {
+        (this.self as nopodofo.Outline).action = (v as any).self
     }
 
     get title(): string {
@@ -89,8 +88,30 @@ export class NOutlineItem {
         (this.self as nopodofo.Outline).textColor = v
     }
 
-    protected constructor(private parent: NDocument, protected self?: nopodofo.Outline) {
-        if (!this.self) this.self = this.parent.getOutlines(true) as nopodofo.Outline
+    constructor(private parent: NDocument, protected self: nopodofo.Outline) {
+    }
+
+    createChild(name: string, value: NDestination): NOutlineItem {
+        const n = this.self.createChild(name, value.self)
+        return new NOutlineItem(this.parent, n)
+    }
+
+    createNext(name: string, value: NDestination | NAction): NOutlineItem {
+        const n = this.self.createNext(name, (value as any).self)
+        return new NOutlineItem(this.parent, n)
+    }
+
+    insertItem(item: NObject): void {
+        this.self.insertItem(item.self)
+    }
+
+    getParent(): NOutlineItem {
+        const n = this.self.getParent()
+        return new NOutlineItem(this.parent, n)
+    }
+
+    erase(): void {
+        this.self.erase()
     }
 
     private getItem(m: 'last' | 'first' | 'next' | 'prev'): NOutlineItem | null {
@@ -104,8 +125,20 @@ export class NOutlineItem {
 
 }
 
-export class NOutlines extends NOutlineItem {
-    constructor(parent: NDocument) {
-        super(parent)
+export class NOutlines {
+    get root(): NOutlineItem {
+        const n = this.parent.nOutlines()
+        if (!n) {
+            throw TypeError('Outlines root does not yet exist, please use NOutlines.createRoot to create the root node')
+        }
+        return new NOutlineItem(this.parent, n as any)
+    }
+
+    constructor(private parent: NDocument) {
+    }
+
+    createRoot(name: string): NOutlineItem {
+        const n = this.parent.nOutlines()
+        return new NOutlineItem(this.parent, (n as any))
     }
 }

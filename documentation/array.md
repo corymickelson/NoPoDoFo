@@ -13,6 +13,7 @@
     - [clear](#clear)
     - [push](#push)
     - [write](#write)
+    - [asArray](#asarray)
 
 ## NoPoDoFo Array
 
@@ -33,6 +34,7 @@ class Array {
   clear(): void
   push(v: Object): void
   write(destination: string): void
+  asArray(): any[]
 }
 ```
 
@@ -100,3 +102,13 @@ write(destination: string): void
 ```
 
 Write the array to the destination provided as the first parameter. This destination must be a valid location on disk.
+
+### asArray
+
+```typescript
+asArray(): any[]
+```
+
+Convert the PDF Array into a javascript array. This is a __readonly__ array in context, the resulting array
+will not persist any changes back to the original PDF Array.
+The use of the method is best for simply viewing the contents of an array in a familiar environment(Javaascript).

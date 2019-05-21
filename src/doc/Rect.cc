@@ -106,9 +106,8 @@ Rect::Intersect(const CallbackInfo& info)
   }
   auto rectObj = info[0].As<Object>();
   Rect* rectIntersect = Rect::Unwrap(rectObj);
-  PdfRect _rect = rectIntersect->GetRect();
-  GetRect().Intersect(_rect);
-  //  rect->Intersect(_rect);
+  PdfRect rect = rectIntersect->GetRect();
+  GetRect().Intersect(rect);
 }
 Napi::Value
 Rect::GetWidth(const CallbackInfo& info)

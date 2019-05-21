@@ -3,6 +3,7 @@ import {ListItem, nopodofo, NPDFFieldType, NPDFHighlightingMode, NPDFMouseEvent,
 import {NAnnotation} from "./NAnnotation";
 import {NAction} from "./NAction";
 import {NObject} from "./NObject";
+import {NDate} from "./NDate";
 
 export class NField {
     get DA(): string {
@@ -98,15 +99,23 @@ export class NField {
     }
 
     setMouseAction(on: NPDFMouseEvent, action: NAction): void {
-        this.self.setMouseAction(on, action.self)
+        this.self.setMouseAction(on, (action as any).self)
     }
 
-    setDate(dateTime?: string | nopodofo.Date): void {
-        this.self.setDate(dateTime)
+    setDate(dateTime?: string | NDate): void {
+        if (dateTime) {
+            if (dateTime instanceof NDate) {
+                this.self.setDate((dateTime as any).self)
+            } else {
+                this.self.setDate(dateTime)
+            }
+        } else {
+            this.self.setDate()
+        }
     }
 
     setPageAction(on: NPDFPageEvent, action: NAction): void {
-        this.self.setPageAction(on, action.self)
+        this.self.setPageAction(on, (action as any).self)
     }
 
     static create<T extends nopodofo.Field>(parent: NDocument, field: T): NField {
@@ -327,9 +336,4 @@ export class NPushButton extends NField {
         super(parent, self)
     }
 
-}
-
-export class NSignatureField {
-    constructor(private parent: NDocument, private self: nopodofo.SignatureField) {
-    }
 }

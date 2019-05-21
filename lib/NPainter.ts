@@ -10,16 +10,22 @@ import {
 import {NDocument} from "./NDocument";
 import {NPage} from "./NPage";
 import {NXObject} from "./NXObject";
+import {NExtGState} from "./NExtGState";
+import {NFont} from "./NFont";
 
 export class NPainter {
     private self: nopodofo.Painter;
 
-    get font(): nopodofo.Font | undefined {
-        return this.self.font;
+    get font(): NFont {
+        if (!this.self.font) {
+            throw Error('Font has not been set, please see the NoPoDoFo.Painter docs')
+        } else {
+            return new NFont(this.parent, this.self.font)
+        }
     }
 
-    set font(value: nopodofo.Font | undefined) {
-        this.self.font = value;
+    set font(value: NFont) {
+        this.self.font = (value as any).self;
     }
 
     get precision(): number {
@@ -174,8 +180,8 @@ export class NPainter {
         this.self.setColorCMYK(cmyk)
     }
 
-    setExtGState(state: nopodofo.ExtGState): void {
-        this.self.setExtGState(state)
+    setExtGState(state: NExtGState): void {
+        this.self.setExtGState((state as any).self)
     }
 
     setGrey(v: number): void {

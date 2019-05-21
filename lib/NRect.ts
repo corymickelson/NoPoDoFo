@@ -34,10 +34,12 @@ export class NRect implements nopodofo.Rect {
         this.self.left = value;
     }
 
-    public self: nopodofo.Rect;
+    private self: nopodofo.Rect;
 
-    constructor(private parent: NDocument, left?: number, bottom?: number, width?: number, height?: number) {
-        if (left && bottom && width && height) {
+    constructor(private parent: NDocument, left?: number | nopodofo.Rect, bottom?: number, width?: number, height?: number) {
+        if (left instanceof nopodofo.Rect) {
+            this.self = left
+        } else if (left && bottom && width && height) {
             this.self = new nopodofo.Rect(left, bottom, width, height)
         } else {
             this.self = new nopodofo.Rect()

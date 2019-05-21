@@ -1,10 +1,9 @@
 import {Callback, nopodofo} from "../index";
 import {NDocument} from "./NDocument";
 import Ref = nopodofo.Ref;
-import {defaultCipherList} from "constants";
 
-export class NObject implements nopodofo.Object {
-    private ap(v: nopodofo.Array): nopodofo.Array & Array<any> {
+export class NObject {
+    private ap(v: nopodofo.Array): Array<any> {
         let mutableCheck =
                 () => {
                     if (v.immutable) {
@@ -21,7 +20,7 @@ export class NObject implements nopodofo.Object {
             }
         const parent = this.parent
         // @ts-ignore
-        return new Proxy<nopodofo.Array & Array<any>>(v, {
+        return new Proxy<Array<any>>(v, {
             get(target: nopodofo.Array, prop: any) {
                 const int = propIndex(prop)
                 if (int !== null) prop = int
@@ -31,7 +30,7 @@ export class NObject implements nopodofo.Object {
                     }
                     let item = target.at(prop)
                     if (item instanceof Ref) {
-                        item = parent.getObject(item)
+                        item = (parent.getObject(item) as any) as nopodofo.Object
                     }
                     return new NObject(parent, item)
                 } else if (typeof prop === 'string') {
@@ -66,7 +65,7 @@ export class NObject implements nopodofo.Object {
                             mutableCheck()
                             return () => {
                                 const item = target.splice(0, 1)
-                                return new NObject(parent, item[0])
+                                return new NObject(parent, (item[0] as any))
                             }
                         case 'length':
                             return target.length
@@ -89,9 +88,9 @@ export class NObject implements nopodofo.Object {
                             return (i: number) => {
                                 let item = target.at(i)
                                 if (item instanceof Ref) {
-                                    item = parent.getObject(item)
+                                    item = parent.getObject(item) as any
                                 }
-                                return new NObject(parent, item)
+                                return new NObject(parent, item as nopodofo.Object)
                             }
                         case 'clear':
                             target.clear()
@@ -149,7 +148,7 @@ export class NObject implements nopodofo.Object {
         })
     }
 
-    private op(v: nopodofo.Dictionary): nopodofo.Dictionary & Object {
+    private op(v: nopodofo.Dictionary): Object {
         const parent = this.parent
         return new Proxy(v, {
             get(target: nopodofo.Dictionary, prop: any) {
@@ -157,6 +156,8 @@ export class NObject implements nopodofo.Object {
                     throw EvalError('Object is immutable')
                 } else if (target.hasKey(prop)) {
                     return new NObject(parent, target.getKey(prop))
+                } else if (prop == 'dirty' || prop == 'immutable') {
+                    return (target as any)[prop]
                 } else {
                     throw EvalError(`Property ${prop} does not exist on object.`)
                 }
@@ -231,11 +232,11 @@ export class NObject implements nopodofo.Object {
     }
 
     get immutable(): boolean {
-        return this.self.immutable;
+        return this.self.immutable
     }
 
     set immutable(value: boolean) {
-        this.self.immutable = value;
+        this.self.immutable = value
     }
 
     get type(): "Boolean" | "Number" | "Name" | "Real" | "String" | "Array" | "Dictionary" | "Reference" | "RawData" {
@@ -243,15 +244,15 @@ export class NObject implements nopodofo.Object {
     }
 
     get stream(): nopodofo.Stream {
-        return this.self.stream;
+        return this.self.stream
     }
 
     get length(): number {
-        return this.self.length;
+        return this.self.length
     }
 
     get reference(): nopodofo.Ref {
-        return this.self.reference;
+        return this.self.reference
     }
 
     hasStream(): boolean {
@@ -283,8 +284,7 @@ export class NObject implements nopodofo.Object {
     }
 
     getDictionary(): nopodofo.Dictionary {
-        const item = this.self.getDictionary()
-        return this.op(item)
+        return this.self.getDictionary()
     }
 
     getString(): string {
@@ -303,7 +303,7 @@ export class NObject implements nopodofo.Object {
         return this.self.getNumber()
     }
 
-    getArray(): nopodofo.Array & Array<any> {
+    getArray(): Array<any> {
         const item = this.self.getArray()
         return this.ap(item)
     }

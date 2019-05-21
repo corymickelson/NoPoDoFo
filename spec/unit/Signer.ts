@@ -43,7 +43,7 @@ export class SignerSpec {
         const certificate = Buffer.from(readFileSync(join(__dirname, '../test-documents/certificate.pem')))
         const pkey = Buffer.from(readFileSync(join(__dirname, '../test-documents/key.pem')))
         console.log(certificate.length + pkey.length)
-        await new Promise((resolve, reject) => signer.loadCertificateAndKey(certificate, pkey, (e, l) => {
+        await new Promise((resolve, reject) => signer.loadCertificateAndKey(certificate, {pKey: pkey}, (e, l) => {
             if (e) {
                 Expect.fail(e.message);
                 return
@@ -85,7 +85,7 @@ export class SignerSpec {
         signer.signatureField = field
 
 
-        await new Promise(resolve => signer.loadCertificateAndKey(join(__dirname, '../test-documents/certificate.pem'), join(__dirname, '../test-documents/key.pem'), (e, l) => {
+        await new Promise(resolve => signer.loadCertificateAndKey(join(__dirname, '../test-documents/certificate.pem'), {pKey: join(__dirname, '../test-documents/key.pem')}, (e, l) => {
             if (e) {
                 Expect.fail(e.message);
                 return
@@ -107,5 +107,4 @@ export class SignerSpec {
             })
         }))
     }
-
 }

@@ -21,11 +21,8 @@ export class Bug89 {
         }
         n.painter.finishPage()
         n.insertExistingPage(cover, 0, 0)
-        await new Promise(resolve => n.write((err, data) => {
-            if (err) Expect.fail(err.message)
-            Expect(Buffer.isBuffer(data))
-            return resolve()
-        }))
+        const data = await n.write()
+        Expect(Buffer.isBuffer(data))
     }
 
     @Setup

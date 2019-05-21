@@ -56,11 +56,7 @@ public:
 
   EVP_PKEY* Pkey = nullptr;
   X509* Cert = nullptr;
-  PKCS7* Pkcs7 = nullptr;
-  SHA_CTX ShaCtx{};
-  STACK_OF(X509) * Chain = nullptr;
   std::shared_ptr<spdlog::logger> DbgLog;
-  std::vector<PoDoFo::pdf_uint8> Digest;
 };
 }
 #endif

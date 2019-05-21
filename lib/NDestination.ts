@@ -1,4 +1,4 @@
-import {nopodofo, NPDFDestinationFit, NPDFDestinationType} from "../index"
+import {nopodofo, NPDFDestinationType} from "../index"
 import {NDocument} from "./NDocument"
 import {NPage} from "./NPage"
 

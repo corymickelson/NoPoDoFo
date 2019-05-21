@@ -66,7 +66,20 @@ export class PrimitiveSpec {
         try {
             let candidates = doc.body.filter(i => i.type === 'Array')
             const subject = candidates[0].getArray()
-            Expect(subject[0]).toEqual(subject.at(0))
+            Expect(subject[0]).toEqual((subject as any).at(0))
+        } catch (e) {
+            Expect.fail(e)
+        }
+    }
+
+    @AsyncTest('Dictionary to Javascript Object')
+    public async dictionaryAsJsObject() {
+        let doc = await NDocument.from(join(__dirname, '../test-documents/test.pdf'))
+        try {
+            let candidates = doc.body.filter(i => i.type === 'Dictionary')
+            const subject = candidates[0].getDictionary()
+            const obj = subject.asObject()
+            Expect(Object.keys(obj).length).toBeGreaterThan(0)
         } catch (e) {
             Expect.fail(e)
         }

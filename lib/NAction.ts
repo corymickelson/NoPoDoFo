@@ -23,11 +23,8 @@ export class NAction {
         this.self.script = value
     }
 
-    constructor(private parent: NDocument, action: nopodofo.Action) {
-        this.self = action
+    constructor(private parent: NDocument, private self: nopodofo.Action) {
     }
-
-    readonly self: nopodofo.Action
 
     addToDictionary(dictionary: nopodofo.Dictionary): void {
         this.self.addToDictionary(dictionary)

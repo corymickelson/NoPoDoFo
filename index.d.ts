@@ -8,11 +8,6 @@ export type Callback<T> = (err: Error, data: T) => void
 
 export function pdfDate(d: Date): string
 
-export enum CertificateType {
-    PKCS7,
-    PKCS12
-}
-
 export enum NPDFOutlineFormat {
     Default = 0,
     Italic,
@@ -736,7 +731,7 @@ export namespace nopodofo {
 
         setFieldName(name: string): void
 
-        getObject(): Object
+        getSignatureObject(): Object
 
         ensureSignatureObject(): void
 
@@ -1144,10 +1139,7 @@ export namespace nopodofo {
          * the caller. To complete the signing process this minimum signature size value needs to be
          * provided to the write method.
          */
-        loadCertificateAndKey(certificate: string | Buffer, opts?: { certificateType?: CertificateType, password?: string }, cb?: Callback<number>): void
-        loadCertificateAndKey(certificate: string | Buffer, pkey: string | Buffer, opts?: { certificateType?: CertificateType, password?: string }, cb?: Callback<Number>): void
-        loadCertificateAndKey(certificate: string | Buffer, pkey: string | Buffer, cb: Callback<Number>): void
-
+        loadCertificateAndKey(certificate: string | Buffer, opts?: { password?: string, pKey?: string | Buffer }, cb?: Callback<Number>): void
 
         /**
          * Signs the document output to disk or a node buffer

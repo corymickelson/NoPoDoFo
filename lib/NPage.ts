@@ -2,8 +2,8 @@ import {nopodofo, NPDFAnnotation, NPDFFieldType, NPDFPageEvent, NPDFPageLayout, 
 import {NDocument} from "./NDocument";
 import {NAnnotation} from "./NAnnotation";
 import {NObject} from "./NObject";
-import Field = nopodofo.Field;
-import {NCheckBox, NComboBox, NField, NListBox, NPushButton, NSignatureField, NTextField} from "./NField";
+import {NCheckBox, NComboBox, NField, NListBox, NPushButton, NTextField} from "./NField";
+import {NRect} from "./NRect";
 
 
 export class NPage {
@@ -15,12 +15,12 @@ export class NPage {
         this.self.width = value;
     }
 
-    get trimBox(): nopodofo.Rect {
-        return this.self.trimBox;
+    get trimBox(): NRect {
+        return new NRect(this.parent, this.self.trimBox)
     }
 
-    set trimBox(value: nopodofo.Rect) {
-        this.self.trimBox = value;
+    set trimBox(value: NRect) {
+        this.self.trimBox = (value as any).self;
     }
 
     get rotation(): number {
@@ -58,13 +58,13 @@ export class NPage {
         return this.self.annotationCount()
     }
 
-    createAnnotation(type: NPDFAnnotation, rect: nopodofo.Rect): NAnnotation {
-        const annot = this.self.createAnnotation(type, rect)
+    createAnnotation(type: NPDFAnnotation, rect: NRect): NAnnotation {
+        const annot = this.self.createAnnotation(type, (rect as any).self)
         return new NAnnotation(this.parent, annot)
     }
 
     createField(type: NPDFFieldType, annot: NAnnotation, form: nopodofo.Form, opts?: NObject): NField {
-        const field = this.self.createField(type, annot.self, form, opts)
+        const field = this.self.createField(type, annot.self, form, opts as any)
         switch (type) {
             case NPDFFieldType.PushButton:
                 return new NPushButton(this.parent, field as nopodofo.PushButton)
@@ -85,9 +85,11 @@ export class NPage {
     }
 
     deleteAnnotation(index: number): void {
+        this.self.deleteAnnotation(index)
     }
 
     deleteField(index: number): void {
+        this.self.deleteField(index)
     }
 
     fieldCount(): number {
@@ -95,18 +97,19 @@ export class NPage {
     }
 
     flattenFields(): void {
+        throw Error('Flatten Fields is not yet implemented')
     }
 
     getAnnotation(index: number): NAnnotation {
         return new NAnnotation(this.parent, this.self.getAnnotation(index))
     }
 
-    getArtBox(): nopodofo.Rect {
-        return this.self.getArtBox()
+    getArtBox(): NRect {
+        return new NRect(this.parent, this.self.getArtBox())
     }
 
-    getBleedBox(): nopodofo.Rect {
-        return this.self.getBleedBox()
+    getBleedBox(): NRect {
+        return new NRect(this.parent, this.self.getBleedBox())
     }
 
     getField<T extends nopodofo.Field>(index: number): NField {
@@ -123,8 +126,8 @@ export class NPage {
         return fields.map(i => NField.create(this.parent, i))
     }
 
-    getMediaBox(): nopodofo.Rect {
-        return this.self.getMediaBox()
+    getMediaBox(): NRect {
+        return new NRect(this.parent, this.self.getMediaBox())
     }
 
 }

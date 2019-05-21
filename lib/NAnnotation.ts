@@ -1,6 +1,7 @@
 import {nopodofo, NPDFAnnotationFlag, NPDFAnnotationType} from '../'
 import {NDocument} from "./NDocument"
 import {NAction} from "./NAction"
+import {NFileSpec} from "./NFileSpec";
 
 export class NAnnotation {
     get title(): string {
@@ -67,12 +68,15 @@ export class NAnnotation {
         this.self.color = value;
     }
 
-    get attachment(): nopodofo.FileSpec {
-        return this.self.attachment;
+    get attachment(): NFileSpec | null {
+        if (this.self.attachment) {
+            return new NFileSpec(this.parent, this.self.attachment)
+        }
+        return null
     }
 
-    set attachment(value: nopodofo.FileSpec) {
-        this.self.attachment = value;
+    set attachment(value: NFileSpec | null) {
+        this.self.attachment = (value as any).self
     }
 
     get action(): NAction {
@@ -80,7 +84,7 @@ export class NAnnotation {
     }
 
     set action(value: NAction) {
-        this.self.action = value.self;
+        this.self.action = (value as any).self;
     }
 
     constructor(private parent: NDocument, self: nopodofo.Annotation) {

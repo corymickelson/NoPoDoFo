@@ -18,6 +18,7 @@
     - [clear](#clear)
     - [write](#write)
     - [writeSync](#writesync)
+    - [asObject](#asobject)
 
 ## NoPoDoFo Dictionary
 
@@ -42,6 +43,7 @@ class Dictionary {
   clear(): void
   write(destination: string, cb: (e: Error, i: string) => void): void
   writeSync(destination: string): void
+  asObject(): Object
 }
 ```
 
@@ -157,3 +159,13 @@ writeSync(destination: string): void
 ```
 
 Writes the dictionary to disk as a blocking operation. Can be useful for debugging.
+
+### asObject
+
+```typescript
+asObject(): Object
+```
+
+Convert the PDF Dictionary into a javascript object. This is a __readonly__ object in context, the resulting object 
+will not persist any changes back to the original PDF Dictionary.
+The use of the method is best for simply viewing the contents of a dictionary in a familiar environment(Javascript).

@@ -133,7 +133,7 @@ SignatureField::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceMethod("addCertificateReference",
                      &SignatureField::AddCertificateReference),
       InstanceMethod("setFieldName", &SignatureField::SetFieldName),
-      InstanceMethod("getObject", &SignatureField::GetSignatureObject),
+      InstanceMethod("getSignatureObject", &SignatureField::GetSignatureObject),
       InstanceMethod("ensureSignatureObject",
                      &SignatureField::EnsureSignatureObject) });
   Constructor = Napi::Persistent(ctor);
