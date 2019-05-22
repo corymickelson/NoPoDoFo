@@ -33,6 +33,6 @@ if (process.argv.length >= 3) {
     if (process.argv[2] === '-D') cmd += ' -D'
 }
 
-cmd += ` --CDPROJECT_DIR=${findModules()} -s=c++14`
+cmd += ` --CDPROJECT_DIR=${findModules()} -s=c++17`
 console.log('CMD: ', cmd)
 run(cmd, {"stdio": "inherit"})

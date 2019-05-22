@@ -1,6 +1,6 @@
 {
   "name": "nopodofo",
-  "version": "1.0.0-pre",
+  "version": "1.0.0",
   "description": "Node.js native module bindings for PoDoFo",
   "main": "index.js",
   "types": "index.d.ts",
@@ -14,7 +14,8 @@
     "tsc:spec": "tsc -p tsconfig.json",
     "build": "cmake-js build -s=c++17",
     "build:debug": "cmake-js build -D -s=c++17",
-    "clean": "cmake-js clean"
+    "clean": "cmake-js clean",
+    "install": "node ./scripts/install.js"
   },
   "nyc": {
     "exclude": [
@@ -48,16 +49,17 @@
     "uuid": "^3.2.1"
   },
   "dependencies": {
-    "node-addon-api": "1.6.2"
+    "node-addon-api": "1.6.3"
   },
   "files": [
-    "build/Release",
-    "build/Debug",
     "scripts",
     "src",
-    "dist",
     "deps",
     "tsconfig.json",
-    "CMakeLists.txt"
+    "CMakeLists.txt",
+    "package.json",
+    "package-lock.json",
+    "index.js",
+    "index.d.ts"
   ]
 }
