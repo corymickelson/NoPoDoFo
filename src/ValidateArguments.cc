@@ -48,7 +48,7 @@ AssertCallbackInfo(const Napi::CallbackInfo& info,
         stringstream eMsg;
         eMsg << "Expected " << vars.size()
              << " argument parameters but received " << info.Length() << endl;
-        dbglog->debug(eMsg.str());
+        if(dbglog != nullptr) dbglog->debug(eMsg.str());
         Napi::Error::New(info.Env(), eMsg.str()).ThrowAsJavaScriptException();
         return {};
       }
@@ -65,7 +65,7 @@ AssertCallbackInfo(const Napi::CallbackInfo& info,
       if (!valid) {
         stringstream eMsg;
         eMsg << "Invalid function argument at index " << item.first << endl;
-				dbglog->debug(eMsg.str());
+				if(dbglog != nullptr) dbglog->debug(eMsg.str());
         Napi::TypeError::New(info.Env(), eMsg.str())
           .ThrowAsJavaScriptException();
         return {};

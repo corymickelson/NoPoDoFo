@@ -28,6 +28,7 @@ export class Bug89 {
     @Setup
     public setup() {
         const config = new nopodofo.Configure()
+        config.logFile('debug.txt')
         config.enableDebugLogging = true
         global.gc()
     }

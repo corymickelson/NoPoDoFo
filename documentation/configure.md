@@ -6,6 +6,7 @@
 	- [Properties](#properties)
 		- [enableDebugLogging](#enabledebuglogging)
 	- [Methods](#methods)
+		- [logFile](#logfile)
 	
 ## NoPoDoFo Configure
 Configure exposes runtime configuration options and loggers.
@@ -19,3 +20,11 @@ Configure exposes runtime configuration options and loggers.
 Enabling debug logging. Debug logs are written to the root of the module as ```DbgLog.txt```.
 
 ## Methods
+
+### logFile
+
+```typescript
+logFile(output: string): void
+```
+
+Set the loggers output location, this must be called prior to [enableDebugLogging](#enabledebuglogging).

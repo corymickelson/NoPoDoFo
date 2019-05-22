@@ -87,9 +87,9 @@ FileSpec::FileSpec(const CallbackInfo& info)
 
 FileSpec::~FileSpec()
 {
-  DbgLog->debug("FileSpec Cleanup");
+  if(DbgLog != nullptr) DbgLog->debug("FileSpec Cleanup");
   if(Self.use_count() == 0) {
-  	DbgLog->debug("FileSpec resource count: {}", Self.use_count());
+  	if(DbgLog != nullptr) DbgLog->debug("FileSpec resource count: {}", Self.use_count());
   }
 }
 

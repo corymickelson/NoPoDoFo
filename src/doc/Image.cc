@@ -109,7 +109,7 @@ Image::Image(const CallbackInfo& info)
 
 Image::~Image()
 {
-  DbgLog->debug("Image Cleanup");
+  if(DbgLog != nullptr) DbgLog->debug("Image Cleanup");
   HandleScope scope(Env());
   Doc = nullptr;
 }

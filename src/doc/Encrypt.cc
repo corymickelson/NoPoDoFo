@@ -70,7 +70,7 @@ Encrypt::Encrypt(const Napi::CallbackInfo& info)
 
 Encrypt::~Encrypt()
 {
-  DbgLog->debug("Encrypt Cleanup");
+  if(DbgLog != nullptr) DbgLog->debug("Encrypt Cleanup");
 }
 
 void

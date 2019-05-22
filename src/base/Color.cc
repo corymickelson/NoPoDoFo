@@ -102,7 +102,7 @@ Color::Color(const CallbackInfo& info)
 
 Color::~Color()
 {
-  DbgLog->debug("Color Cleanup");
+  if(DbgLog != nullptr) DbgLog->debug("Color Cleanup");
   HandleScope scope(Env());
   delete Self;
 }

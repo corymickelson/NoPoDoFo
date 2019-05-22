@@ -9,7 +9,7 @@ FileAccess(std::string& file)
 	auto dbgLog = spdlog::get("DbgLog");
 	std::stringstream msg;
 	msg << "Attempting to access file " << file;
-	dbgLog->debug(msg.str());
+	if(dbgLog != nullptr) dbgLog->debug(msg.str());
   auto found = 0;
 #ifdef __APPLE__
   if (access(file.c_str(), F_OK) == -1) {
@@ -23,9 +23,9 @@ FileAccess(std::string& file)
   }
 #endif
   if(found == 0) {
-  	dbgLog->debug("file not found");
+  	if(dbgLog != nullptr)dbgLog->debug("file not found");
   } else {
-  	dbgLog->debug("file found");
+  	if(dbgLog != nullptr)dbgLog->debug("file found");
   }
   return found;
 }

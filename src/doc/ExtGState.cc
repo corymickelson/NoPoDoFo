@@ -57,7 +57,7 @@ ExtGState::ExtGState(const Napi::CallbackInfo& info)
 
 ExtGState::~ExtGState()
 {
-  DbgLog->debug("ExtGState Cleanup");
+  if(DbgLog != nullptr) DbgLog->debug("ExtGState Cleanup");
 }
 
 void

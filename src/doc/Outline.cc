@@ -45,7 +45,7 @@ Outline::Outline(const CallbackInfo& info)
 }
 Outline::~Outline()
 {
-  DbgLog->debug("Outline Cleanup");
+  if(DbgLog != nullptr) DbgLog->debug("Outline Cleanup");
 }
 void
 Outline::Initialize(Napi::Env& env, Napi::Object& target)

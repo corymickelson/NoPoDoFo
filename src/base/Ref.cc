@@ -39,7 +39,7 @@ Ref::Ref(const CallbackInfo& info)
                             static_cast<const PoDoFo::pdf_gennum>(
                               info[1].As<Number>().Uint32Value()));
   } else if (info.Length() == 1 && info[0].IsExternal()) {
-    DbgLog->debug("Creating a new PdfReference Copy");
+    if(DbgLog != nullptr) DbgLog->debug("Creating a new PdfReference Copy");
     Self = new PdfReference(*info[0].As<External<PdfReference>>().Data());
   } else {
     Error::New(info.Env(),
@@ -52,7 +52,7 @@ Ref::~Ref()
   std::stringstream dbgMsg;
   dbgMsg << "Cleaning up Ref " << Self->ObjectNumber() << " : "
        << Self->GenerationNumber() << endl;
-  DbgLog->debug(dbgMsg.str());
+  if(DbgLog != nullptr) DbgLog->debug(dbgMsg.str());
   delete Self;
 }
 void

@@ -45,7 +45,7 @@ Font::Font(const Napi::CallbackInfo& info)
 
 Font::~Font()
 {
-  DbgLog->debug("Font Cleanup");
+  if(DbgLog != nullptr) DbgLog->debug("Font Cleanup");
 }
 
 void

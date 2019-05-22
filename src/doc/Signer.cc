@@ -73,7 +73,8 @@ Signer::Signer(const Napi::CallbackInfo& info)
 
 Signer::~Signer()
 {
-  DbgLog->debug("Signer Cleanup");
+  if(DbgLog != nullptr)
+    DbgLog->debug("Signer Cleanup");
   HandleScope scope(Env());
   if (Cert != nullptr) {
     X509_free(Cert);
@@ -184,9 +185,12 @@ protected:
         PdfDate now;
         PdfString str;
         now.ToString(str);
-        Self.DbgLog->debug("Signer::SignAsync::Execute SignatureField Date "
-                           "Null, setting to now: {}",
-                           str.GetStringUtf8());
+        if (Self.DbgLog) {
+          Self.DbgLog->debug("Signer::SignAsync::Execute SignatureField Date "
+                             "Null, setting to now: {}",
+                             str.GetStringUtf8());
+        }
+
         Self.Field->SetSignatureDate(now);
       }
 
@@ -381,7 +385,7 @@ protected:
          !KeyFile.empty())) { // PKCS7 Certificate File or buffer and Private
                               // Key File or buffer
       LoadPKCS7();
-    }  else {
+    } else {
       SetError("Signature does not match any Signer loanCertificateAndKey "
                "options, please see the docs");
     }
@@ -526,8 +530,7 @@ Signer::LoadCertificateAndKey(const CallbackInfo& info)
   if (!certFile.empty() && !keyFile.empty()) {
     // PKCS7 cert and private key files
     worker = new LoadCertificateAndKeyWorker(cb, *this, certFile, keyFile, pwd);
-  } else if (useBuffers && !certBuffer.IsEmpty() &&
-             !keyBuffer.IsEmpty()) {
+  } else if (useBuffers && !certBuffer.IsEmpty() && !keyBuffer.IsEmpty()) {
     // PKCS7 cert and private key buffer
     worker = new LoadCertificateAndKeyWorker(cb,
                                              *this,
@@ -536,7 +539,7 @@ Signer::LoadCertificateAndKey(const CallbackInfo& info)
                                              certBuffer.Length(),
                                              keyBuffer.Length(),
                                              pwd);
-  }  else {
+  } else {
     Error::New(info.Env(),
                "Parameters do not match function signature. Please view "
                "signer.loadCertAndKey docs")

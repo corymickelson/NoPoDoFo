@@ -82,7 +82,7 @@ TextField::TextField(const CallbackInfo& info)
 }
 TextField::~TextField()
 {
- DbgLog->debug("TextField Cleanup");
+ if(DbgLog != nullptr) DbgLog->debug("TextField Cleanup");
 }
 void
 TextField::Initialize(Napi::Env& env, Napi::Object& target)

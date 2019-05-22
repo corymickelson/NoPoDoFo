@@ -441,6 +441,12 @@ export namespace nopodofo {
 
     export class Configure {
         enableDebugLogging: boolean
+
+        /**
+         * @desc Set the logging file destination, ex: /tmp/foo/bar.txt
+         * @param output
+         */
+        logFile(output: string): void
     }
 
     /**

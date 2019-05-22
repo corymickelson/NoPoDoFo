@@ -55,7 +55,7 @@ SimpleTable::SimpleTable(const CallbackInfo& info)
 
 SimpleTable::~SimpleTable()
 {
-  DbgLog->debug("SimpleTable Cleanup");
+  if(DbgLog != nullptr) DbgLog->debug("SimpleTable Cleanup");
   HandleScope scope(Env());
   delete Model;
   delete Table;

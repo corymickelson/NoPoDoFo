@@ -50,7 +50,7 @@ ContentsTokenizer::ContentsTokenizer(const Napi::CallbackInfo& info)
 
 ContentsTokenizer::~ContentsTokenizer()
 {
-  DbgLog->debug("ContentsTokenizer Cleanup");
+  if(DbgLog != nullptr) DbgLog->debug("ContentsTokenizer Cleanup");
 }
 void
 ContentsTokenizer::Initialize(Napi::Env& env, Napi::Object& target)

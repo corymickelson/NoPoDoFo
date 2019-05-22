@@ -127,12 +127,12 @@ Obj::Obj(const Napi::CallbackInfo& info)
 {
   DbgLog = spdlog::get("DbgLog");
   if(Init != nullptr) {
-    DbgLog->debug("New Object Created");
+    if(DbgLog != nullptr) DbgLog->debug("New Object Created");
   }
 }
 Obj::~Obj()
 {
-  DbgLog->debug("Object Cleanup");
+  if(DbgLog != nullptr) DbgLog->debug("Object Cleanup");
   HandleScope scope(Env());
   delete Init;
 }
@@ -157,7 +157,7 @@ Obj::GetStream(const CallbackInfo& info)
       stringstream msg;
       msg << "This Object does not have a stream associated with it" << endl;
       cout << "Writing Object to: " << outfile << endl;
-      DbgLog->debug(msg.str());
+      if(DbgLog != nullptr) DbgLog->debug(msg.str());
       PdfOutputDevice outDevice(outfile);
       NObj.WriteObject(&outDevice, ePdfWriteMode_Clean, nullptr);
       return info.Env().Undefined();

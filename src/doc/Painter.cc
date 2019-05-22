@@ -64,7 +64,7 @@ Painter::Painter(const Napi::CallbackInfo& info)
 
 Painter::~Painter()
 {
-  DbgLog->debug("Painter Cleanup");
+  if(DbgLog != nullptr) DbgLog->debug("Painter Cleanup");
   HandleScope scope(Env());
   Doc = nullptr;
 }

@@ -35,7 +35,7 @@ ListField::ListField(PdfField& field)
 
 ListField::~ListField()
 {
-  DbgLog->debug("ListField Cleanup");
+  if(DbgLog != nullptr) DbgLog->debug("ListField Cleanup");
 }
 
 void

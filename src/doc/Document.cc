@@ -104,7 +104,7 @@ Document::Document(const CallbackInfo &info)
 
 Document::~Document()
 {
-	DbgLog->debug("Document Cleanup");
+	if(DbgLog != nullptr) DbgLog->debug("Document Cleanup");
 }
 
 void

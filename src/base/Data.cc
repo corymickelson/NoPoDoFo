@@ -59,7 +59,7 @@ Data::Data(const Napi::CallbackInfo& info)
 
 Data::~Data()
 {
-  DbgLog->debug("Data Cleanup");
+  if(DbgLog != nullptr) DbgLog->debug("Data Cleanup");
 }
 
 void

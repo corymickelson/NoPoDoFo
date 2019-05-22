@@ -56,13 +56,13 @@ Array::Array(const CallbackInfo& info)
 {
   DbgLog = spdlog::get("DbgLog");
   if (Init != nullptr) {
-    DbgLog->debug("Initialized New Array");
+    if(DbgLog != nullptr) DbgLog->debug("Initialized New Array");
   }
 }
 
 Array::~Array()
 {
-  DbgLog->debug("Array cleanup");
+  if(DbgLog != nullptr) DbgLog->debug("Array cleanup");
   HandleScope scope(Env());
   for (auto child : Children) {
     delete child;
@@ -201,7 +201,7 @@ Array::GetObjAtIndex(const CallbackInfo& info)
   }
   // Create copy for shift and pop operations
   const auto child = new PdfObject(*item);
-  DbgLog->debug("Array[{}] = {}", index, child->GetDataTypeString());
+  if(DbgLog != nullptr) DbgLog->debug("Array[{}] = {}", index, child->GetDataTypeString());
   Children.push_back(child);
   const auto initPtr = Napi::External<PdfObject>::New(info.Env(), child);
   const auto instance = Obj::Constructor.New({ initPtr });
@@ -282,12 +282,12 @@ Array::Splice(const Napi::CallbackInfo& info)
     if (GetArray().size() <
         info[0].As<Number>().Int32Value() + info[1].As<Number>().Int32Value()) {
       const auto msg = "starting position plus count exceeds array length";
-      DbgLog->debug(msg);
+      if(DbgLog != nullptr) DbgLog->debug(msg);
       RangeError::New(info.Env(), msg).ThrowAsJavaScriptException();
     }
     if (GetArray().GetImmutable()) {
       const auto msg = "Array is immutable";
-      DbgLog->debug(msg);
+      if(DbgLog != nullptr) DbgLog->debug(msg);
       Error::New(info.Env(), msg).ThrowAsJavaScriptException();
     }
     auto it = GetArray().begin() + info[0].As<Number>().Uint32Value();

@@ -75,7 +75,7 @@ Rect::Rect(const CallbackInfo& info)
 
 Rect::~Rect()
 {
-  DbgLog->debug("Rect Cleanup");
+  if(DbgLog != nullptr) DbgLog->debug("Rect Cleanup");
   HandleScope scope(Env());
   delete Self;
 }

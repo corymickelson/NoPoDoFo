@@ -759,7 +759,10 @@
 <li><a href="#enabledebuglogging">enableDebugLogging</a></li>
 </ul>
 </li>
-<li><a href="#methods">Methods</a></li>
+<li><a href="#methods">Methods</a><ul>
+<li><a href="#logfile">logFile</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -770,6 +773,10 @@
 <h3 id="enabledebuglogging">enableDebugLogging</h3>
 <p>Enabling debug logging. Debug logs are written to the root of the module as <code>DbgLog.txt</code>.</p>
 <h2 id="methods">Methods</h2>
+<h3 id="logfile">logFile</h3>
+<pre><code class="lang-typescript">logFile(output: <span class="hljs-built_in">string</span>): <span class="hljs-built_in">void</span>
+</code></pre>
+<p>Set the loggers output location, this must be called prior to <a href="#enabledebuglogging">enableDebugLogging</a>.</p>
 
                                 
                                 </section>
@@ -813,7 +820,7 @@
     <script>
         var gitbook = gitbook || [];
         gitbook.push(function() {
-            gitbook.page.hasChanged({"page":{"title":"Configure","level":"1.3.8","depth":2,"next":{"title":"ContentsTokenizer","level":"1.3.9","depth":2,"path":"documentation/contentstokenizer.md","ref":"documentation/contentstokenizer.md","articles":[]},"previous":{"title":"ComboBox","level":"1.3.7","depth":2,"path":"documentation/combobox.md","ref":"documentation/combobox.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":[],"pluginsConfig":{"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"documentation/configure.md","mtime":"2019-05-05T02:11:09.217Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2019-05-21T04:27:45.096Z"},"basePath":"..","book":{"language":""}});
+            gitbook.page.hasChanged({"page":{"title":"Configure","level":"1.3.8","depth":2,"next":{"title":"ContentsTokenizer","level":"1.3.9","depth":2,"path":"documentation/contentstokenizer.md","ref":"documentation/contentstokenizer.md","articles":[]},"previous":{"title":"ComboBox","level":"1.3.7","depth":2,"path":"documentation/combobox.md","ref":"documentation/combobox.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":[],"pluginsConfig":{"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"documentation/configure.md","mtime":"2019-05-22T17:22:30.345Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2019-05-22T17:41:18.978Z"},"basePath":"..","book":{"language":""}});
         });
     </script>
 </div>

@@ -58,7 +58,7 @@ Dictionary::Dictionary(const CallbackInfo& info)
 {
   DbgLog = spdlog::get("DbgLog");
   if(Init != nullptr) {
-    DbgLog->debug("New Dictionary Created");
+    if(DbgLog != nullptr) DbgLog->debug("New Dictionary Created");
   }
 }
 
@@ -91,7 +91,7 @@ Dictionary::Initialize(Napi::Env& env, Napi::Object& target)
 }
 Dictionary::~Dictionary()
 {
-  DbgLog->debug("Dictionary Cleanup");
+  if(DbgLog != nullptr) DbgLog->debug("Dictionary Cleanup");
   HandleScope scope(Env());
   for (auto i : Children) {
     delete i;

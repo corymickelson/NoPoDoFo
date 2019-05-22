@@ -102,7 +102,7 @@ Field::Field(EPdfField type, const CallbackInfo& info)
 
 Field::~Field()
 {
-  DbgLog->debug("Field Cleanup");
+  if(DbgLog != nullptr) DbgLog->debug("Field Cleanup");
   delete Self;
   for (auto c : Children) {
     delete c;

@@ -17,8 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "spdlog/spdlog.h"
-#include "spdlog/sinks/basic_file_sink.h"
+#include "Configure.h"
 #include "base/Array.h"
 #include "base/Color.h"
 #include "base/ContentsTokenizer.h"
@@ -53,7 +52,6 @@
 #include "doc/SimpleTable.h"
 #include "doc/StreamDocument.h"
 #include "doc/TextField.h"
-#include "Configure.h"
 #include <napi.h>
 
 Napi::Object
@@ -64,13 +62,13 @@ INIT(Napi::Env env, Napi::Object exports)
     .ThrowAsJavaScriptException();
   return;
 #endif
-  std::cout << "Create and Register Debug Logging" << std::endl;
-  std::cout << "To enable debug logging see NoPoDoFo::Configure::EnableDebugLogging" << std::endl;
-  auto dbgLog = spdlog::basic_logger_mt("DbgLog", "DbgLog.txt");
 #ifdef NOPODOFO_DEBUG
-  std::cout << "/******************************************************/" << std::endl;
-  std::cout << "/***** You are running a Debug build of NoPoDoFo ******/" << std::endl;
-  std::cout << "/******************************************************/" << std::endl;
+  std::cout << "/******************************************************/"
+            << std::endl;
+  std::cout << "/***** You are running a Debug build of NoPoDoFo ******/"
+            << std::endl;
+  std::cout << "/******************************************************/"
+            << std::endl;
 #endif
   NoPoDoFo::Configure::Initialize(env, exports);
   NoPoDoFo::Action::Initialize(env, exports);
@@ -107,7 +105,10 @@ INIT(Napi::Env env, Napi::Object exports)
   NoPoDoFo::StreamDocument::Initialize(env, exports);
   NoPoDoFo::TextField::Initialize(env, exports);
   NoPoDoFo::Ref::Initialize(env, exports);
-	dbgLog->debug("Initialization Complete");
+  if (env.Global().Has("console")) {
+    env.Global().Get("console").As<Object>().Get("info").As<Function>().Call(
+      { String::New(env, "NoPoDoFo Initialized") });
+  }
   return exports;
 }
 

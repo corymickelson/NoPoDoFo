@@ -43,7 +43,7 @@ Stream::Stream(const CallbackInfo& info)
 }
 Stream::~Stream()
 {
-  DbgLog->debug("Stream Cleanup");
+  if(DbgLog != nullptr) DbgLog->debug("Stream Cleanup");
 }
 void
 Stream::Initialize(Napi::Env& env, Napi::Object& target)

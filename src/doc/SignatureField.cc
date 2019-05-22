@@ -109,7 +109,7 @@ SignatureField::SignatureField(const CallbackInfo& info)
 
 SignatureField::~SignatureField()
 {
-  DbgLog->debug("SignatureField Cleanup");
+  if(DbgLog != nullptr) DbgLog->debug("SignatureField Cleanup");
 }
 
 

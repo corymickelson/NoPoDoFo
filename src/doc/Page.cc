@@ -57,7 +57,7 @@ Page::Page(const CallbackInfo& info)
 
 Page::~Page()
 {
-  DbgLog->debug("Page Cleanup");
+  if(DbgLog != nullptr) DbgLog->debug("Page Cleanup");
 }
 
 void

@@ -22,6 +22,7 @@ public:
 	const Configure&operator=(const Configure&) = delete;
 	void EnableDebugLogging(const Napi::CallbackInfo&, const JsValue&);
 	JsValue GetDebugLogging(const Napi::CallbackInfo&);
+	void LogOutput(const Napi::CallbackInfo&);
 private:
 	std::shared_ptr<spdlog::logger> DbgLog;
 };

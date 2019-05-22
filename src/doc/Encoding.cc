@@ -40,12 +40,12 @@ Encoding::Encoding(const Napi::CallbackInfo& info)
 }
 Encoding::~Encoding()
 {
-  DbgLog->debug("Encoding Cleanup");
+  if(DbgLog != nullptr) DbgLog->debug("Encoding Cleanup");
   if (!Self->IsAutoDelete()) {
-    DbgLog->debug("Encoding is NOT auto deleted, deleting now");
+    if(DbgLog != nullptr) DbgLog->debug("Encoding is NOT auto deleted, deleting now");
     delete Self;
   } else {
-    DbgLog->debug("Encoding is an auto deleted object, nothing deleted");
+    if(DbgLog != nullptr) DbgLog->debug("Encoding is an auto deleted object, nothing deleted");
   }
 }
 void

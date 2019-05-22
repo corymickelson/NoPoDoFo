@@ -86,7 +86,7 @@ Destination::Destination(const CallbackInfo& info)
 }
 Destination::~Destination()
 {
-  DbgLog->debug("Destination Cleanup");
+  if(DbgLog != nullptr) DbgLog->debug("Destination Cleanup");
   delete Self;
   Self = nullptr;
 }

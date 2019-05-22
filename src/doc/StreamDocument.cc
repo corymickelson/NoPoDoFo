@@ -45,7 +45,7 @@ StreamDocument::StreamDocument(const CallbackInfo& info)
 }
 StreamDocument::~StreamDocument()
 {
- DbgLog->debug("StreamDocument Cleanup");
+ if(DbgLog != nullptr) DbgLog->debug("StreamDocument Cleanup");
 }
 void
 StreamDocument::Initialize(Napi::Env& env, Napi::Object& target)

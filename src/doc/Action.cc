@@ -47,7 +47,9 @@ Action::Action(const Napi::CallbackInfo& info)
   if (opts[0] == 0 && info.Length() == 1) {
     Self =
       new PdfAction(info[0].As<External<PdfAction>>().Data()->GetObject());
-    DbgLog->debug("PdfAction Copied from external object");
+    if(DbgLog != nullptr) {
+			DbgLog->debug("PdfAction Copied from external object");
+    }
   }
   // Create a new Action
   else if (opts[0] == 1 && opts[1] == 1) {
@@ -64,7 +66,7 @@ Action::Action(const Napi::CallbackInfo& info)
     }
     const auto t = static_cast<EPdfAction>(info[1].As<Number>().Uint32Value());
     Self = new PdfAction(t, doc);
-    DbgLog->debug("new PdfAction created");
+    if(DbgLog != nullptr) DbgLog->debug("new PdfAction created");
   } else {
     TypeError::New(
       info.Env(),
@@ -74,7 +76,7 @@ Action::Action(const Napi::CallbackInfo& info)
 }
 Action::~Action()
 {
-  DbgLog->debug("Action Cleanup");
+  if(DbgLog != nullptr) DbgLog->debug("Action Cleanup");
   delete Self;
 }
 void

@@ -57,7 +57,7 @@ Form::Form(const Napi::CallbackInfo& info)
 
 Form::~Form()
 {
-  DbgLog->debug("Form Cleanup");
+  if(DbgLog != nullptr) DbgLog->debug("Form Cleanup");
 }
 
 void

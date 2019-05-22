@@ -37,7 +37,7 @@ Button::Button(PdfField& field)
 
 Button::~Button()
 {
-  DbgLog->debug("Button Cleanup");
+  if(DbgLog != nullptr) DbgLog->debug("Button Cleanup");
   delete Btn;
 }
 JsValue

@@ -58,7 +58,7 @@ Date::Date(const Napi::CallbackInfo& info)
 }
 Date::~Date()
 {
-  DbgLog->debug("Date Cleanup");
+  if(DbgLog != nullptr) DbgLog->debug("Date Cleanup");
   HandleScope scope(Env());
   delete Self;
 }

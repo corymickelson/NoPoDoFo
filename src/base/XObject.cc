@@ -36,7 +36,7 @@ XObject::XObject(const CallbackInfo& info)
   DbgLog = spdlog::get("DbgLog");
   // create an xobject from an existing object (must be an xobject)
   if (info[0].IsExternal()) {
-    DbgLog->debug("XObject copy");
+    if(DbgLog != nullptr) DbgLog->debug("XObject copy");
     auto copy = info[0].As<External<PdfXObject>>().Data();
     Self = new PdfXObject(*copy);
   }
@@ -45,14 +45,14 @@ XObject::XObject(const CallbackInfo& info)
            info[0].As<Object>().InstanceOf(Rect::constructor.Value()) &&
            info[1].IsExternal()) {
     auto rect = Rect::Unwrap(info[0].As<Object>());
-    DbgLog->debug("New XObject");
+    if(DbgLog != nullptr) DbgLog->debug("New XObject");
     PdfDocument* doc = info[1].As<External<PdfDocument>>().Data();
     Self = new PdfXObject(rect->GetRect(), doc);
   }
 }
 XObject::~XObject()
 {
-  DbgLog->debug("XObject Cleanup");
+  if(DbgLog != nullptr) DbgLog->debug("XObject Cleanup");
   HandleScope scope(Env());
   delete Self;
 }
