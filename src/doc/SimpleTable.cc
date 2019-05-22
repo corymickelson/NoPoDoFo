@@ -1,6 +1,6 @@
 /**
  * This file is part of the NoPoDoFo (R) project.
- * Copyright (c) 2017-2018
+ * Copyright (c) 2017-2019
  * Authors: Cory Mickelson, et al.
  *
  * NoPoDoFo is free software: you can redistribute it and/or modify
