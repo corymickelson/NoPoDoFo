@@ -45,7 +45,9 @@ export class NObject {
                             mutableCheck()
                             return (...v: Array<NObject>) => {
                                 if (v.every(i => i instanceof NObject)) {
-                                    target.splice(0, ...v)
+                                    v.forEach(vv => {
+                                        target.unshift((vv as any).self)
+                                    })
                                     return target.length
                                 } else {
                                     throw TypeError()
@@ -55,7 +57,9 @@ export class NObject {
                             mutableCheck()
                             return (...v: Array<NObject>) => {
                                 if (v.every(i => i instanceof NObject)) {
-                                    target.splice(target.length, ...v)
+                                    v.forEach(vv => {
+                                        target.push((vv as any).self)
+                                    })
                                     return target.length
                                 } else {
                                     throw TypeError()
@@ -64,16 +68,14 @@ export class NObject {
                         case 'shift':
                             mutableCheck()
                             return () => {
-                                const item = target.splice(0, 1)
-                                return new NObject(parent, (item[0] as any))
+                                const item = target.shift()
+                                return new NObject(parent, item)
                             }
                         case 'length':
                             return target.length
                         case 'concat':
-                            mutableCheck()
-                            return (...v: Array<NObject>) => {
-                                return target.splice(target.length, ...v)
-                            }
+                            console.warn('NoPoDoFo Array does not support array concatenation')
+                            break
                         case 'copyWithin':
                             console.warn(`NoPoDoFo does not yet support the creation of new PdfArray types.`)
                             break
@@ -101,6 +103,13 @@ export class NObject {
                             }
                         case 'asArray':
                             return target.asArray()
+                        case 'splice':
+                            return (begin: number, endOrItems?: number | NObject[], items?: NObject[]): NObject[] => {
+                                if(typeof(endOrItems) === 'number' && !items) {
+
+                                }
+                                return []
+                        }
                         default:
                             throw Error(`unknown method, could not get ${prop} on NArray data type`)
                     }
@@ -126,7 +135,7 @@ export class NObject {
                     }
                 }
                 if (value instanceof NObject && typeof prop === 'number') {
-                    target.splice(prop, value)
+                    target.splice(prop, (value as any).self)
                     return true
                 }
                 return false
@@ -134,14 +143,11 @@ export class NObject {
             deleteProperty(target: nopodofo.Array, prop: any): boolean {
                 mutableCheck()
                 const index = propIndex(prop)
-                if (!prop) {
+                if (!index) {
                     console.warn(`When prop is null the entire array is cleared`)
                     target.clear()
-                }
-                if (!index) {
-
                 } else {
-                    target.splice(index, 1)
+                    target.clear(index)
                 }
                 return true
             }

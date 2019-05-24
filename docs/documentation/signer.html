@@ -776,8 +776,8 @@ Please see the <a href="cookbook/signer.html">Signer Cookbook</a> for an example
 
   <span class="hljs-keyword">constructor</span>(doc: Document, output?: string)
 
-  loadCertificateAndKey(certificate: string, pkey: string, p: string | Callback&lt;Number&gt;, cb?: Callback&lt;Number&gt;): number
-  write(minSignatureSize: Number, cb: Callback&lt;Buffer | string&gt;): void
+    loadCertificateAndKey(certificate: string | Buffer, opts?: { password?: <span class="hljs-built_in">string</span>, pKey?: <span class="hljs-built_in">string</span> | Buffer }, cb?: Callback&lt;<span class="hljs-built_in">Number</span>&gt;): <span class="hljs-built_in">void</span>
+  write(minSignatureSize: <span class="hljs-built_in">Number</span>, cb: Callback&lt;Buffer | <span class="hljs-built_in">string</span>&gt;): <span class="hljs-built_in">void</span>
 }
 </code></pre>
 <h2 id="constructors">Constructors</h2>
@@ -793,11 +793,11 @@ Please see the <a href="cookbook/signer.html">Signer Cookbook</a> for an example
 <hr>
 <h3 id="loadcertificateandkey">loadCertificateAndKey</h3>
 <p>Loads the Certificate and Private Key and stores the values into the Signer instance.
-Values are not retrievable but are stored for use on Signer.write method invokation.
+Values are not retrievable but are stored for use on Signer.write method invocation.
 After both cert and pkey are loaded, a minimal signature size is calculated and returned to
 the caller. To complete the signing process this minimum signature size value needs to be
 provided to the write method.</p>
-<pre><code class="lang-typescript">loadCertificateAndKey(certificate: <span class="hljs-built_in">string</span>, pkey: <span class="hljs-built_in">string</span>, p: <span class="hljs-built_in">string</span> | Callback&lt;<span class="hljs-built_in">Number</span>&gt;, cb?: Callback&lt;<span class="hljs-built_in">Number</span>&gt;): <span class="hljs-built_in">number</span>
+<pre><code class="lang-typescript">loadCertificateAndKey(certificate: <span class="hljs-built_in">string</span> | Buffer, opts?: { password?: <span class="hljs-built_in">string</span>, pKey?: <span class="hljs-built_in">string</span> | Buffer }, cb?: Callback&lt;<span class="hljs-built_in">Number</span>&gt;): <span class="hljs-built_in">void</span>
 </code></pre>
 <h3 id="write">write</h3>
 <p>Signs the document output to disk or a node buffer. The loadCertificateAndKey must be loaded prior to calling write</p>
@@ -846,7 +846,7 @@ provided to the write method.</p>
     <script>
         var gitbook = gitbook || [];
         gitbook.push(function() {
-            gitbook.page.hasChanged({"page":{"title":"Signer","level":"1.3.33","depth":2,"next":{"title":"SimpleTable","level":"1.3.34","depth":2,"path":"documentation/simpletable.md","ref":"documentation/simpletable.md","articles":[]},"previous":{"title":"SignatureField","level":"1.3.32","depth":2,"path":"documentation/signaturefield.md","ref":"documentation/signaturefield.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":[],"pluginsConfig":{"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"documentation/signer.md","mtime":"2019-04-26T23:00:50.732Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2019-05-22T17:41:18.978Z"},"basePath":"..","book":{"language":""}});
+            gitbook.page.hasChanged({"page":{"title":"Signer","level":"1.3.33","depth":2,"next":{"title":"SimpleTable","level":"1.3.34","depth":2,"path":"documentation/simpletable.md","ref":"documentation/simpletable.md","articles":[]},"previous":{"title":"SignatureField","level":"1.3.32","depth":2,"path":"documentation/signaturefield.md","ref":"documentation/signaturefield.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":[],"pluginsConfig":{"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"documentation/signer.md","mtime":"2019-05-23T22:13:09.635Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2019-05-24T03:03:21.551Z"},"basePath":"..","book":{"language":""}});
         });
     </script>
 </div>

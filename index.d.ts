@@ -1,6 +1,5 @@
 /// <reference types="node" />
 
-import {NObject} from "./lib/NObject";
 
 export const CONVERSION = 0.0028346456693
 export type NPDFExternal<T> = Object
@@ -1012,9 +1011,17 @@ export namespace nopodofo {
 
         pop(): Object
 
-        clear(): void
+        /**
+         * @desc Clear a single item or the entire array
+         * @param {number} index - if present only the item at this index is removed.
+         */
+        clear(index?: number): void
 
         push(v: Object): void
+
+        shift(): nopodofo.Object
+
+        unshift(v: nopodofo.Object): void
 
         write(destination: string): void
 
@@ -1027,9 +1034,6 @@ export namespace nopodofo {
          *
          */
         asArray(): any[]
-
-        splice(startIndex: number, endIndex: number, ...items: NObject[]): NObject[]
-        splice(startIndex: number, ...items: NObject[]): NObject[]
     }
 
     export class Ref {

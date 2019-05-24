@@ -4,13 +4,13 @@
   - [NoPoDoFo Encrypt](#nopodofo-encrypt)
   - [Constructors](#constructors)
     - [Example](#example)
-  - [## Properties](#properties)
+  - [Properties](#properties)
     - [owner](#owner)
     - [user](#user)
     - [encryptionKey](#encryptionkey)
     - [keyLength](#keylength)
     - [protections](#protections)
-  - [## Methods](#methods)
+  - [Methods](#methods)
     - [isAllowed](#isallowed)
 
 ## NoPoDoFo Encrypt

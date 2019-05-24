@@ -47,7 +47,7 @@ AssertCallbackInfo(const Napi::CallbackInfo& info,
       if (!valid) {
         stringstream eMsg;
         eMsg << "Expected " << vars.size()
-             << " argument parameters but received " << info.Length() << endl;
+             << " parameters but received " << info.Length() << endl;
         if(dbglog != nullptr) dbglog->debug(eMsg.str());
         Napi::Error::New(info.Env(), eMsg.str()).ThrowAsJavaScriptException();
         return {};

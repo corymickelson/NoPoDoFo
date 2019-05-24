@@ -49,14 +49,15 @@ public:
   void SetImmutable(const Napi::CallbackInfo&, const Napi::Value&);
   void Push(const Napi::CallbackInfo&);
   JsValue Pop(const Napi::CallbackInfo&);
-  JsValue Splice(const Napi::CallbackInfo&);
+  void Unshift(const Napi::CallbackInfo&);
+  JsValue Shift(const Napi::CallbackInfo&);
   void Clear(const Napi::CallbackInfo&);
   JsValue ToJsArray(const Napi::CallbackInfo&);
   PoDoFo::PdfArray& GetArray() const { return Init ? *Init : Self; }
 
 private:
   vector<PoDoFo::PdfObject*> Children;
-  Napi::Value GetObjAtIndex(const Napi::CallbackInfo&);
+  Napi::Value GetObjAtIndex(Napi::Env, size_t);
   PoDoFo::PdfArray& Self;
   PoDoFo::PdfArray* Init = nullptr;
   PoDoFo::PdfObject* Parent = nullptr;

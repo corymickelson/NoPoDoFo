@@ -9,7 +9,7 @@
     - [resources](#resources)
     - [pageMediaBox](#pagemediabox)
     - [reference](#reference)
-  - [## Methods](#methods)
+  - [Methods](#methods)
 
 ## NoPoDoFo XObject
 

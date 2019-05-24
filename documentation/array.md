@@ -3,15 +3,17 @@
 - [API Documentation for Array](#api-documentation-for-array)
   - [NoPoDoFo Array](#nopodofo-array)
   - [Constructor](#constructor)
-  - [## Properties](#properties)
+  - [Properties](#properties)
     - [dirty](#dirty)
     - [length](#length)
     - [immutable](#immutable)
-  - [## Methods](#methods)
+  - [Methods](#methods)
     - [at](#at)
     - [pop](#pop)
     - [clear](#clear)
     - [push](#push)
+    - [shift](#shift)
+    - [unshift](#unshift)
     - [write](#write)
     - [asArray](#asarray)
 
@@ -31,8 +33,10 @@ class Array {
 
   at(i: number): Ref | Object
   pop(): Object
-  clear(): void
+  clear(index?: number): void
   push(v: Object): void
+  shift(): nopodofo.Object
+  unshift(v: nopodofo.Object): void
   write(destination: string): void
   asArray(): any[]
 }
@@ -82,10 +86,10 @@ This method will act the same as the native javascript array pop method. Pop wil
 ### clear
 
 ```typescript
-clear(): void
+clear(index?: number): void
 ```
 
-Removes all object in an array.
+If an index is provided, only the item at that index will be removed else all object in the array are removed.
 
 ### push
 
@@ -95,6 +99,21 @@ push(v: Object): void
 
 Add an [Object](./object.md) to the end of the array.
 
+### shift
+
+```typescript
+shift(): nopodofo.Object | nopodofo.Ref
+```
+
+Get the first element from the array
+
+### unshift
+
+```typescript
+unshift(v: nopodofo.Object): void
+```
+
+Push an element to the front of an array, all preceding elements are shifted back
 ### write
 
 ```typescript

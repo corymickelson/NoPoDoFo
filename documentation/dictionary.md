@@ -7,7 +7,7 @@
     - [dirty](#dirty)
     - [immutable](#immutable)
     - [obj](#obj)
-  - [## Methods](#methods)
+  - [Methods](#methods)
     - [getKeyType](#getkeytype)
     - [getKey](#getkey)
     - [addKey](#addkey)

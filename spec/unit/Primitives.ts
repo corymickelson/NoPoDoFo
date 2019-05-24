@@ -84,4 +84,27 @@ export class PrimitiveSpec {
             Expect.fail(e)
         }
     }
+
+    @AsyncTest('nopodofo.Array manipulation')
+    public arrayManipulations() {
+        return new Promise((resolve, reject) => {
+            const doc = new nopodofo.Document()
+            doc.load(join(__dirname, '../test-documents/test.pdf'), e => {
+                if (e) {
+                    Expect.fail(e.message)
+                }
+                let candidates = doc.body.filter(i => i.type === 'Array')
+                const subject = candidates[0].getArray()
+                const subjectStartingLength = subject.length
+                subject.pop()
+                Expect(subject.length).toEqual(subjectStartingLength -1)
+
+                let noObj = new nopodofo.Object(0.0)
+                subject.unshift(noObj)
+                Expect(subject.length).toEqual(subjectStartingLength)
+                console.log(JSON.stringify(subject.asArray()))
+                return resolve()
+            })
+        })
+    }
 }

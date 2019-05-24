@@ -21,7 +21,7 @@ class Signer {
 
   constructor(doc: Document, output?: string)
 
-  loadCertificateAndKey(certificate: string, pkey: string, p: string | Callback<Number>, cb?: Callback<Number>): number
+	loadCertificateAndKey(certificate: string | Buffer, opts?: { password?: string, pKey?: string | Buffer }, cb?: Callback<Number>): void
   write(minSignatureSize: Number, cb: Callback<Buffer | string>): void
 }
 ```
@@ -48,13 +48,13 @@ The page [Annotation](./annotations.md) used to store the signature.
 ### loadCertificateAndKey
 
 Loads the Certificate and Private Key and stores the values into the Signer instance.
-Values are not retrievable but are stored for use on Signer.write method invokation.
+Values are not retrievable but are stored for use on Signer.write method invocation.
 After both cert and pkey are loaded, a minimal signature size is calculated and returned to
 the caller. To complete the signing process this minimum signature size value needs to be
 provided to the write method.
 
 ```typescript
-loadCertificateAndKey(certificate: string, pkey: string, p: string | Callback<Number>, cb?: Callback<Number>): number
+loadCertificateAndKey(certificate: string | Buffer, opts?: { password?: string, pKey?: string | Buffer }, cb?: Callback<Number>): void
 ```
 
 ### write

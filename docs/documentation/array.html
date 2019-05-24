@@ -755,17 +755,19 @@
 <li><a href="#api-documentation-for-array">API Documentation for Array</a><ul>
 <li><a href="#nopodofo-array">NoPoDoFo Array</a></li>
 <li><a href="#constructor">Constructor</a></li>
-<li><a href="#properties">## Properties</a><ul>
+<li><a href="#properties">Properties</a><ul>
 <li><a href="#dirty">dirty</a></li>
 <li><a href="#length">length</a></li>
 <li><a href="#immutable">immutable</a></li>
 </ul>
 </li>
-<li><a href="#methods">## Methods</a><ul>
+<li><a href="#methods">Methods</a><ul>
 <li><a href="#at">at</a></li>
 <li><a href="#pop">pop</a></li>
 <li><a href="#clear">clear</a></li>
 <li><a href="#push">push</a></li>
+<li><a href="#shift">shift</a></li>
+<li><a href="#unshift">unshift</a></li>
 <li><a href="#write">write</a></li>
 <li><a href="#asarray">asArray</a></li>
 </ul>
@@ -786,8 +788,10 @@ NoPoDoFo does not currently support the creation of new PDf Array objects. NoPoD
 
   at(i: <span class="hljs-built_in">number</span>): Ref | <span class="hljs-built_in">Object</span>
   pop(): <span class="hljs-built_in">Object</span>
-  clear(): <span class="hljs-built_in">void</span>
+  clear(index?: <span class="hljs-built_in">number</span>): <span class="hljs-built_in">void</span>
   push(v: <span class="hljs-built_in">Object</span>): <span class="hljs-built_in">void</span>
+  shift(): nopodofo.Object
+  unshift(v: nopodofo.Object): <span class="hljs-built_in">void</span>
   write(destination: <span class="hljs-built_in">string</span>): <span class="hljs-built_in">void</span>
   asArray(): <span class="hljs-built_in">any</span>[]
 }
@@ -817,13 +821,21 @@ less than zero or greater than the array length a Range Error will be thrown.</p
 </code></pre>
 <p>This method will act the same as the native javascript array pop method. Pop will remove and return the last item of an array.</p>
 <h3 id="clear">clear</h3>
-<pre><code class="lang-typescript">clear(): <span class="hljs-built_in">void</span>
+<pre><code class="lang-typescript">clear(index?: <span class="hljs-built_in">number</span>): <span class="hljs-built_in">void</span>
 </code></pre>
-<p>Removes all object in an array.</p>
+<p>If an index is provided, only the item at that index will be removed else all object in the array are removed.</p>
 <h3 id="push">push</h3>
 <pre><code class="lang-typescript">push(v: <span class="hljs-built_in">Object</span>): <span class="hljs-built_in">void</span>
 </code></pre>
 <p>Add an <a href="object.html">Object</a> to the end of the array.</p>
+<h3 id="shift">shift</h3>
+<pre><code class="lang-typescript">shift(): nopodofo.Object | nopodofo.Ref
+</code></pre>
+<p>Get the first element from the array</p>
+<h3 id="unshift">unshift</h3>
+<pre><code class="lang-typescript">unshift(v: nopodofo.Object): <span class="hljs-built_in">void</span>
+</code></pre>
+<p>Push an element to the front of an array, all preceding elements are shifted back</p>
 <h3 id="write">write</h3>
 <pre><code class="lang-typescript">write(destination: <span class="hljs-built_in">string</span>): <span class="hljs-built_in">void</span>
 </code></pre>
@@ -877,7 +889,7 @@ The use of the method is best for simply viewing the contents of an array in a f
     <script>
         var gitbook = gitbook || [];
         gitbook.push(function() {
-            gitbook.page.hasChanged({"page":{"title":"Array","level":"1.3.3","depth":2,"next":{"title":"Best Practices","level":"1.3.4","depth":2,"path":"documentation/bestpractices.md","ref":"documentation/bestpractices.md","articles":[]},"previous":{"title":"Annotation","level":"1.3.2","depth":2,"path":"documentation/annotations.md","ref":"documentation/annotations.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":[],"pluginsConfig":{"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"documentation/array.md","mtime":"2019-05-21T04:27:15.471Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2019-05-22T17:41:18.978Z"},"basePath":"..","book":{"language":""}});
+            gitbook.page.hasChanged({"page":{"title":"Array","level":"1.3.3","depth":2,"next":{"title":"Best Practices","level":"1.3.4","depth":2,"path":"documentation/bestpractices.md","ref":"documentation/bestpractices.md","articles":[]},"previous":{"title":"Annotation","level":"1.3.2","depth":2,"path":"documentation/annotations.md","ref":"documentation/annotations.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":[],"pluginsConfig":{"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"documentation/array.md","mtime":"2019-05-24T03:00:38.901Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2019-05-24T03:03:21.551Z"},"basePath":"..","book":{"language":""}});
         });
     </script>
 </div>

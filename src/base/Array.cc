@@ -56,13 +56,15 @@ Array::Array(const CallbackInfo& info)
 {
   DbgLog = spdlog::get("DbgLog");
   if (Init != nullptr) {
-    if(DbgLog != nullptr) DbgLog->debug("Initialized New Array");
+    if (DbgLog != nullptr)
+      DbgLog->debug("Initialized New Array");
   }
 }
 
 Array::~Array()
 {
-  if(DbgLog != nullptr) DbgLog->debug("Array cleanup");
+  if (DbgLog != nullptr)
+    DbgLog->debug("Array cleanup");
   HandleScope scope(Env());
   for (auto child : Children) {
     delete child;
@@ -88,9 +90,10 @@ Array::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceMethod("write", &Array::Write),
       InstanceMethod("push", &Array::Push),
       InstanceMethod("pop", &Array::Pop),
+      InstanceMethod("shift", &Array::Shift),
+      InstanceMethod("unshift", &Array::Unshift),
       InstanceMethod("asArray", &Array::ToJsArray),
-      InstanceMethod("clear", &Array::Clear),
-      InstanceMethod("splice", &Array::Splice) });
+      InstanceMethod("clear", &Array::Clear) });
   Constructor = Persistent(ctor);
   Constructor.SuppressDestruct();
   target.Set("Array", ctor);
@@ -146,7 +149,8 @@ Array::IsDirty(const CallbackInfo& info)
 JsValue
 Array::At(const CallbackInfo& info)
 {
-  return GetObjAtIndex(info);
+  AssertCallbackInfo(info, { { 0, { option(napi_number) } } });
+  return GetObjAtIndex(info.Env(), info[0].As<Number>().Int32Value());
 }
 
 void
@@ -178,32 +182,58 @@ Array::Push(const CallbackInfo& info)
 JsValue
 Array::Pop(const CallbackInfo& info)
 {
-  const auto copy = GetObjAtIndex(info);
-  const size_t index = info[0].As<Number>().Uint32Value();
+  const auto index = GetArray().size() - 1;
+  const auto copy = GetObjAtIndex(info.Env(), index);
   GetArray().erase(GetArray().begin() + index);
   return copy;
 }
 
 JsValue
-Array::GetObjAtIndex(const CallbackInfo& info)
+Array::Shift(const Napi::CallbackInfo& info)
 {
-  const size_t index = info[0].As<Number>().Uint32Value();
+  const auto index = 0;
+  const auto copy = GetObjAtIndex(info.Env(), index);
+  GetArray().erase(GetArray().begin());
+  return copy;
+}
+
+void
+Array::Unshift(const Napi::CallbackInfo& info)
+{
+  const auto wrapper = info[0].As<Object>();
+  if (!wrapper.InstanceOf(Obj::Constructor.Value())) {
+    throw Error::New(info.Env(), "must be an instance of Obj");
+  }
+  try {
+    auto item = Obj::Unwrap(wrapper);
+    GetArray().insert(GetArray().begin(), item->GetObject());
+  } catch (PdfError& err) {
+    ErrorHandler(err, info);
+  } catch (Napi::Error& err) {
+    ErrorHandler(err, info);
+  }
+}
+
+JsValue
+Array::GetObjAtIndex(Napi::Env env, size_t index)
+{
   if (index > GetArray().size()) {
-    throw Napi::RangeError();
+    Napi::RangeError().ThrowAsJavaScriptException();
   }
   PdfObject* item;
   if (GetArray()[index].IsReference()) {
     auto indirect = GetArray()[index].GetReference();
     return Ref::Constructor.New(
-      { External<PdfReference>::New(info.Env(), &indirect) });
+      { External<PdfReference>::New(env, &indirect) });
   } else {
     item = &(GetArray()[index]);
   }
   // Create copy for shift and pop operations
   const auto child = new PdfObject(*item);
-  if(DbgLog != nullptr) DbgLog->debug("Array[{}] = {}", index, child->GetDataTypeString());
+  if (DbgLog != nullptr)
+    DbgLog->debug("Array[{}] = {}", index, child->GetDataTypeString());
   Children.push_back(child);
-  const auto initPtr = Napi::External<PdfObject>::New(info.Env(), child);
+  const auto initPtr = Napi::External<PdfObject>::New(env, child);
   const auto instance = Obj::Constructor.New({ initPtr });
   return instance;
 }
@@ -212,7 +242,16 @@ void
 Array::Clear(const CallbackInfo& info)
 {
   try {
-    GetArray().Clear();
+    if (info.Length() == 1 && info[0].IsNumber()) {
+      const auto index = info[0].As<Number>().Int32Value();
+      if (GetArray().size() < index || index < 0) {
+        Napi::RangeError().ThrowAsJavaScriptException();
+        return;
+      }
+      GetArray().erase(GetArray().begin() + index);
+    } else {
+      GetArray().Clear();
+    }
   } catch (PdfError& err) {
     ErrorHandler(err, info);
   }
@@ -228,79 +267,5 @@ Array::ToJsArray(const Napi::CallbackInfo& info)
   }
   return js;
 }
-JsValue
-Array::Splice(const Napi::CallbackInfo& info)
-{
-  const auto opts = AssertCallbackInfo(
-    info,
-    { { 0, { option(napi_number) } },
-      { 1, { option(napi_number), option(napi_object), tl::nullopt } },
-      { 2, { option(napi_object), tl::nullopt } } });
-  const auto out = Napi::Array::New(info.Env());
-  vector<PdfObject> spliceIn;
-  const auto env = info.Env();
-  const auto getPdfElement = [env](Napi::Value v) -> PdfObject {
-    if (v.IsBoolean()) {
-      return PdfObject(v.As<Boolean>());
-    } else if (v.IsString()) {
-      return PdfObject(v.As<String>());
-    } else if (v.IsNumber()) {
-      return PdfObject(v.As<Number>().Int64Value());
-    } else if (v.IsObject()) {
-      if (v.As<Object>().InstanceOf(Dictionary::Constructor.Value())) {
-        return Dictionary::Unwrap(v.As<Object>())->GetDictionary();
-      } else if (v.As<Object>().InstanceOf(Array::Constructor.Value())) {
-        return Array::Unwrap(v.As<Object>())->GetArray();
-      } else if (v.As<Object>().InstanceOf(Obj::Constructor.Value())) {
-        return Obj::Unwrap(v.As<Object>())->GetObject();
-      } else if (v.As<Object>().InstanceOf(Ref::Constructor.Value())) {
-        const auto r = Ref::Unwrap(v.As<Object>())->Self;
-        return PdfVariant(*r);
-      }
-    }
-    throw std::exception();
-  };
-  if (opts[2] == 0 || opts[1] == 1) {
-    try {
-      if (info[opts[2] == 0 ? 2 : 1].IsArray()) {
-        Napi::Array a = info[opts[2] == 0 ? 2 : 1].As<Napi::Array>();
-        for (int i = 0; i < a.Length(); ++i) {
-          const auto inn = getPdfElement(a.Get(i));
-          spliceIn.emplace_back(inn);
-        }
-      } else {
-        const auto inn = getPdfElement(info[opts[2] == 0 ? 2 : 1].As<Object>());
-        spliceIn.emplace_back(inn);
-      }
-    } catch (...) {
-      const auto msg =
-        "Unknown type, please see the NoPoDoFo::Array docs for details";
-      TypeError::New(env, msg).ThrowAsJavaScriptException();
-    }
-  }
-  if (opts[1] == 0) {
-    if (GetArray().size() <
-        info[0].As<Number>().Int32Value() + info[1].As<Number>().Int32Value()) {
-      const auto msg = "starting position plus count exceeds array length";
-      if(DbgLog != nullptr) DbgLog->debug(msg);
-      RangeError::New(info.Env(), msg).ThrowAsJavaScriptException();
-    }
-    if (GetArray().GetImmutable()) {
-      const auto msg = "Array is immutable";
-      if(DbgLog != nullptr) DbgLog->debug(msg);
-      Error::New(info.Env(), msg).ThrowAsJavaScriptException();
-    }
-    auto it = GetArray().begin() + info[0].As<Number>().Uint32Value();
-    while (it != GetArray().begin() + (info[0].As<Number>().Uint32Value() +
-                                       info[1].As<Number>().Uint32Value())) {
-      const auto item = Obj::Constructor.New(
-        { Napi::External<PdfObject>::New(info.Env(), it.base()) });
-      out[out.Length()] = item;
-      GetArray().erase(it);
-    }
-  }
-  if (!spliceIn.empty()) {
-  }
-  return out;
-}
+
 }
