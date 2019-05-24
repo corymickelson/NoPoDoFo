@@ -15,11 +15,12 @@
     "build": "cmake-js build -s=c++17",
     "build:debug": "cmake-js build -D -s=c++17",
     "clean": "cmake-js clean",
-    "install": "node ./scripts/install.js"
+    "postinstall": "node ./scripts/install.js"
   },
   "nyc": {
     "exclude": [
-      "spec/**"
+      "spec/**",
+      "lib/**"
     ]
   },
   "keywords": [
@@ -43,8 +44,6 @@
     "coveralls": "^3.0.1",
     "gitbook-cli": "2.3.2",
     "nyc": "^11.9.0",
-    "tap-summary": "^4.0.0",
-    "tape": "^4.9.0",
     "typescript": "^3.0.1",
     "uuid": "^3.2.1"
   },

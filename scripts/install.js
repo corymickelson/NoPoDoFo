@@ -28,7 +28,7 @@ if(platform() === 'win32') {
         process.exit(1)
     }
 }
-let cmd = `${join(__dirname, '../node_modules/.bin/cmake-js')} build`
+let cmd = `${join(__dirname, '../node_modules/.bin/cmake-js')} clean && ${join(__dirname, '../node_modules/.bin/cmake-js')} build`
 if (process.argv.length >= 3) {
     if (process.argv[2] === '-D') cmd += ' -D'
 }
