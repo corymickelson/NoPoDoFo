@@ -139,10 +139,14 @@ Building NoPoDoFo from source.
 Incorporating NoPoDoFo into your AWS Lambda functions is easily accomplished by installing the pre-built release packages.
 In addition to installing this package `nopodofo` you will also need to install `nopodofolambda`. The latter package is a collection of
 binaries used by PoDoFo that are not included in an AWS linux instance.
-__Please note this will only run on AWS Lambda Node8__.
+__Please note this will only run on AWS Lambda Node>=8.10__.
 
-- run `npm i -S https://github.com/corymickelson/NoPoDoFo/releases/download/v0.7.0/nopodofo-v0.7.0-linux-aws-x64-node-v8.tar.gz` - install nopodofo v0.7.0
-- run `npm i -S nopodofolambda`
+- run `npm i -S --ignore-scripts https://github.com/corymickelson/NoPoDoFo/releases/download/v1.0.0/nopodofo-v1.0.0-linux-aws-x64.tar.gz` - install nopodofo v1.0.0
+- run `npm i -S nopodofolambda@1.0.0`
+
+nopodofo and nopodofolambda should share the same versions,
+for example nopodofo v1.0.0 is not guaranteed to work with nopodofolambdav.07.0,
+but nopodofo v1.0.0 and nopodofolambda v1.0.0 have been tested to ensure they work accordingly
 
 You can also build this yourself using docker. Pull image nopodofo/aws, this is a centos 7 image which closely resembles the amazon linux image. Binaries
 built on this will also run on AWS
@@ -154,6 +158,12 @@ built on this will also run on AWS
 - Build package `LDFLAGS=-Wl,-rpath=/var/task/node_modules/nopodofolambda/lib ./node_modules/.bin/cmake-js build`
 
 
+If you wish to build all or your own binaries for use in aws lambda all you need to do to utilize your own binaries 
+is:
+
+ - if they are not in `/usr` or `/usr/local` they must be at `/var/task/node_modules/nopodofolambda/lib`
+ - if using the latter path build nopodofo with `--CDNOPODOFO_BUILD_AWS_LAMBDA=ON`
+ 
 [1]: The Windows vcpkg PoDoFo build does not include all optional dependencies. This build does not support
 AES256 encryption. Missing optional dependencies are: libidn, fontconfig. As previously stated, this build does not
 support AES256 encryption which is caused from libidn not being available. The lack of fontconfig does not disable
