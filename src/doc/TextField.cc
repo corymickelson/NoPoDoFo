@@ -18,6 +18,7 @@
  */
 
 #include "TextField.h"
+#include "../base/Names.h"
 #include "../ErrorHandler.h"
 #include "Document.h"
 #include "StreamDocument.h"
@@ -137,7 +138,7 @@ TextField::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceMethod("setMouseAction", &TextField::SetMouseAction),
       InstanceMethod("setPageAction", &TextField::SetPageAction),
       InstanceMethod("setHighlightingMode", &TextField::SetHighlightingMode),
-      InstanceMethod("refreshAppearanceStream", &TextField::RefreshAppearanceStream)});
+      InstanceMethod("refreshAppearanceStream", &TextField::WriteAppearanceStream)});
   Constructor = Napi::Persistent(ctor);
   Constructor.SuppressDestruct();
 
@@ -243,14 +244,62 @@ TextField::IsRichText(const Napi::CallbackInfo& info)
   return Boolean::New(info.Env(), GetText().IsRichText());
 }
 void
-TextField::RefreshAppearanceStream(const Napi::CallbackInfo &info)
+TextField::WriteAppearanceStream(const Napi::CallbackInfo &info)
 {
-  try {
-    Field::RefreshAppearanceStream();
-  } catch(PdfError& pdferr) {
-    ErrorHandler(pdferr, info);
-  } catch(...) {
-    Error::New(info.Env(), "An unknown error occurred").ThrowAsJavaScriptException();
+  stringstream ss;
+  PdfLocaleImbue(ss);
+  map<string, PdfObject*> apKeys;
+  PdfRefCountedBuffer buffer;
+  apKeys = GetFieldRefreshKeys(&GetField());
+  if (apKeys.find(Name::V) == apKeys.end() &&
+      apKeys.find(Name::DV) == apKeys.end()) {
+    throw std::exception();
   }
+  if (!apKeys.find(Name::V)->second->GetString().IsValid() ||
+      apKeys.find(Name::V)->second->GetString().GetCharacterLength() <= 0) {
+    throw std::exception();
+  }
+  PdfXObject xObj(apKeys.find(Name::AP)->second->MustGetIndirectKey(Name::N));
+  xObj.GetContentsForAppending()->GetStream()->BeginAppend();
+  PdfOutputDevice device(&buffer);
+  apKeys.find(Name::V)->second->GetString().Write(&device,
+                                                  ePdfWriteMode_Compact);
+  ss << "/Tx " << BEGIN_MARKED_CONTENT_OP << endl;
+  ss << SAVE_OP << endl;
+  ss << BEGIN_TEXT_OP << endl;
+  if (apKeys.find(Name::DA) != apKeys.end()) {
+    ss << apKeys.find(Name::DA)->second->GetString().GetString() << endl;
+    if (!xObj.GetResources()->GetDictionary().HasKey(Name::FONT)) {
+      PdfFont* f = GetDAFont(
+        string_view(apKeys.find(Name::DA)->second->GetString().GetString()));
+      xObj.AddResource(
+        f->GetIdentifier(), f->GetObject()->Reference(), Name::FONT);
+    }
+    if (Self.GetWidgetAnnotation()->GetObject()->GetDictionary().HasKey(
+          Name::DA)) {
+      Self.GetWidgetAnnotation()->GetObject()->GetDictionary().RemoveKey(
+        Name::DA);
+    }
+    // Add the DA key from apKeys in case the DA was taken from the form
+    Self.GetWidgetAnnotation()->GetObject()->GetDictionary().AddKey(
+      Name::DA, apKeys.find(Name::DA)->second);
+  }
+  ss << "2.0 2.0 " << TEXT_POS_OP << endl;
+  ss << buffer.GetBuffer() << SHOW_TEXT_OP << endl;
+  ss << END_TEXT_OP << endl;
+  ss << RESTORE_OP << endl;
+  ss << END_MARKED_CONTENT_OP << endl;
+
+  xObj.GetContentsForAppending()->GetStream()->Append(ss.str());
+  xObj.GetContentsForAppending()->GetStream()->EndAppend();
+
+  PdfRect r(0,
+            0,
+            Self.GetWidgetAnnotation()->GetRect().GetWidth(),
+            Self.GetWidgetAnnotation()->GetRect().GetHeight());
+  xObj.GetObject()->GetDictionary().RemoveKey(Name::BBOX);
+  PdfVariant ra;
+  r.ToVariant(ra);
+  xObj.GetObject()->GetDictionary().AddKey(Name::BBOX, ra.GetArray());
 }
 }

@@ -33,15 +33,17 @@ class Button
 public:
   explicit Button(PoDoFo::PdfField&);
   explicit Button(const Button&) = delete;
-  const Button&operator=(const Button&) = delete;
+  const Button& operator=(const Button&) = delete;
   ~Button();
   JsValue GetCaption(const Napi::CallbackInfo&);
   void SetCaption(const Napi::CallbackInfo&, const JsValue&);
-
+  PoDoFo::PdfObject* GetStateAppearanceStream();
+  void WriteAppearanceStream(const PoDoFo::PdfXObject& canvas);
   PoDoFo::PdfButton* Btn;
+  PoDoFo::PdfField& Field;
 
 protected:
-	std::shared_ptr<spdlog::logger> DbgLog;
+  std::shared_ptr<spdlog::logger> DbgLog;
 };
 }
 #endif // NPDF_BUTTON_H

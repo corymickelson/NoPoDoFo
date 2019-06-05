@@ -46,6 +46,11 @@ public:
   JsValue GetLeft(const Napi::CallbackInfo&);
   void SetLeft(const Napi::CallbackInfo&, const JsValue&);
   PoDoFo::PdfRect& GetRect() const { return *Self; }
+  static bool IsEmpty(PoDoFo::PdfRect& r)
+  {
+    return r.GetLeft() >= r.GetLeft() + r.GetWidth() ||
+           r.GetBottom() >= r.GetBottom() + r.GetHeight();
+  }
 
 private:
   PoDoFo::PdfRect* Self;

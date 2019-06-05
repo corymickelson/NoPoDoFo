@@ -102,7 +102,8 @@ Field::Field(EPdfField type, const CallbackInfo& info)
 
 Field::~Field()
 {
-  if(DbgLog != nullptr) DbgLog->debug("Field Cleanup");
+  if (DbgLog != nullptr)
+    DbgLog->debug("Field Cleanup");
   delete Self;
   for (auto c : Children) {
     delete c;
@@ -230,9 +231,8 @@ Field::SetBackground(const Napi::CallbackInfo& info)
   vector<NPDFColorFormat> types = { NPDFColorFormat::GreyScale,
                                     NPDFColorFormat::RGB,
                                     NPDFColorFormat::CMYK };
-  NPDF_COLOR_ACCESSOR(Color::Unwrap(info[0].As<Object>())->Self,
-                    types,
-                    Self->SetBackgroundColor)
+  NPDF_COLOR_ACCESSOR(
+    Color::Unwrap(info[0].As<Object>())->Self, types, Self->SetBackgroundColor)
 }
 void
 Field::SetBorder(const Napi::CallbackInfo& info)
@@ -321,8 +321,7 @@ Field::GetAppearanceStream(const Napi::CallbackInfo& info)
   }
 }
 void
-Field::SetAppearanceStream(const Napi::CallbackInfo& info,
-                           const JsValue& value)
+Field::SetAppearanceStream(const Napi::CallbackInfo& info, const JsValue& value)
 {
   if (GetFieldDictionary().HasKey(Name::AP)) {
     GetFieldDictionary().RemoveKey(Name::AP);
@@ -379,8 +378,7 @@ Field::GetJustification(const Napi::CallbackInfo& info)
   }
 }
 void
-Field::SetJustification(const Napi::CallbackInfo& info,
-                        const JsValue& value)
+Field::SetJustification(const Napi::CallbackInfo& info, const JsValue& value)
 {
   if (value.IsNumber()) {
     pdf_int64 qValue = value.As<Number>();
@@ -403,6 +401,11 @@ Field::GetFieldObject(const CallbackInfo& info)
     { External<PdfObject>::New(info.Env(), Self->GetFieldObject()) });
 }
 
+/**
+ * @brief Get fields: AP, AS, DA, DV
+ * @param f
+ * @return
+ */
 std::map<std::string, PoDoFo::PdfObject*>
 Field::GetFieldRefreshKeys(PoDoFo::PdfField* f)
 {
@@ -435,8 +438,7 @@ Field::GetFieldRefreshKeys(PoDoFo::PdfField* f)
     xRect.SetBottom(0.0);
     xRect.SetWidth(f->GetWidgetAnnotation()->GetRect().GetWidth());
     xRect.SetHeight(f->GetWidgetAnnotation()->GetRect().GetHeight());
-    PdfXObject x(xRect,
-                 f->GetFieldObject()->GetOwner()->GetParentDocument());
+    PdfXObject x(xRect, f->GetFieldObject()->GetOwner()->GetParentDocument());
     f->GetWidgetAnnotation()
       ->GetObject()
       ->MustGetIndirectKey(Name::AP)
@@ -456,6 +458,11 @@ Field::GetFieldRefreshKeys(PoDoFo::PdfField* f)
       Name::DV,
       f->GetWidgetAnnotation()->GetObject()->MustGetIndirectKey(Name::DV)));
   }
+  keys.insert(std::pair<string, PdfObject*>(
+    Name::AS,
+    f->GetWidgetAnnotation()->GetObject()->GetDictionary().HasKey(Name::AS)
+      ? f->GetWidgetAnnotation()->GetObject()->MustGetIndirectKey(Name::AS)
+      : nullptr));
   return keys;
 }
 
@@ -465,61 +472,7 @@ Field::GetFieldRefreshKeys(PoDoFo::PdfField* f)
 void
 Field::RefreshAppearanceStream()
 {
-  stringstream ss;
-  PdfLocaleImbue(ss);
-  map<string, PdfObject*> apKeys;
-  PdfRefCountedBuffer buffer;
-  apKeys = GetFieldRefreshKeys(&GetField());
-  if (apKeys.find(Name::V) == apKeys.end() &&
-      apKeys.find(Name::DV) == apKeys.end()) {
-    throw std::exception();
-  }
-  if (!apKeys.find(Name::V)->second->GetString().IsValid() ||
-      apKeys.find(Name::V)->second->GetString().GetCharacterLength() <= 0) {
-    throw std::exception();
-  }
-  PdfXObject xObj(apKeys.find(Name::AP)->second->MustGetIndirectKey(Name::N));
-  xObj.GetContentsForAppending()->GetStream()->BeginAppend();
-  PdfOutputDevice device(&buffer);
-  apKeys.find(Name::V)->second->GetString().Write(&device,
-                                                  ePdfWriteMode_Compact);
-  ss << "/Tx " << BEGIN_MARKED_CONTENT_OP << endl;
-  ss << SAVE_OP << endl;
-  ss << BEGIN_TEXT_OP << endl;
-  if (apKeys.find(Name::DA) != apKeys.end()) {
-    ss << apKeys.find(Name::DA)->second->GetString().GetString() << endl;
-    if (!xObj.GetResources()->GetDictionary().HasKey(Name::FONT)) {
-      PdfFont* f = GetDAFont(
-        string_view(apKeys.find(Name::DA)->second->GetString().GetString()));
-      xObj.AddResource(
-        f->GetIdentifier(), f->GetObject()->Reference(), Name::FONT);
-    }
-    if (Self->GetWidgetAnnotation()->GetObject()->GetDictionary().HasKey(
-          Name::DA)) {
-      Self->GetWidgetAnnotation()->GetObject()->GetDictionary().RemoveKey(
-        Name::DA);
-    }
-    // Add the DA key from apKeys in case the DA was taken from the form
-    Self->GetWidgetAnnotation()->GetObject()->GetDictionary().AddKey(
-      Name::DA, apKeys.find(Name::DA)->second);
-  }
-  ss << "2.0 2.0 " << TEXT_POS_OP << endl;
-  ss << buffer.GetBuffer() << SHOW_TEXT_OP << endl;
-  ss << END_TEXT_OP << endl;
-  ss << RESTORE_OP << endl;
-  ss << END_MARKED_CONTENT_OP << endl;
 
-  xObj.GetContentsForAppending()->GetStream()->Append(ss.str());
-  xObj.GetContentsForAppending()->GetStream()->EndAppend();
-
-  PdfRect r(0,
-            0,
-            Self->GetWidgetAnnotation()->GetRect().GetWidth(),
-            Self->GetWidgetAnnotation()->GetRect().GetHeight());
-  xObj.GetObject()->GetDictionary().RemoveKey(Name::BBOX);
-  PdfVariant ra;
-  r.ToVariant(ra);
-  xObj.GetObject()->GetDictionary().AddKey(Name::BBOX, ra.GetArray());
 }
 PoDoFo::PdfFont*
 Field::GetDAFont(string_view da)
