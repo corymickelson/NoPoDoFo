@@ -9,12 +9,22 @@ doc.load('/path/to/pdf', e => {
   if(e) {/* handle error */}
 
   // Create an annotation for the SignatureField
-  const rect = new npdf.Rect(0, 0, 10, 10),
+  const rect = new npdf.Rect(400, 685, 50, 20),
       page = doc.getPage(0),
       annot = page.createAnnotation(NPDFAnnotation.Widget, rect)
 
-  // This signature is going to be hidden, for a visible signature add an appearance stream
+  // To create an invisible signature
   annot.flags = NPDFAnnotationFlag.Hidden | NPDFAnnotationFlag.Invisible
+  
+  // To add a signature with an image
+  annot.flags = NPDFAnnotation.Print
+  // Apply image to page
+	const image = new nopodofo.Image(doc, join(__dirname, '../test-documents/signatureImage.jpg'))
+	const painter = new nopodofo.Painter(doc)
+	painter.setPage(page)
+	painter.drawImage(image, rect.left, rect.bottom, {width: rect.width, height: rect.height})
+	painter.finishPage();
+  // end apply image to page
 
   const field = new npdf.SignatureField(annot, doc)
 
