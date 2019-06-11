@@ -10,7 +10,7 @@ existing PDF documents. Features also include encryption, signing, and drawing a
 To get started please read [the book](https://corymickelson.github.io/NoPoDoFo/index), a good place to start is on
 [best practices](https://corymickelson.github.io/NoPoDoFo/documentation/bestpractices.html)
 
-### __Current Version 1.0.0__
+### __Current Version 1.0.1__
 [![NPM](https://nodei.co/npm/nopodofo.png?downloads=true&downloadRank=true)](http://nodei.co/npm/nopodofo)
 
 ## A Brief Introduction
