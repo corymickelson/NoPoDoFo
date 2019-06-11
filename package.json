@@ -40,7 +40,6 @@
     "@types/uuid": "^3.4.3",
     "alsatian": "^2.3.0",
     "benchmark": "^2.1.4",
-    "cmake-js": "^3.7.3",
     "coveralls": "^3.0.1",
     "gitbook-cli": "2.3.2",
     "nyc": "^11.9.0",
@@ -48,6 +47,7 @@
     "uuid": "^3.2.1"
   },
   "dependencies": {
+    "cmake-js": "^3.7.3",
     "node-addon-api": "1.6.3"
   },
   "files": [

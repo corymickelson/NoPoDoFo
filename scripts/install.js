@@ -28,11 +28,12 @@ if(platform() === 'win32') {
         process.exit(1)
     }
 }
-let cmd = `${join(__dirname, '../node_modules/.bin/cmake-js')} clean && ${join(__dirname, '../node_modules/.bin/cmake-js')} build`
+let modulesPath = findModules()
+let cmd = `${join(modulesPath, 'node_modules/.bin/cmake-js')} clean && ${join(modulesPath, 'node_modules/.bin/cmake-js')} build`
 if (process.argv.length >= 3) {
     if (process.argv[2] === '-D') cmd += ' -D'
 }
 
-cmd += ` --CDPROJECT_DIR=${findModules()} -s=c++17`
+cmd += ` --CDPROJECT_DIR=${modulesPath} -s=c++17`
 console.log('CMD: ', cmd)
 run(cmd, {"stdio": "inherit"})
