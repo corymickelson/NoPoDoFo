@@ -1,4 +1,4 @@
-import {TestFixture, AsyncTest, Expect, Timeout, Setup} from 'alsatian';
+import {AsyncTest, Expect, Setup, TestFixture, Timeout} from 'alsatian';
 import {NDocument} from '../../lib/NDocument';
 import {nopodofo} from '../../'
 import {join} from 'path'
@@ -45,16 +45,17 @@ export class Bug89 {
                     global.gc()
                 }
                 const used = process.memoryUsage()
+                const roundAlloc = (x: number) => Math.round(x / 1024 / 1024 * 100) / 100
                 if (i === 0) {
-                    startingResidentSetAllocation = Math.round(used.rss / 1024 / 1024 * 100) / 100
-                    startingExternalAllocation = Math.round(used.external / 1024 / 1024 * 100) / 100
+                    startingResidentSetAllocation = roundAlloc(used.rss)
+                    startingExternalAllocation = roundAlloc(used.external)
                 } else {
-                    if (startingResidentSetAllocation && startingResidentSetAllocation * 1.5 <= Math.round(used.rss / 1024 / 1024 * 100) / 100) {
-                        Expect.fail(`Starting RSS ${startingResidentSetAllocation}, max exceeded: ${Math.round(used.rss / 1024 / 1024 * 100) / 100}`)
+                    if (startingResidentSetAllocation && startingResidentSetAllocation * 1.2 <= roundAlloc(used.rss)) {
+                        Expect.fail(`Starting RSS ${startingResidentSetAllocation}, max exceeded: ${roundAlloc(used.rss)}`)
                     }
                 }
                 for (let key in used) {
-                    console.log(`Memory usage: ${key} ${Math.round((used as any)[key as string] / 1024 / 1024 * 100) / 100} MB`)
+                    console.log(`Memory usage: ${key} ${roundAlloc((used as any)[key as string])} MB`)
                 }
             }
         } catch (e) {

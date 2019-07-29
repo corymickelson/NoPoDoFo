@@ -15,7 +15,6 @@ import Dictionary = nopodofo.Dictionary;
 @TestFixture('Image')
 export class ImageSpec {
     @AsyncTest('SetImageMemDocument')
-    @Timeout(500000)
     public async setImageTestMemDocument() {
         let doc: Base
         await new Promise<Document>(resolve => {
@@ -42,6 +41,34 @@ export class ImageSpec {
         })
     }
 
+    @AsyncTest('SetImageFromBufferMemDocument')
+    @Timeout(50000)
+    public async setImageFromBufferTestMemDocument() {
+        let doc: Base
+        await new Promise<Document>(resolve => {
+            let document = new Document();
+            (document as Document).load(join(__dirname, '../test-documents/test.pdf'), (err, data) => {
+                if (err) Expect.fail(err.message)
+                else {
+                    const painter = new Painter(document)
+                    const imageBuf = readFileSync(join(__dirname, '../test-documents/test.jpg'))
+                    const image = new Image(document, imageBuf)
+                    const page = document.getPage(0)
+                    painter.setPage(page)
+                    painter.drawImage(image, 0, page.height - image.height, {scaleY: 0.5, scaleX: 0.5})
+                    painter.finishPage();
+                    (document as Document).write((err1, data1) => {
+                        if (err1) Expect.fail(err1.message)
+                        else {
+                            this.testDocument(data1)
+                                .then(() => resolve())
+                                .catch(e => Expect.fail(e))
+                        }
+                    })
+                }
+            })
+        })
+    }
     @AsyncTest('SetImageStreamDocument')
     public async setImageTestStreamDocument() {
         const doc = new StreamDocument()

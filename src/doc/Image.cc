@@ -32,7 +32,10 @@ using std::string;
 
 namespace NoPoDoFo {
 
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "OCInconsistentNamingInspection"
 FunctionReference Image::Constructor; // NOLINT
+#pragma clang diagnostic pop
 
 Image::Image(const CallbackInfo& info)
   : ObjectWrap(info)
@@ -59,7 +62,7 @@ Image::Image(const CallbackInfo& info)
   }
   Self = make_unique<PdfImage>(Doc);
   string file;
-  unsigned char* buffer;
+  unsigned char* buffer = nullptr;
   size_t bufLen = 0;
   if (info[1].IsString()) {
     file = info[1].As<String>().Utf8Value();
