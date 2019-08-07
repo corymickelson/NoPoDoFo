@@ -789,6 +789,13 @@ export namespace nopodofo {
         readonly width: number
         readonly height: number
 
+        setICCProfile(input: Buffer, colorComponent: number, alt: NPDFColorSpace): void
+
+        setImageSoftMask(img: Image): void
+
+        setImageChromaKeyMask(r: number, g: number, b: number, threshold: number): void
+
+        setColorSpace(colorSpace: NPDFColorSpace): void
         setInterpolate(v: boolean): void
     }
 

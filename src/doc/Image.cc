@@ -20,6 +20,7 @@
 #include "Image.h"
 #include "../Defines.h"
 #include "../ErrorHandler.h"
+#include "../ValidateArguments.h"
 #include "Document.h"
 #include "StreamDocument.h"
 #include <spdlog/spdlog.h>
@@ -112,7 +113,8 @@ Image::Image(const CallbackInfo& info)
 
 Image::~Image()
 {
-  if(DbgLog != nullptr) DbgLog->debug("Image Cleanup");
+  if (DbgLog != nullptr)
+    DbgLog->debug("Image Cleanup");
   HandleScope scope(Env());
   Doc = nullptr;
 }
@@ -120,14 +122,18 @@ void
 Image::Initialize(Napi::Env& env, Napi::Object& target)
 {
   HandleScope scope(env);
-  Function ctor =
-    DefineClass(env,
-                "Image",
-                {
-                  InstanceAccessor("width", &Image::GetWidth, nullptr),
-                  InstanceAccessor("height", &Image::GetHeight, nullptr),
-                  InstanceMethod("setInterpolate", &Image::SetInterpolate),
-                });
+  Function ctor = DefineClass(
+    env,
+    "Image",
+    {
+      InstanceAccessor("width", &Image::GetWidth, nullptr),
+      InstanceAccessor("height", &Image::GetHeight, nullptr),
+      InstanceMethod("setChromaKeyMark", &Image::SetImageChromaKeyMask),
+      InstanceMethod("setSoftMask", &Image::SetImageSoftMask),
+      InstanceMethod("setColorSpace", &Image::SetImageColorSpace),
+      InstanceMethod("setICCProfile", &Image::SetImageICCProfile),
+      InstanceMethod("setInterpolate", &Image::SetInterpolate),
+    });
   Constructor = Napi::Persistent(ctor);
   Constructor.SuppressDestruct();
 
@@ -150,5 +156,82 @@ void
 Image::SetInterpolate(const CallbackInfo& info)
 {
   Self->SetInterpolate(info[0].As<Boolean>());
+}
+void
+Image::SetImageColorSpace(const Napi::CallbackInfo& info)
+{
+  if (!info[0].IsNumber()) {
+    Error::New(info.Env(), "image color space expects NPDFColorSpace")
+      .ThrowAsJavaScriptException();
+  }
+  auto colorSpace =
+    static_cast<EPdfColorSpace>(info[0].As<Number>().Int64Value());
+  Self->SetImageColorSpace(colorSpace);
+}
+void
+Image::SetImageICCProfile(const Napi::CallbackInfo& info)
+{
+  auto opts =
+    AssertCallbackInfo(info,
+                       { { 0, { option(napi_object) } },
+                         { 1, { option(napi_number) } },
+                         { 2, { tl::nullopt, option(napi_number) } } });
+  auto buf = info[0].As<Buffer<char>>();
+  PdfMemoryInputStream input(buf.Data(), buf.Length());
+  long colorComponent = info[1].As<Number>().Int64Value();
+  EPdfColorSpace alt = ePdfColorSpace_DeviceRGB;
+  if (opts[2] == 1) {
+    alt = static_cast<EPdfColorSpace>(info[2].As<Number>().Int64Value());
+  }
+  Self->SetImageICCProfile(&input, colorComponent, alt);
+}
+void
+Image::SetImageSoftMask(const Napi::CallbackInfo& info)
+{
+  if (info[0].As<Object>().InstanceOf(Image::Constructor.Value())) {
+    auto img = Image::Unwrap(info[0].As<Object>())->GetImage();
+    Self->SetImageSoftmask(&img);
+  } else {
+    Error::New(info.Env(), "soft mask expects an image as the argument value")
+      .ThrowAsJavaScriptException();
+  }
+  Self->SetImageSoftmask(nullptr);
+}
+void
+Image::SetImageChromaKeyMask(const Napi::CallbackInfo& info)
+{
+  if (!info[0].IsObject()) {
+    Error::New(info.Env(),
+               "chroma key mask can only accept an object with keys: "
+               "r,g,b,threshold")
+      .ThrowAsJavaScriptException();
+  }
+  Napi::Object arg = info[0].As<Object>();
+  pdf_int64 r = 0, g = 0, b = 0, threshold = 0;
+  if (arg.Has("r")) {
+    r = arg.Get("r").As<Number>().Int64Value();
+  } else {
+    Error::New(info.Env(), "chroma key mask requires \"r\" property")
+      .ThrowAsJavaScriptException();
+  }
+  if (arg.Has("g")) {
+    g = arg.Get("g").As<Number>().Int64Value();
+  } else {
+    Error::New(info.Env(), "chroma key mask requires \"g\" property")
+      .ThrowAsJavaScriptException();
+  }
+  if (arg.Has("b")) {
+    g = arg.Get("b").As<Number>().Int64Value();
+  } else {
+    Error::New(info.Env(), "chroma key mask requires \"b\" property")
+      .ThrowAsJavaScriptException();
+  }
+  if (arg.Has("threshold")) {
+    g = arg.Get("threshold").As<Number>().Int64Value();
+  } else {
+    Error::New(info.Env(), "chroma key mask requires \"threshold\" property")
+      .ThrowAsJavaScriptException();
+  }
+  Self->SetImageChromaKeyMask(r, g, b, threshold);
 }
 }

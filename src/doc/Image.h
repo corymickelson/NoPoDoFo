@@ -38,6 +38,10 @@ public:
   JsValue GetWidth(const Napi::CallbackInfo&);
   JsValue GetHeight(const Napi::CallbackInfo&);
   void SetInterpolate(const Napi::CallbackInfo&);
+  void SetImageColorSpace(const Napi::CallbackInfo& info);
+  void SetImageICCProfile(const Napi::CallbackInfo& info);
+  void SetImageSoftMask(const Napi::CallbackInfo& info);
+  void SetImageChromaKeyMask(const Napi::CallbackInfo&);
   PoDoFo::PdfImage GetImage() const { return *Self; }
 
 private:

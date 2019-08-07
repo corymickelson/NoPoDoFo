@@ -1,4 +1,4 @@
-import {nopodofo} from "../index"
+import {nopodofo, NPDFColorSpace} from "../index"
 import {NDocument} from "./NDocument";
 
 export class NImage implements nopodofo.Image {
@@ -16,5 +16,19 @@ export class NImage implements nopodofo.Image {
 
     setInterpolate(v: boolean): void {
         return this.self.setInterpolate(v)
+    }
+
+    setColorSpace(colorSpace: NPDFColorSpace): void {
+        this.self.setColorSpace(colorSpace)
+    }
+
+    setICCProfile(input: Buffer, colorComponent: number, alt: NPDFColorSpace): void {
+        this.self.setICCProfile(input, colorComponent, alt)
+    }
+
+    setImageChromaKeyMask(r: number, g: number, b: number, threshold: number): void {
+    }
+
+    setImageSoftMask(img: nopodofo.Image): void {
     }
 }
