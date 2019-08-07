@@ -87,9 +87,22 @@ ex npm run command: `npm run build -- --CDCMAKE_TOOLCHAIN_FILE=C:\LIBS\VCPKG\SCR
 
 ## Mac
 
-PoDoFo v0.9.6 is available in MacPorts or vcpkg.
+PoDoFo v0.9.6 is available in MacPorts or vcpkg or Homebrew.
 
 Building NoPoDoFo
+
+#### Prepare Envrionment
+
+Setup the following environment variables:
+
+- `OPENSSL_ROOT_DIR`
+- `OPENSSL_INCLUDE_DIR`
+- `PODOFO_LIBRARY`
+- `PODOFO_INCLUDE_DIR`
+
+If you are installing Podofo using Homebrew the Podofo directory is included in ```/usr/local/Cellar/podofo/0.9.6``` update the above Environment variables with the same
+
+#### Install NoPoDoFo
 
 - `cd nopodofo`
 - `npm i nopodofo`
