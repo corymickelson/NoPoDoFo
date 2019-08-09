@@ -128,7 +128,7 @@ Image::Initialize(Napi::Env& env, Napi::Object& target)
     {
       InstanceAccessor("width", &Image::GetWidth, nullptr),
       InstanceAccessor("height", &Image::GetHeight, nullptr),
-      InstanceMethod("setChromaKeyMark", &Image::SetImageChromaKeyMask),
+      InstanceMethod("setChromaKeyMask", &Image::SetImageChromaKeyMask),
       InstanceMethod("setSoftMask", &Image::SetImageSoftMask),
       InstanceMethod("setColorSpace", &Image::SetImageColorSpace),
       InstanceMethod("setICCProfile", &Image::SetImageICCProfile),
@@ -200,38 +200,19 @@ Image::SetImageSoftMask(const Napi::CallbackInfo& info)
 void
 Image::SetImageChromaKeyMask(const Napi::CallbackInfo& info)
 {
-  if (!info[0].IsObject()) {
-    Error::New(info.Env(),
-               "chroma key mask can only accept an object with keys: "
-               "r,g,b,threshold")
-      .ThrowAsJavaScriptException();
-  }
-  Napi::Object arg = info[0].As<Object>();
+  AssertCallbackInfo(info,
+                     {
+                       { 0, { option(napi_number) } },
+                       { 1, { option(napi_number) } },
+                       { 2, { option(napi_number) } },
+                       { 3, { option(napi_number) } },
+                     });
+
   pdf_int64 r = 0, g = 0, b = 0, threshold = 0;
-  if (arg.Has("r")) {
-    r = arg.Get("r").As<Number>().Int64Value();
-  } else {
-    Error::New(info.Env(), "chroma key mask requires \"r\" property")
-      .ThrowAsJavaScriptException();
-  }
-  if (arg.Has("g")) {
-    g = arg.Get("g").As<Number>().Int64Value();
-  } else {
-    Error::New(info.Env(), "chroma key mask requires \"g\" property")
-      .ThrowAsJavaScriptException();
-  }
-  if (arg.Has("b")) {
-    g = arg.Get("b").As<Number>().Int64Value();
-  } else {
-    Error::New(info.Env(), "chroma key mask requires \"b\" property")
-      .ThrowAsJavaScriptException();
-  }
-  if (arg.Has("threshold")) {
-    g = arg.Get("threshold").As<Number>().Int64Value();
-  } else {
-    Error::New(info.Env(), "chroma key mask requires \"threshold\" property")
-      .ThrowAsJavaScriptException();
-  }
+  r = info[0].As<Number>().Int64Value();
+  g = info[1].As<Number>().Int64Value();
+  b = info[2].As<Number>().Int64Value();
+  threshold = info[3].As<Number>().Int64Value();
   Self->SetImageChromaKeyMask(r, g, b, threshold);
 }
 }

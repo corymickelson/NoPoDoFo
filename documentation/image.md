@@ -7,6 +7,10 @@
     - [width](#width)
     - [height](#height)
   - [Methods](#methods)
+    - [setICCProfile](#seticcprofile)
+    - [setSoftMask](#setsoftmask)
+    - [setChromaKeyMask](#setchromakeymask)
+    - [setColorSpace](#setcolorspace)
     - [setInterpolate](#setinterpolate)
 
 ## NoPoDoFo Image
@@ -20,7 +24,10 @@ class Image {
   new(doc: Base, source: string | Buffer, format?: NPDFImageFormat): Image
   readonly width: number
   readonly height: number
-
+  setICCProfile(input: Buffer, colorComponent: number, alt: NPDFColorSpace): void
+  setSoftMask(img: Image): void
+  setChromaKeyMask(r: number, g: number, b: number, threshold: number): void
+  setColorSpace(colorSpace: NPDFColorSpace): void
   setInterpolate(v: boolean): void
 }
 ```
@@ -45,6 +52,40 @@ Readonly, get the height of the image
 
 ## Methods
 -----------
+
+### setICCProfile
+
+```typescript
+setICCProfile(input: Buffer, colorComponent: number, alt: NPDFColorSpace): void
+```
+
+Set an ICC profile for this image. The ICC profile data is read in as the [input], the number of color components
+is set by the [colorComponent], and a color space to use in case the ICC profile cannot be used is set by [alt]
+
+### setSoftMask
+
+```typescript
+setSoftMask(img: Image): void
+```
+
+Set a soft mask for this image. The image to be set as the soft mask must be an 8 bit greyscale.
+
+### setColorSpace
+
+```typescript
+setColorSpace(colorSpace: NPDFColorSpace): void
+```
+
+Set the color space of the image, the default is `DeviceRGB`.
+
+### setChromaKeyMask
+
+```typescript
+setChromaKeyMask(r: number, g: number, b: number, threshold: number): void
+```
+
+Set the color chroma key mask on the image.
+The mask color will not be painted, i.e masked as transparent.
 
 ### setInterpolate
 

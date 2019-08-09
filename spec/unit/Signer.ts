@@ -112,7 +112,7 @@ export class SignerSpec {
     @AsyncTest('Signer with image')
     public async signatureWithImageTest() {
         const doc = await this.loadDocument()
-        const rect = new npdf.Rect(400, 685, 50, 20),
+        const rect = new npdf.Rect(360, 685, 50, 20),
             page = doc.getPage(0),
             annot = page.createAnnotation(NPDFAnnotation.Widget, rect)
         annot.flags = NPDFAnnotationFlag.Print
@@ -124,7 +124,8 @@ export class SignerSpec {
         field.setFieldName('signer.sign')
         field.setDate()
 
-        const image = new nopodofo.Image(doc, join(__dirname, '../test-documents/signatureImage.jpg'))
+        const image = new nopodofo.Image(doc, join(__dirname, '../test-documents/signatureImage.png'))
+        image.setChromaKeyMask(255, 255, 255, 100)
         const painter = new nopodofo.Painter(doc)
         painter.setPage(page)
         painter.drawImage(image, rect.left, rect.bottom, {width: rect.width, height: rect.height})
@@ -143,7 +144,7 @@ export class SignerSpec {
                 } else {
                     let signed = new npdf.Document()
                     signed.load(signedPath, (e: Error) => {
-                        if (e instanceof Error) Expect.fail(e.message)
+                        if (e) Expect.fail(e.message)
                         let writtenSignatureField = signed.getPage(0).getFields().filter((i: any) => i instanceof npdf.SignatureField)[0]
                         let docSignatureMode = signed.form.SigFlags
                         Expect(writtenSignatureField).toBeDefined()

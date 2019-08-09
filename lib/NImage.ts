@@ -26,9 +26,9 @@ export class NImage implements nopodofo.Image {
         this.self.setICCProfile(input, colorComponent, alt)
     }
 
-    setImageChromaKeyMask(r: number, g: number, b: number, threshold: number): void {
+    setChromaKeyMask(r: number, g: number, b: number, threshold: number): void {
     }
 
-    setImageSoftMask(img: nopodofo.Image): void {
+    setSoftMask(img: nopodofo.Image): void {
     }
 }
