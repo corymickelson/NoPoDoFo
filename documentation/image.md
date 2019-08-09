@@ -87,6 +87,11 @@ setChromaKeyMask(r: number, g: number, b: number, threshold: number): void
 Set the color chroma key mask on the image.
 The mask color will not be painted, i.e masked as transparent.
 
+- [r] red RGB value that should be masked
+- [g] green RGB value that should be masked
+- [b] blue RGB value that should be masked
+- [threshold] colors are masked that are in the range [(r-threshold, r+threshold),(g-threshold, g+threshold),(b-threshold, b+threshold)]
+
 ### setInterpolate
 
 ```typescript

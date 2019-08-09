@@ -761,10 +761,10 @@
 </ul>
 </li>
 <li><a href="#methods">Methods</a><ul>
-    <li><a href="#seticcprofile">setICCProfile</a></li>
-    <li><a href="#setsoftmask">setSoftMask</a></li>
-    <li><a href="#setchromakeymask">setChromaKeyMask</a></li>
-    <li><a href="#setcolorspace">setColorSpace</a></li>
+<li><a href="#seticcprofile">setICCProfile</a></li>
+<li><a href="#setsoftmask">setSoftMask</a></li>
+<li><a href="#setchromakeymask">setChromaKeyMask</a></li>
+<li><a href="#setcolorspace">setColorSpace</a></li>
 <li><a href="#setinterpolate">setInterpolate</a></li>
 </ul>
 </li>
@@ -779,12 +779,9 @@ for examples.</p>
   <span class="hljs-keyword">new</span>(doc: Base, source: <span class="hljs-built_in">string</span> | Buffer, format?: NPDFImageFormat): Image
   readonly width: <span class="hljs-built_in">number</span>
   readonly height: <span class="hljs-built_in">number</span>
-  setICCProfile(input: Buffer, colorComponent: <span class="hljs-built_in">number</span>, alt: NPDFColorSpace): <span
-            class="hljs-built_in">void</span>
+  setICCProfile(input: Buffer, colorComponent: <span class="hljs-built_in">number</span>, alt: NPDFColorSpace): <span class="hljs-built_in">void</span>
   setSoftMask(img: Image): <span class="hljs-built_in">void</span>
-  setChromaKeyMask(r: <span class="hljs-built_in">number</span>, g: <span class="hljs-built_in">number</span>, b: <span
-            class="hljs-built_in">number</span>, threshold: <span class="hljs-built_in">number</span>): <span
-            class="hljs-built_in">void</span>
+  setChromaKeyMask(r: <span class="hljs-built_in">number</span>, g: <span class="hljs-built_in">number</span>, b: <span class="hljs-built_in">number</span>, threshold: <span class="hljs-built_in">number</span>): <span class="hljs-built_in">void</span>
   setColorSpace(colorSpace: NPDFColorSpace): <span class="hljs-built_in">void</span>
   setInterpolate(v: <span class="hljs-built_in">boolean</span>): <span class="hljs-built_in">void</span>
 }
@@ -802,35 +799,30 @@ for examples.</p>
 <p>Readonly, get the height of the image</p>
 <h2 id="methods">Methods</h2>
 <hr>
-                                    <h3 id="seticcprofile">setICCProfile</h3>
-                                    <pre><code
-                                            class="lang-typescript">setICCProfile(input: Buffer, colorComponent: <span
-                                            class="hljs-built_in">number</span>, alt: NPDFColorSpace): <span
-                                            class="hljs-built_in">void</span>
+<h3 id="seticcprofile">setICCProfile</h3>
+<pre><code class="lang-typescript">setICCProfile(input: Buffer, colorComponent: <span class="hljs-built_in">number</span>, alt: NPDFColorSpace): <span class="hljs-built_in">void</span>
 </code></pre>
-                                    <p>Set an ICC profile for this image. The ICC profile data is read in as the
-                                        [input], the number of color components
-                                        is set by the [colorComponent], and a color space to use in case the ICC profile
-                                        cannot be used is set by [alt]</p>
-                                    <h3 id="setsoftmask">setSoftMask</h3>
-                                    <pre><code class="lang-typescript">setSoftMask(img: Image): <span
-                                            class="hljs-built_in">void</span>
+<p>Set an ICC profile for this image. The ICC profile data is read in as the [input], the number of color components
+is set by the [colorComponent], and a color space to use in case the ICC profile cannot be used is set by [alt]</p>
+<h3 id="setsoftmask">setSoftMask</h3>
+<pre><code class="lang-typescript">setSoftMask(img: Image): <span class="hljs-built_in">void</span>
 </code></pre>
-                                    <p>Set a soft mask for this image. The image to be set as the soft mask must be an 8
-                                        bit greyscale.</p>
-                                    <h3 id="setcolorspace">setColorSpace</h3>
-                                    <pre><code class="lang-typescript">setColorSpace(colorSpace: NPDFColorSpace): <span
-                                            class="hljs-built_in">void</span>
+<p>Set a soft mask for this image. The image to be set as the soft mask must be an 8 bit greyscale.</p>
+<h3 id="setcolorspace">setColorSpace</h3>
+<pre><code class="lang-typescript">setColorSpace(colorSpace: NPDFColorSpace): <span class="hljs-built_in">void</span>
 </code></pre>
-                                    <p>Set the color space of the image, the default is <code>DeviceRGB</code>.</p>
-                                    <h3 id="setchromakeymask">setChromaKeyMask</h3>
-                                    <pre><code class="lang-typescript">setChromaKeyMask(r: <span class="hljs-built_in">number</span>, g: <span
-                                            class="hljs-built_in">number</span>, b: <span
-                                            class="hljs-built_in">number</span>, threshold: <span class="hljs-built_in">number</span>): <span
-                                            class="hljs-built_in">void</span>
+<p>Set the color space of the image, the default is <code>DeviceRGB</code>.</p>
+<h3 id="setchromakeymask">setChromaKeyMask</h3>
+<pre><code class="lang-typescript">setChromaKeyMask(r: <span class="hljs-built_in">number</span>, g: <span class="hljs-built_in">number</span>, b: <span class="hljs-built_in">number</span>, threshold: <span class="hljs-built_in">number</span>): <span class="hljs-built_in">void</span>
 </code></pre>
-                                    <p>Set the color chroma key mask on the image.
-                                        The mask color will not be painted, i.e masked as transparent.</p>
+<p>Set the color chroma key mask on the image.
+The mask color will not be painted, i.e masked as transparent.</p>
+<ul>
+<li>[r] red RGB value that should be masked</li>
+<li>[g] green RGB value that should be masked</li>
+<li>[b] blue RGB value that should be masked</li>
+<li>[threshold] colors are masked that are in the range [(r-threshold, r+threshold),(g-threshold, g+threshold),(b-threshold, b+threshold)]</li>
+</ul>
 <h3 id="setinterpolate">setInterpolate</h3>
 <pre><code class="lang-typescript">setInterpolate(v: <span class="hljs-built_in">boolean</span>): <span class="hljs-built_in">void</span>
 </code></pre>
@@ -878,88 +870,7 @@ for examples.</p>
     <script>
         var gitbook = gitbook || [];
         gitbook.push(function() {
-            gitbook.page.hasChanged({
-                "page": {
-                    "title": "Image",
-                    "level": "1.3.22",
-                    "depth": 2,
-                    "next": {
-                        "title": "ListBox",
-                        "level": "1.3.23",
-                        "depth": 2,
-                        "path": "documentation/listbox.md",
-                        "ref": "documentation/listbox.md",
-                        "articles": []
-                    },
-                    "previous": {
-                        "title": "Form",
-                        "level": "1.3.21",
-                        "depth": 2,
-                        "path": "documentation/form.md",
-                        "ref": "documentation/form.md",
-                        "articles": []
-                    },
-                    "dir": "ltr"
-                },
-                "config": {
-                    "gitbook": "*",
-                    "theme": "default",
-                    "variables": {},
-                    "plugins": [],
-                    "pluginsConfig": {
-                        "highlight": {},
-                        "search": {},
-                        "lunr": {"maxIndexSize": 1000000, "ignoreSpecialCharacters": false},
-                        "sharing": {
-                            "facebook": true,
-                            "twitter": true,
-                            "google": false,
-                            "weibo": false,
-                            "instapaper": false,
-                            "vk": false,
-                            "all": ["facebook", "google", "twitter", "weibo", "instapaper"]
-                        },
-                        "fontsettings": {"theme": "white", "family": "sans", "size": 2},
-                        "theme-default": {
-                            "styles": {
-                                "website": "styles/website.css",
-                                "pdf": "styles/pdf.css",
-                                "epub": "styles/epub.css",
-                                "mobi": "styles/mobi.css",
-                                "ebook": "styles/ebook.css",
-                                "print": "styles/print.css"
-                            }, "showLevel": false
-                        }
-                    },
-                    "structure": {
-                        "langs": "LANGS.md",
-                        "readme": "README.md",
-                        "glossary": "GLOSSARY.md",
-                        "summary": "SUMMARY.md"
-                    },
-                    "pdf": {
-                        "pageNumbers": true,
-                        "fontSize": 12,
-                        "fontFamily": "Arial",
-                        "paperSize": "a4",
-                        "chapterMark": "pagebreak",
-                        "pageBreaksBefore": "/",
-                        "margin": {"right": 62, "left": 62, "top": 56, "bottom": 56}
-                    },
-                    "styles": {
-                        "website": "styles/website.css",
-                        "pdf": "styles/pdf.css",
-                        "epub": "styles/epub.css",
-                        "mobi": "styles/mobi.css",
-                        "ebook": "styles/ebook.css",
-                        "print": "styles/print.css"
-                    }
-                },
-                "file": {"path": "documentation/image.md", "mtime": "2019-08-09T15:33:11.364Z", "type": "markdown"},
-                "gitbook": {"version": "3.2.3", "time": "2019-08-09T15:33:50.611Z"},
-                "basePath": "..",
-                "book": {"language": ""}
-            });
+            gitbook.page.hasChanged({"page":{"title":"Image","level":"1.3.22","depth":2,"next":{"title":"ListBox","level":"1.3.23","depth":2,"path":"documentation/listbox.md","ref":"documentation/listbox.md","articles":[]},"previous":{"title":"Form","level":"1.3.21","depth":2,"path":"documentation/form.md","ref":"documentation/form.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":[],"pluginsConfig":{"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"documentation/image.md","mtime":"2019-08-09T15:57:27.338Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2019-08-09T15:57:42.397Z"},"basePath":"..","book":{"language":""}});
         });
     </script>
 </div>
