@@ -37,19 +37,15 @@ FunctionReference Action::Constructor; // NOLINT
 Action::Action(const Napi::CallbackInfo& info)
   : ObjectWrap(info)
 {
-
-	DbgLog = spdlog::get("DbgLog");
   const auto opts =
     AssertCallbackInfo(info,
                        { { 0, { option(napi_external), option(napi_object) } },
                          { 1, { nullopt, option(napi_number) } } });
   // Create Copy Constructor Action
   if (opts[0] == 0 && info.Length() == 1) {
-    Self =
-      new PdfAction(info[0].As<External<PdfAction>>().Data()->GetObject());
-    if(DbgLog != nullptr) {
-			DbgLog->debug("PdfAction Copied from external object");
-    }
+    Self = new PdfAction(info[0].As<External<PdfAction>>().Data()->GetObject());
+    Logger(
+      "Log", spdlog::level::trace, "PdfAction Copied from external object");
   }
   // Create a new Action
   else if (opts[0] == 1 && opts[1] == 1) {
@@ -66,7 +62,7 @@ Action::Action(const Napi::CallbackInfo& info)
     }
     const auto t = static_cast<EPdfAction>(info[1].As<Number>().Uint32Value());
     Self = new PdfAction(t, doc);
-    if(DbgLog != nullptr) DbgLog->debug("new PdfAction created");
+    Logger("Log", spdlog::level::trace, "new PdfAction created");
   } else {
     TypeError::New(
       info.Env(),
@@ -76,7 +72,7 @@ Action::Action(const Napi::CallbackInfo& info)
 }
 Action::~Action()
 {
-  if(DbgLog != nullptr) DbgLog->debug("Action Cleanup");
+  Logger("Log", spdlog::level::trace, "Action cleanup");
   delete Self;
 }
 void
@@ -137,5 +133,15 @@ Action::AddToDictionary(const Napi::CallbackInfo& info)
 {
   auto dictionary = Dictionary::Unwrap(info[0].As<Object>())->GetDictionary();
   GetAction().AddToDictionary(dictionary);
+  if (spdlog::get("Log") != nullptr &&
+      spdlog::get("Log")->level() <= spdlog::level::debug) {
+    PdfRefCountedBuffer rBuf;
+    PdfOutputDevice device(&rBuf);
+    dictionary.Write(&device, ePdfWriteMode_Clean);
+    Logger("Log",
+           spdlog::level::debug,
+           "Action::AddToDictionary: Dictionary after operation = {}",
+           rBuf.GetBuffer());
+  }
 }
 } // namespace NoPoDoFo

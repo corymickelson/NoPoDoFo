@@ -47,7 +47,7 @@ public:
 private:
   std::unique_ptr<PoDoFo::PdfImage> Self;
   PoDoFo::PdfDocument* Doc;
-  std::shared_ptr<spdlog::logger> DbgLog;
+  std::shared_ptr<spdlog::logger> Log;
 };
 }
 #endif // NPDF_IMAGE_H

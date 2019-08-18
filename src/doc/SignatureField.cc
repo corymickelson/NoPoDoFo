@@ -45,7 +45,7 @@ FunctionReference SignatureField::Constructor; // NOLINT
 SignatureField::SignatureField(const CallbackInfo& info)
   : ObjectWrap<SignatureField>(info)
 {
-  DbgLog = spdlog::get("DbgLog");
+  Log = spdlog::get("Log");
   try {
     // Create a new Signature Field
     if (info.Length() == 2) {
@@ -109,7 +109,7 @@ SignatureField::SignatureField(const CallbackInfo& info)
 
 SignatureField::~SignatureField()
 {
-  if(DbgLog != nullptr) DbgLog->debug("SignatureField Cleanup");
+  if(Log != nullptr) Log->debug("SignatureField Cleanup");
 }
 
 

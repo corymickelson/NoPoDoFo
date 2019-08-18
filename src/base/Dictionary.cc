@@ -56,9 +56,9 @@ Dictionary::Dictionary(const CallbackInfo& info)
                 : *info[0].As<External<PdfDictionary>>().Data())
            : *(Init = new PdfDictionary()))
 {
-  DbgLog = spdlog::get("DbgLog");
+  Log = spdlog::get("Log");
   if(Init != nullptr) {
-    if(DbgLog != nullptr) DbgLog->debug("New Dictionary Created");
+    if(Log != nullptr) Log->debug("New Dictionary Created");
   }
 }
 
@@ -91,7 +91,7 @@ Dictionary::Initialize(Napi::Env& env, Napi::Object& target)
 }
 Dictionary::~Dictionary()
 {
-  if(DbgLog != nullptr) DbgLog->debug("Dictionary Cleanup");
+  if(Log != nullptr) Log->debug("Dictionary Cleanup");
   HandleScope scope(Env());
   for (auto i : Children) {
     delete i;

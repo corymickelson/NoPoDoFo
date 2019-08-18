@@ -39,7 +39,7 @@ FunctionReference ExtGState::Constructor; // NOLINT
 ExtGState::ExtGState(const Napi::CallbackInfo& info)
   : ObjectWrap(info)
 {
-  DbgLog = spdlog::get("DbgLog");
+  Log = spdlog::get("Log");
   auto o = info[0].As<Object>();
   if (o.InstanceOf(Document::Constructor.Value())) {
     auto d = Document::Unwrap(o);
@@ -57,7 +57,7 @@ ExtGState::ExtGState(const Napi::CallbackInfo& info)
 
 ExtGState::~ExtGState()
 {
-  if(DbgLog != nullptr) DbgLog->debug("ExtGState Cleanup");
+  if(Log != nullptr) Log->debug("ExtGState Cleanup");
 }
 
 void

@@ -51,7 +51,7 @@ public:
 
 private:
   PoDoFo::PdfField& Self;
-  std::shared_ptr<spdlog::logger> DbgLog;
+  std::shared_ptr<spdlog::logger> Log;
 };
 }
 #endif

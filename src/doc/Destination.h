@@ -48,7 +48,7 @@ public:
   PoDoFo::PdfDestination& GetDestination() const { return *Self; }
   PoDoFo::PdfDestination* Self;
 private:
-  std::shared_ptr<spdlog::logger> DbgLog;
+  std::shared_ptr<spdlog::logger> Log;
 };
 
 }

@@ -65,7 +65,7 @@ public:
 
 private:
   PoDoFo::PdfOutlineItem& Self; // owned by the document
-  std::shared_ptr<spdlog::logger> DbgLog;
+  std::shared_ptr<spdlog::logger> Log;
 };
 }
 #endif // NPDF_OUTLINE_H

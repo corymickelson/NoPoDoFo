@@ -31,21 +31,21 @@ using std::stringstream;
 
 ErrorHandler::ErrorHandler(PoDoFo::PdfError& err, const CallbackInfo& info)
 {
-  DbgLog = spdlog::get("DbgLog");
+  Log = spdlog::get("Log");
   const auto msg = WriteMsg(err);
   stringstream eMsg;
   eMsg << "PoDoFo error: " << msg << endl;
   err.PrintErrorMsg();
-  if(DbgLog != nullptr) DbgLog->debug(eMsg.str());
+  if(Log != nullptr) Log->debug(eMsg.str());
   Error::New(info.Env(), eMsg.str()).ThrowAsJavaScriptException();
 }
 
 ErrorHandler::ErrorHandler(Error& err, const CallbackInfo& info)
 {
-  DbgLog = spdlog::get("DbgLog");
+  Log = spdlog::get("Log");
   stringstream msg;
   msg << "JS error: " << err.Message() << endl;
-  if(DbgLog != nullptr) DbgLog->debug(msg.str());
+  if(Log != nullptr) Log->debug(msg.str());
   Error::New(info.Env(), msg.str()).ThrowAsJavaScriptException();
 }
 

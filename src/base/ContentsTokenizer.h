@@ -47,7 +47,7 @@ public:
 private:
   std::unique_ptr<PoDoFo::PdfContentsTokenizer> Self;
   Document& Doc;
-  std::shared_ptr<spdlog::logger> DbgLog;
+  std::shared_ptr<spdlog::logger> Log;
 
   int PageIndex;
   void AddText(PoDoFo::PdfFont*, const PoDoFo::PdfString&);

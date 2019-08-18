@@ -49,7 +49,7 @@ public:
 
 private:
   PoDoFo::PdfRect* Self;
-  std::shared_ptr<spdlog::logger> DbgLog;
+  std::shared_ptr<spdlog::logger> Log;
 };
 }
 #endif // NPDF_RECT_H

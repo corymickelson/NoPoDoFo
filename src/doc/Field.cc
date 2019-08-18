@@ -48,7 +48,7 @@ namespace NoPoDoFo {
  */
 Field::Field(EPdfField type, const CallbackInfo& info)
 {
-  DbgLog = spdlog::get("DbgLog");
+  Log = spdlog::get("Log");
   if (info[0].IsExternal()) {
     const auto arg = info[0].As<External<PdfField>>().Data();
     Self = new PdfField(*arg);
@@ -102,7 +102,7 @@ Field::Field(EPdfField type, const CallbackInfo& info)
 
 Field::~Field()
 {
-  if(DbgLog != nullptr) DbgLog->debug("Field Cleanup");
+  if(Log != nullptr) Log->debug("Field Cleanup");
   delete Self;
   for (auto c : Children) {
     delete c;

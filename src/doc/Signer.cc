@@ -55,7 +55,7 @@ Signer::Signer(const Napi::CallbackInfo& info)
   : ObjectWrap(info)
   , Doc(Document::Unwrap(info[0].As<Object>())->GetDocument())
 {
-  DbgLog = spdlog::get("DbgLog");
+  Log = spdlog::get("Log");
   if (info.Length() < 1) {
     Error::New(info.Env(), "Document required to construct Signer")
       .ThrowAsJavaScriptException();
@@ -73,8 +73,8 @@ Signer::Signer(const Napi::CallbackInfo& info)
 
 Signer::~Signer()
 {
-  if(DbgLog != nullptr)
-    DbgLog->debug("Signer Cleanup");
+  if(Log != nullptr)
+    Log->debug("Signer Cleanup");
   HandleScope scope(Env());
   if (Cert != nullptr) {
     X509_free(Cert);
@@ -185,8 +185,8 @@ protected:
         PdfDate now;
         PdfString str;
         now.ToString(str);
-        if (Self.DbgLog) {
-          Self.DbgLog->debug("Signer::SignAsync::Execute SignatureField Date "
+        if (Self.Log) {
+          Self.Log->debug("Signer::SignAsync::Execute SignatureField Date "
                              "Null, setting to now: {}",
                              str.GetStringUtf8());
         }

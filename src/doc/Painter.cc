@@ -46,7 +46,7 @@ FunctionReference Painter::constructor; // NOLINT
 Painter::Painter(const Napi::CallbackInfo& info)
   : ObjectWrap(info)
 {
-  DbgLog = spdlog::get("DbgLog");
+  Log = spdlog::get("Log");
   auto o = info[0].As<Object>();
   if (o.InstanceOf(Document::Constructor.Value())) {
     IsMemDoc = true;
@@ -64,7 +64,7 @@ Painter::Painter(const Napi::CallbackInfo& info)
 
 Painter::~Painter()
 {
-  if(DbgLog != nullptr) DbgLog->debug("Painter Cleanup");
+  if(Log != nullptr) Log->debug("Painter Cleanup");
   HandleScope scope(Env());
   Doc = nullptr;
 }

@@ -50,7 +50,7 @@ FileSpec::Initialize(Napi::Env& env, Napi::Object& target)
 FileSpec::FileSpec(const CallbackInfo& info)
   : ObjectWrap<FileSpec>(info)
 {
-  DbgLog = spdlog::get("DbgLog");
+  Log = spdlog::get("Log");
   if (info.Length() == 1 && info[0].IsObject() &&
       info[0].As<Object>().InstanceOf(Obj::Constructor.Value())) {
     Self =
@@ -87,9 +87,9 @@ FileSpec::FileSpec(const CallbackInfo& info)
 
 FileSpec::~FileSpec()
 {
-  if(DbgLog != nullptr) DbgLog->debug("FileSpec Cleanup");
+  if(Log != nullptr) Log->debug("FileSpec Cleanup");
   if(Self.use_count() == 0) {
-  	if(DbgLog != nullptr) DbgLog->debug("FileSpec resource count: {}", Self.use_count());
+  	if(Log != nullptr) Log->debug("FileSpec resource count: {}", Self.use_count());
   }
 }
 

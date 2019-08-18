@@ -52,12 +52,12 @@ Page::Page(const CallbackInfo& info)
   : ObjectWrap(info)
   , Self(*info[0].As<External<PdfPage>>().Data())
 {
-  DbgLog = spdlog::get("DbgLog");
+  Log = spdlog::get("Log");
 }
 
 Page::~Page()
 {
-  if(DbgLog != nullptr) DbgLog->debug("Page Cleanup");
+  if(Log != nullptr) Log->debug("Page Cleanup");
 }
 
 void

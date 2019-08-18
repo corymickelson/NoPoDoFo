@@ -66,7 +66,7 @@ private:
   std::shared_ptr<PoDoFo::PdfSignatureField> Self;
   std::unique_ptr<PoDoFo::PdfData> SigningContent;
   SignatureInfo Info;
-  std::shared_ptr<spdlog::logger> DbgLog;
+  std::shared_ptr<spdlog::logger> Log;
 };
 }
 #endif

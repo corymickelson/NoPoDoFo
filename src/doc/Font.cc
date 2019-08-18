@@ -40,12 +40,12 @@ Font::Font(const Napi::CallbackInfo& info)
   : ObjectWrap(info)
   , Self(*info[0].As<External<PdfFont>>().Data())
 {
-  DbgLog = spdlog::get("DbgLog");
+  Log = spdlog::get("Log");
 }
 
 Font::~Font()
 {
-  if(DbgLog != nullptr) DbgLog->debug("Font Cleanup");
+  if(Log != nullptr) Log->debug("Font Cleanup");
 }
 
 void

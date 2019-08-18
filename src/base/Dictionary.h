@@ -62,7 +62,7 @@ private:
   PoDoFo::PdfDictionary& Self;
   PoDoFo::PdfDictionary* Init = nullptr;
   PoDoFo::PdfObject* Parent = nullptr;
-  std::shared_ptr<spdlog::logger> DbgLog;
+  std::shared_ptr<spdlog::logger> Log;
 };
 }
 #endif

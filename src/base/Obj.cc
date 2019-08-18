@@ -125,14 +125,14 @@ Obj::Obj(const Napi::CallbackInfo& info)
           ? *info[0].As<External<PdfObject>>().Data()
           : *(Init = InitObject(info)))
 {
-  DbgLog = spdlog::get("DbgLog");
+  Log = spdlog::get("Log");
   if(Init != nullptr) {
-    if(DbgLog != nullptr) DbgLog->debug("New Object Created");
+    if(Log != nullptr) Log->debug("New Object Created");
   }
 }
 Obj::~Obj()
 {
-  if(DbgLog != nullptr) DbgLog->debug("Object Cleanup");
+  if(Log != nullptr) Log->debug("Object Cleanup");
   HandleScope scope(Env());
   delete Init;
 }
@@ -157,7 +157,7 @@ Obj::GetStream(const CallbackInfo& info)
       stringstream msg;
       msg << "This Object does not have a stream associated with it" << endl;
       cout << "Writing Object to: " << outfile << endl;
-      if(DbgLog != nullptr) DbgLog->debug(msg.str());
+      if(Log != nullptr) Log->debug(msg.str());
       PdfOutputDevice outDevice(outfile);
       NObj.WriteObject(&outDevice, ePdfWriteMode_Clean, nullptr);
       return info.Env().Undefined();

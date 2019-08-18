@@ -33,7 +33,7 @@ PushButton::PushButton(const Napi::CallbackInfo& info)
   , Button(Field::GetField())
   , Self(Field::GetField())
 {
-  DbgLog = spdlog::get("DbgLog");
+  Log = spdlog::get("Log");
 }
 
 void

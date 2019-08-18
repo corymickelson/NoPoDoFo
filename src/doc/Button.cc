@@ -32,12 +32,12 @@ namespace NoPoDoFo {
 Button::Button(PdfField& field)
 {
   Btn = new PdfButton(field);
-  DbgLog = spdlog::get("DbgLog");
+  Log = spdlog::get("Log");
 }
 
 Button::~Button()
 {
-  if(DbgLog != nullptr) DbgLog->debug("Button Cleanup");
+  if(Log != nullptr) Log->debug("Button Cleanup");
   delete Btn;
 }
 JsValue

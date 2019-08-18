@@ -36,16 +36,16 @@ Encoding::Encoding(const Napi::CallbackInfo& info)
   : ObjectWrap(info)
   , Self(info[0].As<External<PdfEncoding>>().Data())
 {
-  DbgLog = spdlog::get("DbgLog");
+  Log = spdlog::get("Log");
 }
 Encoding::~Encoding()
 {
-  if(DbgLog != nullptr) DbgLog->debug("Encoding Cleanup");
+  if(Log != nullptr) Log->debug("Encoding Cleanup");
   if (!Self->IsAutoDelete()) {
-    if(DbgLog != nullptr) DbgLog->debug("Encoding is NOT auto deleted, deleting now");
+    if(Log != nullptr) Log->debug("Encoding is NOT auto deleted, deleting now");
     delete Self;
   } else {
-    if(DbgLog != nullptr) DbgLog->debug("Encoding is an auto deleted object, nothing deleted");
+    if(Log != nullptr) Log->debug("Encoding is an auto deleted object, nothing deleted");
   }
 }
 void

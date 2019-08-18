@@ -67,7 +67,7 @@ public:
 
 private:
   PoDoFo::PdfFont& Self; // owned by the document
-  std::shared_ptr<spdlog::logger> DbgLog;
+  std::shared_ptr<spdlog::logger> Log;
 };
 }
 #endif // NPDF_FONT_H

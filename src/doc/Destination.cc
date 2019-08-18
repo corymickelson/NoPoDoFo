@@ -43,7 +43,7 @@ FunctionReference Destination::Constructor; // NOLINT
 Destination::Destination(const CallbackInfo& info)
   : ObjectWrap(info)
 {
-  DbgLog = spdlog::get("DbgLog");
+  Log = spdlog::get("Log");
   auto opts = AssertCallbackInfo(
     info,
     { { 0, { option(napi_external), option(napi_object) } },
@@ -86,7 +86,7 @@ Destination::Destination(const CallbackInfo& info)
 }
 Destination::~Destination()
 {
-  if(DbgLog != nullptr) DbgLog->debug("Destination Cleanup");
+  if(Log != nullptr) Log->debug("Destination Cleanup");
   delete Self;
   Self = nullptr;
 }

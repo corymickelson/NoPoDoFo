@@ -41,7 +41,6 @@
 #include "doc/Form.h"
 #include "doc/Image.h"
 #include "doc/ListBox.h"
-#include "doc/ListField.h"
 #include "doc/Outline.h"
 #include "doc/Page.h"
 #include "doc/Painter.h"
@@ -53,6 +52,7 @@
 #include "doc/StreamDocument.h"
 #include "doc/TextField.h"
 #include <napi.h>
+#include <podofo/podofo.h>
 
 Napi::Object
 INIT(Napi::Env env, Napi::Object exports)
@@ -63,6 +63,7 @@ INIT(Napi::Env env, Napi::Object exports)
   return;
 #endif
 #ifdef NOPODOFO_DEBUG
+  PdfError::EnableDebug(true);
   std::cout << "/******************************************************/"
             << std::endl;
   std::cout << "/***** You are running a Debug build of NoPoDoFo ******/"

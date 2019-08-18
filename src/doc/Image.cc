@@ -41,7 +41,7 @@ FunctionReference Image::Constructor; // NOLINT
 Image::Image(const CallbackInfo& info)
   : ObjectWrap(info)
 {
-  DbgLog = spdlog::get("DbgLog");
+  Log = spdlog::get("Log");
 #if defined(PODOFO_HAVE_JPEG_LIB) && defined(PODOFO_HAVE_PNG_LIB) &&           \
   defined(PODOFO_HAVE_TIFF_LIB)
   if (info.Length() < 2 || !info[0].IsObject() ||
@@ -113,8 +113,8 @@ Image::Image(const CallbackInfo& info)
 
 Image::~Image()
 {
-  if (DbgLog != nullptr)
-    DbgLog->debug("Image Cleanup");
+  if (Log != nullptr)
+    Log->debug("Image Cleanup");
   HandleScope scope(Env());
   Doc = nullptr;
 }

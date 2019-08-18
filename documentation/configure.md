@@ -4,9 +4,10 @@
 	- [NoPoDoFo Configure](#nopodofo-configure)
 	- [Constructors](#constructors)
 	- [Properties](#properties)
-		- [enableDebugLogging](#enabledebuglogging)
+	    - [logLevel](#loglevel)
 	- [Methods](#methods)
 		- [logFile](#logfile)
+		- [logOnInterval](#logoninterval)
 	
 ## NoPoDoFo Configure
 Configure exposes runtime configuration options and loggers.
@@ -15,10 +16,9 @@ Configure exposes runtime configuration options and loggers.
 
 ## Properties
 
-### enableDebugLogging
+### logLevel
 
-Enabling debug logging. Debug logs are written to the root of the module as ```DbgLog.txt```.
-
+Set the log level as one of NPDFLogLevel
 ## Methods
 
 ### logFile
@@ -27,4 +27,12 @@ Enabling debug logging. Debug logs are written to the root of the module as ```D
 logFile(output: string): void
 ```
 
-Set the loggers output location, this must be called prior to [enableDebugLogging](#enabledebuglogging).
+Initializes the logger and sets the logger output location.
+
+### logOnInterval
+
+```typescript
+logOnInterval(n: number): void
+```
+
+Set's the logger to flush every [n] seconds

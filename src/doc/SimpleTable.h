@@ -78,7 +78,7 @@ private:
   PoDoFo::PdfSimpleTableModel* Model = nullptr;
   PoDoFo::PdfTable* Table = nullptr;
   PoDoFo::PdfDocument* Doc = nullptr;
-  std::shared_ptr<spdlog::logger> DbgLog;
+  std::shared_ptr<spdlog::logger> Log;
 };
 }
 #endif // NPDF_SIMPLETABLE_H

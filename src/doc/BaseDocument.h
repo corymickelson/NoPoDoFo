@@ -86,7 +86,7 @@ protected:
   std::string Pwd;
   vector<PoDoFo::PdfObject*> Copies;
 
-	std::shared_ptr<spdlog::logger> DbgLog;
+	std::shared_ptr<spdlog::logger> Log;
 };
 }
 #endif

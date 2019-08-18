@@ -20,10 +20,6 @@
 #ifndef NOPODOFO_DEFINES_H
 #define NOPODOFO_DEFINES_H
 
-#define CONCAT_(a, b) a##b
-#define CONCAT(a, b) CONCAT_(a, b)
-#define DEFER(fn) ScopeGuard CONCAT(__defer__, __LINE__) = [&]() { fn; }
-
 #include "base/Color.h"
 #include <podofo/podofo.h>
 
@@ -53,13 +49,14 @@
 #include <unistd.h>
 #define string_view std::string
 #elif defined(__linux__)
-#include <unistd.h>
 #include <experimental/string_view>
+#include <unistd.h>
 using std::experimental::string_view;
 #endif
 
 #if defined(_WIN32) || defined(_WIN64) || defined(__linux__)
 #include <experimental/filesystem>
+#include <spdlog/spdlog.h>
 namespace fs = std::experimental::filesystem;
 #endif
 
@@ -77,7 +74,7 @@ enum DocumentInputDevice
 int
 FileAccess(std::string& file);
 
-#define TRY_LOAD(doc, file, buffer, pwd, forUpdate, typeE)                      \
+#define TRY_LOAD(doc, file, buffer, pwd, forUpdate, typeE)                     \
   {                                                                            \
     try {                                                                      \
       switch (typeE) {                                                         \
@@ -112,7 +109,7 @@ enum NPDFColorFormat
   CMYK
 };
 
-#define NPDF_COLOR_ACCESSOR(color, types, cb)                                    \
+#define NPDF_COLOR_ACCESSOR(color, types, cb)                                  \
   /* Color is the PdfColor object, types an array of NPDFColorFormat's in*/    \
   /* order of precedence, and the function to call as the cb*/                 \
   {                                                                            \
@@ -159,6 +156,52 @@ enum NPDFColorFormat
       }                                                                        \
     }                                                                          \
   }
+
+template<typename T>
+inline double
+msgArg(T t);
+template<typename T>
+inline float
+msgArg(T t);
+template<typename T>
+inline int
+msgArg(T t);
+template<typename T>
+inline uint
+msgArg(T t);
+template<typename T>
+inline bool
+msgArg(T t);
+template<typename T>
+inline std::string
+msgArg(T t);
+template<typename... Ts>
+inline void
+Logger(std::shared_ptr<spdlog::logger> logger,
+       spdlog::level::level_enum level,
+       const std::string& msg,
+       Ts... ts);
+template<typename... Ts>
+inline void
+Logger(const std::string& logger,
+       spdlog::level::level_enum level,
+       const std::string& msg,
+       Ts... ts);
+template<typename... Ts>
+inline void
+Logger(std::shared_ptr<spdlog::logger> logger,
+       spdlog::level::level_enum level,
+       Napi::Env env,
+       const std::string& msg,
+       Ts... ts);
+template<typename... Ts>
+inline void
+Logger(const std::string& logger,
+       spdlog::level::level_enum level,
+       Napi::Env env,
+       const std::string& msg,
+       Ts... ts);
+
 }
 
 const char RECT_OP[] = "re";

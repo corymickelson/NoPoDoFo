@@ -39,7 +39,7 @@ TextField::TextField(const CallbackInfo& info)
   , Field(ePdfField_TextField, info)
   , Self(GetField())
 {
-  DbgLog = spdlog::get("DbgLog");
+  Log = spdlog::get("Log");
   if (info[info.Length() - 1].IsObject() &&
       !info[info.Length() - 1].As<Object>().InstanceOf(
         Document::Constructor.Value()) &&
@@ -82,7 +82,7 @@ TextField::TextField(const CallbackInfo& info)
 }
 TextField::~TextField()
 {
- if(DbgLog != nullptr) DbgLog->debug("TextField Cleanup");
+ if(Log != nullptr) Log->debug("TextField Cleanup");
 }
 void
 TextField::Initialize(Napi::Env& env, Napi::Object& target)

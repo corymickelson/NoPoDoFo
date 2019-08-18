@@ -54,17 +54,17 @@ Array::Array(const CallbackInfo& info)
              : *info[0].As<External<PdfArray>>().Data())
         : *(Init = new PdfArray()))
 {
-  DbgLog = spdlog::get("DbgLog");
+  Log = spdlog::get("Log");
   if (Init != nullptr) {
-    if (DbgLog != nullptr)
-      DbgLog->debug("Initialized New Array");
+    if (Log != nullptr)
+      Log->debug("Initialized New Array");
   }
 }
 
 Array::~Array()
 {
-  if (DbgLog != nullptr)
-    DbgLog->debug("Array cleanup");
+  if (Log != nullptr)
+    Log->debug("Array cleanup");
   HandleScope scope(Env());
   for (auto child : Children) {
     delete child;
@@ -230,8 +230,8 @@ Array::GetObjAtIndex(Napi::Env env, size_t index)
   }
   // Create copy for shift and pop operations
   const auto child = new PdfObject(*item);
-  if (DbgLog != nullptr)
-    DbgLog->debug("Array[{}] = {}", index, child->GetDataTypeString());
+  if (Log != nullptr)
+    Log->debug("Array[{}] = {}", index, child->GetDataTypeString());
   Children.push_back(child);
   const auto initPtr = Napi::External<PdfObject>::New(env, child);
   const auto instance = Obj::Constructor.New({ initPtr });

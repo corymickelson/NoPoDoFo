@@ -43,7 +43,7 @@ Data::Data(const Napi::CallbackInfo& info)
       .ThrowAsJavaScriptException();
     return;
   }
-  DbgLog = spdlog::get("DbgLog");
+  Log = spdlog::get("Log");
   if (info[0].IsString()) {
     const auto strData = info[0].As<String>().Utf8Value();
     Self = make_unique<PdfData>(strData.c_str());
@@ -59,7 +59,7 @@ Data::Data(const Napi::CallbackInfo& info)
 
 Data::~Data()
 {
-  if(DbgLog != nullptr) DbgLog->debug("Data Cleanup");
+  if(Log != nullptr) Log->debug("Data Cleanup");
 }
 
 void

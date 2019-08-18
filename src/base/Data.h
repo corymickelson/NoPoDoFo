@@ -41,7 +41,7 @@ public:
 
 private:
   std::unique_ptr<PoDoFo::PdfData> Self;
-  std::shared_ptr<spdlog::logger> DbgLog;
+  std::shared_ptr<spdlog::logger> Log;
 };
 }
 #endif

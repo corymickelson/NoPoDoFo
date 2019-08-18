@@ -33,13 +33,13 @@ FunctionReference Ref::Constructor; // NOLINT
 Ref::Ref(const CallbackInfo& info)
   : ObjectWrap(info)
 {
-  DbgLog = spdlog::get("DbgLog");
+  Log = spdlog::get("Log");
   if (info.Length() == 2 && info[0].IsNumber() && info[1].IsNumber()) {
     Self = new PdfReference(info[0].As<Number>(),
                             static_cast<const PoDoFo::pdf_gennum>(
                               info[1].As<Number>().Uint32Value()));
   } else if (info.Length() == 1 && info[0].IsExternal()) {
-    if(DbgLog != nullptr) DbgLog->debug("Creating a new PdfReference Copy");
+    if(Log != nullptr) Log->debug("Creating a new PdfReference Copy");
     Self = new PdfReference(*info[0].As<External<PdfReference>>().Data());
   } else {
     Error::New(info.Env(),
@@ -52,7 +52,7 @@ Ref::~Ref()
   std::stringstream dbgMsg;
   dbgMsg << "Cleaning up Ref " << Self->ObjectNumber() << " : "
        << Self->GenerationNumber() << endl;
-  if(DbgLog != nullptr) DbgLog->debug(dbgMsg.str());
+  if(Log != nullptr) Log->debug(dbgMsg.str());
   delete Self;
 }
 void

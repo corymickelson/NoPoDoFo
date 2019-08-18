@@ -56,11 +56,11 @@ namespace NoPoDoFo {
  */
 BaseDocument::BaseDocument(const Napi::CallbackInfo& info, const bool inMem)
 {
-  DbgLog = spdlog::get("DbgLog");
+  Log = spdlog::get("Log");
   if (inMem) {
     Base = new PdfMemDocument();
-    if (DbgLog != nullptr)
-      DbgLog->debug("New PdfMemDocument");
+    if (Log != nullptr)
+      Log->debug("New PdfMemDocument");
   } else {
     auto version = ePdfVersion_1_7;
     auto writeMode = ePdfWriteMode_Default;
@@ -87,23 +87,23 @@ BaseDocument::BaseDocument(const Napi::CallbackInfo& info, const bool inMem)
         new PdfStreamedDocument(Output.c_str(), version, encrypt, writeMode);
       std::stringstream dbgMsg;
       dbgMsg << "New PdfStreamedDocument to " << Output.c_str() << endl;
-      if (DbgLog != nullptr)
-        DbgLog->debug(dbgMsg.str());
+      if (Log != nullptr)
+        Log->debug(dbgMsg.str());
     } else {
       StreamDocRefCountedBuffer = new PdfRefCountedBuffer(2048);
       StreamDocOutputDevice = new PdfOutputDevice(StreamDocRefCountedBuffer);
       Base = new PdfStreamedDocument(
         StreamDocOutputDevice, version, encrypt, writeMode);
-      if (DbgLog != nullptr)
-        DbgLog->debug("New PdfStreamedDocument to Buffer");
+      if (Log != nullptr)
+        Log->debug("New PdfStreamedDocument to Buffer");
     }
   }
 }
 
 BaseDocument::~BaseDocument()
 {
-  if (DbgLog != nullptr)
-    DbgLog->debug("BaseDocument Cleanup");
+  if (Log != nullptr)
+    Log->debug("BaseDocument Cleanup");
   for (auto c : Copies) {
     delete c;
   }
@@ -338,8 +338,8 @@ BaseDocument::GetObject(const CallbackInfo& info)
     stringstream oss;
     oss << "NoPoDoFo is unable to resolve reference " << ref->ObjectNumber()
         << " : " << ref->GenerationNumber();
-    if (DbgLog != nullptr)
-      DbgLog->debug(oss.str());
+    if (Log != nullptr)
+      Log->debug(oss.str());
     Error::New(info.Env(), oss.str()).ThrowAsJavaScriptException();
     return {};
   }
@@ -546,8 +546,8 @@ BaseDocument::GetAttachment(const CallbackInfo& info)
       !Base->GetNamesTree(false)->GetObject()->IsDictionary() ||
       !Base->GetNamesTree(false)->GetObject()->GetDictionary().HasKey(
         Name::EMBEDDED_FILES)) {
-    if (DbgLog != nullptr)
-      DbgLog->debug("GetAttachment: PDF does not have any attachments\n");
+    if (Log != nullptr)
+      Log->debug("GetAttachment: PDF does not have any attachments\n");
     return info.Env().Null();
   }
   auto findAttachment = [&](PdfArray& arr) -> PdfObject* {
@@ -564,8 +564,8 @@ BaseDocument::GetAttachment(const CallbackInfo& info)
 
         if (fileSpec->GetDictionary().HasKey(Name::UF)) {
           PdfObject* uf = fileSpec->MustGetIndirectKey(Name::UF);
-          if (DbgLog != nullptr)
-            DbgLog->debug("GetAttachment: PDF Attachment name:%s\n",
+          if (Log != nullptr)
+            Log->debug("GetAttachment: PDF Attachment name:%s\n",
                           uf->GetString().GetStringUtf8().c_str());
           if (uf->IsString() && uf->GetString().GetStringUtf8() == name) {
             fileSpec->GetDictionary().RemoveKey(PdfName(Name::TYPE));

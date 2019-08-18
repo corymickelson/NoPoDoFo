@@ -42,7 +42,7 @@ public:
 
 private:
   const PoDoFo::PdfEncoding* Self;
-  std::shared_ptr<spdlog::logger> DbgLog;
+  std::shared_ptr<spdlog::logger> Log;
 };
 }
 #endif // NPDF_ENCODING_H

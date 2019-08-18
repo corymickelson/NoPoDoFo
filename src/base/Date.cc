@@ -41,7 +41,7 @@ Date::Date(const Napi::CallbackInfo& info)
 {
   auto argIndex = AssertCallbackInfo(
     info, { { 0, { option(napi_string), nullopt, option(napi_external) } } });
-  DbgLog = spdlog::get("DbgLog");
+  Log = spdlog::get("Log");
   if (argIndex[0] == 0) {
     Self = new PdfDate(info[0].As<String>().Utf8Value());
     if (!Self->IsValid()) {
@@ -58,7 +58,7 @@ Date::Date(const Napi::CallbackInfo& info)
 }
 Date::~Date()
 {
-  if(DbgLog != nullptr) DbgLog->debug("Date Cleanup");
+  if(Log != nullptr) Log->debug("Date Cleanup");
   HandleScope scope(Env());
   delete Self;
 }

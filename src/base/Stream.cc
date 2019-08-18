@@ -39,11 +39,11 @@ Stream::Stream(const CallbackInfo& info)
              ? *info[0].As<External<PdfStream>>().Data()
              : *Obj::Unwrap(info[0].As<Object>())->GetObject().GetStream())
 {
-  DbgLog = spdlog::get("DbgLog");
+  Log = spdlog::get("Log");
 }
 Stream::~Stream()
 {
-  if(DbgLog != nullptr) DbgLog->debug("Stream Cleanup");
+  if(Log != nullptr) Log->debug("Stream Cleanup");
 }
 void
 Stream::Initialize(Napi::Env& env, Napi::Object& target)

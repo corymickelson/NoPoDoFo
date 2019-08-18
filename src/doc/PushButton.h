@@ -46,7 +46,7 @@ public:
   PdfPushButton GetPushButton() { return PdfPushButton(Self); }
   PdfField& Self;
 private:
-  std::shared_ptr<spdlog::logger> DbgLog;
+  std::shared_ptr<spdlog::logger> Log;
 };
 }
 #endif // NPDF_PUSHBUTTON_H

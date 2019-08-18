@@ -36,7 +36,7 @@ FunctionReference Rect::constructor; // NOLINT
 Rect::Rect(const CallbackInfo& info)
   : ObjectWrap(info)
 {
-  DbgLog = spdlog::get("DbgLog");
+  Log = spdlog::get("Log");
   vector<int> opts = AssertCallbackInfo(
     info,
     {
@@ -75,7 +75,7 @@ Rect::Rect(const CallbackInfo& info)
 
 Rect::~Rect()
 {
-  if(DbgLog != nullptr) DbgLog->debug("Rect Cleanup");
+  if(Log != nullptr) Log->debug("Rect Cleanup");
   HandleScope scope(Env());
   delete Self;
 }

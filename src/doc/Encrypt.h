@@ -49,7 +49,7 @@ public:
 
   const PoDoFo::PdfEncrypt* Self;
 private:
-  std::shared_ptr<spdlog::logger> DbgLog;
+  std::shared_ptr<spdlog::logger> Log;
 };
 }
 #endif

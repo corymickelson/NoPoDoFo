@@ -45,7 +45,7 @@ public:
 
 private:
   PoDoFo::PdfXObject* Self;
-  std::shared_ptr<spdlog::logger> DbgLog;
+  std::shared_ptr<spdlog::logger> Log;
 };
 }
 #endif // NPDF_XOBJECT_H

@@ -45,12 +45,12 @@ ContentsTokenizer::ContentsTokenizer(const Napi::CallbackInfo& info)
 {
   Self =
     make_unique<PdfContentsTokenizer>(Doc.GetDocument().GetPage(PageIndex));
-  DbgLog = spdlog::get("DbgLog");
+  Log = spdlog::get("Log");
 }
 
 ContentsTokenizer::~ContentsTokenizer()
 {
-  if(DbgLog != nullptr) DbgLog->debug("ContentsTokenizer Cleanup");
+  if(Log != nullptr) Log->debug("ContentsTokenizer Cleanup");
 }
 void
 ContentsTokenizer::Initialize(Napi::Env& env, Napi::Object& target)

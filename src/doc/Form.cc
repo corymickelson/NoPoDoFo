@@ -52,12 +52,12 @@ Form::Form(const Napi::CallbackInfo& info)
                 ? Document::Unwrap(info[0].As<Object>())->Base
                 : StreamDocument::Unwrap(info[0].As<Object>())->Base))
 {
-  DbgLog = spdlog::get("DbgLog");
+  Log = spdlog::get("Log");
 }
 
 Form::~Form()
 {
-  if(DbgLog != nullptr) DbgLog->debug("Form Cleanup");
+  if(Log != nullptr) Log->debug("Form Cleanup");
 }
 
 void

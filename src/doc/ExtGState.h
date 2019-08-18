@@ -50,7 +50,7 @@ public:
 
 private:
   std::unique_ptr<PoDoFo::PdfExtGState> Self;
-  std::shared_ptr<spdlog::logger> DbgLog;
+  std::shared_ptr<spdlog::logger> Log;
 };
 }
 #endif

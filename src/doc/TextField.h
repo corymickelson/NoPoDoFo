@@ -57,7 +57,7 @@ public:
   PoDoFo::PdfTextField GetText() const { return PoDoFo::PdfTextField(Self); }
   PoDoFo::PdfField& Self;
 private:
-  std::shared_ptr<spdlog::logger> DbgLog;
+  std::shared_ptr<spdlog::logger> Log;
 };
 }
 #endif // NPDF_TEXTFIELD_H

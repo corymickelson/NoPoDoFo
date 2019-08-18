@@ -6,10 +6,11 @@ namespace NoPoDoFo {
 int
 FileAccess(std::string& file)
 {
-	auto dbgLog = spdlog::get("DbgLog");
-	std::stringstream msg;
-	msg << "Attempting to access file " << file;
-	if(dbgLog != nullptr) dbgLog->debug(msg.str());
+  auto Log = spdlog::get("Log");
+  std::stringstream msg;
+  msg << "Attempting to access file " << file;
+  if (Log != nullptr)
+    Log->debug(msg.str());
   auto found = 0;
 #ifdef __APPLE__
   if (access(file.c_str(), F_OK) == -1) {
@@ -22,42 +23,102 @@ FileAccess(std::string& file)
     found = 1;
   }
 #endif
-  if(found == 0) {
-  	if(dbgLog != nullptr)dbgLog->debug("file not found");
+  if (found == 0) {
+    if (Log != nullptr)
+      Log->debug("file not found");
   } else {
-  	if(dbgLog != nullptr)dbgLog->debug("file found");
+    if (Log != nullptr)
+      Log->debug("file found");
   }
   return found;
 }
-/**
- * https://oded.blog/2017/10/05/go-defer-in-cpp/
- * Scope Guard, based off of go's defer
- */
-class ScopeGuard
+template<typename... Ts>
+void
+Logger(std::shared_ptr<spdlog::logger> logger,
+       spdlog::level::level_enum level,
+       const std::string& msg,
+       Ts... ts)
 {
-public:
-  template<class Callable>
-  explicit ScopeGuard(Callable&& fn)
-    : fn_(std::forward<Callable>(fn))
-  {}
-
-  ScopeGuard(ScopeGuard&& other) noexcept
-    : fn_(std::move(other.fn_))
-  {
-    other.fn_ = nullptr;
+  if (logger != nullptr) {
+    logger->log(level, msg, msgArg(ts...));
   }
-
-  ~ScopeGuard()
-  {
-    if (fn_)
-      fn_();
+}
+template<typename... Ts>
+void
+Logger(const std::string& logger,
+       spdlog::level::level_enum level,
+       const std::string& msg,
+       Ts... ts)
+{
+  if (spdlog::get(logger) != nullptr) {
+    spdlog::get(logger)->log(level, msg, msgArg(ts...));
   }
+}
+template<typename... Ts>
+void
+Logger(std::shared_ptr<spdlog::logger> logger,
+       spdlog::level::level_enum level,
+       Napi::Env env,
+       const std::string& msg,
+       Ts... ts)
+{
+  if (logger != nullptr) {
+    logger->log(level, msg, msgArg(ts...));
+    if (level == spdlog::level::err) {
+      Error::New(env, msg).ThrowAsJavaScriptException();
+    }
+  }
+}
+template<typename... Ts>
+void
+Logger(const std::string& logger,
+       spdlog::level::level_enum level,
+       Napi::Env env,
+       const std::string& msg,
+       Ts... ts)
+{
+  if (spdlog::get(logger) != nullptr) {
+    spdlog::get(logger)->log(level, msg, msgArg(ts...));
+    if (level == spdlog::level::err) {
+      Error::New(env, msg).ThrowAsJavaScriptException();
+    }
+  }
+}
+template<typename T>
+double
+msgArg(T t)
+{
+  return t;
+}
+template<typename T>
+float
+msgArg(T t)
+{
+  return t;
+}
+template<typename T>
+int
+msgArg(T t)
+{
+  return t;
+}
+template<typename T>
+uint
+msgArg(T t)
+{
+  return t;
+}
+template<typename T>
+bool
+msgArg(T t)
+{
+  return t;
+}
+template<typename T>
+std::string
+msgArg(T t)
+{
+  return t;
+}
 
-  ScopeGuard(const ScopeGuard&) = delete;
-
-  void operator=(const ScopeGuard&) = delete;
-
-private:
-  std::function<void()> fn_;
-};
 }

@@ -18,8 +18,9 @@
  */
 
 #include "ValidateArguments.h"
-#include <sstream>
+#include "Defines.h"
 #include "spdlog/spdlog.h"
+#include <sstream>
 
 using std::endl;
 using std::map;
@@ -33,7 +34,6 @@ AssertCallbackInfo(const Napi::CallbackInfo& info,
                    const std::map<int, std::vector<option>>& vars)
 {
   vector<int> argIndex;
-  auto dbglog = spdlog::get("DbgLog");
   for (auto item : vars) {
     auto valid = false;
     if (static_cast<int>(info.Length()) - 1 < item.first) {
@@ -46,9 +46,9 @@ AssertCallbackInfo(const Napi::CallbackInfo& info,
       }
       if (!valid) {
         stringstream eMsg;
-        eMsg << "Expected " << vars.size()
-             << " parameters but received " << info.Length() << endl;
-        if(dbglog != nullptr) dbglog->debug(eMsg.str());
+        eMsg << "Expected " << vars.size() << " parameters but received "
+             << info.Length() << endl;
+        Logger("Log", spdlog::level::err, eMsg.str());
         Napi::Error::New(info.Env(), eMsg.str()).ThrowAsJavaScriptException();
         return {};
       }
@@ -65,7 +65,7 @@ AssertCallbackInfo(const Napi::CallbackInfo& info,
       if (!valid) {
         stringstream eMsg;
         eMsg << "Invalid function argument at index " << item.first << endl;
-				if(dbglog != nullptr) dbglog->debug(eMsg.str());
+        Logger("Log", spdlog::level::err, eMsg.str());
         Napi::TypeError::New(info.Env(), eMsg.str())
           .ThrowAsJavaScriptException();
         return {};

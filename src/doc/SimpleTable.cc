@@ -40,7 +40,7 @@ FunctionReference SimpleTable::Constructor; // NOLINT
 SimpleTable::SimpleTable(const CallbackInfo& info)
   : ObjectWrap(info)
 {
-  DbgLog = spdlog::get("DbgLog");
+  Log = spdlog::get("Log");
   if (info[0].As<Object>().InstanceOf(Document::Constructor.Value())) {
     Doc = Document::Unwrap(info[0].As<Object>())->Base;
   } else if (info[0].As<Object>().InstanceOf(
@@ -55,7 +55,7 @@ SimpleTable::SimpleTable(const CallbackInfo& info)
 
 SimpleTable::~SimpleTable()
 {
-  if(DbgLog != nullptr) DbgLog->debug("SimpleTable Cleanup");
+  if(Log != nullptr) Log->debug("SimpleTable Cleanup");
   HandleScope scope(Env());
   delete Model;
   delete Table;

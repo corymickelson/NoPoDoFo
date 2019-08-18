@@ -100,7 +100,7 @@ private:
   PoDoFo::PdfDocument* Doc;
   void GetCMYK(JsValue&, float* CMYK);
   void GetRGB(JsValue&, float* rgb);
-  std::shared_ptr<spdlog::logger> DbgLog;
+  std::shared_ptr<spdlog::logger> Log;
 };
 }
 #endif // NPDF_PAINTER_H

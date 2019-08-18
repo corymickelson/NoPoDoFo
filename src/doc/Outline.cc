@@ -41,11 +41,11 @@ Outline::Outline(const CallbackInfo& info)
   : ObjectWrap(info)
   , Self(*info[0].As<External<PdfOutlineItem>>().Data())
 {
-  DbgLog = spdlog::get("DbgLog");
+  Log = spdlog::get("Log");
 }
 Outline::~Outline()
 {
-  if(DbgLog != nullptr) DbgLog->debug("Outline Cleanup");
+  if(Log != nullptr) Log->debug("Outline Cleanup");
 }
 void
 Outline::Initialize(Napi::Env& env, Napi::Object& target)

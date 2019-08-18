@@ -65,12 +65,12 @@ Encrypt::Encrypt(const Napi::CallbackInfo& info)
   Error::New(info.Env(), "This build does not include OpenSSL")
     .ThrowAsJavaScriptException();
 #endif
-  DbgLog = spdlog::get("DbgLog");
+  Log = spdlog::get("Log");
 }
 
 Encrypt::~Encrypt()
 {
-  if(DbgLog != nullptr) DbgLog->debug("Encrypt Cleanup");
+  if(Log != nullptr) Log->debug("Encrypt Cleanup");
 }
 
 void

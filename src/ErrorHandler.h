@@ -38,6 +38,6 @@ public:
 
 private:
   static std::string ParseMsgFromPdfError(PoDoFo::PdfError&);
-  std::shared_ptr<spdlog::logger> DbgLog;
+  std::shared_ptr<spdlog::logger> Log;
 };
 #endif // NPDF_ERRORHANDLER_H

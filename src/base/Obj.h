@@ -70,7 +70,7 @@ public:
 private:
   PoDoFo::PdfObject& NObj;
   PoDoFo::PdfObject* Init = nullptr;
-  std::shared_ptr<spdlog::logger> DbgLog;
+  std::shared_ptr<spdlog::logger> Log;
 };
 }
 #endif

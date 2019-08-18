@@ -30,12 +30,12 @@ namespace NoPoDoFo {
 ListField::ListField(PdfField& field)
   : Self(field)
 {
-  DbgLog = spdlog::get("DbgLog");
+  Log = spdlog::get("Log");
 }
 
 ListField::~ListField()
 {
-  if(DbgLog != nullptr) DbgLog->debug("ListField Cleanup");
+  if(Log != nullptr) Log->debug("ListField Cleanup");
 }
 
 void

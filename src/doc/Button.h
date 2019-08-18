@@ -41,7 +41,7 @@ public:
   PoDoFo::PdfButton* Btn;
 
 protected:
-	std::shared_ptr<spdlog::logger> DbgLog;
+	std::shared_ptr<spdlog::logger> Log;
 };
 }
 #endif // NPDF_BUTTON_H

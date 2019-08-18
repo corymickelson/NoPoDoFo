@@ -73,7 +73,7 @@ Color::Color(const CallbackInfo& info)
                          { 1, { nullopt, option(napi_number) } },
                          { 2, { nullopt, option(napi_number) } },
                          { 3, { nullopt, option(napi_number) } } });
-  DbgLog = spdlog::get("DbgLog");
+  Log = spdlog::get("Log");
   if (opts[0] == 3) {
     const auto cs = info[0].As<String>().Utf8Value().c_str();
     Self = new PdfColor(PdfColor::FromString(cs));
@@ -102,7 +102,7 @@ Color::Color(const CallbackInfo& info)
 
 Color::~Color()
 {
-  if(DbgLog != nullptr) DbgLog->debug("Color Cleanup");
+  if(Log != nullptr) Log->debug("Color Cleanup");
   HandleScope scope(Env());
   delete Self;
 }

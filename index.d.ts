@@ -15,6 +15,16 @@ export enum NPDFOutlineFormat {
     Unknown = 0xFF
 }
 
+export enum NPDFLogLevel {
+    trace,
+    debug,
+    info,
+    warn,
+    err,
+    critical,
+    off,
+}
+
 export interface NPDFFontMetrics {
     lineSpacing: number
     underlineThickness: number
@@ -796,6 +806,7 @@ export namespace nopodofo {
         setChromaKeyMask(r: number, g: number, b: number, threshold: number): void
 
         setColorSpace(colorSpace: NPDFColorSpace): void
+
         setInterpolate(v: boolean): void
     }
 

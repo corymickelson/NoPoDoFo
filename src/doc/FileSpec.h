@@ -44,7 +44,7 @@ public:
   }
 private:
   std::shared_ptr<PoDoFo::PdfFileSpec> Self;
-  std::shared_ptr<spdlog::logger> DbgLog;
+  std::shared_ptr<spdlog::logger> Log;
 };
 }
 #endif // NPDF_FILESPEC_H

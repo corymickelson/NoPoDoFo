@@ -87,7 +87,7 @@ public:
 
 protected:
   string TypeString();
-	std::shared_ptr<spdlog::logger> DbgLog;
+	std::shared_ptr<spdlog::logger> Log;
 private:
   PdfField* Self;
   vector<PdfObject*> Children;

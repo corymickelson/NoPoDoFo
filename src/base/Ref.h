@@ -44,7 +44,7 @@ public:
 
   PdfReference* Self;
 private:
-  std::shared_ptr<spdlog::logger> DbgLog;
+  std::shared_ptr<spdlog::logger> Log;
 };
 
 }

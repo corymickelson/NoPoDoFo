@@ -56,7 +56,7 @@ public:
 
   EVP_PKEY* Pkey = nullptr;
   X509* Cert = nullptr;
-  std::shared_ptr<spdlog::logger> DbgLog;
+  std::shared_ptr<spdlog::logger> Log;
 };
 }
 #endif

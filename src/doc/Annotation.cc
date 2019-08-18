@@ -44,23 +44,22 @@ Annotation::Annotation(const CallbackInfo& info)
   : ObjectWrap(info)
   , Self(*info[0].As<External<PdfAnnotation>>().Data())
 {
-  DbgLog = spdlog::get("DbgLog");
-  if(DbgLog != nullptr)
-    DbgLog->debug("PdfAnnotation from external object");
+  Log = spdlog::get("Log");
+  Logger(Log, spdlog::level::trace, "PdfAnnotation from external object");
 }
 
 Annotation::~Annotation()
 {
-  if(DbgLog != nullptr)
-    DbgLog->debug("Annotation Cleanup");
+  Logger(Log, spdlog::level::trace, "Annotation Cleanup");
 }
 void
 Annotation::Initialize(Napi::Env& env, Napi::Object& target)
 {
   HandleScope scope(env);
+  const auto klass = "Annotation";
   Function ctor = DefineClass(
     env,
-    "Annotation",
+    klass,
     {
       InstanceAccessor("flags", &Annotation::GetFlags, &Annotation::SetFlags),
       InstanceAccessor("rect", &Annotation::GetRect, &Annotation::SetRect),
@@ -86,17 +85,19 @@ Annotation::Initialize(Napi::Env& env, Napi::Object& target)
 
   Constructor = Persistent(ctor);
   Constructor.SuppressDestruct();
-  target.Set("Annotation", ctor);
+  target.Set(klass, ctor);
 }
 void
 Annotation::SetFlags(const CallbackInfo& info, const JsValue& value)
 {
   if (!value.IsNumber()) {
-    throw Napi::TypeError::New(
-      info.Env(), "SetFlag must be an instance of NpdfAnnotationType");
+    Logger(Log,
+           spdlog::level::err,
+           info.Env(),
+           "SetFlag must be an instance of NPDFAnnotationType");
   }
-  int jsValue = info[0].As<Number>();
-  const auto flag = static_cast<PoDoFo::EPdfAnnotationFlags>(jsValue);
+  const auto flag =
+    static_cast<PoDoFo::EPdfAnnotationFlags>(info[0].As<Number>().Int32Value());
   GetAnnotation().SetFlags(flag);
 }
 
@@ -117,12 +118,13 @@ Annotation::SetAppearanceStream(const CallbackInfo& info)
 {
   if (info.Length() != 1 || !info[0].IsObject() ||
       !info[0].As<Object>().InstanceOf(XObject::Constructor.Value())) {
-    TypeError::New(info.Env(),
-                   "Requires an instance of XObject as the first argument")
-      .ThrowAsJavaScriptException();
+    Logger(Log,
+           spdlog::level::err,
+           info.Env(),
+           "Requires an instance of XObject as the first argument");
     return;
   }
-  if (DbgLog != nullptr && DbgLog->level() == spdlog::level::debug) {
+  if (Log != nullptr && Log->level() <= spdlog::level::debug) {
     std::stringbuf out;
     std::ostream stream(&out);
     PdfOutputDevice device(&stream);
@@ -130,7 +132,7 @@ Annotation::SetAppearanceStream(const CallbackInfo& info)
       ->GetXObject()
       .GetObject()
       ->Write(&device, ePdfWriteMode_Clean);
-    DbgLog->debug(out.str());
+    Logger(Log, spdlog::level::debug, out.str());
   }
   GetAnnotation().SetAppearanceStream(
     &(XObject::Unwrap(info[0].As<Object>())->GetXObject()));
@@ -152,14 +154,20 @@ Annotation::SetBorderStyle(const CallbackInfo& info)
   double vertical = info[0].As<Object>().Get("vertical").As<Number>();
   double width = info[0].As<Object>().Get("width").As<Number>();
   GetAnnotation().SetBorderStyle(horizontal, vertical, width);
+  Logger(Log,
+         spdlog::level::trace,
+         "Annotation::SetBorderStyle: horizontal={}, vertical={}, width={}",
+         horizontal,
+         vertical,
+         width);
 }
 
 void
 Annotation::SetTitle(const CallbackInfo& info, const JsValue& value)
 {
   if (!value.IsString()) {
-    throw Napi::TypeError::New(
-      info.Env(), "SetTitle requires a single argument of type string.");
+    const auto msg = "SetTitle requires a single argument of type string.";
+    Logger(Log, spdlog::level::err, info.Env(), msg);
   }
   try {
     string title = info[0].As<String>().Utf8Value();
@@ -167,7 +175,7 @@ Annotation::SetTitle(const CallbackInfo& info, const JsValue& value)
   } catch (PdfError& err) {
     stringstream msg;
     msg << "PoDoFo PdfError: " << err.GetError() << endl;
-    throw Napi::Error::New(info.Env(), msg.str());
+    Logger(Log, spdlog::level::err, info.Env(), msg.str());
   }
 }
 
@@ -182,8 +190,10 @@ void
 Annotation::SetContent(const CallbackInfo& info, const JsValue& value)
 {
   if (value.IsEmpty()) {
-    throw Napi::Error::New(info.Env(),
-                           "SetContent requires string \"value\" argument.");
+    Logger(Log,
+           spdlog::level::err,
+           info.Env(),
+           "SetContent requires string \"value\" argument.");
   }
   string content = value.As<String>().Utf8Value();
   GetAnnotation().SetContents(content);
@@ -203,8 +213,8 @@ Annotation::SetDestination(const CallbackInfo& info, const JsValue& value)
     auto destination = Destination::Unwrap(value.As<Object>());
     GetAnnotation().SetDestination(destination->GetDestination());
   } else {
-    TypeError::New(info.Env(), "Requires instance of Destination")
-      .ThrowAsJavaScriptException();
+    Logger(
+      Log, spdlog::level::err, info.Env(), "Requires instance of Destination");
   }
 }
 
@@ -212,8 +222,8 @@ JsValue
 Annotation::GetDestination(const CallbackInfo& info)
 {
   if (!GetAnnotation().HasDestination()) {
-    if(DbgLog != nullptr)
-      DbgLog->debug("Getting Destination that does not exist");
+    Logger(
+      Log, spdlog::level::debug, "Getting Destination that does not exist");
     return info.Env().Null();
   }
   auto doc = Document::Unwrap(info[0].As<Object>())->Base;
@@ -226,8 +236,7 @@ void
 Annotation::SetAction(const CallbackInfo& info, const JsValue& value)
 {
   if (!value.As<Object>().InstanceOf(Action::Constructor.Value())) {
-    TypeError::New(info.Env(), "Requires instance of Action")
-      .ThrowAsJavaScriptException();
+    Logger(Log, spdlog::level::err, info.Env(), "Requires instance of Action");
     return;
   }
   auto action = Action::Unwrap(value.As<Object>());
@@ -238,8 +247,10 @@ JsValue
 Annotation::GetAction(const CallbackInfo& info)
 {
   if (!GetAnnotation().HasAction()) {
-    if(DbgLog != nullptr)
-      DbgLog->debug("Getting PdfAction that does not exist");
+    Logger(Log,
+           spdlog::level::err,
+           info.Env(),
+           "Getting PdfAction that does not exist");
     return info.Env().Null();
   }
   PdfAction* currentAction = GetAnnotation().GetAction();
@@ -256,9 +267,7 @@ Annotation::GetAction(const CallbackInfo& info)
 void
 Annotation::SetOpen(const CallbackInfo& info, const JsValue& value)
 {
-  if (!value.IsBoolean()) {
-    throw Napi::Error::New(info.Env(), "Requires Boolean type");
-  }
+  AssertCallbackInfo(info, { { 0, { napi_boolean } } });
   GetAnnotation().SetOpen(value.As<Boolean>());
 }
 
@@ -440,7 +449,10 @@ Annotation::SetQuadPoints(const CallbackInfo& info, const JsValue& value)
   for (uint32_t i = 0; i < nArray.Length(); i++) {
     auto item = nArray.Get(i);
     if (!item.IsNumber()) {
-      throw Error::New(info.Env(), "QuadPoints must be integer values");
+      Logger(Log,
+             spdlog::level::err,
+             info.Env(),
+             "QuadPoints must be integer values");
     }
     points.push_back(PdfObject(item.As<Number>().DoubleValue()));
   }
@@ -467,17 +479,20 @@ JsValue
 Annotation::GetAttachment(const CallbackInfo& info)
 {
   if (!GetAnnotation().HasFileAttachement()) {
-    if(DbgLog != nullptr) DbgLog->debug("Getting attachment that does not exist");
+    Logger(Log,
+           spdlog::level::info,
+           info.Env(),
+           "Getting attachment that does not exist");
     return info.Env().Null();
   }
   auto file = GetAnnotation().GetFileAttachement()->GetObject();
 
-  if (DbgLog != nullptr && DbgLog->level() == spdlog::level::debug) {
+  if (Log != nullptr && Log->level() == spdlog::level::debug) {
     std::stringbuf buf;
     std::ostream stream(&buf);
     PdfOutputDevice device(&stream);
     file->Write(&device, ePdfWriteMode_Clean);
-    DbgLog->debug(buf.str());
+    Log->debug(buf.str());
   }
   return FileSpec::Constructor.New({ External<PdfObject>::New(
     info.Env(), new PdfObject(*file), [](Napi::Env env, PdfObject* data) {
@@ -492,8 +507,7 @@ Annotation::SetAttachment(const CallbackInfo& info, const JsValue& value)
     auto spec = FileSpec::Unwrap(value.As<Object>())->GetFileSpec();
     GetAnnotation().SetFileAttachement(*spec.get());
   } else {
-    TypeError::New(info.Env(), "Not an instance of FileSpec")
-      .ThrowAsJavaScriptException();
+    Logger(Log, spdlog::level::err, info.Env(), "Not an instance of FileSpec");
   }
 }
 JsValue
@@ -509,8 +523,7 @@ void
 Annotation::SetRect(const CallbackInfo& info, const JsValue& value)
 {
   if (!value.As<Object>().InstanceOf(Rect::constructor.Value())) {
-    Error::New(info.Env(), "NoPoDoFo Rect required")
-      .ThrowAsJavaScriptException();
+    Logger(Log, spdlog::level::err, info.Env(), "NoPoDoFo Rect required");
     return;
   }
 #ifdef __linux__

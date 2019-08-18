@@ -13,12 +13,14 @@ Configure::Initialize(Napi::Env& env, Napi::Object& target)
 {
   HandleScope scope(env);
   const char* klass = "Configure";
-  auto ctor = DefineClass(env,
-                          klass,
-                          { InstanceAccessor("enableDebugLogging",
-                                             &Configure::GetDebugLogging,
-                                             &Configure::EnableDebugLogging),
-                            InstanceMethod("logFile", &Configure::LogOutput) });
+  auto ctor = DefineClass(
+    env,
+    klass,
+    {
+      InstanceAccessor("logLevel", &Configure::GetLevel, &Configure::SetLevel),
+      InstanceMethod("logFile", &Configure::InitLog),
+      InstanceMethod("logOnInterval", &Configure::IntervalFlush),
+    });
   Constructor = Persistent(ctor);
   Constructor.SuppressDestruct();
   target.Set(klass, ctor);
@@ -26,41 +28,16 @@ Configure::Initialize(Napi::Env& env, Napi::Object& target)
 Configure::Configure(const Napi::CallbackInfo& info)
   : ObjectWrap(info)
 {
-  DbgLog = spdlog::get("DbgLog");
+  Log = spdlog::get("Log");
 }
+
 void
-Configure::EnableDebugLogging(const CallbackInfo& info, const JsValue& value)
-{
-  if (DbgLog == nullptr) {
-    Error::New(info.Env(),
-               "Before debug logging can be enabled the output must be set. "
-               "See Configure::logFile in the docs")
-      .ThrowAsJavaScriptException();
-    return;
-  }
-  if (value.IsBoolean() && value.As<Boolean>() == true) {
-    DbgLog->set_level(spdlog::level::debug);
-    DbgLog->flush_on(spdlog::level::debug);
-  } else {
-    DbgLog->set_level(spdlog::level::off);
-  }
-}
-JsValue
-Configure::GetDebugLogging(const Napi::CallbackInfo& info)
-{
-  bool enabled = false;
-  if (DbgLog->level() == spdlog::level::debug) {
-    enabled = true;
-  }
-  return Boolean::New(info.Env(), enabled);
-}
-void
-Configure::LogOutput(const Napi::CallbackInfo& info)
+Configure::InitLog(const Napi::CallbackInfo& info)
 {
   AssertCallbackInfo(info, { { 0, { option(napi_string) } } });
   const auto output = info[0].As<String>().Utf8Value();
-  if (!DbgLog) {
-    DbgLog = spdlog::basic_logger_mt("DbgLog", output);
+  if (!Log) {
+    Log = spdlog::basic_logger_mt("Log", output);
   } else {
     if (info.Env().Global().Has("console")) {
       info.Env()
@@ -69,10 +46,43 @@ Configure::LogOutput(const Napi::CallbackInfo& info)
         .As<Object>()
         .Get("info")
         .As<Function>()
-        .Call({ String::New(info.Env(),
-                            "DbgLogging has already been configured") });
+        .Call(
+          { String::New(info.Env(), "Logging has already been initialized") });
     }
   }
+}
+
+void
+Configure::SetLevel(const Napi::CallbackInfo& info, const Napi::Value& value)
+{
+  if (!value.IsNumber()) {
+    TypeError::New(info.Env(),
+                   "NoPoDoFo::Configure::SetLevel expected a number")
+      .ThrowAsJavaScriptException();
+  }
+  if (value.As<Number>().Int32Value() > 6 ||
+      value.As<Number>().Int32Value() < 0) {
+    RangeError::New(info.Env(),
+                    "NoPoDoFo::Configure::SetLevel value must be an "
+                    "nopodofo.LogLevel or a number between 0 - 6")
+      .ThrowAsJavaScriptException();
+  }
+  Log->set_level(
+    static_cast<spdlog::level::level_enum>(value.As<Number>().Int32Value()));
+  Log->flush_on(
+    static_cast<spdlog::level::level_enum>(value.As<Number>().Int32Value()));
+}
+
+JsValue
+Configure::GetLevel(const Napi::CallbackInfo& info)
+{
+  return Number::New(info.Env(), Log->level());
+}
+void
+Configure::IntervalFlush(const Napi::CallbackInfo& info)
+{
+  AssertCallbackInfo(info, {{0, {napi_number}}});
+  spdlog::flush_every(std::chrono::seconds(info[0].As<Number>()));
 }
 
 } // namespace NoPoDoFo
