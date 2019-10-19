@@ -13,19 +13,19 @@ using JsValue = Napi::Value;
 
 namespace NoPoDoFo {
 
-class Configure : public Napi::ObjectWrap<Configure>{
+class Log : public Napi::ObjectWrap<Log>{
 public:
 	static Napi::FunctionReference Constructor;
 	static void Initialize(Napi::Env& env, Napi::Object& target);
-	explicit Configure(const Napi::CallbackInfo&);
-	explicit Configure(const NoPoDoFo::Configure &info) = delete;
-	const Configure&operator=(const Configure&) = delete;
+	explicit Log(const Napi::CallbackInfo&);
+	explicit Log(const NoPoDoFo::Log&info) = delete;
+	const Log&operator=(const Log&) = delete;
 	void InitLog(const Napi::CallbackInfo& info);
 	void SetLevel(const Napi::CallbackInfo&, const Napi::Value&);
 	JsValue GetLevel(const Napi::CallbackInfo&);
-	void IntervalFlush(const Napi::CallbackInfo&);
+	static void IntervalFlush(const Napi::CallbackInfo&);
 private:
-	std::shared_ptr<spdlog::logger> Log;
+	std::shared_ptr<spdlog::logger> Instance;
 };
 
 }

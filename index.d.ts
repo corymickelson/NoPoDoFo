@@ -448,7 +448,7 @@ export enum NPDFRenderingIntent {
 
 export namespace nopodofo {
 
-    export class Configure {
+    export class Log {
         enableDebugLogging: boolean
 
         /**

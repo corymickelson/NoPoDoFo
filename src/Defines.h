@@ -156,52 +156,28 @@ enum NPDFColorFormat
       }                                                                        \
     }                                                                          \
   }
-
-template<typename T>
-inline double
-msgArg(T t);
-template<typename T>
-inline float
-msgArg(T t);
-template<typename T>
-inline int
-msgArg(T t);
-template<typename T>
-inline uint
-msgArg(T t);
-template<typename T>
-inline bool
-msgArg(T t);
-template<typename T>
-inline std::string
-msgArg(T t);
-template<typename... Ts>
-inline void
-Logger(std::shared_ptr<spdlog::logger> logger,
-       spdlog::level::level_enum level,
-       const std::string& msg,
-       Ts... ts);
 template<typename... Ts>
 inline void
 Logger(const std::string& logger,
        spdlog::level::level_enum level,
-       const std::string& msg,
-       Ts... ts);
+       const char* format,
+       Ts&&... ts)
+{
+  if (spdlog::get(logger) != nullptr) {
+    spdlog::get(logger)->log(level, format, ts...);
+  }
+}
 template<typename... Ts>
 inline void
 Logger(std::shared_ptr<spdlog::logger> logger,
        spdlog::level::level_enum level,
-       Napi::Env env,
-       const std::string& msg,
-       Ts... ts);
-template<typename... Ts>
-inline void
-Logger(const std::string& logger,
-       spdlog::level::level_enum level,
-       Napi::Env env,
-       const std::string& msg,
-       Ts... ts);
-
+       const char* format,
+       Ts&&... ts)
+{
+  if (logger != nullptr) {
+    logger->log(level, format, ts...);
+  }
+}
 }
 
 const char RECT_OP[] = "re";

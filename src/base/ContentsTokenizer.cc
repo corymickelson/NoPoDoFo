@@ -22,7 +22,6 @@
 
 #include <iostream>
 #include <spdlog/spdlog.h>
-#include <sstream>
 #include <stack>
 
 using namespace Napi;

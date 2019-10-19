@@ -138,10 +138,11 @@ Action::AddToDictionary(const Napi::CallbackInfo& info)
     PdfRefCountedBuffer rBuf;
     PdfOutputDevice device(&rBuf);
     dictionary.Write(&device, ePdfWriteMode_Clean);
+    string msg = rBuf.GetBuffer() == nullptr ? "" : string(rBuf.GetBuffer());
     Logger("Log",
            spdlog::level::debug,
            "Action::AddToDictionary: Dictionary after operation = {}",
-           rBuf.GetBuffer());
+           msg);
   }
 }
 } // namespace NoPoDoFo

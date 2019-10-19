@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Configure.h"
+#include "Log.h"
 #include "base/Array.h"
 #include "base/Color.h"
 #include "base/ContentsTokenizer.h"
@@ -71,7 +71,7 @@ INIT(Napi::Env env, Napi::Object exports)
   std::cout << "/******************************************************/"
             << std::endl;
 #endif
-  NoPoDoFo::Configure::Initialize(env, exports);
+  NoPoDoFo::Log::Initialize(env, exports);
   NoPoDoFo::Action::Initialize(env, exports);
   NoPoDoFo::Date::Initialize(env, exports);
   NoPoDoFo::Annotation::Initialize(env, exports);

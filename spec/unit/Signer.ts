@@ -7,7 +7,7 @@ import {readFileSync} from "fs";
 export class SignerSpec {
     @Setup
     public setup() {
-        const config = new nopodofo.Configure()
+        const config = new nopodofo.Log()
         config.logFile('debug.txt')
         config.enableDebugLogging = true;
     }

@@ -43,6 +43,7 @@ using std::endl;
 using std::string;
 using std::stringstream;
 using tl::nullopt;
+using spdlog::level::level_enum;
 
 namespace NoPoDoFo {
 
@@ -59,8 +60,7 @@ BaseDocument::BaseDocument(const Napi::CallbackInfo& info, const bool inMem)
   Log = spdlog::get("Log");
   if (inMem) {
     Base = new PdfMemDocument();
-    if (Log != nullptr)
-      Log->debug("New PdfMemDocument");
+    Logger(Log, level_enum::trace, "New PdfMemDocument");
   } else {
     auto version = ePdfVersion_1_7;
     auto writeMode = ePdfWriteMode_Default;
@@ -566,7 +566,7 @@ BaseDocument::GetAttachment(const CallbackInfo& info)
           PdfObject* uf = fileSpec->MustGetIndirectKey(Name::UF);
           if (Log != nullptr)
             Log->debug("GetAttachment: PDF Attachment name:%s\n",
-                          uf->GetString().GetStringUtf8().c_str());
+                       uf->GetString().GetStringUtf8().c_str());
           if (uf->IsString() && uf->GetString().GetStringUtf8() == name) {
             fileSpec->GetDictionary().RemoveKey(PdfName(Name::TYPE));
             fileSpec->GetDictionary().AddKey(PdfName(Name::TYPE),
