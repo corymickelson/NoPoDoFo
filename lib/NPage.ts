@@ -64,7 +64,7 @@ export class NPage {
     }
 
     createField(type: NPDFFieldType, annot: NAnnotation, form: nopodofo.Form, opts?: NObject): NField {
-        const field = this.self.createField(type, annot.self, form, opts as any)
+        const field = nopodofo.Page.createField(type, annot.self, form, opts as any)
         switch (type) {
             case NPDFFieldType.PushButton:
                 return new NPushButton(this.parent, field as nopodofo.PushButton)

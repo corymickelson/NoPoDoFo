@@ -18,6 +18,7 @@
  */
 
 #include "Array.h"
+#include "../Defines.h"
 #include "../ErrorHandler.h"
 #include "../ValidateArguments.h"
 #include "Data.h"
@@ -56,15 +57,13 @@ Array::Array(const CallbackInfo& info)
 {
   Log = spdlog::get("Log");
   if (Init != nullptr) {
-    if (Log != nullptr)
-      Log->debug("Initialized New Array");
+    Logger(Log, spdlog::level::trace, "Initialized New Array");
   }
 }
 
 Array::~Array()
 {
-  if (Log != nullptr)
-    Log->debug("Array cleanup");
+  Logger(Log, spdlog::level::trace, "Array Cleanup");
   HandleScope scope(Env());
   for (auto child : Children) {
     delete child;
@@ -230,8 +229,11 @@ Array::GetObjAtIndex(Napi::Env env, size_t index)
   }
   // Create copy for shift and pop operations
   const auto child = new PdfObject(*item);
-  if (Log != nullptr)
-    Log->debug("Array[{}] = {}", index, child->GetDataTypeString());
+  Logger(Log,
+         spdlog::level::trace,
+         "Array[{}] = {}",
+         index,
+         child->GetDataTypeString());
   Children.push_back(child);
   const auto initPtr = Napi::External<PdfObject>::New(env, child);
   const auto instance = Obj::Constructor.New({ initPtr });

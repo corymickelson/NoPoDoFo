@@ -20,6 +20,7 @@
 #include "Destination.h"
 #include "../base/Dictionary.h"
 
+#include "../Defines.h"
 #include "../ValidateArguments.h"
 #include "../base/Obj.h"
 #include "./Page.h"
@@ -86,7 +87,7 @@ Destination::Destination(const CallbackInfo& info)
 }
 Destination::~Destination()
 {
-  if(Log != nullptr) Log->debug("Destination Cleanup");
+  Logger(Log, spdlog::level::trace, "Destination Cleanup");
   delete Self;
   Self = nullptr;
 }
@@ -94,9 +95,10 @@ void
 Destination::Initialize(Napi::Env& env, Napi::Object& target)
 {
   HandleScope scope(env);
+  const char* name = "Destination";
   Function ctor = DefineClass(
     env,
-    "Destination",
+    name,
     { InstanceMethod("type", &Destination::GetType),
       InstanceMethod("zoom", &Destination::GetZoom),
       InstanceMethod("rect", &Destination::GetRect),
@@ -107,7 +109,7 @@ Destination::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceMethod("addToDictionary", &Destination::AddToDictionary) });
   Constructor = Napi::Persistent(ctor);
   Constructor.SuppressDestruct();
-  target.Set("Destination", ctor);
+  target.Set(name, ctor);
 }
 JsValue
 Destination::GetType(const Napi::CallbackInfo& info)

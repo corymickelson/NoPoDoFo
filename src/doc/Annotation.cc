@@ -45,21 +45,21 @@ Annotation::Annotation(const CallbackInfo& info)
   , Self(*info[0].As<External<PdfAnnotation>>().Data())
 {
   Log = spdlog::get("Log");
-  Logger("Log", spdlog::level::trace, "PdfAnnotation from external object");
+  Logger(Log, spdlog::level::trace, "PdfAnnotation from external object");
 }
 
 Annotation::~Annotation()
 {
-  Logger("Log", spdlog::level::trace, "Annotation Cleanup");
+  Logger(Log, spdlog::level::trace, "Annotation Cleanup");
 }
 void
 Annotation::Initialize(Napi::Env& env, Napi::Object& target)
 {
   HandleScope scope(env);
-  const auto klass = "Annotation";
+  const char* name = "Annotation";
   Function ctor = DefineClass(
     env,
-    klass,
+    name,
     {
       InstanceAccessor("flags", &Annotation::GetFlags, &Annotation::SetFlags),
       InstanceAccessor("rect", &Annotation::GetRect, &Annotation::SetRect),
@@ -85,13 +85,13 @@ Annotation::Initialize(Napi::Env& env, Napi::Object& target)
 
   Constructor = Persistent(ctor);
   Constructor.SuppressDestruct();
-  target.Set(klass, ctor);
+  target.Set(name, ctor);
 }
 void
 Annotation::SetFlags(const CallbackInfo& info, const JsValue& value)
 {
   if (!value.IsNumber()) {
-    Logger("Log",
+    Logger(Log,
            spdlog::level::err,
            "SetFlag must be an instance of NPDFAnnotationType");
   }
@@ -117,7 +117,7 @@ Annotation::SetAppearanceStream(const CallbackInfo& info)
 {
   if (info.Length() != 1 || !info[0].IsObject() ||
       !info[0].As<Object>().InstanceOf(XObject::Constructor.Value())) {
-    Logger("Log",
+    Logger(Log,
            spdlog::level::err,
            "Requires an instance of XObject as the first argument");
     return;
@@ -130,7 +130,7 @@ Annotation::SetAppearanceStream(const CallbackInfo& info)
       ->GetXObject()
       .GetObject()
       ->Write(&device, ePdfWriteMode_Clean);
-    Logger("Log", spdlog::level::debug, out.str().c_str());
+    Logger(Log, spdlog::level::debug, out.str().c_str());
   }
   GetAnnotation().SetAppearanceStream(
     &(XObject::Unwrap(info[0].As<Object>())->GetXObject()));
@@ -152,12 +152,12 @@ Annotation::SetBorderStyle(const CallbackInfo& info)
   double vertical = info[0].As<Object>().Get("vertical").As<Number>();
   double width = info[0].As<Object>().Get("width").As<Number>();
   GetAnnotation().SetBorderStyle(horizontal, vertical, width);
-  Logger("Log",
+  Logger(Log,
          spdlog::level::trace,
          "Annotation::SetBorderStyle: horizontal={}, vertical={}, width={}",
-         std::to_string(horizontal),
-         std::to_string(vertical),
-         std::to_string(width));
+         horizontal,
+         vertical,
+         width);
 }
 
 void
@@ -165,7 +165,7 @@ Annotation::SetTitle(const CallbackInfo& info, const JsValue& value)
 {
   if (!value.IsString()) {
     const auto msg = "SetTitle requires a single argument of type string.";
-    Logger("Log", spdlog::level::err, msg);
+    Logger(Log, spdlog::level::err, msg);
   }
   try {
     string title = info[0].As<String>().Utf8Value();
@@ -173,7 +173,7 @@ Annotation::SetTitle(const CallbackInfo& info, const JsValue& value)
   } catch (PdfError& err) {
     stringstream msg;
     msg << "PoDoFo PdfError: " << err.GetError() << endl;
-    Logger("Log", spdlog::level::err, msg.str().c_str());
+    Logger(Log, spdlog::level::err, msg.str().c_str());
   }
 }
 
@@ -188,7 +188,7 @@ void
 Annotation::SetContent(const CallbackInfo& info, const JsValue& value)
 {
   if (value.IsEmpty()) {
-    Logger("Log",
+    Logger(Log,
            spdlog::level::err,
            "SetContent requires string \"value\" argument.");
   }
@@ -210,8 +210,7 @@ Annotation::SetDestination(const CallbackInfo& info, const JsValue& value)
     auto destination = Destination::Unwrap(value.As<Object>());
     GetAnnotation().SetDestination(destination->GetDestination());
   } else {
-    Logger(
-      "Log", spdlog::level::err, "Requires instance of Destination");
+    Logger(Log, spdlog::level::err, "Requires instance of Destination");
   }
 }
 
@@ -220,7 +219,7 @@ Annotation::GetDestination(const CallbackInfo& info)
 {
   if (!GetAnnotation().HasDestination()) {
     Logger(
-      "Log", spdlog::level::debug, "Getting Destination that does not exist");
+      Log, spdlog::level::debug, "Getting Destination that does not exist");
     return info.Env().Null();
   }
   auto doc = Document::Unwrap(info[0].As<Object>())->Base;
@@ -233,7 +232,7 @@ void
 Annotation::SetAction(const CallbackInfo& info, const JsValue& value)
 {
   if (!value.As<Object>().InstanceOf(Action::Constructor.Value())) {
-    Logger("Log", spdlog::level::err, "Requires instance of Action");
+    Logger(Log, spdlog::level::err, "Requires instance of Action");
     return;
   }
   auto action = Action::Unwrap(value.As<Object>());
@@ -244,9 +243,7 @@ JsValue
 Annotation::GetAction(const CallbackInfo& info)
 {
   if (!GetAnnotation().HasAction()) {
-    Logger("Log",
-           spdlog::level::err,
-           "Getting PdfAction that does not exist");
+    Logger(Log, spdlog::level::err, "Getting PdfAction that does not exist");
     return info.Env().Null();
   }
   PdfAction* currentAction = GetAnnotation().GetAction();
@@ -445,9 +442,7 @@ Annotation::SetQuadPoints(const CallbackInfo& info, const JsValue& value)
   for (uint32_t i = 0; i < nArray.Length(); i++) {
     auto item = nArray.Get(i);
     if (!item.IsNumber()) {
-      Logger("Log",
-             spdlog::level::err,
-             "QuadPoints must be integer values");
+      Logger(Log, spdlog::level::err, "QuadPoints must be integer values");
     }
     points.push_back(PdfObject(item.As<Number>().DoubleValue()));
   }
@@ -474,9 +469,7 @@ JsValue
 Annotation::GetAttachment(const CallbackInfo& info)
 {
   if (!GetAnnotation().HasFileAttachement()) {
-    Logger("Log",
-           spdlog::level::info,
-           "Getting attachment that does not exist");
+    Logger(Log, spdlog::level::info, "Getting attachment that does not exist");
     return info.Env().Null();
   }
   auto file = GetAnnotation().GetFileAttachement()->GetObject();
@@ -501,7 +494,7 @@ Annotation::SetAttachment(const CallbackInfo& info, const JsValue& value)
     auto spec = FileSpec::Unwrap(value.As<Object>())->GetFileSpec();
     GetAnnotation().SetFileAttachement(*spec.get());
   } else {
-    Logger("Log", spdlog::level::err, "Not an instance of FileSpec");
+    Logger(Log, spdlog::level::err, "Not an instance of FileSpec");
   }
 }
 JsValue
@@ -517,7 +510,7 @@ void
 Annotation::SetRect(const CallbackInfo& info, const JsValue& value)
 {
   if (!value.As<Object>().InstanceOf(Rect::constructor.Value())) {
-    Logger("Log", spdlog::level::err, "NoPoDoFo Rect required");
+    Logger(Log, spdlog::level::err, "NoPoDoFo Rect required");
     return;
   }
 #ifdef __linux__

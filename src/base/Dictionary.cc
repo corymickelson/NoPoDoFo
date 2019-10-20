@@ -18,6 +18,7 @@
  */
 
 #include "Dictionary.h"
+#include "../Defines.h"
 #include "../ErrorHandler.h"
 #include "Array.h"
 #include "Obj.h"
@@ -57,8 +58,8 @@ Dictionary::Dictionary(const CallbackInfo& info)
            : *(Init = new PdfDictionary()))
 {
   Log = spdlog::get("Log");
-  if(Init != nullptr) {
-    if(Log != nullptr) Log->debug("New Dictionary Created");
+  if (Init != nullptr) {
+    Logger(Log, spdlog::level::trace, "New Dictionary Created");
   }
 }
 
@@ -83,7 +84,7 @@ Dictionary::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceMethod("write", &Dictionary::Write),
       InstanceMethod("writeSync", &Dictionary::WriteSync),
       InstanceMethod("eq", &Dictionary::Eq),
-      InstanceMethod("asObject", &Dictionary::ToJsObject)});
+      InstanceMethod("asObject", &Dictionary::ToJsObject) });
   Constructor = Napi::Persistent(ctor);
   Constructor.SuppressDestruct();
 
@@ -91,7 +92,7 @@ Dictionary::Initialize(Napi::Env& env, Napi::Object& target)
 }
 Dictionary::~Dictionary()
 {
-  if(Log != nullptr) Log->debug("Dictionary Cleanup");
+  Logger(Log, spdlog::level::trace, "Dictionary Cleanup");
   HandleScope scope(Env());
   for (auto i : Children) {
     delete i;
@@ -434,14 +435,15 @@ Dictionary::Write(const CallbackInfo& info)
   }
   return info.Env().Undefined();
 }
-JsValue Dictionary::ToJsObject(const Napi::CallbackInfo &info )
+JsValue
+Dictionary::ToJsObject(const Napi::CallbackInfo& info)
 {
-	Napi::Object target = Napi::Object::New(info.Env());
-	auto it = GetDictionary().GetKeys().begin();
-	while(it != GetDictionary().GetKeys().end()) {
-		Obj::TrickleDown(info.Env(), &(it->first), *it->second, target);
-		it++;
-	}
-	return target;
+  Napi::Object target = Napi::Object::New(info.Env());
+  auto it = GetDictionary().GetKeys().begin();
+  while (it != GetDictionary().GetKeys().end()) {
+    Obj::TrickleDown(info.Env(), &(it->first), *it->second, target);
+    it++;
+  }
+  return target;
 }
 }

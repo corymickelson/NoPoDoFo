@@ -29,6 +29,7 @@
 #include "Page.h"
 #include "Rect.h"
 #include "StreamDocument.h"
+#include <gsl/gsl_util>
 #include <spdlog/spdlog.h>
 
 using namespace Napi;
@@ -64,7 +65,7 @@ Painter::Painter(const Napi::CallbackInfo& info)
 
 Painter::~Painter()
 {
-  if(Log != nullptr) Log->debug("Painter Cleanup");
+  Logger(Log, spdlog::level::trace, "Painter Cleanup");
   HandleScope scope(Env());
   Doc = nullptr;
 }
@@ -73,9 +74,10 @@ void
 Painter::Initialize(Napi::Env& env, Napi::Object& target)
 {
   Napi::HandleScope scope(env);
+  const char* name = "Painter";
   Napi::Function ctor = DefineClass(
     env,
-    "Painter",
+    name,
     { InstanceAccessor(
         "tabWidth", &Painter::GetTabWidth, &Painter::SetTabWidth),
       InstanceAccessor(
@@ -130,7 +132,7 @@ Painter::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceMethod("drawImage", &Painter::DrawImage) });
   constructor = Napi::Persistent(ctor);
   constructor.SuppressDestruct();
-  target.Set("Painter", ctor);
+  target.Set(name, ctor);
 }
 void
 Painter::SetPage(const Napi::CallbackInfo& info)
@@ -807,7 +809,7 @@ Painter::DrawGlyph(const CallbackInfo& info)
       .ThrowAsJavaScriptException();
     return;
   }
-  auto sharedMemDoc = static_cast<PdfMemDocument*>(Doc);
+  auto sharedMemDoc = gsl::narrow_cast<PdfMemDocument*>(Doc);
   auto point = info[0].As<Object>();
   string glyph = info[1].As<String>().Utf8Value();
   double x, y;

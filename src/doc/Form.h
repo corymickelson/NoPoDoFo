@@ -58,7 +58,7 @@ public:
     return &(Doc.GetAcroForm()->GetObject()->GetDictionary());
   }
 
-  std::map<std::string, PoDoFo::PdfObject*> GetFieldAPKeys(PoDoFo::PdfField*);
+  static std::map<std::string, PoDoFo::PdfObject*> GetFieldAPKeys(PoDoFo::PdfField*);
 private:
   bool Create = true;
   PoDoFo::PdfDocument& Doc;

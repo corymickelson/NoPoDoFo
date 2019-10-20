@@ -18,7 +18,6 @@
  */
 
 #include "ExtGState.h"
-#include "../ErrorHandler.h"
 #include "Document.h"
 #include "StreamDocument.h"
 #include <algorithm>
@@ -57,16 +56,17 @@ ExtGState::ExtGState(const Napi::CallbackInfo& info)
 
 ExtGState::~ExtGState()
 {
-  if(Log != nullptr) Log->debug("ExtGState Cleanup");
+  Logger(Log, spdlog::level::trace, "ExtGState Cleanup");
 }
 
 void
 ExtGState::Initialize(Napi::Env& env, Object& target)
 {
   HandleScope scope(env);
+  const char* name = "ExtGState";
   Function ctor = DefineClass(
     env,
-    "ExtGState",
+    name,
     { InstanceMethod("setFillOpacity", &ExtGState::SetFillOpacity),
       InstanceMethod("setBlendMode", &ExtGState::SetBlendMode),
       InstanceMethod("setOverprint", &ExtGState::SetOverprint),
@@ -78,7 +78,7 @@ ExtGState::Initialize(Napi::Env& env, Object& target)
       InstanceMethod("setFrequency", &ExtGState::SetFrequency) });
   Constructor = Persistent(ctor);
   Constructor.SuppressDestruct();
-  target.Set("ExtGState", ctor);
+  target.Set(name, ctor);
 }
 
 void

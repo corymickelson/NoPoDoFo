@@ -57,14 +57,15 @@ Page::Page(const CallbackInfo& info)
 
 Page::~Page()
 {
-  if(Log != nullptr) Log->debug("Page Cleanup");
+  Logger(Log, spdlog::level::trace, "Page Cleanup");
 }
 
 void
 Page::Initialize(Napi::Env& env, Napi::Object& target)
 {
   HandleScope scope(env);
-  Function ctor = DefineClass(env, "Page", {
+  const char* name = "Page";
+  Function ctor = DefineClass(env, name, {
     InstanceAccessor("rotation", &Page::GetRotation, &Page::SetRotation),
       InstanceAccessor("trimBox", &Page::GetTrimBox, &Page::SetTrimBox),
       InstanceAccessor("number", &Page::GetPageNumber, nullptr),
@@ -72,9 +73,8 @@ Page::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceAccessor("height", &Page::GetPageHeight, &Page::SetPageHeight),
       InstanceAccessor("contents", &Page::GetContents, nullptr),
       InstanceAccessor("resources", &Page::GetResources, nullptr),
-
+      StaticMethod("createField", &Page::CreateField),
       InstanceMethod("getField", &Page::GetField),
-      InstanceMethod("createField", &Page::CreateField),
       InstanceMethod("deleteField", &Page::DeleteField),
       InstanceMethod("getFields", &Page::GetFields),
 #if NOPODOFO_SDK
@@ -92,7 +92,7 @@ Page::Initialize(Napi::Env& env, Napi::Object& target)
   });
   Constructor = Napi::Persistent(ctor);
   Constructor.SuppressDestruct();
-  target.Set("Page", ctor);
+  target.Set(name, ctor);
 }
 Napi::Value
 Page::GetRotation(const CallbackInfo& info)

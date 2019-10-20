@@ -37,15 +37,15 @@ ComboBox::ComboBox(const Napi::CallbackInfo& info)
   , Field(ePdfField_ComboBox, info)
   , ListField(Field::GetField())
   , FormField(Field::GetField())
-{
-}
+{}
 void
 ComboBox::Initialize(Napi::Env& env, Napi::Object& target)
 {
   HandleScope scope(env);
+  const char* name = "ComboBox";
   auto ctor = DefineClass(
     env,
-    "ComboBox",
+    name,
     { InstanceAccessor(
         "editable", &ComboBox::GetEditable, &ComboBox::SetEditable),
       InstanceAccessor(
@@ -91,7 +91,7 @@ ComboBox::Initialize(Napi::Env& env, Napi::Object& target)
     });
   Constructor = Napi::Persistent(ctor);
   Constructor.SuppressDestruct();
-  target.Set("ComboBox", ctor);
+  target.Set(name, ctor);
 }
 void
 ComboBox::SetEditable(const Napi::CallbackInfo&, const JsValue& value)

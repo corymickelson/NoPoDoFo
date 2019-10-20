@@ -18,6 +18,7 @@
  */
 
 #include "Field.h"
+#include "../Log.h"
 #include "../ValidateArguments.h"
 #include "../base/Dictionary.h"
 #include "../base/Names.h"
@@ -102,7 +103,7 @@ Field::Field(EPdfField type, const CallbackInfo& info)
 
 Field::~Field()
 {
-  if(Log != nullptr) Log->debug("Field Cleanup");
+  Logger(Log, spdlog::level::trace, "Field Cleanup");
   delete Self;
   for (auto c : Children) {
     delete c;
@@ -230,9 +231,8 @@ Field::SetBackground(const Napi::CallbackInfo& info)
   vector<NPDFColorFormat> types = { NPDFColorFormat::GreyScale,
                                     NPDFColorFormat::RGB,
                                     NPDFColorFormat::CMYK };
-  NPDF_COLOR_ACCESSOR(Color::Unwrap(info[0].As<Object>())->Self,
-                    types,
-                    Self->SetBackgroundColor)
+  NPDF_COLOR_ACCESSOR(
+    Color::Unwrap(info[0].As<Object>())->Self, types, Self->SetBackgroundColor)
 }
 void
 Field::SetBorder(const Napi::CallbackInfo& info)
@@ -305,9 +305,8 @@ Field::SetPageAction(const Napi::CallbackInfo& info)
 JsValue
 Field::GetAnnotation(const Napi::CallbackInfo& info)
 {
-  PdfAnnotation* annot = Self->GetWidgetAnnotation();
   return Annotation::Constructor.New(
-    { External<PdfAnnotation>::New(info.Env(), annot) });
+    { External<PdfAnnotation>::New(info.Env(), Self->GetWidgetAnnotation()) });
 }
 JsValue
 Field::GetAppearanceStream(const Napi::CallbackInfo& info)
@@ -321,15 +320,20 @@ Field::GetAppearanceStream(const Napi::CallbackInfo& info)
   }
 }
 void
-Field::SetAppearanceStream(const Napi::CallbackInfo& info,
-                           const JsValue& value)
+Field::SetAppearanceStream(const Napi::CallbackInfo& info, const JsValue& value)
 {
   if (GetFieldDictionary().HasKey(Name::AP)) {
     GetFieldDictionary().RemoveKey(Name::AP);
   }
   if (value.IsNull()) {
-    cout << "The AP value you've provided is null. Removing field ap object"
-         << endl;
+    const char* msg =
+      "The AP value you've provided is null. Removing field ap object";
+    const auto console = NoPoDoFo::Log::Console(info.Env());
+    if (console != nullptr) {
+      console.Get("info").As<Function>().Call({ String::New(info.Env(), msg) });
+    } else {
+      Logger(Log, spdlog::level::trace, msg);
+    }
   }
 
   if (value.IsObject() &&
@@ -357,9 +361,13 @@ Field::SetDefaultAppearance(const Napi::CallbackInfo& info,
     GetFieldDictionary().RemoveKey(Name::DA);
   }
   if (value.IsNull()) {
-    cout << "The DA value you've provided is null. Removing field DA from "
-            "field dictionary"
-         << endl;
+    const char* msg =
+      "The DA value you've provided is null. Removing field DA from "
+      "field dictionary";
+    NoPoDoFo::Log::Console(info.Env())
+      .Get("info")
+      .As<Function>()
+      .Call({ String::New(info.Env(), msg) });
   }
 
   if (value.IsString()) {
@@ -379,8 +387,7 @@ Field::GetJustification(const Napi::CallbackInfo& info)
   }
 }
 void
-Field::SetJustification(const Napi::CallbackInfo& info,
-                        const JsValue& value)
+Field::SetJustification(const Napi::CallbackInfo& info, const JsValue& value)
 {
   if (value.IsNumber()) {
     pdf_int64 qValue = value.As<Number>();
@@ -435,8 +442,7 @@ Field::GetFieldRefreshKeys(PoDoFo::PdfField* f)
     xRect.SetBottom(0.0);
     xRect.SetWidth(f->GetWidgetAnnotation()->GetRect().GetWidth());
     xRect.SetHeight(f->GetWidgetAnnotation()->GetRect().GetHeight());
-    PdfXObject x(xRect,
-                 f->GetFieldObject()->GetOwner()->GetParentDocument());
+    PdfXObject x(xRect, f->GetFieldObject()->GetOwner()->GetParentDocument());
     f->GetWidgetAnnotation()
       ->GetObject()
       ->MustGetIndirectKey(Name::AP)
@@ -508,7 +514,7 @@ Field::RefreshAppearanceStream()
   ss << END_TEXT_OP << endl;
   ss << RESTORE_OP << endl;
   ss << END_MARKED_CONTENT_OP << endl;
-
+  Logger("Log", spdlog::level::trace, ss.str().c_str());
   xObj.GetContentsForAppending()->GetStream()->Append(ss.str());
   xObj.GetContentsForAppending()->GetStream()->EndAppend();
 

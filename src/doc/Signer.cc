@@ -73,8 +73,7 @@ Signer::Signer(const Napi::CallbackInfo& info)
 
 Signer::~Signer()
 {
-  if(Log != nullptr)
-    Log->debug("Signer Cleanup");
+  Logger(Log, spdlog::level::trace, "Signer Cleanup");
   HandleScope scope(Env());
   if (Cert != nullptr) {
     X509_free(Cert);
@@ -88,9 +87,10 @@ void
 Signer::Initialize(Napi::Env& env, Napi::Object& target)
 {
   HandleScope scope(env);
+  const char* name = "Signer";
   Function ctor = DefineClass(
     env,
-    "Signer",
+    name,
     {
       InstanceAccessor("signatureField", &Signer::GetField, &Signer::SetField),
       InstanceMethod("write", &Signer::SignWorker),
@@ -98,7 +98,7 @@ Signer::Initialize(Napi::Env& env, Napi::Object& target)
     });
   Constructor = Persistent(ctor);
   Constructor.SuppressDestruct();
-  target.Set("Signer", ctor);
+  target.Set(name, ctor);
 }
 
 void
@@ -187,8 +187,8 @@ protected:
         now.ToString(str);
         if (Self.Log) {
           Self.Log->debug("Signer::SignAsync::Execute SignatureField Date "
-                             "Null, setting to now: {}",
-                             str.GetStringUtf8());
+                          "Null, setting to now: {}",
+                          str.GetStringUtf8());
         }
 
         Self.Field->SetSignatureDate(now);

@@ -70,16 +70,17 @@ Encrypt::Encrypt(const Napi::CallbackInfo& info)
 
 Encrypt::~Encrypt()
 {
-  if(Log != nullptr) Log->debug("Encrypt Cleanup");
+  Logger(Log, spdlog::level::trace, "Encrypt Cleanup");
 }
 
 void
 Encrypt::Initialize(Napi::Env& env, Napi::Object& target)
 {
+  const char* name = "Encrypt";
   HandleScope scope(env);
   Function ctor = DefineClass(
     env,
-    "Encrypt",
+    name,
     { StaticMethod("createEncrypt", &Encrypt::CreateEncrypt),
       InstanceAccessor("user", &Encrypt::GetUserValue, nullptr),
       InstanceAccessor("owner", &Encrypt::GetOwnerValue, nullptr),
@@ -89,7 +90,7 @@ Encrypt::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceMethod("isAllowed", &Encrypt::IsAllowed) });
   Constructor = Persistent(ctor);
   Constructor.SuppressDestruct();
-  target.Set("Encrypt", ctor);
+  target.Set(name, ctor);
 }
 
 Napi::Value

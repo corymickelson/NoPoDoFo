@@ -18,6 +18,7 @@
  */
 
 #include "Ref.h"
+#include "../Defines.h"
 #include <iosfwd>
 #include <iostream>
 #include <spdlog/spdlog.h>
@@ -39,7 +40,7 @@ Ref::Ref(const CallbackInfo& info)
                             static_cast<const PoDoFo::pdf_gennum>(
                               info[1].As<Number>().Uint32Value()));
   } else if (info.Length() == 1 && info[0].IsExternal()) {
-    if(Log != nullptr) Log->debug("Creating a new PdfReference Copy");
+    Logger(Log, spdlog::level::trace, "Creating a new PdfReference Copy");
     Self = new PdfReference(*info[0].As<External<PdfReference>>().Data());
   } else {
     Error::New(info.Env(),
@@ -49,10 +50,12 @@ Ref::Ref(const CallbackInfo& info)
 }
 Ref::~Ref()
 {
-  std::stringstream dbgMsg;
-  dbgMsg << "Cleaning up Ref " << Self->ObjectNumber() << " : "
-       << Self->GenerationNumber() << endl;
-  if(Log != nullptr) Log->debug(dbgMsg.str());
+  Logger(Log,
+         spdlog::level::trace,
+         "Cleaning up Ref ",
+         Self->ObjectNumber(),
+         " : ",
+         Self->GenerationNumber());
   delete Self;
 }
 void

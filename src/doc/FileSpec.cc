@@ -38,14 +38,15 @@ void
 FileSpec::Initialize(Napi::Env& env, Napi::Object& target)
 {
   HandleScope scope(env);
+  const char* name = "FileSpec";
   Function ctor =
     DefineClass(env,
-                "FileSpec",
+                name,
                 { InstanceAccessor("name", &FileSpec::GetFileName, nullptr),
                   InstanceMethod("getContents", &FileSpec::Data) });
   Constructor = Napi::Persistent(ctor);
   Constructor.SuppressDestruct();
-  target.Set("FileSpec", ctor);
+  target.Set(name, ctor);
 }
 FileSpec::FileSpec(const CallbackInfo& info)
   : ObjectWrap<FileSpec>(info)
@@ -87,9 +88,12 @@ FileSpec::FileSpec(const CallbackInfo& info)
 
 FileSpec::~FileSpec()
 {
-  if(Log != nullptr) Log->debug("FileSpec Cleanup");
-  if(Self.use_count() == 0) {
-  	if(Log != nullptr) Log->debug("FileSpec resource count: {}", Self.use_count());
+  Logger(Log, spdlog::level::trace, "FileSpec Cleanup");
+  if (Self.use_count() == 0) {
+    Logger(Log,
+           spdlog::level::trace,
+           "FileSpec resource count: {}",
+           Self.use_count());
   }
 }
 

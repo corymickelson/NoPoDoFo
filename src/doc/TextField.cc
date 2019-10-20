@@ -82,15 +82,16 @@ TextField::TextField(const CallbackInfo& info)
 }
 TextField::~TextField()
 {
- if(Log != nullptr) Log->debug("TextField Cleanup");
+  Logger(Log, spdlog::level::trace, "TextField Cleanup");
 }
 void
 TextField::Initialize(Napi::Env& env, Napi::Object& target)
 {
   HandleScope scope(env);
+  const char* name = "TextField";
   Function ctor = DefineClass(
     env,
-    "TextField",
+    name,
     { InstanceAccessor("text", &TextField::Text, &TextField::SetText),
       InstanceAccessor("maxLen", &TextField::GetMaxLen, &TextField::SetMaxLen),
       InstanceAccessor(
@@ -137,11 +138,12 @@ TextField::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceMethod("setMouseAction", &TextField::SetMouseAction),
       InstanceMethod("setPageAction", &TextField::SetPageAction),
       InstanceMethod("setHighlightingMode", &TextField::SetHighlightingMode),
-      InstanceMethod("refreshAppearanceStream", &TextField::RefreshAppearanceStream)});
+      InstanceMethod("refreshAppearanceStream",
+                     &TextField::RefreshAppearanceStream) });
   Constructor = Napi::Persistent(ctor);
   Constructor.SuppressDestruct();
 
-  target.Set("TextField", ctor);
+  target.Set(name, ctor);
 }
 void
 TextField::SetText(const CallbackInfo& info, const JsValue& value)
@@ -171,8 +173,7 @@ TextField::GetMaxLen(const Napi::CallbackInfo& info)
   return Number::New(info.Env(), GetText().GetMaxLen());
 }
 void
-TextField::SetMultiLine(const Napi::CallbackInfo& info,
-                        const JsValue& value)
+TextField::SetMultiLine(const Napi::CallbackInfo& info, const JsValue& value)
 {
   GetText().SetMultiLine(value.As<Boolean>());
 }
@@ -202,8 +203,7 @@ TextField::IsFileField(const Napi::CallbackInfo& info)
   return Boolean::New(info.Env(), GetText().IsFileField());
 }
 void
-TextField::SetSpellcheckEnabled(const Napi::CallbackInfo&,
-                                const JsValue& value)
+TextField::SetSpellcheckEnabled(const Napi::CallbackInfo&, const JsValue& value)
 {
   GetText().SetSpellcheckingEnabled(value.As<Boolean>());
 }
@@ -243,14 +243,15 @@ TextField::IsRichText(const Napi::CallbackInfo& info)
   return Boolean::New(info.Env(), GetText().IsRichText());
 }
 void
-TextField::RefreshAppearanceStream(const Napi::CallbackInfo &info)
+TextField::RefreshAppearanceStream(const Napi::CallbackInfo& info)
 {
   try {
     Field::RefreshAppearanceStream();
-  } catch(PdfError& pdferr) {
+  } catch (PdfError& pdferr) {
     ErrorHandler(pdferr, info);
-  } catch(...) {
-    Error::New(info.Env(), "An unknown error occurred").ThrowAsJavaScriptException();
+  } catch (...) {
+    Error::New(info.Env(), "An unknown error occurred")
+      .ThrowAsJavaScriptException();
   }
 }
 }

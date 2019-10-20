@@ -35,7 +35,7 @@ ListField::ListField(PdfField& field)
 
 ListField::~ListField()
 {
-  if(Log != nullptr) Log->debug("ListField Cleanup");
+  Logger(Log, spdlog::level::trace, "ListField Cleanup");
 }
 
 void

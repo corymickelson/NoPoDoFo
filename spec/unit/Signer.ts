@@ -1,5 +1,5 @@
 import {AsyncTest, Expect, Setup, TestFixture, Timeout} from 'alsatian'
-import {nopodofo, nopodofo as npdf, NPDFAnnotation, NPDFAnnotationFlag} from '../../'
+import {nopodofo, nopodofo as npdf, NPDFAnnotation, NPDFAnnotationFlag, NPDFLogLevel} from '../../'
 import {join} from "path";
 import {readFileSync} from "fs";
 
@@ -7,9 +7,9 @@ import {readFileSync} from "fs";
 export class SignerSpec {
     @Setup
     public setup() {
-        const config = new nopodofo.Log()
-        config.logFile('debug.txt')
-        config.enableDebugLogging = true;
+        const logger = new npdf.Log()
+        logger.logFile('debug.txt')
+        logger.logLevel = NPDFLogLevel.info
     }
 
     public loadDocument(): Promise<npdf.Document> {
@@ -55,7 +55,7 @@ export class SignerSpec {
                 } else {
                     let signed = new npdf.Document()
                     signed.load(signedPath, (e: Error) => {
-                        if (e instanceof Error) Expect.fail(e.message)
+                        if (e) Expect.fail(e.message)
                         let writtenSignatureField = signed.getPage(1).getFields().filter((i: any) => i instanceof npdf.SignatureField)[0]
                         let docSignatureMode = signed.form.SigFlags
                         Expect(writtenSignatureField).toBeDefined()
@@ -97,7 +97,7 @@ export class SignerSpec {
                 } else {
                     let signed = new npdf.Document()
                     signed.load(signedPath, (e: Error) => {
-                        if (e instanceof Error) Expect.fail(e.message)
+                        if (e) Expect.fail(e.message)
                         let writtenSignatureField = signed.getPage(1).getFields().filter((i: any) => i instanceof npdf.SignatureField)[0]
                         let docSignatureMode = signed.form.SigFlags
                         Expect(writtenSignatureField).toBeDefined()

@@ -102,7 +102,7 @@ Color::Color(const CallbackInfo& info)
 
 Color::~Color()
 {
-  if(Log != nullptr) Log->debug("Color Cleanup");
+  Logger(Log, spdlog::level::trace, "Color Cleanup");
   HandleScope scope(Env());
   delete Self;
 }

@@ -22,6 +22,7 @@
 
 #define CONVERSION_CONSTANT 0.002834645669291339
 
+#include "Field.h"
 #include <iostream>
 #include <napi.h>
 #include <podofo/podofo.h>
@@ -38,7 +39,7 @@ class Page : public Napi::ObjectWrap<Page>
 public:
   explicit Page(const Napi::CallbackInfo& callbackInfo);
   explicit Page(const Page&) = delete;
-  const Page operator=(const Page&) = delete;
+  const Page& operator=(const Page&) = delete;
   ~Page();
   static Napi::FunctionReference Constructor;
   static void Initialize(Napi::Env& env, Napi::Object& target);
@@ -63,7 +64,7 @@ public:
   JsValue GetArtBox(const Napi::CallbackInfo&);
   JsValue CreateAnnotation(const Napi::CallbackInfo&);
   JsValue GetAnnotation(const Napi::CallbackInfo&);
-  JsValue CreateField(const Napi::CallbackInfo&);
+  static JsValue CreateField(const Napi::CallbackInfo&);
   JsValue GetNumAnnots(const Napi::CallbackInfo&);
   void DeleteAnnotation(const Napi::CallbackInfo&);
   void DeleteField(const Napi::CallbackInfo&);
@@ -74,7 +75,7 @@ public:
   void FlattenFields(const Napi::CallbackInfo&);
 #endif
   PoDoFo::PdfPage& Self;
-  Napi::Object ExtractAndApplyRectValues(const Napi::CallbackInfo&,
+  static Napi::Object ExtractAndApplyRectValues(const Napi::CallbackInfo&,
                                          PoDoFo::PdfRect&);
 
 private:

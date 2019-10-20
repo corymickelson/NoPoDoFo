@@ -88,7 +88,7 @@ SignatureField::SignatureField(const CallbackInfo& info)
           signatureDict.GetKey(Name::BYTERANGE)->IsArray()) {
         auto byteRange = signatureDict.GetKey(Name::BYTERANGE)->GetArray();
         for (auto& i : byteRange) {
-					Info.Range.emplace_back(i.GetNumber());
+          Info.Range.emplace_back(i.GetNumber());
         }
       }
       if (signatureDict.HasKey(Name::CONTENTS) &&
@@ -100,26 +100,28 @@ SignatureField::SignatureField(const CallbackInfo& info)
         Info.Contents = out;
       }
     } else {
-      cout << "Could not parse Signature Object" << endl;
+      Logger(Log, spdlog::level::err, "Could not parse Signature Object");
     }
   } catch (PdfError& err) {
-    cout << "Signature Object has not been set on this field" << endl;
+    Logger(Log,
+           spdlog::level::err,
+           "Signature Object has not been set on this field");
   }
 }
 
 SignatureField::~SignatureField()
 {
-  if(Log != nullptr) Log->debug("SignatureField Cleanup");
+  Logger(Log, spdlog::level::trace, "SignatureField Cleanup");
 }
-
 
 void
 SignatureField::Initialize(Napi::Env& env, Napi::Object& target)
 {
   HandleScope scope(env);
+  const char* name = "SignatureField";
   Function ctor = DefineClass(
     env,
-    "SignatureField",
+    name,
     { InstanceAccessor("info", &SignatureField::GetInfo, nullptr),
       InstanceAccessor(
         "widgetAnnotation", &SignatureField::GetAnnotation, nullptr),
@@ -138,8 +140,7 @@ SignatureField::Initialize(Napi::Env& env, Napi::Object& target)
                      &SignatureField::EnsureSignatureObject) });
   Constructor = Napi::Persistent(ctor);
   Constructor.SuppressDestruct();
-
-  target.Set("SignatureField", ctor);
+  target.Set(name, ctor);
 }
 
 Napi::Value

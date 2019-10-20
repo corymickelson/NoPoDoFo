@@ -18,6 +18,7 @@
  */
 
 #include "Data.h"
+#include "../Defines.h"
 #include "../ErrorHandler.h"
 #include <spdlog/spdlog.h>
 
@@ -59,7 +60,7 @@ Data::Data(const Napi::CallbackInfo& info)
 
 Data::~Data()
 {
-  if(Log != nullptr) Log->debug("Data Cleanup");
+  Logger(Log, spdlog::level::trace, "Data Cleanup");
 }
 
 void

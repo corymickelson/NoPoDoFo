@@ -18,8 +18,9 @@
  */
 
 #include "StreamDocument.h"
+#include "../Defines.h"
+#include "../Log.h"
 #include "Encrypt.h"
-
 #include <iostream>
 #include <spdlog/spdlog.h>
 
@@ -41,21 +42,20 @@ FunctionReference StreamDocument::Constructor; // NOLINT
 StreamDocument::StreamDocument(const CallbackInfo& info)
   : ObjectWrap(info)
   , BaseDocument(info, false)
-{
-}
+{}
 StreamDocument::~StreamDocument()
 {
- if(Log != nullptr) Log->debug("StreamDocument Cleanup");
+  Logger(Log, spdlog::level::trace, "StreamDocument Cleanup");
 }
 void
 StreamDocument::Initialize(Napi::Env& env, Napi::Object& target)
 {
   HandleScope scope(env);
+  const char* name = "StreamDocument";
   Function ctor = DefineClass(
     env,
-    "StreamDocument",
+    name,
     { InstanceMethod("close", &StreamDocument::Close),
-
       InstanceAccessor("form", &StreamDocument::GetForm, nullptr),
       InstanceAccessor("body", &StreamDocument::GetObjects, nullptr),
       InstanceAccessor("version", &StreamDocument::GetVersion, nullptr),
@@ -98,7 +98,7 @@ StreamDocument::Initialize(Napi::Env& env, Napi::Object& target)
     });
   Constructor = Napi::Persistent(ctor);
   Constructor.SuppressDestruct();
-  target.Set("StreamDocument", ctor);
+  target.Set(name, ctor);
 }
 
 JsValue
@@ -106,22 +106,32 @@ StreamDocument::Close(const CallbackInfo& info)
 {
   GetStreamedDocument().Close();
   if (Output.empty()) {
-    return Napi::Value(Buffer<char>::Copy(info.Env(),
-                                          StreamDocRefCountedBuffer->GetBuffer(),
-                                          StreamDocRefCountedBuffer->GetSize()));
+    return Napi::Value(
+      Buffer<char>::Copy(info.Env(),
+                         StreamDocRefCountedBuffer->GetBuffer(),
+                         StreamDocRefCountedBuffer->GetSize()));
   }
   return String::New(info.Env(), Output);
 }
 void
 StreamDocument::Append(const Napi::CallbackInfo& info)
 {
-  cout << "StreamDocument does not currently support the append operation"
-       << endl;
+  NoPoDoFo::Log::Console(info.Env())
+    .Get("warn")
+    .As<Function>()
+    .Call({ String::New(
+      info.Env(),
+      "StreamDocument does not currently support the append operation") });
 }
 JsValue
-StreamDocument::InsertExistingPage(const Napi::CallbackInfo&)
+StreamDocument::InsertExistingPage(const Napi::CallbackInfo& info)
 {
-  cout << "StreamDocument does not currently support this operation" << endl;
+  NoPoDoFo::Log::Console(info.Env())
+    .Get("warn")
+    .As<Function>()
+    .Call({ String::New(
+      info.Env(),
+      "StreamDocument does not currently support this operation") });
   return {};
 }
 }

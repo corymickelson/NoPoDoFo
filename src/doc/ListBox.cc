@@ -41,9 +41,10 @@ void
 ListBox::Initialize(Napi::Env& env, Napi::Object& target)
 {
   HandleScope scope(env);
+  const char* name = "ListBox";
   auto ctor = DefineClass(
     env,
-    "ListBox",
+    name,
     { InstanceAccessor(
         "selected", &ListBox::GetSelectedItem, &ListBox::SetSelectedItem),
       InstanceAccessor("length", &ListBox::GetItemCount, nullptr),
@@ -82,7 +83,7 @@ ListBox::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceMethod("setHighlightingMode", &ListBox::SetHighlightingMode) });
   Constructor = Persistent(ctor);
   Constructor.SuppressDestruct();
-  target.Set("ListBox", ctor);
+  target.Set(name, ctor);
 }
 
 PdfListBox

@@ -57,16 +57,17 @@ Form::Form(const Napi::CallbackInfo& info)
 
 Form::~Form()
 {
-  if(Log != nullptr) Log->debug("Form Cleanup");
+  Logger(Log, spdlog::level::debug, "Form Cleanup");
 }
 
 void
 Form::Initialize(Napi::Env& env, Napi::Object& target)
 {
   HandleScope scope(env);
+  const char* name = "Form";
   Function ctor = DefineClass(
     env,
-    "Form",
+    name,
     { InstanceAccessor("dictionary", &Form::GetFormDictionary, nullptr),
       InstanceAccessor("SigFlags", &Form::SigFlags, &Form::SetSigFlags),
       InstanceAccessor("needAppearances",
@@ -79,7 +80,7 @@ Form::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceAccessor("DR", &Form::GetResource, &Form::SetResource) });
   Constructor = Napi::Persistent(ctor);
   Constructor.SuppressDestruct();
-  target.Set("Form", ctor);
+  target.Set(name, ctor);
 }
 void
 Form::SetNeedAppearances(const CallbackInfo& info, const JsValue& value)
@@ -229,7 +230,8 @@ Form::GetCalculationOrder(const CallbackInfo& info)
   if (d.HasKey(Name::CO)) {
     auto co = d.GetKey(Name::CO);
     if (!co->IsArray()) {
-      TypeError::New(info.Env(), "CO expected an array").ThrowAsJavaScriptException();
+      TypeError::New(info.Env(), "CO expected an array")
+        .ThrowAsJavaScriptException();
     } else {
       auto arr = co->GetArray();
       for (const auto& item : arr) {

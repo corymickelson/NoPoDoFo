@@ -40,9 +40,10 @@ void
 PushButton::Initialize(Napi::Env& env, Napi::Object& target)
 {
   HandleScope scope(env);
+  const char* name = "PushButton";
   auto ctor = DefineClass(
     env,
-    "PushButton",
+    name,
     { InstanceAccessor("rollover",
                        &PushButton::GetRolloverCaption,
                        &PushButton::SetRolloverCaption),
@@ -85,7 +86,7 @@ PushButton::Initialize(Napi::Env& env, Napi::Object& target)
     });
   Constructor = Persistent(ctor);
   Constructor.SuppressDestruct();
-  target.Set("PushButton", ctor);
+  target.Set(name, ctor);
 }
 Napi::Value
 PushButton::GetRolloverCaption(const Napi::CallbackInfo& info)

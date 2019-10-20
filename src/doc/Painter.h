@@ -98,8 +98,8 @@ private:
   bool IsMemDoc = false;
   std::unique_ptr<PoDoFo::PdfPainter> Self;
   PoDoFo::PdfDocument* Doc;
-  void GetCMYK(JsValue&, float* CMYK);
-  void GetRGB(JsValue&, float* rgb);
+  static void GetCMYK(JsValue&, float* CMYK);
+  static void GetRGB(JsValue&, float* rgb);
   std::shared_ptr<spdlog::logger> Log;
 };
 }

@@ -18,6 +18,7 @@
  */
 
 #include "Encoding.h"
+#include "../Defines.h"
 #include "../ErrorHandler.h"
 #include "../base/Dictionary.h"
 #include "Font.h"
@@ -40,27 +41,31 @@ Encoding::Encoding(const Napi::CallbackInfo& info)
 }
 Encoding::~Encoding()
 {
-  if(Log != nullptr) Log->debug("Encoding Cleanup");
+  Logger(Log, spdlog::level::trace, "Encoding Cleanup");
   if (!Self->IsAutoDelete()) {
-    if(Log != nullptr) Log->debug("Encoding is NOT auto deleted, deleting now");
+    Logger(
+      Log, spdlog::level::trace, "Encoding is NOT auto deleted, deleting now");
     delete Self;
   } else {
-    if(Log != nullptr) Log->debug("Encoding is an auto deleted object, nothing deleted");
+    Logger(Log,
+           spdlog::level::trace,
+           "Encoding is an auto deleted object, nothing deleted");
   }
 }
 void
 Encoding::Initialize(Napi::Env& env, Napi::Object& target)
 {
   HandleScope scope(env);
+  const char* name = "Encoding";
   Function ctor = DefineClass(
     env,
-    "Encoding",
+    name,
     { InstanceMethod("addToDictionary", &Encoding::AddToDictionary),
       InstanceMethod("convertToUnicode", &Encoding::ConvertToUnicode),
       InstanceMethod("convertToEncoding", &Encoding::ConvertToEncoding) });
   Constructor = Persistent(ctor);
   Constructor.SuppressDestruct();
-  target.Set("Encoding", ctor);
+  target.Set(name, ctor);
 }
 Napi::Value
 Encoding::AddToDictionary(const Napi::CallbackInfo& info)

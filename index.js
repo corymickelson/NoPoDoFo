@@ -881,3 +881,13 @@ var NPDFRenderingIntent;
     NPDFRenderingIntent["Perceptual"] = "Perceptual";
     NPDFRenderingIntent["Saturation"] = "Saturation";
 })(NPDFRenderingIntent = exports.NPDFRenderingIntent || (exports.NPDFRenderingIntent = {}));
+var NPDFLogLevel;
+(function (NPDFLogLevel) {
+    NPDFLogLevel[NPDFLogLevel["trace"] = 0] = "trace";
+    NPDFLogLevel[NPDFLogLevel["debug"] = 1] = "debug";
+    NPDFLogLevel[NPDFLogLevel["info"] = 2] = "info";
+    NPDFLogLevel[NPDFLogLevel["warn"] = 3] = "warn";
+    NPDFLogLevel[NPDFLogLevel["err"] = 4] = "err";
+    NPDFLogLevel[NPDFLogLevel["critical"] = 5] = "critical";
+    NPDFLogLevel[NPDFLogLevel["off"] = 6] = "off";
+})(NPDFLogLevel = exports.NPDFLogLevel || (exports.NPDFLogLevel = {}))

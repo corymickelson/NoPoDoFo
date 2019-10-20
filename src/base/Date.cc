@@ -18,6 +18,7 @@
  */
 
 #include "Date.h"
+#include "../Defines.h"
 #include "../ValidateArguments.h"
 #include <spdlog/spdlog.h>
 
@@ -58,7 +59,7 @@ Date::Date(const Napi::CallbackInfo& info)
 }
 Date::~Date()
 {
-  if(Log != nullptr) Log->debug("Date Cleanup");
+  Logger(Log, spdlog::level::trace, "Date Cleanup");
   HandleScope scope(Env());
   delete Self;
 }
@@ -67,9 +68,9 @@ Date::Initialize(Napi::Env& env, Napi::Object& target)
 {
   HandleScope scope(env);
   auto ctor = DefineClass(env,
-                              "Date",
-                              { InstanceMethod("toString", &Date::ToString),
-                                InstanceMethod("isValid", &Date::IsValid) });
+                          "Date",
+                          { InstanceMethod("toString", &Date::ToString),
+                            InstanceMethod("isValid", &Date::IsValid) });
   Constructor = Napi::Persistent(ctor);
   Constructor.SuppressDestruct();
   target.Set("Date", ctor);

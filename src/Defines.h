@@ -178,6 +178,14 @@ Logger(std::shared_ptr<spdlog::logger> logger,
     logger->log(level, format, ts...);
   }
 }
+template<typename... Ts>
+inline void
+Logger(std::shared_ptr<spdlog::logger> logger, const char* format, Ts&&... ts)
+{
+  if (logger != nullptr) {
+    logger->log(logger->level(), format, ts...);
+  }
+}
 }
 
 const char RECT_OP[] = "re";

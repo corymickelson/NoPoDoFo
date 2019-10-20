@@ -32,7 +32,7 @@ export class FieldSpec {
         painter.drawText({x: 100, y: 500}, nameLabel)
         painter.finishPage()
 
-        const nameField = page.createField(NPDFFieldType.TextField, nameFieldAnnot, doc.form);
+        const nameField = nopodofo.Page.createField(NPDFFieldType.TextField, nameFieldAnnot, doc.form);
         nameField.fieldName = 'FirstName'
         const red = new nopodofo.Color(1.0, 0.0, 0.0)
         nameField.setBackgroundColor(red)
@@ -41,7 +41,7 @@ export class FieldSpec {
 
     @AsyncTest('Fields')
     public async simpleFieldsTest() {
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
 
             const doc = new nopodofo.Document()
             doc.load(this.filePath, (e: Error) => {
@@ -55,7 +55,6 @@ export class FieldSpec {
                         Expect(field.fieldName).toBeDefined()
                         Expect(typeof field.exported === 'boolean').toBeTruthy()
                         Expect(typeof field.readOnly === 'boolean').toBeTruthy()
-                        Expect(typeof field.required === 'boolean').toBeTruthy()
                         switch (field.type) {
                             case NPDFFieldType.TextField:
                                 (field as nopodofo.TextField).text = 'TEST'
@@ -70,7 +69,7 @@ export class FieldSpec {
                                 break
                         }
                     })
-                    doc.write(this.outfile, (err, data) => {
+                    doc.write(this.outfile, (err) => {
                         if (err) Expect.fail(err.message)
                         else {
                             let fieldsDoc = new nopodofo.Document()

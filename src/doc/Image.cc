@@ -113,8 +113,7 @@ Image::Image(const CallbackInfo& info)
 
 Image::~Image()
 {
-  if (Log != nullptr)
-    Log->debug("Image Cleanup");
+  Logger(Log, spdlog::level::trace, "Image Cleanup");
   HandleScope scope(Env());
   Doc = nullptr;
 }
@@ -122,9 +121,10 @@ void
 Image::Initialize(Napi::Env& env, Napi::Object& target)
 {
   HandleScope scope(env);
+  const char* name = "Image";
   Function ctor = DefineClass(
     env,
-    "Image",
+    name,
     {
       InstanceAccessor("width", &Image::GetWidth, nullptr),
       InstanceAccessor("height", &Image::GetHeight, nullptr),
@@ -137,7 +137,7 @@ Image::Initialize(Napi::Env& env, Napi::Object& target)
   Constructor = Napi::Persistent(ctor);
   Constructor.SuppressDestruct();
 
-  target.Set("Image", ctor);
+  target.Set(name, ctor);
 }
 
 Napi::Value

@@ -18,6 +18,7 @@
  */
 
 #include "Obj.h"
+#include "../Defines.h"
 #include "../ErrorHandler.h"
 #include "Array.h"
 #include "Dictionary.h"
@@ -122,17 +123,17 @@ Obj::Initialize(Napi::Env& env, Napi::Object& target)
 Obj::Obj(const Napi::CallbackInfo& info)
   : ObjectWrap<Obj>(info)
   , NObj(info.Length() == 1 && info[0].IsExternal()
-          ? *info[0].As<External<PdfObject>>().Data()
-          : *(Init = InitObject(info)))
+           ? *info[0].As<External<PdfObject>>().Data()
+           : *(Init = InitObject(info)))
 {
   Log = spdlog::get("Log");
-  if(Init != nullptr) {
-    if(Log != nullptr) Log->debug("New Object Created");
+  if (Init != nullptr) {
+    Logger(Log, spdlog::level::trace, "New Object Created");
   }
 }
 Obj::~Obj()
 {
-  if(Log != nullptr) Log->debug("Object Cleanup");
+  Logger(Log, spdlog::level::trace, "Object Cleanup");
   HandleScope scope(Env());
   delete Init;
 }
@@ -157,7 +158,7 @@ Obj::GetStream(const CallbackInfo& info)
       stringstream msg;
       msg << "This Object does not have a stream associated with it" << endl;
       cout << "Writing Object to: " << outfile << endl;
-      if(Log != nullptr) Log->debug(msg.str());
+      Logger(Log, spdlog::level::trace, msg.str().c_str());
       PdfOutputDevice outDevice(outfile);
       NObj.WriteObject(&outDevice, ePdfWriteMode_Clean, nullptr);
       return info.Env().Undefined();
@@ -340,7 +341,8 @@ Obj::GetDictionary(const CallbackInfo& info)
     throw Napi::Error::New(info.Env(), "Obj only accessible as Dictionary");
   }
   return Dictionary::Constructor.New(
-    { External<PdfObject>::New(info.Env(), &NObj), Number::New(info.Env(), 0) });
+    { External<PdfObject>::New(info.Env(), &NObj),
+      Number::New(info.Env(), 0) });
 }
 
 JsValue
@@ -350,7 +352,8 @@ Obj::GetRawData(const CallbackInfo& info)
     throw Napi::Error::New(info.Env(), "Obj not accessible as a buffer");
   }
   const auto data = NObj.GetRawData().data();
-  return Napi::Value(Buffer<char>::Copy(info.Env(), data.c_str(), data.length()));
+  return Napi::Value(
+    Buffer<char>::Copy(info.Env(), data.c_str(), data.length()));
 }
 
 class ObjOffsetAsync final : public Napi::AsyncWorker
@@ -400,7 +403,8 @@ class ObjWriteAsync final : public Napi::AsyncWorker
 {
 public:
   ObjWriteAsync(Napi::Function& cb, Obj* obj, string dest)
-		: AsyncWorker(cb), Self(obj)
+    : AsyncWorker(cb)
+    , Self(obj)
     , Arg(std::move(dest))
   {}
 
@@ -409,7 +413,7 @@ protected:
   {
     try {
       PdfOutputDevice device(Arg.c_str());
-			Self->GetObject().WriteObject(&device, ePdfWriteMode_Default, nullptr);
+      Self->GetObject().WriteObject(&device, ePdfWriteMode_Default, nullptr);
     } catch (PdfError& err) {
       SetError(ErrorHandler::WriteMsg(err));
     } catch (Napi::Error& err) {
@@ -423,7 +427,7 @@ protected:
   }
 
 private:
-	Obj *Self;
+  Obj* Self;
   string Arg;
 };
 
@@ -431,8 +435,7 @@ JsValue
 Obj::Write(const CallbackInfo& info)
 {
   auto cb = info[1].As<Function>();
-  auto worker =
-    new ObjWriteAsync(cb, this, info[0].As<String>().Utf8Value());
+  auto worker = new ObjWriteAsync(cb, this, info[0].As<String>().Utf8Value());
   worker->Queue();
   return info.Env().Undefined();
 }
@@ -450,102 +453,114 @@ Obj::MustGetIndirect(const CallbackInfo& info)
   const auto target = NObj.MustGetIndirectKey(name);
   return Constructor.New({ External<PdfObject>::New(info.Env(), target) });
 }
-void Obj::TrickleDown(Napi::Env env, const PoDoFo::PdfName *name, PoDoFo::PdfObject &item, Napi::Value &target)
+void
+Obj::TrickleDown(Napi::Env env,
+                 const PoDoFo::PdfName* name,
+                 PoDoFo::PdfObject& item,
+                 Napi::Value& target)
 {
-	switch (item.GetDataType()) {
-		case ePdfDataType_Bool:
-			target.IsArray() ?
-			target.As<Napi::Array>().Set(target.As<Napi::Array>().Length(), Boolean::New(env, item.GetBool()))
-											 :
-			target.As<Object>().Set(String::New(env, name->GetName()), Boolean::New(env, item.GetBool()));
-			break;
-		case ePdfDataType_Number:
-			target.IsArray() ?
-			target.As<Napi::Array>().Set(target.As<Napi::Array>().Length(), Number::New(env, item.GetNumber()))
-											 :
-			target.As<Object>().Set(String::New(env, name->GetName()), Number::New(env, item.GetNumber()));
-			break;
-		case ePdfDataType_Real:
-			target.IsArray() ?
-			target.As<Napi::Array>().Set(target.As<Napi::Array>().Length(), Number::New(env, item.GetReal()))
-											 :
-			target.As<Object>().Set(String::New(env, name->GetName()), Number::New(env, item.GetReal()));
-			break;
-		case ePdfDataType_String:
-			target.IsArray() ?
-			target.As<Napi::Array>()
-						.Set(target.As<Napi::Array>().Length(), String::New(env, item.GetString().GetStringUtf8()))
-											 :
-			target.As<Object>().Set(String::New(env, name->GetName()), String::New(env, item.GetString().GetStringUtf8()));
-			break;
-		case ePdfDataType_HexString:
-			target.IsArray() ?
-			target.As<Napi::Array>().Set(target.As<Napi::Array>().Length(), Buffer<char>::Copy(env,
-																																														 item.GetString()
-																																																 .GetString(),
-																																														 item.GetString()
-																																																 .GetLength()))
-											 :
-			target.As<Object>().Set(String::New(env, name->GetName()), Buffer<char>::Copy(env,
-																																										item.GetString().GetString(),
-																																										item.GetString().GetLength()));
-			break;
-		case ePdfDataType_Name:
-			target.IsArray() ?
-			target.As<Napi::Array>().Set(target.As<Napi::Array>().Length(), String::New(env, item.GetName().GetName()))
-											 :
-			target.As<Object>().Set(String::New(env, name->GetName()), String::New(env, item.GetName().GetName()));
-			break;
-		case ePdfDataType_Array: {
-			Napi::Array nested = Napi::Array::New(env);
-			auto it = item.GetArray().begin();
-			while (it != item.GetArray().end()) {
-				TrickleDown(env, nullptr, (*it), nested);
-				it++;
-			}
-			target.IsArray() ?
-			target.As<Napi::Array>().Set(target.As<Napi::Array>().Length(), nested) :
-			target.As<Object>().Set(String::New(env, name->GetName()), nested);
-			break;
-		}
-		case ePdfDataType_Dictionary: {
-			Napi::Object nested = Napi::Object::New(env);
-			auto it = item.GetDictionary().GetKeys().begin();
-			Napi::Object obj = Napi::Object::New(env);
-			while (it != item.GetDictionary().GetKeys().end()) {
-				TrickleDown(env, &(it->first), *it->second, nested);
-				it++;
-			}
-			target.IsArray() ?
-			target.As<Napi::Array>().Set(target.As<Napi::Array>().Length(), nested) :
-			target.As<Object>().Set(String::New(env, name->GetName()), nested);
-			break;
-		}
-		case ePdfDataType_Null:
-			target.IsArray() ?
-			target.As<Napi::Array>().Set(target.As<Napi::Array>().Length(), env.Null())
-											 :
-			target.As<Object>().Set(String::New(env, name->GetName()), env.Null());
-			break;
-		case ePdfDataType_Reference: {
-			auto ref = Ref::Constructor.New({
-																				Number::New(env, item.GetReference().ObjectNumber()),
-																				Number::New(env, item.GetReference().GenerationNumber())});
-			target.IsArray() ?
-			target.As<Napi::Array>().Set(target.As<Napi::Array>().Length(), ref)
-											 :
-			target.As<Object>().Set(String::New(env, name->GetName()), ref);
-			break;
-		}
-		case ePdfDataType_RawData: {
-			auto raw = Napi::Buffer<char>::Copy(env, item.GetRawData().data().c_str(), item.GetRawData().data().size());
-			target.IsArray() ?
-			target.As<Napi::Array>().Set(target.As<Napi::Array>().Length(), raw)
-											 :
-			target.As<Object>().Set(String::New(env, name->GetName()), raw);
-			break;
-		}
-		case ePdfDataType_Unknown: Error::New(env, "Unknown Datatype").ThrowAsJavaScriptException();
-	}
+  switch (item.GetDataType()) {
+    case ePdfDataType_Bool:
+      target.IsArray()
+        ? target.As<Napi::Array>().Set(target.As<Napi::Array>().Length(),
+                                       Boolean::New(env, item.GetBool()))
+        : target.As<Object>().Set(String::New(env, name->GetName()),
+                                  Boolean::New(env, item.GetBool()));
+      break;
+    case ePdfDataType_Number:
+      target.IsArray()
+        ? target.As<Napi::Array>().Set(target.As<Napi::Array>().Length(),
+                                       Number::New(env, item.GetNumber()))
+        : target.As<Object>().Set(String::New(env, name->GetName()),
+                                  Number::New(env, item.GetNumber()));
+      break;
+    case ePdfDataType_Real:
+      target.IsArray()
+        ? target.As<Napi::Array>().Set(target.As<Napi::Array>().Length(),
+                                       Number::New(env, item.GetReal()))
+        : target.As<Object>().Set(String::New(env, name->GetName()),
+                                  Number::New(env, item.GetReal()));
+      break;
+    case ePdfDataType_String:
+      target.IsArray() ? target.As<Napi::Array>().Set(
+                           target.As<Napi::Array>().Length(),
+                           String::New(env, item.GetString().GetStringUtf8()))
+                       : target.As<Object>().Set(
+                           String::New(env, name->GetName()),
+                           String::New(env, item.GetString().GetStringUtf8()));
+      break;
+    case ePdfDataType_HexString:
+      target.IsArray()
+        ? target.As<Napi::Array>().Set(
+            target.As<Napi::Array>().Length(),
+            Buffer<char>::Copy(
+              env, item.GetString().GetString(), item.GetString().GetLength()))
+        : target.As<Object>().Set(
+            String::New(env, name->GetName()),
+            Buffer<char>::Copy(
+              env, item.GetString().GetString(), item.GetString().GetLength()));
+      break;
+    case ePdfDataType_Name:
+      target.IsArray()
+        ? target.As<Napi::Array>().Set(
+            target.As<Napi::Array>().Length(),
+            String::New(env, item.GetName().GetName()))
+        : target.As<Object>().Set(String::New(env, name->GetName()),
+                                  String::New(env, item.GetName().GetName()));
+      break;
+    case ePdfDataType_Array: {
+      Napi::Array nested = Napi::Array::New(env);
+      auto it = item.GetArray().begin();
+      while (it != item.GetArray().end()) {
+        TrickleDown(env, nullptr, (*it), nested);
+        it++;
+      }
+      target.IsArray()
+        ? target.As<Napi::Array>().Set(target.As<Napi::Array>().Length(),
+                                       nested)
+        : target.As<Object>().Set(String::New(env, name->GetName()), nested);
+      break;
+    }
+    case ePdfDataType_Dictionary: {
+      Napi::Object nested = Napi::Object::New(env);
+      auto it = item.GetDictionary().GetKeys().begin();
+      Napi::Object obj = Napi::Object::New(env);
+      while (it != item.GetDictionary().GetKeys().end()) {
+        TrickleDown(env, &(it->first), *it->second, nested);
+        it++;
+      }
+      target.IsArray()
+        ? target.As<Napi::Array>().Set(target.As<Napi::Array>().Length(),
+                                       nested)
+        : target.As<Object>().Set(String::New(env, name->GetName()), nested);
+      break;
+    }
+    case ePdfDataType_Null:
+      target.IsArray()
+        ? target.As<Napi::Array>().Set(target.As<Napi::Array>().Length(),
+                                       env.Null())
+        : target.As<Object>().Set(String::New(env, name->GetName()),
+                                  env.Null());
+      break;
+    case ePdfDataType_Reference: {
+      auto ref = Ref::Constructor.New(
+        { Number::New(env, item.GetReference().ObjectNumber()),
+          Number::New(env, item.GetReference().GenerationNumber()) });
+      target.IsArray()
+        ? target.As<Napi::Array>().Set(target.As<Napi::Array>().Length(), ref)
+        : target.As<Object>().Set(String::New(env, name->GetName()), ref);
+      break;
+    }
+    case ePdfDataType_RawData: {
+      auto raw = Napi::Buffer<char>::Copy(
+        env, item.GetRawData().data().c_str(), item.GetRawData().data().size());
+      target.IsArray()
+        ? target.As<Napi::Array>().Set(target.As<Napi::Array>().Length(), raw)
+        : target.As<Object>().Set(String::New(env, name->GetName()), raw);
+      break;
+    }
+    case ePdfDataType_Unknown:
+      Error::New(env, "Unknown Datatype").ThrowAsJavaScriptException();
+  }
 }
 }

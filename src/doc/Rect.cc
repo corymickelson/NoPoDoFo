@@ -18,6 +18,7 @@
  */
 
 #include "Rect.h"
+#include "../Defines.h"
 #include "../ValidateArguments.h"
 #include <iostream>
 #include <spdlog/spdlog.h>
@@ -66,16 +67,16 @@ Rect::Rect(const CallbackInfo& info)
                          info[3].As<Number>().DoubleValue());
       break;
     default:
-      cout << "WTF error: Rect constructor failed to parse args and find valid "
-              "constructor"
-           << endl;
-      break;
+      Logger(Log,
+             spdlog::level::err,
+             "WTF error: Rect constructor failed to parse args and find valid "
+             "constructor");
   }
 }
 
 Rect::~Rect()
 {
-  if(Log != nullptr) Log->debug("Rect Cleanup");
+  Logger(Log, spdlog::level::trace, "Rect Cleanup");
   HandleScope scope(Env());
   delete Self;
 }
@@ -84,9 +85,10 @@ void
 Rect::Initialize(Napi::Env& env, Napi::Object& target)
 {
   HandleScope scope(env);
+  const char* name = "Rect";
   Function ctor = DefineClass(
     env,
-    "Rect",
+    name,
     { InstanceAccessor("left", &Rect::GetLeft, &Rect::SetLeft),
       InstanceAccessor("bottom", &Rect::GetBottom, &Rect::SetBottom),
       InstanceAccessor("width", &Rect::GetWidth, &Rect::SetWidth),
@@ -95,7 +97,7 @@ Rect::Initialize(Napi::Env& env, Napi::Object& target)
   constructor = Napi::Persistent(ctor);
   constructor.SuppressDestruct();
 
-  target.Set("Rect", ctor);
+  target.Set(name, ctor);
 }
 void
 Rect::Intersect(const CallbackInfo& info)

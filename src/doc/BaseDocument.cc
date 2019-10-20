@@ -38,12 +38,12 @@
 using namespace Napi;
 using namespace PoDoFo;
 
+using spdlog::level::level_enum;
 using std::cout;
 using std::endl;
 using std::string;
 using std::stringstream;
 using tl::nullopt;
-using spdlog::level::level_enum;
 
 namespace NoPoDoFo {
 
@@ -87,23 +87,20 @@ BaseDocument::BaseDocument(const Napi::CallbackInfo& info, const bool inMem)
         new PdfStreamedDocument(Output.c_str(), version, encrypt, writeMode);
       std::stringstream dbgMsg;
       dbgMsg << "New PdfStreamedDocument to " << Output.c_str() << endl;
-      if (Log != nullptr)
-        Log->debug(dbgMsg.str());
+      Logger(Log, dbgMsg.str().c_str());
     } else {
       StreamDocRefCountedBuffer = new PdfRefCountedBuffer(2048);
       StreamDocOutputDevice = new PdfOutputDevice(StreamDocRefCountedBuffer);
       Base = new PdfStreamedDocument(
         StreamDocOutputDevice, version, encrypt, writeMode);
-      if (Log != nullptr)
-        Log->debug("New PdfStreamedDocument to Buffer");
+      Logger(Log, level_enum::trace, "New PdfStreamedDocument to Buffer");
     }
   }
 }
 
 BaseDocument::~BaseDocument()
 {
-  if (Log != nullptr)
-    Log->debug("BaseDocument Cleanup");
+  Logger(Log, level_enum::trace, "BaseDocument Cleanup");
   for (auto c : Copies) {
     delete c;
   }
@@ -338,8 +335,7 @@ BaseDocument::GetObject(const CallbackInfo& info)
     stringstream oss;
     oss << "NoPoDoFo is unable to resolve reference " << ref->ObjectNumber()
         << " : " << ref->GenerationNumber();
-    if (Log != nullptr)
-      Log->debug(oss.str());
+    Logger(Log, level_enum::err, oss.str().c_str());
     Error::New(info.Env(), oss.str()).ThrowAsJavaScriptException();
     return {};
   }
@@ -546,8 +542,9 @@ BaseDocument::GetAttachment(const CallbackInfo& info)
       !Base->GetNamesTree(false)->GetObject()->IsDictionary() ||
       !Base->GetNamesTree(false)->GetObject()->GetDictionary().HasKey(
         Name::EMBEDDED_FILES)) {
-    if (Log != nullptr)
-      Log->debug("GetAttachment: PDF does not have any attachments\n");
+    Logger(Log,
+           level_enum::trace,
+           "GetAttachment: PDF does not have any attachments\n");
     return info.Env().Null();
   }
   auto findAttachment = [&](PdfArray& arr) -> PdfObject* {
@@ -564,9 +561,10 @@ BaseDocument::GetAttachment(const CallbackInfo& info)
 
         if (fileSpec->GetDictionary().HasKey(Name::UF)) {
           PdfObject* uf = fileSpec->MustGetIndirectKey(Name::UF);
-          if (Log != nullptr)
-            Log->debug("GetAttachment: PDF Attachment name:%s\n",
-                       uf->GetString().GetStringUtf8().c_str());
+          Logger(Log,
+                 level_enum::trace,
+                 "GetAttachment: PDF Attachment name:{}",
+                 uf->GetString().GetStringUtf8().c_str());
           if (uf->IsString() && uf->GetString().GetStringUtf8() == name) {
             fileSpec->GetDictionary().RemoveKey(PdfName(Name::TYPE));
             fileSpec->GetDictionary().AddKey(PdfName(Name::TYPE),

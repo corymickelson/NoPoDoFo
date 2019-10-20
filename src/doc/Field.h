@@ -79,7 +79,7 @@ public:
   {
     return Self->GetFieldObject()->GetDictionary();
   }
-  std::map<std::string, PdfObject*> GetFieldRefreshKeys(
+  static std::map<std::string, PdfObject*> GetFieldRefreshKeys(
     PdfField*);
   PdfFont* GetDAFont(string_view);
   string FieldName;

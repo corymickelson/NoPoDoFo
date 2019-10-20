@@ -18,6 +18,7 @@
  */
 
 #include "Stream.h"
+#include "../Defines.h"
 #include "../ErrorHandler.h"
 #include "../ValidateArguments.h"
 #include "Obj.h"
@@ -36,14 +37,14 @@ FunctionReference Stream::constructor; // NOLINT
 Stream::Stream(const CallbackInfo& info)
   : ObjectWrap(info)
   , Self(info.Length() == 1 && info[0].IsExternal()
-             ? *info[0].As<External<PdfStream>>().Data()
-             : *Obj::Unwrap(info[0].As<Object>())->GetObject().GetStream())
+           ? *info[0].As<External<PdfStream>>().Data()
+           : *Obj::Unwrap(info[0].As<Object>())->GetObject().GetStream())
 {
   Log = spdlog::get("Log");
 }
 Stream::~Stream()
 {
-  if(Log != nullptr) Log->debug("Stream Cleanup");
+  Logger(Log, spdlog::level::trace, "Stream Cleanup");
 }
 void
 Stream::Initialize(Napi::Env& env, Napi::Object& target)
@@ -99,9 +100,9 @@ protected:
   void OnOK() override
   {
     if (Arg.empty()) {
-      Callback().Call(
-        { Env().Null(),
-          Buffer<char>::Copy(Env(), RefBuffer.GetBuffer(), RefBuffer.GetSize()) });
+      Callback().Call({ Env().Null(),
+                        Buffer<char>::Copy(
+                          Env(), RefBuffer.GetBuffer(), RefBuffer.GetSize()) });
     }
     Callback().Call({ Env().Null(), String::New(Env(), Arg) });
   }

@@ -16,7 +16,7 @@ export enum NPDFOutlineFormat {
 }
 
 export enum NPDFLogLevel {
-    trace,
+    trace = 0,
     debug,
     info,
     warn,
@@ -449,7 +449,8 @@ export enum NPDFRenderingIntent {
 export namespace nopodofo {
 
     export class Log {
-        enableDebugLogging: boolean
+        logLevel: NPDFLogLevel
+        static logOnInterval(interval: number): void
 
         /**
          * @desc Set the logging file destination, ex: /tmp/foo/bar.txt
@@ -1373,6 +1374,8 @@ export namespace nopodofo {
         contents: Object
         resources: Object
 
+        static createField(type: NPDFFieldType, annot: Annotation, form: Form, opts?: Object): Field
+
         /**
          * Get the field as a field of type T where T is one of: Checkbox, Pushbutton, Textfield, ComboBox, or ListField
          * @param index - field index
@@ -1404,7 +1407,6 @@ export namespace nopodofo {
 
         createAnnotation(type: NPDFAnnotation, rect: Rect): Annotation
 
-        createField(type: NPDFFieldType, annot: Annotation, form: Form, opts?: Object): Field
 
         deleteField(index: number): void
 

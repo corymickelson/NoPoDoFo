@@ -18,6 +18,7 @@
  */
 
 #include "Font.h"
+#include "../Defines.h"
 #include "../ErrorHandler.h"
 #include "../base/Obj.h"
 #include "../base/Stream.h"
@@ -45,16 +46,17 @@ Font::Font(const Napi::CallbackInfo& info)
 
 Font::~Font()
 {
-  if(Log != nullptr) Log->debug("Font Cleanup");
+  Logger(Log, spdlog::level::trace, "Font Cleanup");
 }
 
 void
 Font::Initialize(Napi::Env& env, Napi::Object& target)
 {
   HandleScope scope(env);
+  const char* name = "Font";
   Function ctor = DefineClass(
     env,
-    "Font",
+    name,
     { InstanceAccessor("size", &Font::GetFontSize, &Font::SetFontSize),
       InstanceAccessor("scale", &Font::GetFontScale, &Font::SetFontScale),
       InstanceAccessor("object", &Font::GetObject, nullptr),
@@ -75,7 +77,7 @@ Font::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceMethod("embedSubsetFont", &Font::EmbedSubsetFont) });
   Constructor = Napi::Persistent(ctor);
   Constructor.SuppressDestruct();
-  target.Set("Font", ctor);
+  target.Set(name, ctor);
 }
 Napi::Value
 Font::GetFontSize(const Napi::CallbackInfo& info)

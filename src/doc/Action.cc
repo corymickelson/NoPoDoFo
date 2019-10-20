@@ -56,7 +56,7 @@ Action::Action(const Napi::CallbackInfo& info)
                  StreamDocument::Constructor.Value())) {
       doc = StreamDocument::Unwrap(info[0].As<Object>())->Base;
     } else {
-      Error::New(info.Env(), "Instance of Base is required")
+      Error::New(info.Env(), "Self of Base is required")
         .ThrowAsJavaScriptException();
       return;
     }
@@ -79,9 +79,10 @@ void
 Action::Initialize(Napi::Env& env, Napi::Object& target)
 {
   HandleScope scope(env);
+  const char* name = "Action";
   const auto ctor = DefineClass(
     env,
-    "Action",
+    name,
     { InstanceAccessor("type", &Action::GetType, nullptr),
       InstanceAccessor("uri", &Action::GetUri, &Action::SetUri),
       InstanceAccessor("script", &Action::GetScript, &Action::SetScript),
@@ -89,7 +90,7 @@ Action::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceMethod("addToDictionary", &Action::AddToDictionary) });
   Constructor = Persistent(ctor);
   Constructor.SuppressDestruct();
-  target.Set("Action", ctor);
+  target.Set(name, ctor);
 }
 JsValue
 Action::GetUri(const Napi::CallbackInfo& info)

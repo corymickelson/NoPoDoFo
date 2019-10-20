@@ -49,7 +49,7 @@ ContentsTokenizer::ContentsTokenizer(const Napi::CallbackInfo& info)
 
 ContentsTokenizer::~ContentsTokenizer()
 {
-  if(Log != nullptr) Log->debug("ContentsTokenizer Cleanup");
+  Logger(Log, spdlog::level::trace, "ContentsTokenizer Cleanup");
 }
 void
 ContentsTokenizer::Initialize(Napi::Env& env, Napi::Object& target)

@@ -26,6 +26,7 @@
 #include "Page.h"
 #include "Painter.h"
 #include "StreamDocument.h"
+#include <gsl/gsl_util>
 #include <optional/optional.hpp>
 #include <spdlog/spdlog.h>
 
@@ -55,7 +56,7 @@ SimpleTable::SimpleTable(const CallbackInfo& info)
 
 SimpleTable::~SimpleTable()
 {
-  if(Log != nullptr) Log->debug("SimpleTable Cleanup");
+  Logger(Log, spdlog::level::trace, "SimpleTable Cleanup");
   HandleScope scope(Env());
   delete Model;
   delete Table;
@@ -66,9 +67,10 @@ void
 SimpleTable::Initialize(Napi::Env& env, Napi::Object& target)
 {
   HandleScope scope(env);
+  const char* name = "SimpleTable";
   const auto ctor = DefineClass(
     env,
-    "SimpleTable",
+    name,
     { InstanceAccessor("borderWidth",
                        &SimpleTable::GetBorderWidth,
                        &SimpleTable::SetBorderWidth),
@@ -112,7 +114,7 @@ SimpleTable::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceMethod("setRowHeights", &SimpleTable::SetRowHeights) });
   Constructor = Napi::Persistent(ctor);
   Constructor.SuppressDestruct();
-  target.Set("SimpleTable", ctor);
+  target.Set(name, ctor);
 }
 
 Value
@@ -197,7 +199,7 @@ SimpleTable::GetImage(const CallbackInfo& info)
   const auto length = pStream->GetLength();
   const auto value =
     Buffer<char>::Copy(info.Env(), stream, static_cast<size_t>(length));
-  return static_cast<Napi::Value>(value);
+  return gsl::narrow_cast<Napi::Value>(value);
 }
 Value
 SimpleTable::HasImage(const CallbackInfo& info)

@@ -22,7 +22,6 @@
 #include <iostream>
 #include <spdlog/spdlog.h>
 
-
 namespace NoPoDoFo {
 
 FunctionReference CheckBox::Constructor; // NOLINT
@@ -33,15 +32,17 @@ CheckBox::CheckBox(const CallbackInfo& info)
   , Button(GetField())
   , Self(GetField())
 {
+  Logger("Log", spdlog::level::trace, "New Checkbox");
 }
 
 void
 CheckBox::Initialize(Napi::Env& env, Napi::Object& target)
 {
   HandleScope scope(env);
+  const char* name = "Checkbox";
   Function ctor = DefineClass(
     env,
-    "Checkbox",
+    name,
     { InstanceAccessor("checked", &CheckBox::IsChecked, &CheckBox::SetChecked),
       InstanceAccessor(
         "AP", &CheckBox::GetAppearanceStream, &CheckBox::SetAppearanceStream),
@@ -72,7 +73,7 @@ CheckBox::Initialize(Napi::Env& env, Napi::Object& target)
   Constructor = Napi::Persistent(ctor);
   Constructor.SuppressDestruct();
 
-  target.Set("Checkbox", ctor);
+  target.Set(name, ctor);
 }
 JsValue
 CheckBox::IsChecked(const CallbackInfo& info)

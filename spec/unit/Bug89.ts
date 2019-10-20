@@ -1,6 +1,6 @@
 import {AsyncTest, Expect, Setup, TestFixture, Timeout} from 'alsatian';
 import {NDocument} from '../../lib/NDocument';
-import {nopodofo} from '../../'
+import {nopodofo, NPDFLogLevel} from '../../'
 import {join} from 'path'
 
 @TestFixture('Bug89-RSS')
@@ -27,9 +27,9 @@ export class Bug89 {
 
     @Setup
     public setup() {
-        const config = new nopodofo.Log()
-        config.logFile('debug.txt')
-        config.enableDebugLogging = true
+        const logger = new nopodofo.Log()
+        logger.logFile('debug.txt')
+        logger.logLevel= NPDFLogLevel.info
         global.gc()
     }
 
