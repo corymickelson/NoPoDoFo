@@ -18,13 +18,10 @@
  */
 
 #include "Page.h"
-#include <spdlog/spdlog.h>
-#if NOPODOFO_SDK
-#include "../../sdk/FlattenFields.h"
-#endif // NOPODOFO_SDK
 #include "../ErrorHandler.h"
 #include "../base/Names.h"
 #include "../base/Obj.h"
+#include "../nlib/FlattenFields.h"
 #include "Annotation.h"
 #include "CheckBox.h"
 #include "ComboBox.h"
@@ -34,6 +31,7 @@
 #include "Rect.h"
 #include "SignatureField.h"
 #include "TextField.h"
+#include <spdlog/spdlog.h>
 
 using namespace Napi;
 using namespace PoDoFo;
@@ -57,15 +55,19 @@ Page::Page(const CallbackInfo& info)
 
 Page::~Page()
 {
-  if(DbgLog != nullptr) DbgLog->debug("Page Cleanup");
+  if (DbgLog != nullptr)
+    DbgLog->debug("Page Cleanup");
 }
 
 void
 Page::Initialize(Napi::Env& env, Napi::Object& target)
 {
   HandleScope scope(env);
-  Function ctor = DefineClass(env, "Page", {
-    InstanceAccessor("rotation", &Page::GetRotation, &Page::SetRotation),
+  Function ctor = DefineClass(
+    env,
+    "Page",
+    { StaticMethod("createField", &Page::CreateField),
+      InstanceAccessor("rotation", &Page::GetRotation, &Page::SetRotation),
       InstanceAccessor("trimBox", &Page::GetTrimBox, &Page::SetTrimBox),
       InstanceAccessor("number", &Page::GetPageNumber, nullptr),
       InstanceAccessor("width", &Page::GetPageWidth, &Page::SetPageWidth),
@@ -74,12 +76,9 @@ Page::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceAccessor("resources", &Page::GetResources, nullptr),
 
       InstanceMethod("getField", &Page::GetField),
-      InstanceMethod("createField", &Page::CreateField),
       InstanceMethod("deleteField", &Page::DeleteField),
       InstanceMethod("getFields", &Page::GetFields),
-#if NOPODOFO_SDK
       InstanceMethod("flattenFields", &Page::FlattenFields),
-#endif
       InstanceMethod("fieldCount", &Page::GetNumFields),
       InstanceMethod("getFieldIndex", &Page::GetFieldIndex),
       InstanceMethod("getMediaBox", &Page::GetMediaBox),
@@ -88,8 +87,7 @@ Page::Initialize(Napi::Env& env, Napi::Object& target)
       InstanceMethod("createAnnotation", &Page::CreateAnnotation),
       InstanceMethod("getAnnotation", &Page::GetAnnotation),
       InstanceMethod("annotationCount", &Page::GetNumAnnots),
-      InstanceMethod("deleteAnnotation", &Page::DeleteAnnotation)
-  });
+      InstanceMethod("deleteAnnotation", &Page::DeleteAnnotation) });
   Constructor = Napi::Persistent(ctor);
   Constructor.SuppressDestruct();
   target.Set("Page", ctor);
@@ -452,11 +450,10 @@ Page::DeleteFormField(PdfPage& page, PdfObject& item, PdfObject& coll)
   }
   return false;
 }
-#if NOPODOFO_SDK
 void
 Page::FlattenFields(const Napi::CallbackInfo& info)
 {
-  class FlattenFields ff(page);
+  class FlattenFields ff(Self);
   FlattenFieldsResponse resp = ff.Flatten();
   if (!resp.err.empty()) {
     Error::New(info.Env(), resp.err).ThrowAsJavaScriptException();
@@ -465,5 +462,4 @@ Page::FlattenFields(const Napi::CallbackInfo& info)
     log << "Fields affected= " << resp.fieldsAffected << endl;
   }
 }
-#endif
 }

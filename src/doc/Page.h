@@ -63,18 +63,16 @@ public:
   JsValue GetArtBox(const Napi::CallbackInfo&);
   JsValue CreateAnnotation(const Napi::CallbackInfo&);
   JsValue GetAnnotation(const Napi::CallbackInfo&);
-  JsValue CreateField(const Napi::CallbackInfo&);
+  static JsValue CreateField(const Napi::CallbackInfo&);
   JsValue GetNumAnnots(const Napi::CallbackInfo&);
   void DeleteAnnotation(const Napi::CallbackInfo&);
   void DeleteField(const Napi::CallbackInfo&);
   static bool DeleteFormField(PoDoFo::PdfPage&,
                               PoDoFo::PdfObject&,
                               PoDoFo::PdfObject&);
-#if NOPODOFO_SDK
   void FlattenFields(const Napi::CallbackInfo&);
-#endif
   PoDoFo::PdfPage& Self;
-  Napi::Object ExtractAndApplyRectValues(const Napi::CallbackInfo&,
+  static Napi::Object ExtractAndApplyRectValues(const Napi::CallbackInfo&,
                                          PoDoFo::PdfRect&);
 
 private:

@@ -3,8 +3,8 @@
 //
 
 #include "FlattenFields.h"
-#include "../src/base/Names.h"
-#include "../src/doc/Page.h"
+#include "../base/Names.h"
+#include "../doc/Page.h"
 
 using namespace PoDoFo;
 using std::get;

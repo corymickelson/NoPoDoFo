@@ -26,8 +26,6 @@ if ("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_CURRENT_SOURCE_DIR}")
 
     option(NOPODOFO_BUILD_TESTS "Build native bindings tests" OFF)
 
-    option(NOPODOFO_BUILD_SDK "Build the NoPoDoFo SDK" OFF)
-
     option(NOPODOFO_BUILD_AWS_LAMBDA "Build NoPoDoFo for use in AWS Lambda" OFF)
 endif ()
 
@@ -39,13 +37,6 @@ if (NOPODOFO_BUILD_AWS_LAMBDA)
     set(CMAKE_SHARED_LINKER_FLAGS
             "-Wl,-rpath=/var/task/node_modules/nopodofolambda/lib")
 endif (NOPODOFO_BUILD_AWS_LAMBDA)
-
-if (NOPODOFO_BUILD_SDK)
-    set(NOPODOFO_SDK 1)
-    add_subdirectory(sdk)
-else ()
-    set(NOPODOFO_SDK 0)
-endif (NOPODOFO_BUILD_SDK)
 
 add_subdirectory(src)
 
